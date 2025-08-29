@@ -765,7 +765,7 @@
             container.querySelectorAll('.btn-danger[data-player-index]').forEach(btn => 
                 btn.addEventListener('click', e => deletePlayer(parseInt(e.currentTarget.dataset.playerIndex)))
             );
-            container.querySelectorAll('.btn-secondary[data-reset-player-index]').forEach(btn => 
+            container.querySelectorAll('.btn-warning[data-reset-player-index]').forEach(btn => 
                 btn.addEventListener('click', e => resetSinglePlayer(parseInt(e.currentTarget.dataset.resetPlayerIndex)))
             );
         }
