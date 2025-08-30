@@ -1,44 +1,47 @@
-# VolleyRank
+# 🏐 VolleyRank
+
+An ELO rating system for your volleyball team that helps track player skill levels and create balanced teams.
 
 Try the application: [https://avpv.github.io/volleyrank/](https://avpv.github.io/volleyrank/)
 
-An ELO rating system for volleyball teams. This application helps objectively evaluate player skills and create balanced teams.
-
 ## Features
 
-- **Player Comparison**: Pairwise comparisons with automatic ELO rating calculation
-- **Position Rankings**: Player rankings within each position
-- **Automatic Team Formation**: Create balanced teams based on ratings
-- **Player Management**: Add, remove, and reset player statistics
+- **Player Management**: Add, remove, and reset players with position tracking
+- **ELO Rating System**: Compare players head-to-head to build accurate skill ratings
+- **Smart Comparisons**: Prioritizes comparing players with fewer previous comparisons
+- **Position-Based Rankings**: View rankings for each volleyball position
+- **Team Builder**: Automatically create balanced teams based on ELO ratings and position requirements
+- **Data Persistence**: All data is saved locally in your browser
+
+## Volleyball Positions
+
+- **S** - Setter
+- **OPP** - Opposite
+- **OH** - Outside Hitter
+- **MB** - Middle Blocker
+- **L** - Libero
 
 ## How to Use
 
-### 1. Adding Players
+### 1. Add Players
+- Go to the **Settings** tab
+- Enter player name and select their position
+- Click "Add Player"
 
-1. Go to the "Settings" tab
-2. Enter player name and select position:
-   - **S** - Setter
-   - **OPP** - Opposite
-   - **OH** - Outside Hitter
-   - **MB** - Middle Blocker
-   - **L** - Libero
-3. Click "Add Player"
+### 2. Compare Players
+- Go to the **Compare** tab
+- Select a position from the dropdown
+- Click on the better player in each matchup
+- The ELO ratings will automatically adjust
 
-### 2. Comparing Players
+### 3. View Rankings
+- Go to the **Rankings** tab to see players ranked by position
+- Rankings are based on ELO ratings from comparisons
 
-1. On the "Compare" tab, select a position from the dropdown
-2. The system will automatically select a pair of players for comparison
-3. Click on the card of the stronger player
-4. Ratings will update automatically using the ELO system
-
-### 3. Team Formation
-
-1. Go to the "Teams" tab
-2. Configure parameters:
-   - **Number of teams**: from 1 to 6
-   - **Team composition**: specify the number of players for each position
-3. Click "Create Teams"
-4. The system will create maximally balanced teams
+### 4. Create Teams
+- Go to the **Teams** tab
+- Set the number of teams and composition (players per position)
+- Click "Create Teams" for balanced team suggestions
 
 ## How It Works
 
@@ -58,13 +61,32 @@ An ELO rating system for volleyball teams. This application helps objectively ev
 - Excludes repeat comparisons between same players
 - Random selection from suitable pairs for fairness
 
+## File Structure
 
+```
+volleyrank/
+├── index.html          # Main HTML file
+├── styles/
+│   └── main.css       # CSS styles
+├── scripts/
+│   └── app.js         # JavaScript application logic
+└── README.md          # This file
+```
 
+## Getting Started
 
+1. Download or clone this repository
+2. Open `index.html` in your web browser
+3. Start adding players and making comparisons!
 
+## Browser Compatibility
 
+This application uses modern web technologies and requires a recent browser version. It stores data locally using localStorage, so your data persists between sessions.
 
+## Contributing
 
-## Feedback
+Feel free to fork this project and submit pull requests for improvements or bug fixes.
 
-If you have suggestions for improvements or found bugs, please create an Issue in this repository.
+## License
+
+Open source - feel free to use and modify for your volleyball team!
