@@ -2,7 +2,7 @@
 
 An ELO rating system for your volleyball team that helps track player skill levels and create balanced teams.
 
-Try the application: [https://avpv.github.io/volleyrank/](https://avpv.github.io/volleyrank/)
+Try the application: [VolleyRank](https://avpv.github.io/volleyrank/)
 
 ## Features
 
@@ -51,10 +51,28 @@ Try the application: [https://avpv.github.io/volleyrank/](https://avpv.github.io
 - Rating changes based on expected match outcome
 
 ### Team Formation Algorithm
-1. **Position Distribution**: players are distributed according to specified composition
-2. **Snake Draft**: strongest players are distributed in snake pattern between teams
-3. **Optimization**: 20,000 iterations of random swaps to improve balance
-4. **Result**: teams with minimal difference in total rating
+
+The team formation system uses a sophisticated multi-algorithm approach to create optimally balanced teams:
+
+#### 1. Initial Solution Generation
+- **Snake Draft**: Players are distributed in a snake pattern (1-2-3-3-2-1) to ensure fair distribution of top talent
+- **Balanced Rating**: Players are assigned to teams with the lowest current total rating to balance overall team strength
+- **Random Distribution**: Random solutions are created to provide diversity for the optimization algorithms
+
+#### 2. Advanced Optimization Techniques
+- **Simulated Annealing**: 50,000 iterations of intelligent player swaps with a cooling schedule to escape local optima
+- **Genetic Algorithm**: Population-based optimization with crossover and mutation operations
+- **Smart Swaps**: Prioritizes swaps between the strongest and weakest teams to rapidly improve balance
+
+#### 3. Evaluation Metrics
+- **Team Balance**: Minimizes the difference between the strongest and weakest teams
+- **Rating Variance**: Penalizes uneven distribution of talent across all teams
+- **Position Compliance**: Ensures teams meet the specified position composition requirements
+
+#### 4. Validation & Analysis
+- **Requirement Validation**: Checks if enough players are available for the requested composition
+- **Composition Analysis**: Provides feedback on team balance and suggests alternative formations
+- **Unused Players**: Identifies players not assigned to teams and provides reasoning
 
 ### Comparison System
 - Priority given to players with fewest comparisons
