@@ -304,9 +304,187 @@ body {
         font-size: 1rem !important;
     }
     
-    #compositionControls .form-group input {
-        flex: 0 0 80px !important;
-        min-height: 48px !important;
+/* Modal Styles */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: var(--surface-1);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.modal-header h3 {
+    margin: 0;
+    color: var(--text-primary);
+}
+
+.modal-close {
+    background: none !important;
+    border: none !important;
+    font-size: 1.5rem !important;
+    cursor: pointer;
+    padding: 0.25rem 0.5rem !important;
+    color: var(--text-secondary);
+    min-height: auto !important;
+}
+
+.modal-close:hover {
+    color: var(--text-primary);
+    transform: none !important;
+    filter: none !important;
+}
+
+.modal-body {
+    padding: 2rem;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    padding: 1.5rem 2rem;
+    border-top: 1px solid var(--border-color);
+}
+
+/* Import Specific Styles */
+.import-options {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.import-section {
+    transition: opacity 0.3s ease;
+}
+
+.file-info {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-top: 0.5rem;
+    line-height: 1.4;
+}
+
+#importDataTextarea {
+    width: 100%;
+    background: var(--bg-dark);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1rem;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    resize: vertical;
+    min-height: 120px;
+}
+
+#importDataTextarea:focus {
+    outline: none;
+    border-color: var(--accent-blue);
+}
+
+#importFileInput {
+    width: 100%;
+    padding: 0.8rem;
+    background: var(--bg-dark);
+    color: var(--text-primary);
+    border: 2px dashed var(--border-color);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+}
+
+#importFileInput:hover {
+    border-color: var(--accent-blue);
+}
+
+/* Import Result Styles */
+.import-result {
+    margin-top: 1rem;
+    padding: 1rem;
+    border-radius: 8px;
+    background: var(--surface-2);
+}
+
+.import-result.success {
+    border-left: 4px solid #10b981;
+    background: rgba(16, 185, 129, 0.1);
+}
+
+.import-result.error {
+    border-left: 4px solid var(--accent-red);
+    background: rgba(239, 68, 68, 0.1);
+}
+
+.import-result.warning {
+    border-left: 4px solid var(--accent-orange);
+    background: rgba(249, 115, 22, 0.1);
+}
+
+.import-summary {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.import-details {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.import-errors, .import-skipped {
+    margin-top: 1rem;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.import-error-item, .import-skipped-item {
+    padding: 0.5rem;
+    margin: 0.25rem 0;
+    background: var(--bg-dark);
+    border-radius: 4px;
+    font-size: 0.85rem;
+}
+
+/* Mobile Modal Adjustments */
+@media (max-width: 768px) {
+    .modal-content {
+        width: 95%;
+        margin: 1rem;
+    }
+    
+    .modal-header, .modal-body, .modal-footer {
+        padding: 1rem;
+    }
+    
+    .modal-footer {
+        flex-direction: column;
+    }
+    
+    .modal-footer .btn {
+        width: 100%;
     }
 }
 
