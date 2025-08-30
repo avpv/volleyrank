@@ -568,15 +568,13 @@ class StateManager {
      * @returns {string} CSV string
      */
     exportPlayersAsCSV() {
-        const headers = ['name', 'position', 'rating', 'comparisons'];
+        const headers = ['name', 'position'];
         const csvLines = [headers.join(',')];
         
         this.state.players.forEach(player => {
             const row = [
                 `"${player.name}"`,
-                player.position,
-                Math.round(player.rating),
-                player.comparisons
+                player.position
             ];
             csvLines.push(row.join(','));
         });
@@ -590,11 +588,12 @@ class StateManager {
      */
     generateSampleCSV() {
         const sampleData = [
-            ['name', 'position', 'rating', 'comparisons'],
-            ['John Smith', 'OH', '1600', '5'],
-            ['Maria Garcia', 'S', '1550', '3'],
-            ['Alex Johnson', 'MB', '1480', '8'],
-            ['Sarah Wilson', 'L', '1520', '2']
+            ['name', 'position'],
+            ['John Smith', 'OH'],
+            ['Maria Garcia', 'S'],
+            ['Alex Johnson', 'MB'],
+            ['Sarah Wilson', 'L'],
+            ['Mike Brown', 'OPP']
         ];
         
         return sampleData.map(row => 
