@@ -1,3 +1,4 @@
+
 /**
  * Centralized application state management
  */
@@ -106,7 +107,7 @@ class StateManager {
         }
 
         const newPlayer = {
-            id: Date.now() + Math.random(), // simple ID for uniqueness
+            id: Date.now() + Math.random(),
             name: name.trim(),
             position,
             rating: 1500,
@@ -182,7 +183,7 @@ class StateManager {
     updateRatingsAfterComparison(winnerId, loserId) {
         const updatedPlayers = this.state.players.map(player => {
             if (player.id === winnerId || player.id === loserId) {
-                return { ...player }; // clone for modification
+                return { ...player };
             }
             return player;
         });
@@ -259,11 +260,9 @@ class StateManager {
             if (saved) {
                 const data = JSON.parse(saved);
                 
-                // Validate loaded data
                 const players = Array.isArray(data.players) ? data.players : [];
                 const comparisons = typeof data.comparisons === 'number' ? data.comparisons : 0;
 
-                // Ensure backward compatibility - add ID if missing
                 const playersWithIds = players.map(player => ({
                     ...player,
                     id: player.id || Date.now() + Math.random(),
@@ -280,7 +279,6 @@ class StateManager {
 
                 this.notify('dataLoaded', { playersCount: playersWithIds.length, comparisons });
             } else {
-                // Demo data for first run
                 this.initializeDemoData();
             }
         } catch (error) {
@@ -348,7 +346,7 @@ class StateManager {
     }
 
     /**
-     * Import full application data (backup/restore)
+     * Import full application data
      * @param {string} jsonData - JSON string with complete app data
      */
     importData(jsonData) {
@@ -359,7 +357,6 @@ class StateManager {
                 throw new Error('Invalid data format: players must be an array');
             }
 
-            // Validate and normalize imported data
             const validatedPlayers = data.players.map((player, index) => ({
                 id: player.id || Date.now() + index,
                 name: player.name || `Player ${index + 1}`,
@@ -387,8 +384,8 @@ class StateManager {
     }
 
     /**
-     * Import players from CSV or JSON data
-     * @param {string} data - CSV or JSON string with player data
+     * Import players from CSV or JSON
+     * @param {string} data - CSV or JSON string
      * @param {string} format - 'csv' or 'json'
      * @returns {object} import result
      */
@@ -396,7 +393,6 @@ class StateManager {
         try {
             let playersData = [];
             
-            // Auto-detect format if not specified
             if (format === 'auto') {
                 format = data.trim().startsWith('[') || data.trim().startsWith('{') ? 'json' : 'csv';
             }
@@ -407,10 +403,9 @@ class StateManager {
             } else if (format === 'csv') {
                 playersData = this.parseCSV(data);
             } else {
-                throw new Error('Unsupported format. Use "csv" or "json".');
+                throw new Error('Unsupported format');
             }
 
-            // Validate and normalize player data
             const validatedPlayers = [];
             const errors = [];
             const skipped = [];
@@ -419,7 +414,6 @@ class StateManager {
                 try {
                     const normalized = this.normalizePlayerData(playerData, index + 1);
                     
-                    // Check for duplicates
                     const existingPlayer = this.state.players.find(p => p.name === normalized.name);
                     if (existingPlayer) {
                         skipped.push({
@@ -440,7 +434,6 @@ class StateManager {
                 }
             });
 
-            // Add validated players to state
             const updatedPlayers = [...this.state.players, ...validatedPlayers];
             this.updateState({ players: updatedPlayers });
 
@@ -471,23 +464,19 @@ class StateManager {
 
     /**
      * Parse CSV data
-     * @param {string} csvData - CSV string
-     * @returns {array} parsed data
      */
     parseCSV(csvData) {
         const lines = csvData.trim().split('\n');
         if (lines.length < 2) {
-            throw new Error('CSV must contain at least a header and one data row');
+            throw new Error('CSV must contain header and data');
         }
 
-        // Parse header
         const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
         const data = [];
 
-        // Parse data rows
         for (let i = 1; i < lines.length; i++) {
             const line = lines[i].trim();
-            if (!line) continue; // Skip empty lines
+            if (!line) continue;
             
             const values = this.parseCSVLine(line);
             const rowData = {};
@@ -503,9 +492,7 @@ class StateManager {
     }
 
     /**
-     * Parse single CSV line handling quoted values
-     * @param {string} line - CSV line
-     * @returns {array} parsed values
+     * Parse CSV line with quotes
      */
     parseCSVLine(line) {
         const values = [];
@@ -519,7 +506,7 @@ class StateManager {
             if (char === '"') {
                 if (inQuotes && nextChar === '"') {
                     current += '"';
-                    i++; // Skip next quote
+                    i++;
                 } else {
                     inQuotes = !inQuotes;
                 }
@@ -536,15 +523,11 @@ class StateManager {
     }
 
     /**
-     * Normalize player data from import
-     * @param {object} playerData - raw player data
-     * @param {number} rowNumber - row number for error reporting
-     * @returns {object} normalized player object
+     * Normalize player data
      */
     normalizePlayerData(playerData, rowNumber) {
-        // Map common field names
         const fieldMapping = {
-            'name': ['name', 'player_name', 'playername', 'player', 'Name', 'Player Name'],
+            'name': ['name', 'player_name', 'playername', 'player', 'Name'],
             'position': ['position', 'pos', 'Position', 'Pos']
         };
 
@@ -552,35 +535,32 @@ class StateManager {
             id: Date.now() + Math.random(),
             name: '',
             position: 'OH',
-            rating: 1500, // Always start with default rating
-            comparisons: 0, // Always start with zero comparisons
-            comparedWith: [], // Always start with empty comparison history
+            rating: 1500,
+            comparisons: 0,
+            comparedWith: [],
             createdAt: new Date().toISOString()
         };
 
-        // Extract and validate name
         const nameField = this.findField(playerData, fieldMapping.name);
         if (!nameField || !nameField.trim()) {
-            throw new Error(`Row ${rowNumber}: Player name is required`);
+            throw new Error(`Row ${rowNumber}: Player name required`);
         }
         
         normalized.name = nameField.trim();
         if (normalized.name.length > 50) {
-            throw new Error(`Row ${rowNumber}: Player name too long (max 50 characters)`);
+            throw new Error(`Row ${rowNumber}: Name too long`);
         }
 
-        // Extract position
         const positionField = this.findField(playerData, fieldMapping.position);
         if (positionField) {
             const pos = positionField.toString().toUpperCase().trim();
             const validPositions = {
                 'S': 'S', 'SETTER': 'S', 'SET': 'S',
                 'OPP': 'OPP', 'OPPOSITE': 'OPP', 'OP': 'OPP',
-                'OH': 'OH', 'OUTSIDE': 'OH', 'OUTSIDE HITTER': 'OH', 'WING': 'OH',
-                'MB': 'MB', 'MIDDLE': 'MB', 'MIDDLE BLOCKER': 'MB', 'MID': 'MB',
+                'OH': 'OH', 'OUTSIDE': 'OH', 'OUTSIDE HITTER': 'OH',
+                'MB': 'MB', 'MIDDLE': 'MB', 'MIDDLE BLOCKER': 'MB',
                 'L': 'L', 'LIBERO': 'L', 'LIB': 'L'
             };
-            
             normalized.position = validPositions[pos] || 'OH';
         }
 
@@ -588,14 +568,11 @@ class StateManager {
     }
 
     /**
-     * Find field value using multiple possible field names
-     * @param {object} data - data object
-     * @param {array} fieldNames - possible field names
-     * @returns {*} field value
+     * Find field by multiple names
      */
     findField(data, fieldNames) {
         for (const fieldName of fieldNames) {
-            if (data.hasOwnProperty(fieldName) && data[fieldName] !== undefined && data[fieldName] !== null) {
+            if (data.hasOwnProperty(fieldName) && data[fieldName] != null) {
                 return data[fieldName];
             }
         }
@@ -603,18 +580,14 @@ class StateManager {
     }
 
     /**
-     * Export players to CSV format
-     * @returns {string} CSV string
+     * Export players as CSV
      */
     exportPlayersAsCSV() {
         const headers = ['name', 'position'];
         const csvLines = [headers.join(',')];
         
         this.state.players.forEach(player => {
-            const row = [
-                `"${player.name}"`,
-                player.position
-            ];
+            const row = [`"${player.name}"`, player.position];
             csvLines.push(row.join(','));
         });
         
@@ -622,8 +595,7 @@ class StateManager {
     }
 
     /**
-     * Generate sample CSV template
-     * @returns {string} sample CSV
+     * Generate sample CSV
      */
     generateSampleCSV() {
         const sampleData = [
@@ -641,5 +613,4 @@ class StateManager {
     }
 }
 
-// Export single instance (Singleton)
 window.stateManager = new StateManager();
