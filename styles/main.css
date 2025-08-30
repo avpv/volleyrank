@@ -303,6 +303,12 @@ body {
         margin-bottom: 0 !important;
         font-size: 1rem !important;
     }
+
+    #compositionControls .form-group input {
+        flex: 0 0 80px !important;
+        min-height: 48px !important;
+    }
+}
     
 /* Modal Styles */
 .modal {
