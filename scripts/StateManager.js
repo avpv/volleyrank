@@ -106,7 +106,7 @@ class StateManager {
         }
 
         const newPlayer = {
-            id: Date.now(), // simple ID for uniqueness
+            id: Date.now() + Math.random(), // simple ID for uniqueness
             name: name.trim(),
             position,
             rating: 1500,
@@ -345,6 +345,45 @@ class StateManager {
             exportedAt: new Date().toISOString(),
             version: '2.0'
         }, null, 2);
+    }
+
+    /**
+     * Import full application data (backup/restore)
+     * @param {string} jsonData - JSON string with complete app data
+     */
+    importData(jsonData) {
+        try {
+            const data = JSON.parse(jsonData);
+            
+            if (!Array.isArray(data.players)) {
+                throw new Error('Invalid data format: players must be an array');
+            }
+
+            // Validate and normalize imported data
+            const validatedPlayers = data.players.map((player, index) => ({
+                id: player.id || Date.now() + index,
+                name: player.name || `Player ${index + 1}`,
+                position: player.position || 'OH',
+                rating: typeof player.rating === 'number' ? player.rating : 1500,
+                comparisons: typeof player.comparisons === 'number' ? player.comparisons : 0,
+                comparedWith: Array.isArray(player.comparedWith) ? player.comparedWith : [],
+                createdAt: player.createdAt || new Date().toISOString()
+            }));
+
+            this.updateState({
+                players: validatedPlayers,
+                comparisons: typeof data.comparisons === 'number' ? data.comparisons : 0,
+                currentPair: null,
+                selectedPosition: ''
+            });
+
+            this.notify('dataImported', { playersCount: validatedPlayers.length });
+            
+        } catch (error) {
+            console.error('Failed to import data:', error);
+            this.notify('importError', error);
+            throw error;
+        }
     }
 
     /**
@@ -599,45 +638,6 @@ class StateManager {
         return sampleData.map(row => 
             row.map(cell => `"${cell}"`).join(',')
         ).join('\n');
-    }
-
-    /**
-     * Import full application data (backup/restore)
-     * @param {string} jsonData - JSON string with complete app data
-     */
-    importData(jsonData) {
-        try {
-            const data = JSON.parse(jsonData);
-            
-            if (!Array.isArray(data.players)) {
-                throw new Error('Invalid data format: players must be an array');
-            }
-
-            // Validate and normalize imported data
-            const validatedPlayers = data.players.map((player, index) => ({
-                id: player.id || Date.now() + index,
-                name: player.name || `Player ${index + 1}`,
-                position: player.position || 'OH',
-                rating: typeof player.rating === 'number' ? player.rating : 1500,
-                comparisons: typeof player.comparisons === 'number' ? player.comparisons : 0,
-                comparedWith: Array.isArray(player.comparedWith) ? player.comparedWith : [],
-                createdAt: player.createdAt || new Date().toISOString()
-            }));
-
-            this.updateState({
-                players: validatedPlayers,
-                comparisons: typeof data.comparisons === 'number' ? data.comparisons : 0,
-                currentPair: null,
-                selectedPosition: ''
-            });
-
-            this.notify('dataImported', { playersCount: validatedPlayers.length });
-            
-        } catch (error) {
-            console.error('Failed to import data:', error);
-            this.notify('importError', error);
-            throw error;
-        }
     }
 }
 
