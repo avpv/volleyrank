@@ -594,5 +594,5 @@ player-content-wrapper {
 }
 
 #importModal #downloadTemplateBtn {
-    margin-top: 1rem;
+    margin-top: 1rem !important;
 }
