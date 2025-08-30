@@ -115,8 +115,64 @@
                 </div>
                 <div style="display: flex; gap: 1rem; margin-top: 1rem; flex-wrap: wrap;">
                     <button class="btn btn-primary" id="addPlayerBtn">Add Player</button>
+                    <button class="btn btn-secondary" id="importPlayersBtn">Import Players</button>
+                    <button class="btn btn-secondary" id="exportPlayersBtn">Export Players</button>
+                </div>
+                
+                <div style="display: flex; gap: 1rem; margin-top: 0.5rem; flex-wrap: wrap;">
                     <button class="btn btn-warning" id="resetAllRatingsBtn">Reset All Ratings</button>
                     <button class="btn btn-danger" id="clearAllBtn">Remove All Players</button>
+                </div>
+            </div>
+
+            <!-- Import Modal -->
+            <div id="importModal" class="modal" style="display: none;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>Import Players</h3>
+                        <button class="btn btn-secondary modal-close">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="import-options">
+                            <div class="form-group">
+                                <label>Import Method</label>
+                                <select id="importMethod">
+                                    <option value="file">Upload File (CSV/JSON)</option>
+                                    <option value="paste">Paste Data</option>
+                                    <option value="template">Download Template</option>
+                                </select>
+                            </div>
+
+                            <div id="fileUploadSection" class="import-section">
+                                <div class="form-group">
+                                    <label>Select File</label>
+                                    <input type="file" id="importFileInput" accept=".csv,.json,.txt">
+                                    <div class="file-info">Supported formats: CSV, JSON</div>
+                                </div>
+                            </div>
+
+                            <div id="pasteDataSection" class="import-section" style="display: none;">
+                                <div class="form-group">
+                                    <label>Paste CSV or JSON Data</label>
+                                    <textarea id="importDataTextarea" rows="8" placeholder="Paste your data here..."></textarea>
+                                    <div class="file-info">
+                                        CSV format: name,position<br>
+                                        JSON format: [{"name":"Player Name","position":"OH"}]<br>
+                                        Note: All players start with 1500 ELO rating
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="templateSection" class="import-section" style="display: none;">
+                                <p>Download a sample CSV template to see the expected format:</p>
+                                <button class="btn btn-secondary" id="downloadTemplateBtn">Download CSV Template</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary modal-close">Cancel</button>
+                        <button class="btn btn-primary" id="executeImportBtn">Import Players</button>
+                    </div>
                 </div>
             </div>
 
