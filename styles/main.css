@@ -348,7 +348,7 @@ body {
     color: var(--text-primary);
 }
 
-.modal-close {
+.modal-header .modal-close {
     background: none !important;
     border: none !important;
     font-size: 1.5rem !important;
@@ -358,10 +358,14 @@ body {
     min-height: auto !important;
 }
 
-.modal-close:hover {
+.modal-header .modal-close:hover {
     color: var(--text-primary);
     transform: none !important;
     filter: none !important;
+}
+
+.modal-footer .btn {
+    min-height: auto;
 }
 
 .modal-body {
