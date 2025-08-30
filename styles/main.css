@@ -593,6 +593,8 @@ player-content-wrapper {
     border-bottom: 1px solid var(--border-color);
 }
 
-#importModal #downloadTemplateBtn {
-    margin-top: 1rem;
+#importModal #templateSection {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
 }
