@@ -65,19 +65,17 @@ Try the application: [https://avpv.github.io/volleyrank/](https://avpv.github.io
 
 ```
 volleyrank/
-├── index.html          # Main HTML file
-├── styles/
-│   └── main.css       # CSS styles
+├── index.html              # Main HTML file with proper script includes
+├── styles/main.css         # All CSS styles
 ├── scripts/
-│   └── app.js         # JavaScript application logic
-└── README.md          # This file
+│   ├── StateManager.js     # Complete state management
+│   ├── PlayerManager.js    # Player business logic
+│   ├── EloCalculator.js    # ELO rating calculations
+│   ├── TeamOptimizer.js    # Team balancing algorithms
+│   ├── UIController.js     # Complete UI management
+│   └── app.js             # Application initialization
+└── README.md              # Project documentation
 ```
-
-## Getting Started
-
-1. Download or clone this repository
-2. Open `index.html` in your web browser
-3. Start adding players and making comparisons!
 
 ## Browser Compatibility
 
