@@ -596,3 +596,33 @@ player-content-wrapper {
 #importModal #downloadTemplateBtn {
     margin-top: 1rem !important;
 }
+
+/* Footer Styles */
+.app-footer {
+    text-align: center;
+    padding: 2rem 1rem;
+    margin-top: 3rem;
+    border-top: 1px solid var(--border-color);
+    color: var(--text-secondary);
+}
+
+.app-footer a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.app-footer a:hover {
+    color: var(--text-primary);
+}
+
+.github-icon {
+    transition: transform 0.3s ease;
+}
+
+.app-footer a:hover .github-icon {
+    transform: scale(1.1);
+}
