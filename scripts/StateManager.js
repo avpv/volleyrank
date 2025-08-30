@@ -600,7 +600,7 @@ class StateManager {
     generateSampleCSV() {
         const sampleData = [
             ['name', 'position'],
-            ['John Smith', 'OH'],
+            ['Andrei Popov', 'OH'],
             ['Maria Garcia', 'S'],
             ['Alex Johnson', 'MB'],
             ['Sarah Wilson', 'L'],
