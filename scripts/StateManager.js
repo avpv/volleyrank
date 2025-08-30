@@ -348,10 +348,259 @@ class StateManager {
     }
 
     /**
-     * Import data
-     * @param {string} jsonData - JSON string with data
+     * Import players from CSV or JSON data
+     * @param {string} data - CSV or JSON string with player data
+     * @param {string} format - 'csv' or 'json'
+     * @returns {object} import result
      */
-    importData(jsonData) {
+    importPlayers(data, format = 'auto') {
+        try {
+            let playersData = [];
+            
+            // Auto-detect format if not specified
+            if (format === 'auto') {
+                format = data.trim().startsWith('[') || data.trim().startsWith('{') ? 'json' : 'csv';
+            }
+            
+            if (format === 'json') {
+                const jsonData = JSON.parse(data);
+                playersData = Array.isArray(jsonData) ? jsonData : [jsonData];
+            } else if (format === 'csv') {
+                playersData = this.parseCSV(data);
+            } else {
+                throw new Error('Unsupported format. Use "csv" or "json".');
+            }
+
+            // Validate and normalize player data
+            const validatedPlayers = [];
+            const errors = [];
+            const skipped = [];
+            
+            playersData.forEach((playerData, index) => {
+                try {
+                    const normalized = this.normalizePlayerData(playerData, index + 1);
+                    
+                    // Check for duplicates
+                    const existingPlayer = this.state.players.find(p => p.name === normalized.name);
+                    if (existingPlayer) {
+                        skipped.push({
+                            row: index + 1,
+                            name: normalized.name,
+                            reason: 'Player already exists'
+                        });
+                        return;
+                    }
+                    
+                    validatedPlayers.push(normalized);
+                } catch (error) {
+                    errors.push({
+                        row: index + 1,
+                        data: playerData,
+                        error: error.message
+                    });
+                }
+            });
+
+            // Add validated players to state
+            const updatedPlayers = [...this.state.players, ...validatedPlayers];
+            this.updateState({ players: updatedPlayers });
+
+            const result = {
+                success: true,
+                imported: validatedPlayers.length,
+                skipped: skipped.length,
+                errors: errors.length,
+                details: { validatedPlayers, skipped, errors }
+            };
+
+            this.notify('playersImported', result);
+            return result;
+
+        } catch (error) {
+            const result = {
+                success: false,
+                imported: 0,
+                skipped: 0,
+                errors: 1,
+                error: error.message
+            };
+            
+            this.notify('importError', result);
+            return result;
+        }
+    }
+
+    /**
+     * Parse CSV data
+     * @param {string} csvData - CSV string
+     * @returns {array} parsed data
+     */
+    parseCSV(csvData) {
+        const lines = csvData.trim().split('\n');
+        if (lines.length < 2) {
+            throw new Error('CSV must contain at least a header and one data row');
+        }
+
+        // Parse header
+        const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+        const data = [];
+
+        // Parse data rows
+        for (let i = 1; i < lines.length; i++) {
+            const line = lines[i].trim();
+            if (!line) continue; // Skip empty lines
+            
+            const values = this.parseCSVLine(line);
+            const rowData = {};
+            
+            headers.forEach((header, index) => {
+                rowData[header] = values[index] ? values[index].trim().replace(/"/g, '') : '';
+            });
+            
+            data.push(rowData);
+        }
+
+        return data;
+    }
+
+    /**
+     * Parse single CSV line handling quoted values
+     * @param {string} line - CSV line
+     * @returns {array} parsed values
+     */
+    parseCSVLine(line) {
+        const values = [];
+        let current = '';
+        let inQuotes = false;
+        
+        for (let i = 0; i < line.length; i++) {
+            const char = line[i];
+            const nextChar = line[i + 1];
+            
+            if (char === '"') {
+                if (inQuotes && nextChar === '"') {
+                    current += '"';
+                    i++; // Skip next quote
+                } else {
+                    inQuotes = !inQuotes;
+                }
+            } else if (char === ',' && !inQuotes) {
+                values.push(current);
+                current = '';
+            } else {
+                current += char;
+            }
+        }
+        
+        values.push(current);
+        return values;
+    }
+
+    /**
+     * Normalize player data from import
+     * @param {object} playerData - raw player data
+     * @param {number} rowNumber - row number for error reporting
+     * @returns {object} normalized player object
+     */
+    normalizePlayerData(playerData, rowNumber) {
+        // Map common field names
+        const fieldMapping = {
+            'name': ['name', 'player_name', 'playername', 'player', 'Name', 'Player Name'],
+            'position': ['position', 'pos', 'Position', 'Pos']
+        };
+
+        const normalized = {
+            id: Date.now() + Math.random(),
+            name: '',
+            position: 'OH',
+            rating: 1500, // Always start with default rating
+            comparisons: 0, // Always start with zero comparisons
+            comparedWith: [], // Always start with empty comparison history
+            createdAt: new Date().toISOString()
+        };
+
+        // Extract and validate name
+        const nameField = this.findField(playerData, fieldMapping.name);
+        if (!nameField || !nameField.trim()) {
+            throw new Error(`Row ${rowNumber}: Player name is required`);
+        }
+        
+        normalized.name = nameField.trim();
+        if (normalized.name.length > 50) {
+            throw new Error(`Row ${rowNumber}: Player name too long (max 50 characters)`);
+        }
+
+        // Extract position
+        const positionField = this.findField(playerData, fieldMapping.position);
+        if (positionField) {
+            const pos = positionField.toString().toUpperCase().trim();
+            const validPositions = {
+                'S': 'S', 'SETTER': 'S', 'SET': 'S',
+                'OPP': 'OPP', 'OPPOSITE': 'OPP', 'OP': 'OPP',
+                'OH': 'OH', 'OUTSIDE': 'OH', 'OUTSIDE HITTER': 'OH', 'WING': 'OH',
+                'MB': 'MB', 'MIDDLE': 'MB', 'MIDDLE BLOCKER': 'MB', 'MID': 'MB',
+                'L': 'L', 'LIBERO': 'L', 'LIB': 'L'
+            };
+            
+            normalized.position = validPositions[pos] || 'OH';
+        }
+
+        return normalized;
+    }
+
+    /**
+     * Find field value using multiple possible field names
+     * @param {object} data - data object
+     * @param {array} fieldNames - possible field names
+     * @returns {*} field value
+     */
+    findField(data, fieldNames) {
+        for (const fieldName of fieldNames) {
+            if (data.hasOwnProperty(fieldName) && data[fieldName] !== undefined && data[fieldName] !== null) {
+                return data[fieldName];
+            }
+        }
+        return undefined;
+    }
+
+    /**
+     * Export players to CSV format
+     * @returns {string} CSV string
+     */
+    exportPlayersAsCSV() {
+        const headers = ['name', 'position', 'rating', 'comparisons'];
+        const csvLines = [headers.join(',')];
+        
+        this.state.players.forEach(player => {
+            const row = [
+                `"${player.name}"`,
+                player.position,
+                Math.round(player.rating),
+                player.comparisons
+            ];
+            csvLines.push(row.join(','));
+        });
+        
+        return csvLines.join('\n');
+    }
+
+    /**
+     * Generate sample CSV template
+     * @returns {string} sample CSV
+     */
+    generateSampleCSV() {
+        const sampleData = [
+            ['name', 'position', 'rating', 'comparisons'],
+            ['John Smith', 'OH', '1600', '5'],
+            ['Maria Garcia', 'S', '1550', '3'],
+            ['Alex Johnson', 'MB', '1480', '8'],
+            ['Sarah Wilson', 'L', '1520', '2']
+        ];
+        
+        return sampleData.map(row => 
+            row.map(cell => `"${cell}"`).join(',')
+        ).join('\n');
+    }
         try {
             const data = JSON.parse(jsonData);
             
