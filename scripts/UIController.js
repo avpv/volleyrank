@@ -1,170 +1,171 @@
 /**
-     * Show import modal
-     */
-    showImportModal() {
-        const modal = document.getElementById('importModal');
-        if (modal) {
-            modal.style.display = 'flex';
-            this.handleImportMethodChange(); // Initialize visibility
+ * Show import modal
+ */
+showImportModal() {
+    const modal = document.getElementById('importModal');
+    if (modal) {
+        modal.style.display = 'flex';
+        this.handleImportMethodChange(); // Initialize visibility
+    }
+}
+
+/**
+ * Hide import modal
+ */
+hideImportModal() {
+    const modal = document.getElementById('importModal');
+    if (modal) {
+        modal.style.display = 'none';
+        // Clear previous results
+        const existingResult = modal.querySelector('.import-result');
+        if (existingResult) {
+            existingResult.remove();
         }
     }
+}
 
-    /**
-     * Hide import modal
-     */
-    hideImportModal() {
-        const modal = document.getElementById('importModal');
-        if (modal) {
-            modal.style.display = 'none';
-            // Clear previous results
-            const existingResult = modal.querySelector('.import-result');
-            if (existingResult) {
-                existingResult.remove();
+/**
+ * Handle import method change
+ */
+handleImportMethodChange() {
+    const method = document.getElementById('importMethod')?.value;
+    const sections = {
+        file: document.getElementById('fileUploadSection'),
+        paste: document.getElementById('pasteDataSection'),
+        template: document.getElementById('templateSection')
+    };
+
+    // Hide all sections
+    Object.values(sections).forEach(section => {
+        if (section) section.style.display = 'none';
+    });
+
+    // Show selected section
+    if (sections[method]) {
+        sections[method].style.display = 'block';
+    }
+
+    // Update import button visibility
+    const importBtn = document.getElementById('executeImportBtn');
+    if (importBtn) {
+        importBtn.style.display = method === 'template' ? 'none' : 'block';
+    }
+}
+
+/**
+ * Handle export players
+ */
+handleExportPlayers() {
+    try {
+        const csv = this.stateManager.exportPlayersAsCSV();
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `volleyrank-players-${new Date().toISOString().split('T')[0]}.csv`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        
+        this.showNotification('Players exported successfully!', 'success');
+    } catch (error) {
+        this.showNotification(`Export failed: ${error.message}`, 'error');
+    }
+}
+
+/**
+ * Handle download template
+ */
+handleDownloadTemplate() {
+    try {
+        const template = this.stateManager.generateSampleCSV();
+        const blob = new Blob([template], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'volleyrank-template.csv';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        
+        this.showNotification('Template downloaded successfully!', 'success');
+    } catch (error) {
+        this.showNotification(`Template download failed: ${error.message}`, 'error');
+    }
+}
+
+/**
+ * Handle execute import
+ */
+async handleExecuteImport() {
+    const method = document.getElementById('importMethod')?.value;
+    let data = '';
+    let format = 'auto';
+
+    try {
+        if (method === 'file') {
+            const fileInput = document.getElementById('importFileInput');
+            const file = fileInput?.files[0];
+            
+            if (!file) {
+                this.showNotification('Please select a file to import', 'error');
+                return;
+            }
+
+            data = await this.readFileAsText(file);
+            format = file.name.toLowerCase().endsWith('.json') ? 'json' : 'csv';
+            
+        } else if (method === 'paste') {
+            const textarea = document.getElementById('importDataTextarea');
+            data = textarea?.value?.trim() || '';
+            
+            if (!data) {
+                this.showNotification('Please paste some data to import', 'error');
+                return;
             }
         }
-    }
 
-    /**
-     * Handle import method change
-     */
-    handleImportMethodChange() {
-        const method = document.getElementById('importMethod')?.value;
-        const sections = {
-            file: document.getElementById('fileUploadSection'),
-            paste: document.getElementById('pasteDataSection'),
-            template: document.getElementById('templateSection')
-        };
+        // Perform import
+        const result = this.stateManager.importPlayers(data, format);
+        
+        // The result will trigger the state change event and show result
+        if (result.success && result.imported > 0) {
+            // Clear form
+            const fileInput = document.getElementById('importFileInput');
+            const textarea = document.getElementById('importDataTextarea');
+            
+            if (fileInput) fileInput.value = '';
+            if (textarea) textarea.value = '';
+        }
 
-        // Hide all sections
-        Object.values(sections).forEach(section => {
-            if (section) section.style.display = 'none';
+    } catch (error) {
+        this.showImportResult({
+            success: false,
+            imported: 0,
+            skipped: 0,
+            errors: 1,
+            error: error.message
         });
-
-        // Show selected section
-        if (sections[method]) {
-            sections[method].style.display = 'block';
-        }
-
-        // Update import button visibility
-        const importBtn = document.getElementById('executeImportBtn');
-        if (importBtn) {
-            importBtn.style.display = method === 'template' ? 'none' : 'block';
-        }
     }
+}
 
-    /**
-     * Handle export players
-     */
-    handleExportPlayers() {
-        try {
-            const csv = this.stateManager.exportPlayersAsCSV();
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `volleyrank-players-${new Date().toISOString().split('T')[0]}.csv`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
-            
-            this.showNotification('Players exported successfully!', 'success');
-        } catch (error) {
-            this.showNotification(`Export failed: ${error.message}`, 'error');
-        }
-    }
-
-    /**
-     * Handle download template
-     */
-    handleDownloadTemplate() {
-        try {
-            const template = this.stateManager.generateSampleCSV();
-            const blob = new Blob([template], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = 'volleyrank-template.csv';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
-            
-            this.showNotification('Template downloaded successfully!', 'success');
-        } catch (error) {
-            this.showNotification(`Template download failed: ${error.message}`, 'error');
-        }
-    }
-
-    /**
-     * Handle execute import
-     */
-    async handleExecuteImport() {
-        const method = document.getElementById('importMethod')?.value;
-        let data = '';
-        let format = 'auto';
-
-        try {
-            if (method === 'file') {
-                const fileInput = document.getElementById('importFileInput');
-                const file = fileInput?.files[0];
-                
-                if (!file) {
-                    this.showNotification('Please select a file to import', 'error');
-                    return;
-                }
-
-                data = await this.readFileAsText(file);
-                format = file.name.toLowerCase().endsWith('.json') ? 'json' : 'csv';
-                
-            } else if (method === 'paste') {
-                const textarea = document.getElementById('importDataTextarea');
-                data = textarea?.value?.trim() || '';
-                
-                if (!data) {
-                    this.showNotification('Please paste some data to import', 'error');
-                    return;
-                }
-            }
-
-            // Perform import
-            const result = this.stateManager.importPlayers(data, format);
-            
-            // The result will trigger the state change event and show result
-            if (result.success && result.imported > 0) {
-                // Clear form
-                const fileInput = document.getElementById('importFileInput');
-                const textarea = document.getElementById('importDataTextarea');
-                
-                if (fileInput) fileInput.value = '';
-                if (textarea) textarea.value = '';
-            }
-
-        } catch (error) {
-            this.showImportResult({
-                success: false,
-                imported: 0,
-                skipped: 0,
-                errors: 1,
-                error: error.message
-            });
-        }
-    }
-
-    /**
-     * Read file as text
-     * @param {File} file - file to read
-     * @returns {Promise<string>} file content
-     */
-    readFileAsText(file) {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = (e) => resolve(e.target.result);
-            reader.onerror = () => reject(new Error('Failed to read file'));
-            reader.readAsText(file);
-        });/**
+/**
+ * Read file as text
+ * @param {File} file - file to read
+ * @returns {Promise<string>} file content
+ */
+readFileAsText(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(e.target.result);
+        reader.onerror = () => reject(new Error('Failed to read file'));
+        reader.readAsText(file);
+    });
+/**
  * User interface controller
  */
 class UIController {
@@ -245,15 +246,20 @@ class UIController {
         }
 
         if (importPlayersBtn) {
-            importPlayersBtn.addEventListener('click', () => this.showImportModal());
+            importPlayersBtn.addEventListener('click', () => {
+                console.log('Import button clicked'); // Debug log
+                this.showImportModal();
+            });
+        } else {
+            console.log('Import button not found'); // Debug log
         }
 
         if (exportPlayersBtn) {
             exportPlayersBtn.addEventListener('click', () => this.handleExportPlayers());
         }
 
-        // Import modal handlers
-        this.initializeImportModalHandlers();
+        // Initialize import modal handlers after DOM is ready
+        setTimeout(() => this.initializeImportModalHandlers(), 100);
     }
 
     /**
