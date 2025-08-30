@@ -1,171 +1,4 @@
 /**
- * Show import modal
- */
-showImportModal() {
-    const modal = document.getElementById('importModal');
-    if (modal) {
-        modal.style.display = 'flex';
-        this.handleImportMethodChange(); // Initialize visibility
-    }
-}
-
-/**
- * Hide import modal
- */
-hideImportModal() {
-    const modal = document.getElementById('importModal');
-    if (modal) {
-        modal.style.display = 'none';
-        // Clear previous results
-        const existingResult = modal.querySelector('.import-result');
-        if (existingResult) {
-            existingResult.remove();
-        }
-    }
-}
-
-/**
- * Handle import method change
- */
-handleImportMethodChange() {
-    const method = document.getElementById('importMethod')?.value;
-    const sections = {
-        file: document.getElementById('fileUploadSection'),
-        paste: document.getElementById('pasteDataSection'),
-        template: document.getElementById('templateSection')
-    };
-
-    // Hide all sections
-    Object.values(sections).forEach(section => {
-        if (section) section.style.display = 'none';
-    });
-
-    // Show selected section
-    if (sections[method]) {
-        sections[method].style.display = 'block';
-    }
-
-    // Update import button visibility
-    const importBtn = document.getElementById('executeImportBtn');
-    if (importBtn) {
-        importBtn.style.display = method === 'template' ? 'none' : 'block';
-    }
-}
-
-/**
- * Handle export players
- */
-handleExportPlayers() {
-    try {
-        const csv = this.stateManager.exportPlayersAsCSV();
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
-        
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `volleyrank-players-${new Date().toISOString().split('T')[0]}.csv`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-        
-        this.showNotification('Players exported successfully!', 'success');
-    } catch (error) {
-        this.showNotification(`Export failed: ${error.message}`, 'error');
-    }
-}
-
-/**
- * Handle download template
- */
-handleDownloadTemplate() {
-    try {
-        const template = this.stateManager.generateSampleCSV();
-        const blob = new Blob([template], { type: 'text/csv;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
-        
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = 'volleyrank-template.csv';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-        
-        this.showNotification('Template downloaded successfully!', 'success');
-    } catch (error) {
-        this.showNotification(`Template download failed: ${error.message}`, 'error');
-    }
-}
-
-/**
- * Handle execute import
- */
-async handleExecuteImport() {
-    const method = document.getElementById('importMethod')?.value;
-    let data = '';
-    let format = 'auto';
-
-    try {
-        if (method === 'file') {
-            const fileInput = document.getElementById('importFileInput');
-            const file = fileInput?.files[0];
-            
-            if (!file) {
-                this.showNotification('Please select a file to import', 'error');
-                return;
-            }
-
-            data = await this.readFileAsText(file);
-            format = file.name.toLowerCase().endsWith('.json') ? 'json' : 'csv';
-            
-        } else if (method === 'paste') {
-            const textarea = document.getElementById('importDataTextarea');
-            data = textarea?.value?.trim() || '';
-            
-            if (!data) {
-                this.showNotification('Please paste some data to import', 'error');
-                return;
-            }
-        }
-
-        // Perform import
-        const result = this.stateManager.importPlayers(data, format);
-        
-        // The result will trigger the state change event and show result
-        if (result.success && result.imported > 0) {
-            // Clear form
-            const fileInput = document.getElementById('importFileInput');
-            const textarea = document.getElementById('importDataTextarea');
-            
-            if (fileInput) fileInput.value = '';
-            if (textarea) textarea.value = '';
-        }
-
-    } catch (error) {
-        this.showImportResult({
-            success: false,
-            imported: 0,
-            skipped: 0,
-            errors: 1,
-            error: error.message
-        });
-    }
-}
-
-/**
- * Read file as text
- * @param {File} file - file to read
- * @returns {Promise<string>} file content
- */
-readFileAsText(file) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = (e) => resolve(e.target.result);
-        reader.onerror = () => reject(new Error('Failed to read file'));
-        reader.readAsText(file);
-    });
-/**
  * User interface controller
  */
 class UIController {
@@ -247,11 +80,8 @@ class UIController {
 
         if (importPlayersBtn) {
             importPlayersBtn.addEventListener('click', () => {
-                console.log('Import button clicked'); // Debug log
                 this.showImportModal();
             });
-        } else {
-            console.log('Import button not found'); // Debug log
         }
 
         if (exportPlayersBtn) {
@@ -503,7 +333,6 @@ class UIController {
                     </div>
             `;
 
-            // Sort players by position
             const sortedTeam = [...team].sort((a, b) => {
                 const order = { 'S': 1, 'OPP': 2, 'OH': 3, 'MB': 4, 'L': 5 };
                 return (order[a.position] || 6) - (order[b.position] || 6);
@@ -523,7 +352,6 @@ class UIController {
             html += '</div>';
         });
 
-        // Add unused players information
         if (result.unusedPlayers.length > 0) {
             html += `
                 <div class="team" style="border-color: var(--accent-orange);">
@@ -630,7 +458,6 @@ class UIController {
             return;
         }
 
-        // Sort by name for consistency
         const sortedPlayers = [...state.players].sort((a, b) => a.name.localeCompare(b.name));
         
         let html = '';
@@ -860,7 +687,6 @@ class UIController {
             this.isProcessing = true;
             this.stateManager.updateRatingsAfterComparison(winnerId, loserId);
             
-            // Small delay for smooth animation
             setTimeout(() => {
                 this.updateComparisonDisplay();
                 this.isProcessing = false;
@@ -905,80 +731,7 @@ class UIController {
         
         element.textContent = total;
     }
-
-    /**
-     * Show import result in modal
-     * @param {object} result - import result
-     */
-    showImportResult(result) {
-        const modal = document.getElementById('importModal');
-        if (!modal) return;
-
-        // Remove existing result
-        const existingResult = modal.querySelector('.import-result');
-        if (existingResult) {
-            existingResult.remove();
-        }
-
-        // Create result display
-        const resultDiv = document.createElement('div');
-        resultDiv.className = `import-result ${result.success ? 'success' : 'error'}`;
-
-        let html = `<div class="import-summary">`;
-        
-        if (result.success) {
-            html += `Import completed: ${result.imported} players added`;
-            if (result.skipped > 0) {
-                html += `, ${result.skipped} skipped`;
-            }
-            if (result.errors > 0) {
-                html += `, ${result.errors} errors`;
-            }
-        } else {
-            html += `Import failed: ${result.error || 'Unknown error'}`;
-        }
-        
-        html += `</div>`;
-
-        // Add details if available
-        if (result.details) {
-            const { skipped, errors } = result.details;
-            
-            if (skipped && skipped.length > 0) {
-                html += `<div class="import-skipped">
-                    <strong>Skipped players:</strong>
-                    ${skipped.map(item => 
-                        `<div class="import-skipped-item">Row ${item.row}: ${item.name} - ${item.reason}</div>`
-                    ).join('')}
-                </div>`;
-            }
-            
-            if (errors && errors.length > 0) {
-                html += `<div class="import-errors">
-                    <strong>Errors:</strong>
-                    ${errors.map(item => 
-                        `<div class="import-error-item">Row ${item.row}: ${item.error}</div>`
-                    ).join('')}
-                </div>`;
-            }
-        }
-
-        resultDiv.innerHTML = html;
-        
-        // Insert after modal body
-        const modalBody = modal.querySelector('.modal-body');
-        if (modalBody) {
-            modalBody.appendChild(resultDiv);
-        }
-
-        // Auto-close on success after delay
-        if (result.success && result.imported > 0) {
-            setTimeout(() => {
-                this.hideImportModal();
-            }, 3000);
-        }
-    }
-
+    
     /**
      * Show import modal
      */
@@ -986,7 +739,7 @@ class UIController {
         const modal = document.getElementById('importModal');
         if (modal) {
             modal.style.display = 'flex';
-            this.handleImportMethodChange(); // Initialize visibility
+            this.handleImportMethodChange();
         }
     }
 
@@ -997,7 +750,6 @@ class UIController {
         const modal = document.getElementById('importModal');
         if (modal) {
             modal.style.display = 'none';
-            // Clear previous results
             const existingResult = modal.querySelector('.import-result');
             if (existingResult) {
                 existingResult.remove();
@@ -1016,17 +768,14 @@ class UIController {
             template: document.getElementById('templateSection')
         };
 
-        // Hide all sections
         Object.values(sections).forEach(section => {
             if (section) section.style.display = 'none';
         });
 
-        // Show selected section
         if (sections[method]) {
             sections[method].style.display = 'block';
         }
 
-        // Update import button visibility
         const importBtn = document.getElementById('executeImportBtn');
         if (importBtn) {
             importBtn.style.display = method === 'template' ? 'none' : 'block';
@@ -1110,14 +859,11 @@ class UIController {
                 }
             }
 
-            // Perform import
             const result = this.stateManager.importPlayers(data, format);
             
-            // Clear form on success
             if (result.success && result.imported > 0) {
                 const fileInput = document.getElementById('importFileInput');
                 const textarea = document.getElementById('importDataTextarea');
-                
                 if (fileInput) fileInput.value = '';
                 if (textarea) textarea.value = '';
             }
@@ -1155,64 +901,47 @@ class UIController {
         const modal = document.getElementById('importModal');
         if (!modal) return;
 
-        // Remove existing result
         const existingResult = modal.querySelector('.import-result');
         if (existingResult) {
             existingResult.remove();
         }
 
-        // Create result display
         const resultDiv = document.createElement('div');
         resultDiv.className = `import-result ${result.success ? 'success' : 'error'}`;
 
         let html = `<div class="import-summary">`;
-        
         if (result.success) {
             html += `Import completed: ${result.imported} players added`;
-            if (result.skipped > 0) {
-                html += `, ${result.skipped} skipped`;
-            }
-            if (result.errors > 0) {
-                html += `, ${result.errors} errors`;
-            }
+            if (result.skipped > 0) html += `, ${result.skipped} skipped`;
+            if (result.errors > 0) html += `, ${result.errors} errors`;
         } else {
             html += `Import failed: ${result.error || 'Unknown error'}`;
         }
-        
         html += `</div>`;
 
-        // Add details if available
         if (result.details) {
             const { skipped, errors } = result.details;
-            
             if (skipped && skipped.length > 0) {
                 html += `<div class="import-skipped">
                     <strong>Skipped players:</strong>
-                    ${skipped.map(item => 
-                        `<div class="import-skipped-item">Row ${item.row}: ${item.name} - ${item.reason}</div>`
-                    ).join('')}
+                    ${skipped.map(item => `<div class="import-skipped-item">Row ${item.row}: ${item.name} - ${item.reason}</div>`).join('')}
                 </div>`;
             }
-            
             if (errors && errors.length > 0) {
                 html += `<div class="import-errors">
                     <strong>Errors:</strong>
-                    ${errors.map(item => 
-                        `<div class="import-error-item">Row ${item.row}: ${item.error}</div>`
-                    ).join('')}
+                    ${errors.map(item => `<div class="import-error-item">Row ${item.row}: ${item.error}</div>`).join('')}
                 </div>`;
             }
         }
 
         resultDiv.innerHTML = html;
         
-        // Insert after modal body
         const modalBody = modal.querySelector('.modal-body');
         if (modalBody) {
             modalBody.appendChild(resultDiv);
         }
 
-        // Auto-close on success after delay
         if (result.success && result.imported > 0) {
             setTimeout(() => {
                 this.hideImportModal();
@@ -1260,16 +989,11 @@ class UIController {
      * @param {string} type - notification type (success, error, info, warning)
      */
     showNotification(message, type = 'info') {
-        // In real application, this should be a modern notification system
-        // Using alert as placeholder for now
-        if (type === 'error') {
-            alert(`Error: ${message}`);
-        } else {
-            alert(message);
-        }
-        
-        // TODO: Implement toast notification system
+        // TODO: Implement a proper toast notification system
         console.log(`[${type.toUpperCase()}] ${message}`);
+        if(type === 'error'){
+            alert(`Error: ${message}`)
+        }
     }
 
     /**
@@ -1278,6 +1002,7 @@ class UIController {
      * @returns {string} escaped text
      */
     escapeHtml(text) {
+        if (typeof text !== 'string') return '';
         const map = {
             '&': '&amp;',
             '<': '&lt;',
