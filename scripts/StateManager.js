@@ -600,6 +600,12 @@ class StateManager {
             row.map(cell => `"${cell}"`).join(',')
         ).join('\n');
     }
+
+    /**
+     * Import full application data (backup/restore)
+     * @param {string} jsonData - JSON string with complete app data
+     */
+    importData(jsonData) {
         try {
             const data = JSON.parse(jsonData);
             
