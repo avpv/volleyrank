@@ -69,11 +69,6 @@ The team formation system uses a sophisticated multi-algorithm approach to creat
 - **Rating Variance**: Penalizes uneven distribution of talent across all teams
 - **Position Compliance**: Ensures teams meet the specified position composition requirements
 
-#### 4. Validation & Analysis
-- **Requirement Validation**: Checks if enough players are available for the requested composition
-- **Composition Analysis**: Provides feedback on team balance and suggests alternative formations
-- **Unused Players**: Identifies players not assigned to teams and provides reasoning
-
 ### Comparison System
 - Priority given to players with fewest comparisons
 - Excludes repeat comparisons between same players
