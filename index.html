@@ -103,9 +103,37 @@
                     <label>Player Name</label>
                     <input type="text" id="playerName" placeholder="Enter player name">
                 </div>
+                
                 <div class="form-group">
-                    <label>Position</label>
-                    <select id="playerPosition">
+                    <label>Positions (select all applicable)</label>
+                    <div class="positions-grid">
+                        <label class="position-checkbox-label">
+                            <input type="checkbox" name="playerPositions" value="S">
+                            <span>Setter (S)</span>
+                        </label>
+                        <label class="position-checkbox-label">
+                            <input type="checkbox" name="playerPositions" value="OPP">
+                            <span>Opposite (OPP)</span>
+                        </label>
+                        <label class="position-checkbox-label">
+                            <input type="checkbox" name="playerPositions" value="OH">
+                            <span>Outside Hitter (OH)</span>
+                        </label>
+                        <label class="position-checkbox-label">
+                            <input type="checkbox" name="playerPositions" value="MB">
+                            <span>Middle Blocker (MB)</span>
+                        </label>
+                        <label class="position-checkbox-label">
+                            <input type="checkbox" name="playerPositions" value="L">
+                            <span>Libero (L)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Primary Position</label>
+                    <select id="primaryPosition">
+                        <option value="">Select primary position</option>
                         <option value="S">Setter</option>
                         <option value="OPP">Opposite</option>
                         <option value="OH">Outside Hitter</option>
@@ -113,6 +141,7 @@
                         <option value="L">Libero</option>
                     </select>
                 </div>
+                
                 <div style="display: flex; gap: 1rem; margin-top: 1rem; flex-wrap: wrap;">
                     <button class="btn btn-primary" id="addPlayerBtn">Add Player</button>
                     <button class="btn btn-secondary" id="importPlayersBtn" onclick="window.uiController && window.uiController.showImportModal()">Import Players</button>
@@ -125,7 +154,7 @@
                 </div>
             </div>
 
-            <!-- Import Modal -->
+            <!-- Updated Import Modal -->
             <div id="importModal" class="modal" style="display: none;">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -147,7 +176,11 @@
                                 <div class="form-group">
                                     <label>Select File</label>
                                     <input type="file" id="importFileInput" accept=".csv,.json,.txt">
-                                    <div class="file-info">Supported formats: CSV, JSON</div>
+                                    <div class="file-info">
+                                        Supported formats: CSV, JSON<br>
+                                        <strong>New CSV format:</strong> name,positions,primary_position<br>
+                                        Example: "John Smith","OH,MB","OH"
+                                    </div>
                                 </div>
                             </div>
 
@@ -156,15 +189,17 @@
                                     <label>Paste CSV or JSON Data</label>
                                     <textarea id="importDataTextarea" rows="8" placeholder="Paste your data here..."></textarea>
                                     <div class="file-info">
-                                        CSV format: name,position<br>
-                                        JSON format: [{"name":"Player Name","position":"OH"}]<br>
+                                        <strong>CSV format:</strong> name,positions,primary_position<br>
+                                        Example: "Player","OH,MB","OH"<br>
+                                        <strong>JSON format:</strong> [{"name":"Player","positions":["OH","MB"],"primary_position":"OH"}]<br>
+                                        <strong>Old format still supported:</strong> name,position<br>
                                         Note: All players start with 1500 ELO rating
                                     </div>
                                 </div>
                             </div>
 
                             <div id="templateSection" class="import-section" style="display: none;">
-                                <p>Download a sample CSV template to see the expected format:</p>
+                                <p>Download a sample CSV template with multiple positions support:</p>
                                 <button class="btn btn-secondary" id="downloadTemplateBtn">Download CSV Template</button>
                             </div>
                         </div>
@@ -203,5 +238,6 @@
     <script src="scripts/TeamOptimizer.js"></script>
     <script src="scripts/UIController.js"></script>
     <script src="scripts/app.js"></script>
+
 </body>
 </html>

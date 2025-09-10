@@ -19,7 +19,7 @@ class PlayerManager {
      * @param {string} position - position
      * @returns {object} validation result object
      */
-    validatePlayer(name, position) {
+    validatePlayer(name, positions) {
         const errors = [];
 
         if (!name || typeof name !== 'string') {
@@ -35,14 +35,33 @@ class PlayerManager {
             }
         }
 
-        if (!position || !this.positions[position]) {
-            errors.push('Valid position is required');
+        // Validate positions array
+        if (!Array.isArray(positions) || positions.length === 0) {
+            errors.push('At least one position is required');
+        } else {
+            const validPositions = Object.keys(this.positions);
+            const invalidPositions = positions.filter(pos => !validPositions.includes(pos));
+            if (invalidPositions.length > 0) {
+                errors.push(`Invalid positions: ${invalidPositions.join(', ')}`);
+            }
+            
+            // Check for duplicates
+            const uniquePositions = [...new Set(positions)];
+            if (uniquePositions.length !== positions.length) {
+                errors.push('Duplicate positions are not allowed');
+            }
+
+            // Maximum positions limit (e.g., no more than 3)
+            if (positions.length > 3) {
+                errors.push('Maximum 3 positions allowed per player');
+            }
         }
 
         return {
             isValid: errors.length === 0,
             errors,
-            sanitizedName: name ? name.trim() : ''
+            sanitizedName: name ? name.trim() : '',
+            sanitizedPositions: Array.isArray(positions) ? [...new Set(positions)] : []
         };
     }
 
@@ -56,6 +75,20 @@ class PlayerManager {
         return state.players.filter(player => player.position === position);
     }
 
+    // New method to get players who can play a specific position
+    getPlayersForPosition(position) {
+        const state = this.stateManager.getState();
+        return state.players.filter(player => 
+            player.positions && player.positions.includes(position)
+        );
+    }
+
+    // Updated method to get players by primary position
+    getPlayersByPrimaryPosition(position) {
+        const state = this.stateManager.getState();
+        return state.players.filter(player => player.primaryPosition === position);
+    }
+
     /**
      * Get position statistics
      * @returns {object} object with player count by position
@@ -64,15 +97,30 @@ class PlayerManager {
         const state = this.stateManager.getState();
         const stats = {};
         
-        // Initialize all positions with zeros
+        // Initialize statistics
         Object.keys(this.positions).forEach(pos => {
-            stats[pos] = 0;
+            stats[pos] = {
+                primary: 0,      // Players with this as primary position
+                canPlay: 0,      // Players who can play this position
+                players: []      // List of players
+            };
         });
 
-        // Count players
+        // Count statistics
         state.players.forEach(player => {
-            if (stats[player.position] !== undefined) {
-                stats[player.position]++;
+            // Primary position
+            if (player.primaryPosition && stats[player.primaryPosition]) {
+                stats[player.primaryPosition].primary++;
+            }
+
+            // All positions they can play
+            if (player.positions && Array.isArray(player.positions)) {
+                player.positions.forEach(pos => {
+                    if (stats[pos]) {
+                        stats[pos].canPlay++;
+                        stats[pos].players.push(player);
+                    }
+                });
             }
         });
 
@@ -88,11 +136,20 @@ class PlayerManager {
         const rankings = {};
 
         Object.keys(this.positions).forEach(position => {
-            const positionPlayers = state.players
-                .filter(player => player.position === position)
+            // Rankings by primary position
+            const primaryPlayers = state.players
+                .filter(player => player.primaryPosition === position)
+                .sort((a, b) => b.rating - a.rating);
+                
+            // Also show players who can play this position
+            const allPlayersForPosition = state.players
+                .filter(player => player.positions && player.positions.includes(position))
                 .sort((a, b) => b.rating - a.rating);
             
-            rankings[position] = positionPlayers;
+            rankings[position] = {
+                primary: primaryPlayers,
+                canPlay: allPlayersForPosition
+            };
         });
 
         return rankings;
@@ -104,25 +161,25 @@ class PlayerManager {
      * @returns {array|null} pair of players or null
      */
     findNextComparisonPair(position) {
-        const positionPlayers = this.getPlayersByPosition(position);
+        // First try to find players with this as primary position
+        let positionPlayers = this.getPlayersByPrimaryPosition(position);
+        
+        // If not enough players with primary position, get all who can play
+        if (positionPlayers.length < 2) {
+            positionPlayers = this.getPlayersForPosition(position);
+        }
         
         if (positionPlayers.length < 2) {
             return null;
         }
 
-        // Find minimum comparison count
+        // Rest of the logic remains the same
         const minComparisons = Math.min(...positionPlayers.map(p => p.comparisons));
-        
-        // Players with minimum comparisons
         let comparisonPool = positionPlayers.filter(p => p.comparisons === minComparisons);
-        
-        // Randomly shuffle for variety
         comparisonPool = this.shuffleArray([...comparisonPool]);
         
-        // Look for pair among players with minimum comparisons
         let foundPair = this.findValidPair(comparisonPool);
         
-        // If not found, search among all position players
         if (!foundPair) {
             const allPositionPlayers = [...positionPlayers].sort((a, b) => a.comparisons - b.comparisons);
             foundPair = this.findValidPair(allPositionPlayers);
@@ -170,13 +227,22 @@ class PlayerManager {
      * @returns {object} object with readiness information
      */
     getPositionComparisonStatus(position) {
-        const players = this.getPlayersByPosition(position);
+        // First try to find players with primary position
+        let players = this.getPlayersByPrimaryPosition(position);
+        let comparisonType = 'primary';
+        
+        // If not enough, get all who can play this position
+        if (players.length < 2) {
+            players = this.getPlayersForPosition(position);
+            comparisonType = 'all';
+        }
         
         if (players.length < 2) {
             return {
                 canCompare: false,
-                reason: 'Not enough players in this position',
-                playersCount: players.length
+                reason: 'Not enough players for this position',
+                playersCount: players.length,
+                comparisonType
             };
         }
 
@@ -187,14 +253,16 @@ class PlayerManager {
                 canCompare: false,
                 reason: 'All possible pairs have been compared',
                 playersCount: players.length,
-                allPairsCompared: true
+                allPairsCompared: true,
+                comparisonType
             };
         }
 
         return {
             canCompare: true,
             playersCount: players.length,
-            nextPair
+            nextPair,
+            comparisonType
         };
     }
 
@@ -209,20 +277,28 @@ class PlayerManager {
         
         if (!player) return null;
 
-        const positionPlayers = this.getPlayersByPosition(player.position);
-        const positionRank = positionPlayers
+        // Ranking among players with same primary position
+        const primaryPositionPlayers = this.getPlayersByPrimaryPosition(player.primaryPosition);
+        const primaryPositionRank = primaryPositionPlayers
             .sort((a, b) => b.rating - a.rating)
             .findIndex(p => p.id === playerId) + 1;
+
+        // Information about all positions
+        const positionNames = player.positions 
+            ? player.positions.map(pos => this.positions[pos]) 
+            : [this.positions[player.primaryPosition] || 'Unknown'];
 
         const winRate = player.comparisons > 0 ? 
             ((player.rating - 1500) / (player.comparisons * 30) + 0.5) * 100 : 50;
 
         return {
             ...player,
-            positionName: this.positions[player.position],
-            positionRank,
-            totalInPosition: positionPlayers.length,
-            estimatedWinRate: Math.max(0, Math.min(100, Math.round(winRate)))
+            primaryPositionName: this.positions[player.primaryPosition],
+            allPositionNames: positionNames,
+            positionRank: primaryPositionRank,
+            totalInPrimaryPosition: primaryPositionPlayers.length,
+            estimatedWinRate: Math.max(0, Math.min(100, Math.round(winRate))),
+            isMultiPosition: player.positions && player.positions.length > 1
         };
     }
 
@@ -269,10 +345,27 @@ class PlayerManager {
         const state = this.stateManager.getState();
         const term = searchTerm.toLowerCase().trim();
         
-        return state.players.filter(player => 
-            player.name.toLowerCase().includes(term) ||
-            this.positions[player.position].toLowerCase().includes(term)
-        );
+        return state.players.filter(player => {
+            // Search by name
+            if (player.name.toLowerCase().includes(term)) {
+                return true;
+            }
+            
+            // Search by positions
+            if (player.positions && Array.isArray(player.positions)) {
+                return player.positions.some(pos => 
+                    this.positions[pos] && this.positions[pos].toLowerCase().includes(term)
+                );
+            }
+            
+            // Search by primary position (for backward compatibility)
+            if (player.primaryPosition) {
+                return this.positions[player.primaryPosition] && 
+                    this.positions[player.primaryPosition].toLowerCase().includes(term);
+            }
+            
+            return false;
+        });
     }
 }
 

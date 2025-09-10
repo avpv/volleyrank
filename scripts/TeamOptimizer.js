@@ -1,5 +1,5 @@
 /**
- * Enhanced team optimizer with advanced algorithms
+ * Enhanced team optimizer with multiple positions support
  */
 class TeamOptimizer {
     constructor(eloCalculator) {
@@ -26,7 +26,50 @@ class TeamOptimizer {
     }
 
     /**
-     * Validate team composition requirements
+     * Updated group players by position for multiple positions support
+     */
+    groupPlayersByPosition(players) {
+        const grouped = {};
+        Object.keys(this.positions).forEach(pos => {
+            grouped[pos] = [];
+        });
+
+        players.forEach(player => {
+            // Handle new multiple positions format
+            if (player.positions && Array.isArray(player.positions)) {
+                player.positions.forEach(position => {
+                    if (grouped[position]) {
+                        grouped[position].push({
+                            ...player,
+                            currentPosition: position, // Track which position we're using
+                            isPrimaryPosition: player.primaryPosition === position
+                        });
+                    }
+                });
+            } 
+            // Handle old single position format for backward compatibility
+            else if (player.position && grouped[player.position]) {
+                grouped[player.position].push({
+                    ...player,
+                    currentPosition: player.position,
+                    isPrimaryPosition: true
+                });
+            }
+            // Handle primary position fallback
+            else if (player.primaryPosition && grouped[player.primaryPosition]) {
+                grouped[player.primaryPosition].push({
+                    ...player,
+                    currentPosition: player.primaryPosition,
+                    isPrimaryPosition: true
+                });
+            }
+        });
+
+        return grouped;
+    }
+
+    /**
+     * Updated team requirements validation with multiple positions
      */
     validateTeamRequirements(composition, teamCount, availablePlayers) {
         const errors = [];
@@ -39,6 +82,8 @@ class TeamOptimizer {
         Object.entries(composition).forEach(([position, count]) => {
             const needed = count * teamCount;
             const available = playersByPosition[position] ? playersByPosition[position].length : 0;
+            const primaryAvailable = playersByPosition[position] ? 
+                playersByPosition[position].filter(p => p.isPrimaryPosition).length : 0;
             
             totalPlayersNeeded += needed;
             
@@ -47,8 +92,14 @@ class TeamOptimizer {
                     position,
                     needed,
                     available,
+                    primaryAvailable,
                     shortage: needed - available,
-                    message: `Not enough ${this.positions[position]}s: need ${needed}, have ${available}`
+                    message: `Not enough ${this.positions[position]}s: need ${needed}, have ${available} (${primaryAvailable} with primary position)`
+                });
+            } else if (primaryAvailable < needed && available >= needed) {
+                warnings.push({
+                    position,
+                    message: `${this.positions[position]} will use players with secondary position (${primaryAvailable} primary out of ${needed} needed)`
                 });
             } else if (available === needed) {
                 warnings.push({
@@ -73,25 +124,7 @@ class TeamOptimizer {
     }
 
     /**
-     * Group players by position
-     */
-    groupPlayersByPosition(players) {
-        const grouped = {};
-        Object.keys(this.positions).forEach(pos => {
-            grouped[pos] = [];
-        });
-
-        players.forEach(player => {
-            if (grouped[player.position]) {
-                grouped[player.position].push(player);
-            }
-        });
-
-        return grouped;
-    }
-
-    /**
-     * Enhanced team optimization with multiple algorithms
+     * Enhanced team optimization with multiple algorithms and position preferences
      */
     async optimizeTeams(composition, teamCount, availablePlayers) {
         const validation = this.validateTeamRequirements(composition, teamCount, availablePlayers);
@@ -104,14 +137,20 @@ class TeamOptimizer {
         // Generate multiple initial solutions
         const candidates = [];
         
-        // 1. Snake draft solution
+        // 1. Primary position priority solution
+        candidates.push(this.createPrimaryPositionSolution(composition, teamCount, playersByPosition));
+        
+        // 2. Snake draft solution
         candidates.push(this.createSnakeDraftSolution(composition, teamCount, playersByPosition));
         
-        // 2. Balanced rating distribution
+        // 3. Balanced rating distribution
         candidates.push(this.createBalancedRatingSolution(composition, teamCount, playersByPosition));
         
-        // 3. Random solutions for diversity
-        for (let i = 0; i < 3; i++) {
+        // 4. Flexible solution (utilizes multi-position players)
+        candidates.push(this.createFlexibleSolution(composition, teamCount, playersByPosition));
+        
+        // 5. Random solutions for diversity
+        for (let i = 0; i < 2; i++) {
             candidates.push(this.createRandomSolution(composition, teamCount, playersByPosition));
         }
 
@@ -160,14 +199,16 @@ class TeamOptimizer {
         });
 
         const balance = this.eloCalculator.evaluateTeamBalance(bestTeams);
-        const unusedPlayers = this.getUnusedPlayers(bestTeams, availablePlayers);
+        const unusedPlayers = this.getUnusedPlayersWithPositionInfo(bestTeams, availablePlayers);
+        const positionAnalysis = this.analyzeTeamPositions(bestTeams);
 
         return {
             teams: bestTeams,
             balance,
             unusedPlayers,
             validation,
-            algorithm: 'Enhanced Multi-Algorithm Optimization',
+            positionAnalysis,
+            algorithm: 'Enhanced Multi-Algorithm Optimization with Multiple Positions',
             stats: {
                 totalTeams: bestTeams.length,
                 playersUsed: bestTeams.reduce((sum, team) => sum + team.length, 0),
@@ -176,22 +217,89 @@ class TeamOptimizer {
                         sum + this.eloCalculator.calculateTeamStrength(team).averageRating, 0
                     ) / bestTeams.length
                 ),
-                balanceScore: Math.round(bestScore)
+                balanceScore: Math.round(bestScore),
+                primaryPositionPlayers: bestTeams.flat().filter(p => p.isPrimaryPosition !== false).length,
+                flexiblePlayers: bestTeams.flat().filter(p => p.isPrimaryPosition === false).length
             }
         };
     }
 
     /**
-     * Create initial solution using snake draft
+     * Create solution prioritizing primary positions
+     */
+    createPrimaryPositionSolution(composition, teamCount, playersByPosition) {
+        let teams = Array.from({ length: teamCount }, () => []);
+        const usedPlayerIds = new Set();
+
+        // First pass: assign players to their primary positions
+        for (const [position, neededCount] of Object.entries(composition)) {
+            if (neededCount === 0) continue;
+
+            const primaryPlayers = (playersByPosition[position] || [])
+                .filter(p => p.isPrimaryPosition && !usedPlayerIds.has(p.id))
+                .sort((a, b) => b.rating - a.rating);
+
+            const playersToAssign = Math.min(primaryPlayers.length, neededCount * teamCount);
+            
+            // Distribute using snake draft
+            for (let i = 0; i < playersToAssign; i++) {
+                const roundNumber = Math.floor(i / teamCount);
+                const isEvenRound = roundNumber % 2 === 0;
+                
+                let teamIndex = isEvenRound ? i % teamCount : teamCount - 1 - (i % teamCount);
+                
+                teams[teamIndex].push(primaryPlayers[i]);
+                usedPlayerIds.add(primaryPlayers[i].id);
+            }
+        }
+
+        // Second pass: fill remaining slots with flexible players
+        for (const [position, neededCount] of Object.entries(composition)) {
+            if (neededCount === 0) continue;
+
+            const currentAssigned = teams.reduce((sum, team) => 
+                sum + team.filter(p => p.currentPosition === position).length, 0);
+            
+            const stillNeeded = (neededCount * teamCount) - currentAssigned;
+            
+            if (stillNeeded > 0) {
+                const flexiblePlayers = (playersByPosition[position] || [])
+                    .filter(p => !p.isPrimaryPosition && !usedPlayerIds.has(p.id))
+                    .sort((a, b) => b.rating - a.rating);
+
+                for (let i = 0; i < Math.min(stillNeeded, flexiblePlayers.length); i++) {
+                    // Assign to team with lowest current rating
+                    const teamRatings = teams.map(team => 
+                        team.reduce((sum, p) => sum + p.rating, 0));
+                    const minRatingIndex = teamRatings.indexOf(Math.min(...teamRatings));
+                    
+                    teams[minRatingIndex].push(flexiblePlayers[i]);
+                    usedPlayerIds.add(flexiblePlayers[i].id);
+                }
+            }
+        }
+
+        return teams;
+    }
+
+    /**
+     * Updated snake draft solution with position priority
      */
     createSnakeDraftSolution(composition, teamCount, playersByPosition) {
         let teams = Array.from({ length: teamCount }, () => []);
+        const usedPlayerIds = new Set();
 
         for (const [position, neededCount] of Object.entries(composition)) {
             if (neededCount === 0) continue;
 
-            const positionPlayers = playersByPosition[position]
-                .sort((a, b) => b.rating - a.rating)
+            let positionPlayers = (playersByPosition[position] || [])
+                .filter(p => !usedPlayerIds.has(p.id))
+                // Sort by: primary position first, then by rating
+                .sort((a, b) => {
+                    if (a.isPrimaryPosition && !b.isPrimaryPosition) return -1;
+                    if (!a.isPrimaryPosition && b.isPrimaryPosition) return 1;
+                    return b.rating - a.rating;
+                })
                 .slice(0, neededCount * teamCount);
 
             for (let i = 0; i < positionPlayers.length; i++) {
@@ -206,6 +314,7 @@ class TeamOptimizer {
                 }
                 
                 teams[teamIndex].push(positionPlayers[i]);
+                usedPlayerIds.add(positionPlayers[i].id);
             }
         }
 
@@ -213,30 +322,37 @@ class TeamOptimizer {
     }
 
     /**
-     * Create solution with balanced rating distribution
+     * Updated balanced rating solution
      */
     createBalancedRatingSolution(composition, teamCount, playersByPosition) {
         let teams = Array.from({ length: teamCount }, () => []);
+        const usedPlayerIds = new Set();
         
         // Calculate target rating per team
         let totalRating = 0;
         let totalPlayers = 0;
         
         Object.entries(composition).forEach(([position, count]) => {
-            const players = playersByPosition[position].slice(0, count * teamCount);
+            const players = (playersByPosition[position] || [])
+                .filter(p => !usedPlayerIds.has(p.id))
+                .slice(0, count * teamCount);
             totalRating += players.reduce((sum, p) => sum + p.rating, 0);
             totalPlayers += players.length;
         });
-        
-        const targetRatingPerTeam = totalRating / teamCount;
         
         // Distribute players to balance ratings
         for (const [position, neededCount] of Object.entries(composition)) {
             if (neededCount === 0) continue;
             
-            const positionPlayers = playersByPosition[position]
-                .slice(0, neededCount * teamCount)
-                .sort((a, b) => b.rating - a.rating);
+            const positionPlayers = (playersByPosition[position] || [])
+                .filter(p => !usedPlayerIds.has(p.id))
+                .sort((a, b) => {
+                    // Prefer primary position players
+                    if (a.isPrimaryPosition && !b.isPrimaryPosition) return -1;
+                    if (!a.isPrimaryPosition && b.isPrimaryPosition) return 1;
+                    return b.rating - a.rating;
+                })
+                .slice(0, neededCount * teamCount);
             
             // Assign players to teams with lowest current rating
             positionPlayers.forEach(player => {
@@ -245,6 +361,7 @@ class TeamOptimizer {
                 );
                 const minRatingIndex = teamRatings.indexOf(Math.min(...teamRatings));
                 teams[minRatingIndex].push(player);
+                usedPlayerIds.add(player.id);
             });
         }
         
@@ -252,15 +369,53 @@ class TeamOptimizer {
     }
 
     /**
-     * Create random solution for diversity
+     * Create flexible solution prioritizing multi-position players
+     */
+    createFlexibleSolution(composition, teamCount, playersByPosition) {
+        let teams = Array.from({ length: teamCount }, () => []);
+        const usedPlayerIds = new Set();
+
+        // Identify multi-position players
+        const allPlayers = [];
+        Object.values(playersByPosition).forEach(positionGroup => {
+            positionGroup.forEach(player => {
+                if (!usedPlayerIds.has(player.id)) {
+                    const flexibilityScore = player.positions && player.positions.length > 1 ? 
+                        player.positions.length * player.rating : player.rating * 0.8;
+                    
+                    allPlayers.push({
+                        ...player,
+                        flexibilityScore
+                    });
+                    usedPlayerIds.add(player.id);
+                }
+            });
+        });
+
+        // Sort by flexibility and rating
+        allPlayers.sort((a, b) => b.flexibilityScore - a.flexibilityScore);
+
+        // Distribute players
+        allPlayers.forEach((player, index) => {
+            const teamIndex = index % teamCount;
+            teams[teamIndex].push(player);
+        });
+
+        return teams;
+    }
+
+    /**
+     * Updated random solution
      */
     createRandomSolution(composition, teamCount, playersByPosition) {
         let teams = Array.from({ length: teamCount }, () => []);
+        const usedPlayerIds = new Set();
 
         for (const [position, neededCount] of Object.entries(composition)) {
             if (neededCount === 0) continue;
 
-            const positionPlayers = [...playersByPosition[position]]
+            let positionPlayers = (playersByPosition[position] || [])
+                .filter(p => !usedPlayerIds.has(p.id))
                 .slice(0, neededCount * teamCount);
             
             // Shuffle players
@@ -272,6 +427,7 @@ class TeamOptimizer {
             // Distribute randomly
             positionPlayers.forEach((player, index) => {
                 teams[index % teamCount].push(player);
+                usedPlayerIds.add(player.id);
             });
         }
 
@@ -279,8 +435,198 @@ class TeamOptimizer {
     }
 
     /**
-     * Simulated annealing optimization
+     * Enhanced team solution evaluation with position penalties
      */
+    evaluateTeamSolution(teams) {
+        if (!teams || teams.length === 0) return Infinity;
+
+        const teamStrengths = teams.map(team => 
+            this.eloCalculator.calculateTeamStrength(team).totalRating
+        );
+
+        // Primary metric: balance (difference between strongest and weakest)
+        const balance = Math.max(...teamStrengths) - Math.min(...teamStrengths);
+        
+        // Secondary metric: variance (penalizes uneven distribution)
+        const avgStrength = teamStrengths.reduce((a, b) => a + b, 0) / teamStrengths.length;
+        const variance = teamStrengths.reduce((sum, strength) => 
+            sum + Math.pow(strength - avgStrength, 2), 0) / teamStrengths.length;
+
+        // Position penalty: prefer players in their primary positions
+        let positionPenalty = 0;
+        teams.forEach(team => {
+            team.forEach(player => {
+                if (player.isPrimaryPosition === false) {
+                    positionPenalty += 50; // Penalty for using player in secondary position
+                }
+            });
+        });
+
+        // Combined score (balance weighted most heavily)
+        return balance + Math.sqrt(variance) * 0.5 + positionPenalty;
+    }
+
+    /**
+     * Updated single swap for multiple positions
+     */
+    performSingleSwap(teams, positions) {
+        const team1Index = Math.floor(Math.random() * teams.length);
+        let team2Index;
+        do {
+            team2Index = Math.floor(Math.random() * teams.length);
+        } while (team1Index === team2Index);
+
+        const position = positions[Math.floor(Math.random() * positions.length)];
+        
+        // Find players who can play the selected position
+        const team1Players = teams[team1Index].filter(p => 
+            p.currentPosition === position || 
+            (p.positions && p.positions.includes(position))
+        );
+        const team2Players = teams[team2Index].filter(p => 
+            p.currentPosition === position || 
+            (p.positions && p.positions.includes(position))
+        );
+        
+        if (team1Players.length > 0 && team2Players.length > 0) {
+            const player1 = team1Players[Math.floor(Math.random() * team1Players.length)];
+            const player2 = team2Players[Math.floor(Math.random() * team2Players.length)];
+            
+            const player1Index = teams[team1Index].findIndex(p => p.id === player1.id);
+            const player2Index = teams[team2Index].findIndex(p => p.id === player2.id);
+            
+            // Update currentPosition for swapped players
+            const updatedPlayer1 = { ...player2, currentPosition: position };
+            const updatedPlayer2 = { ...player1, currentPosition: position };
+            
+            teams[team1Index][player1Index] = updatedPlayer1;
+            teams[team2Index][player2Index] = updatedPlayer2;
+        }
+    }
+
+    /**
+     * Analyze team positions composition
+     */
+    analyzeTeamPositions(teams) {
+        const analysis = {
+            totalPrimaryPositions: 0,
+            totalFlexibleAssignments: 0,
+            teamBreakdown: [],
+            overallFlexibility: 0
+        };
+
+        teams.forEach((team, index) => {
+            let primaryCount = 0;
+            let flexibleCount = 0;
+            const positions = {};
+
+            team.forEach(player => {
+                if (player.isPrimaryPosition !== false) {
+                    primaryCount++;
+                    analysis.totalPrimaryPositions++;
+                } else {
+                    flexibleCount++;
+                    analysis.totalFlexibleAssignments++;
+                }
+
+                const pos = player.currentPosition || player.primaryPosition || player.position;
+                positions[pos] = (positions[pos] || 0) + 1;
+            });
+
+            analysis.teamBreakdown.push({
+                teamIndex: index,
+                primaryPositions: primaryCount,
+                flexibleAssignments: flexibleCount,
+                positionDistribution: positions,
+                flexibilityRatio: team.length > 0 ? Math.round((flexibleCount / team.length) * 100) : 0
+            });
+        });
+
+        const totalPlayers = teams.flat().length;
+        analysis.overallFlexibility = totalPlayers > 0 ? 
+            Math.round((analysis.totalFlexibleAssignments / totalPlayers) * 100) : 0;
+
+        return analysis;
+    }
+
+    /**
+     * Get unused players with position information
+     */
+    getUnusedPlayersWithPositionInfo(teams, allPlayers) {
+        const usedPlayerIds = new Set();
+        teams.forEach(team => {
+            team.forEach(player => {
+                usedPlayerIds.add(player.id);
+            });
+        });
+
+        return allPlayers
+            .filter(player => !usedPlayerIds.has(player.id))
+            .map(player => ({
+                ...player,
+                availablePositions: player.positions || [player.position || player.primaryPosition || 'OH'],
+                isMultiPosition: player.positions && player.positions.length > 1
+            }));
+    }
+
+    /**
+     * Updated alternative compositions with multiple positions consideration
+     */
+    suggestAlternativeCompositions(composition, availablePlayers) {
+        const playersByPosition = this.groupPlayersByPosition(availablePlayers);
+        const alternatives = [];
+
+        const standardCompositions = [
+            { name: '6v6 Standard', composition: { S: 1, OPP: 1, OH: 2, MB: 2, L: 0 } },
+            { name: '6v6 with Libero', composition: { S: 1, OPP: 1, OH: 2, MB: 1, L: 1 } },
+            { name: '4v4 Simplified', composition: { S: 1, OPP: 1, OH: 1, MB: 1, L: 0 } },
+            { name: '3v3 Beach Style', composition: { S: 0, OPP: 1, OH: 1, MB: 1, L: 0 } },
+            { name: '5v5 Adaptive', composition: { S: 1, OPP: 1, OH: 2, MB: 1, L: 0 } }
+        ];
+
+        standardCompositions.forEach(standard => {
+            let canCreate = true;
+            let maxTeams = Infinity;
+            let flexibilityBonus = 0;
+
+            Object.entries(standard.composition).forEach(([pos, count]) => {
+                if (count > 0) {
+                    const available = playersByPosition[pos] ? playersByPosition[pos].length : 0;
+                    const primaryAvailable = playersByPosition[pos] ? 
+                        playersByPosition[pos].filter(p => p.isPrimaryPosition).length : 0;
+                    
+                    if (available === 0) {
+                        canCreate = false;
+                    } else {
+                        maxTeams = Math.min(maxTeams, Math.floor(available / count));
+                        
+                        // Bonus for flexibility (more players available than primary)
+                        if (available > primaryAvailable) {
+                            flexibilityBonus += (available - primaryAvailable) * 10;
+                        }
+                    }
+                }
+            });
+
+            if (canCreate && maxTeams > 0) {
+                alternatives.push({
+                    ...standard,
+                    maxTeams,
+                    playersPerTeam: Object.values(standard.composition).reduce((a, b) => a + b, 0),
+                    flexibilityScore: flexibilityBonus,
+                    recommendation: flexibilityBonus > 50 ? 'Recommended' : 'Possible'
+                });
+            }
+        });
+
+        return alternatives.sort((a, b) => {
+            // Sort by max teams, then by flexibility
+            if (a.maxTeams !== b.maxTeams) return b.maxTeams - a.maxTeams;
+            return b.flexibilityScore - a.flexibilityScore;
+        });
+    }
+
+    // Keep all the existing optimization methods but update them for multiple positions
     async optimizeWithSimulatedAnnealing(teams, positions) {
         if (teams.length < 2 || positions.length === 0) {
             return teams;
@@ -323,9 +669,6 @@ class TeamOptimizer {
         return bestTeams;
     }
 
-    /**
-     * Genetic algorithm optimization
-     */
     async optimizeWithGeneticAlgorithm(initialSolutions, composition) {
         let population = [...initialSolutions];
         
@@ -382,9 +725,6 @@ class TeamOptimizer {
         return population[bestIndex];
     }
 
-    /**
-     * Smart swaps optimization (improved version of original algorithm)
-     */
     async optimizeWithSmartSwaps(teams, positions) {
         if (teams.length < 2 || positions.length === 0) {
             return teams;
@@ -443,31 +783,7 @@ class TeamOptimizer {
         return bestTeams;
     }
 
-    /**
-     * Enhanced team solution evaluation
-     */
-    evaluateTeamSolution(teams) {
-        if (!teams || teams.length === 0) return Infinity;
-
-        const teamStrengths = teams.map(team => 
-            this.eloCalculator.calculateTeamStrength(team).totalRating
-        );
-
-        // Primary metric: balance (difference between strongest and weakest)
-        const balance = Math.max(...teamStrengths) - Math.min(...teamStrengths);
-        
-        // Secondary metric: variance (penalizes uneven distribution)
-        const avgStrength = teamStrengths.reduce((a, b) => a + b, 0) / teamStrengths.length;
-        const variance = teamStrengths.reduce((sum, strength) => 
-            sum + Math.pow(strength - avgStrength, 2), 0) / teamStrengths.length;
-
-        // Combined score (balance is weighted more heavily)
-        return balance + Math.sqrt(variance) * 0.5;
-    }
-
-    /**
-     * Generate neighbor solution for simulated annealing
-     */
+    // Keep other helper methods with minimal changes
     generateNeighborSolution(teams, positions) {
         const newTeams = JSON.parse(JSON.stringify(teams));
         
@@ -488,9 +804,6 @@ class TeamOptimizer {
         return newTeams;
     }
 
-    /**
-     * Tournament selection for genetic algorithm
-     */
     tournamentSelection(population, fitness) {
         const tournamentSize = 3;
         let best = Math.floor(Math.random() * population.length);
@@ -505,16 +818,15 @@ class TeamOptimizer {
         return JSON.parse(JSON.stringify(population[best]));
     }
 
-    /**
-     * Crossover operation for genetic algorithm
-     */
     crossoverTeams(parent1, parent2, composition) {
         const offspring = Array.from({ length: parent1.length }, () => []);
         
         // For each position, randomly choose players from either parent
         Object.keys(composition).forEach(position => {
-            const parent1Players = parent1.flat().filter(p => p.position === position);
-            const parent2Players = parent2.flat().filter(p => p.position === position);
+            const parent1Players = parent1.flat().filter(p => 
+                (p.currentPosition || p.primaryPosition || p.position) === position);
+            const parent2Players = parent2.flat().filter(p => 
+                (p.currentPosition || p.primaryPosition || p.position) === position);
             
             const allPlayers = [...parent1Players, ...parent2Players];
             const uniquePlayers = allPlayers.filter((player, index, arr) => 
@@ -530,9 +842,6 @@ class TeamOptimizer {
         return offspring;
     }
 
-    /**
-     * Mutation operation
-     */
     mutateTeams(teams, positions) {
         const mutatedTeams = JSON.parse(JSON.stringify(teams));
         
@@ -546,50 +855,26 @@ class TeamOptimizer {
         return mutatedTeams;
     }
 
-    /**
-     * Perform single player swap
-     */
-    performSingleSwap(teams, positions) {
-        const team1Index = Math.floor(Math.random() * teams.length);
-        let team2Index;
-        do {
-            team2Index = Math.floor(Math.random() * teams.length);
-        } while (team1Index === team2Index);
-
-        const position = positions[Math.floor(Math.random() * positions.length)];
-        
-        const team1Players = teams[team1Index].filter(p => p.position === position);
-        const team2Players = teams[team2Index].filter(p => p.position === position);
-        
-        if (team1Players.length > 0 && team2Players.length > 0) {
-            const player1 = team1Players[Math.floor(Math.random() * team1Players.length)];
-            const player2 = team2Players[Math.floor(Math.random() * team2Players.length)];
-            
-            const player1Index = teams[team1Index].findIndex(p => p.id === player1.id);
-            const player2Index = teams[team2Index].findIndex(p => p.id === player2.id);
-            
-            teams[team1Index][player1Index] = player2;
-            teams[team2Index][player2Index] = player1;
-        }
-    }
-
-    /**
-     * Perform double swap
-     */
     performDoubleSwap(teams, positions) {
         if (teams.length < 2) return;
         
         const position = positions[Math.floor(Math.random() * positions.length)];
         const teamsWithPosition = teams.filter(team => 
-            team.filter(p => p.position === position).length >= 2
+            team.filter(p => 
+                (p.currentPosition || p.primaryPosition || p.position) === position
+            ).length >= 2
         );
         
         if (teamsWithPosition.length >= 2) {
             const team1 = teamsWithPosition[0];
             const team2 = teamsWithPosition[1];
             
-            const team1Players = team1.filter(p => p.position === position).slice(0, 2);
-            const team2Players = team2.filter(p => p.position === position).slice(0, 2);
+            const team1Players = team1.filter(p => 
+                (p.currentPosition || p.primaryPosition || p.position) === position
+            ).slice(0, 2);
+            const team2Players = team2.filter(p => 
+                (p.currentPosition || p.primaryPosition || p.position) === position
+            ).slice(0, 2);
             
             // Swap both players
             team1Players.forEach((player, i) => {
@@ -602,9 +887,6 @@ class TeamOptimizer {
         }
     }
 
-    /**
-     * Perform rotation swap (3-way)
-     */
     performRotationSwap(teams, positions) {
         if (teams.length < 3) return;
         
@@ -612,7 +894,9 @@ class TeamOptimizer {
         const availableTeams = [];
         
         for (let i = 0; i < teams.length && availableTeams.length < 3; i++) {
-            const posPlayers = teams[i].filter(p => p.position === position);
+            const posPlayers = teams[i].filter(p => 
+                (p.currentPosition || p.primaryPosition || p.position) === position
+            );
             if (posPlayers.length > 0) {
                 availableTeams.push({ teamIndex: i, players: posPlayers });
             }
@@ -634,15 +918,18 @@ class TeamOptimizer {
         }
     }
 
-    /**
-     * Smart player swap with tracking
-     */
     attemptSmartPlayerSwap(teams, team1Index, team2Index, position, attemptedSwaps) {
         const team1 = teams[team1Index];
         const team2 = teams[team2Index];
 
-        const team1Players = team1.filter(p => p.position === position);
-        const team2Players = team2.filter(p => p.position === position);
+        const team1Players = team1.filter(p => 
+            (p.currentPosition || p.primaryPosition || p.position) === position ||
+            (p.positions && p.positions.includes(position))
+        );
+        const team2Players = team2.filter(p => 
+            (p.currentPosition || p.primaryPosition || p.position) === position ||
+            (p.positions && p.positions.includes(position))
+        );
 
         if (team1Players.length === 0 || team2Players.length === 0) {
             return { improved: false };
@@ -664,8 +951,12 @@ class TeamOptimizer {
                 const p1Index = testTeams[team1Index].findIndex(p => p.id === player1.id);
                 const p2Index = testTeams[team2Index].findIndex(p => p.id === player2.id);
                 
-                testTeams[team1Index][p1Index] = player2;
-                testTeams[team2Index][p2Index] = player1;
+                // Update current position for the swap
+                const updatedPlayer1 = { ...player2, currentPosition: position };
+                const updatedPlayer2 = { ...player1, currentPosition: position };
+                
+                testTeams[team1Index][p1Index] = updatedPlayer1;
+                testTeams[team2Index][p2Index] = updatedPlayer2;
                 
                 const newScore = this.evaluateTeamSolution(testTeams);
                 const improvement = currentScore - newScore;
@@ -690,9 +981,6 @@ class TeamOptimizer {
         return { improved: false };
     }
 
-    /**
-     * Get unused players
-     */
     getUnusedPlayers(teams, allPlayers) {
         const usedPlayerIds = new Set();
         teams.forEach(team => {
@@ -705,48 +993,7 @@ class TeamOptimizer {
     }
 
     /**
-     * Suggest alternative compositions
-     */
-    suggestAlternativeCompositions(composition, availablePlayers) {
-        const playersByPosition = this.groupPlayersByPosition(availablePlayers);
-        const alternatives = [];
-
-        const standardCompositions = [
-            { name: '6v6 Standard', composition: { S: 1, OPP: 1, OH: 2, MB: 2, L: 0 } },
-            { name: '6v6 with Libero', composition: { S: 1, OPP: 1, OH: 2, MB: 1, L: 1 } },
-            { name: '4v4 Simplified', composition: { S: 1, OPP: 1, OH: 1, MB: 1, L: 0 } },
-            { name: '3v3 Beach Style', composition: { S: 0, OPP: 1, OH: 1, MB: 1, L: 0 } }
-        ];
-
-        standardCompositions.forEach(standard => {
-            let canCreate = true;
-            let maxTeams = Infinity;
-
-            Object.entries(standard.composition).forEach(([pos, count]) => {
-                if (count > 0) {
-                    const available = playersByPosition[pos] ? playersByPosition[pos].length : 0;
-                    if (available === 0) {
-                        canCreate = false;
-                    } else {
-                        maxTeams = Math.min(maxTeams, Math.floor(available / count));
-                    }
-                }
-            });
-
-            if (canCreate && maxTeams > 0) {
-                alternatives.push({
-                    ...standard,
-                    maxTeams,
-                    playersPerTeam: Object.values(standard.composition).reduce((a, b) => a + b, 0)
-                });
-            }
-        });
-
-        return alternatives.sort((a, b) => b.maxTeams - a.maxTeams);
-    }
-
-    /**
-     * Analyze composition effectiveness
+     * Enhanced composition analysis with multiple positions
      */
     analyzeCompositionEffectiveness(composition) {
         const analysis = {

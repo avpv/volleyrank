@@ -1,5 +1,5 @@
 /**
- * User interface controller
+ * User interface controller with multiple positions support
  */
 class UIController {
     constructor(stateManager, playerManager, eloCalculator, teamOptimizer) {
@@ -24,19 +24,15 @@ class UIController {
             tab.addEventListener('click', (e) => this.handleTabClick(e));
         });
 
-        // Player management
-        const addPlayerBtn = document.getElementById('addPlayerBtn');
+        // Player management - Initialize multiple position support
+        this.initializeMultiplePositionSelectors();
+
         const playerNameInput = document.getElementById('playerName');
-        
-        if (addPlayerBtn) {
-            addPlayerBtn.addEventListener('click', () => this.handleAddPlayer());
-        }
-        
         if (playerNameInput) {
             playerNameInput.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') {
                     e.preventDefault();
-                    this.handleAddPlayer();
+                    this.handleAddPlayerMultiPosition();
                 }
             });
         }
@@ -90,6 +86,260 @@ class UIController {
 
         // Initialize import modal handlers after DOM is ready
         setTimeout(() => this.initializeImportModalHandlers(), 100);
+    }
+
+    /**
+     * Initialize multiple position selectors
+     */
+    initializeMultiplePositionSelectors() {
+        const checkboxes = document.querySelectorAll('input[name="playerPositions"]');
+        const primarySelect = document.getElementById('primaryPosition');
+        
+        if (checkboxes.length && primarySelect) {
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', () => {
+                    this.updatePrimaryPositionOptions();
+                });
+            });
+        }
+
+        // Update add player button handler
+        const addPlayerBtn = document.getElementById('addPlayerBtn');
+        if (addPlayerBtn) {
+            // Remove old handler and add new one
+            const newBtn = addPlayerBtn.cloneNode(true);
+            addPlayerBtn.parentNode.replaceChild(newBtn, addPlayerBtn);
+            newBtn.addEventListener('click', () => this.handleAddPlayerMultiPosition());
+        }
+    }
+
+    /**
+     * Updated add player method for multiple positions
+     */
+    handleAddPlayerMultiPosition() {
+        if (this.isProcessing) return;
+
+        const nameInput = document.getElementById('playerName');
+        const name = nameInput?.value || '';
+        
+        // Get selected positions
+        const selectedPositions = this.getSelectedPositions();
+        const primaryPosition = document.getElementById('primaryPosition')?.value;
+        
+        if (selectedPositions.length === 0) {
+            this.showNotification('Please select at least one position', 'error');
+            return;
+        }
+
+        if (!primaryPosition) {
+            this.showNotification('Please select a primary position', 'error');
+            return;
+        }
+
+        if (!selectedPositions.includes(primaryPosition)) {
+            this.showNotification('Primary position must be among selected positions', 'error');
+            return;
+        }
+
+        try {
+            const validation = this.playerManager.validatePlayer(name, selectedPositions);
+            
+            if (!validation.isValid) {
+                this.showNotification(validation.errors.join(', '), 'error');
+                return;
+            }
+
+            // Create player with multiple positions
+            this.stateManager.addPlayer(validation.sanitizedName, validation.sanitizedPositions);
+            
+            // Update primary position after creation
+            const state = this.stateManager.getState();
+            const createdPlayer = state.players.find(p => p.name === validation.sanitizedName);
+            if (createdPlayer) {
+                const updatedPlayers = state.players.map(p => 
+                    p.id === createdPlayer.id ? { ...p, primaryPosition } : p
+                );
+                this.stateManager.updateState({ players: updatedPlayers });
+            }
+
+            nameInput.value = '';
+            this.clearPositionSelection();
+            document.getElementById('primaryPosition').value = '';
+            
+        } catch (error) {
+            this.showNotification(error.message, 'error');
+        }
+    }
+
+    /**
+     * Get selected positions
+     */
+    getSelectedPositions() {
+        const checkboxes = document.querySelectorAll('input[name="playerPositions"]:checked');
+        return Array.from(checkboxes).map(cb => cb.value);
+    }
+
+    /**
+     * Clear position selection
+     */
+    clearPositionSelection() {
+        const checkboxes = document.querySelectorAll('input[name="playerPositions"]');
+        checkboxes.forEach(cb => cb.checked = false);
+    }
+
+    /**
+     * Update primary position options based on selected positions
+     */
+    updatePrimaryPositionOptions() {
+        const selectedPositions = this.getSelectedPositions();
+        const primarySelect = document.getElementById('primaryPosition');
+        
+        if (!primarySelect) return;
+
+        // Save current selection if valid
+        const currentValue = primarySelect.value;
+        
+        // Clear options
+        primarySelect.innerHTML = '<option value="">Select primary position</option>';
+        
+        // Add only selected positions
+        selectedPositions.forEach(position => {
+            const option = document.createElement('option');
+            option.value = position;
+            option.textContent = this.playerManager.positions[position];
+            if (position === currentValue) {
+                option.selected = true;
+            }
+            primarySelect.appendChild(option);
+        });
+
+        // If current selection is no longer valid, clear it
+        if (!selectedPositions.includes(currentValue)) {
+            primarySelect.value = '';
+        }
+
+        // If only one position selected, make it primary automatically
+        if (selectedPositions.length === 1) {
+            primarySelect.value = selectedPositions[0];
+        }
+    }
+
+    /**
+     * Handle edit player positions
+     */
+    handleEditPlayerPositions(playerId) {
+        const state = this.stateManager.getState();
+        const player = state.players.find(p => p.id === playerId);
+        
+        if (!player) {
+            this.showNotification('Player not found', 'error');
+            return;
+        }
+
+        this.showEditPositionsModal(player);
+    }
+
+    /**
+     * Show edit positions modal
+     */
+    showEditPositionsModal(player) {
+        const modal = document.createElement('div');
+        modal.className = 'modal';
+        modal.style.display = 'flex';
+        
+        const positionsOptions = Object.entries(this.playerManager.positions)
+            .map(([key, name]) => {
+                const isChecked = player.positions && player.positions.includes(key);
+                const isPrimary = player.primaryPosition === key;
+                
+                return `
+                    <label class="position-checkbox-label">
+                        <input type="checkbox" name="editPositions" value="${key}" 
+                               ${isChecked ? 'checked' : ''}>
+                        <span>${name} ${isPrimary ? '(primary)' : ''}</span>
+                    </label>
+                `;
+            }).join('');
+
+        modal.innerHTML = `
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Edit Positions - ${this.escapeHtml(player.name)}</h3>
+                    <button class="btn btn-secondary modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Positions (select all applicable):</label>
+                        <div class="positions-grid">
+                            ${positionsOptions}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Primary Position:</label>
+                        <select id="editPrimaryPosition">
+                            ${Object.entries(this.playerManager.positions)
+                                .map(([key, name]) => 
+                                    `<option value="${key}" ${player.primaryPosition === key ? 'selected' : ''}>${name}</option>`
+                                ).join('')}
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary modal-close">Cancel</button>
+                    <button class="btn btn-primary" id="savePositionsBtn">Save</button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        // Event handlers for modal
+        modal.querySelector('.modal-close').addEventListener('click', () => {
+            document.body.removeChild(modal);
+        });
+
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                document.body.removeChild(modal);
+            }
+        });
+
+        modal.querySelector('#savePositionsBtn').addEventListener('click', () => {
+            const selectedPositions = Array.from(modal.querySelectorAll('input[name="editPositions"]:checked'))
+                .map(cb => cb.value);
+            const primaryPosition = modal.querySelector('#editPrimaryPosition').value;
+
+            if (selectedPositions.length === 0) {
+                this.showNotification('Please select at least one position', 'error');
+                return;
+            }
+
+            if (!selectedPositions.includes(primaryPosition)) {
+                this.showNotification('Primary position must be among selected positions', 'error');
+                return;
+            }
+
+            try {
+                // Update positions through StateManager
+                const updatedPlayer = {
+                    ...player,
+                    positions: selectedPositions,
+                    primaryPosition: primaryPosition
+                };
+
+                const updatedPlayers = this.stateManager.getState().players.map(p => 
+                    p.id === player.id ? updatedPlayer : p
+                );
+
+                this.stateManager.updateState({ players: updatedPlayers });
+                
+                this.showNotification(`Positions for "${player.name}" updated successfully`, 'success');
+                document.body.removeChild(modal);
+                
+            } catch (error) {
+                this.showNotification(`Failed to update positions: ${error.message}`, 'error');
+            }
+        });
     }
 
     /**
@@ -157,6 +407,14 @@ class UIController {
         this.stateManager.subscribe('importError', (result) => {
             this.showImportResult(result);
         });
+
+        // Add migration notification
+        this.stateManager.subscribe('dataMigrated', (data) => {
+            this.showNotification(
+                `${data.message}. Updated ${data.playersUpdated} players.`, 
+                'success'
+            );
+        });
     }
 
     /**
@@ -197,34 +455,6 @@ class UIController {
             this.updateRankingsDisplay();
         } else if (tabName === 'compare') {
             this.updateComparisonDisplay();
-        }
-    }
-
-    /**
-     * Handle add player
-     */
-    handleAddPlayer() {
-        if (this.isProcessing) return;
-
-        const nameInput = document.getElementById('playerName');
-        const positionSelect = document.getElementById('playerPosition');
-        
-        const name = nameInput?.value || '';
-        const position = positionSelect?.value || 'OH';
-        
-        try {
-            const validation = this.playerManager.validatePlayer(name, position);
-            
-            if (!validation.isValid) {
-                this.showNotification(validation.errors.join(', '), 'error');
-                return;
-            }
-
-            this.stateManager.addPlayer(validation.sanitizedName, position);
-            nameInput.value = '';
-            
-        } catch (error) {
-            this.showNotification(error.message, 'error');
         }
     }
 
@@ -309,7 +539,6 @@ class UIController {
 
     /**
      * Display optimized teams
-     * @param {object} result - optimization result
      */
     displayOptimizedTeams(result) {
         const container = document.getElementById('teamsDisplay');
@@ -335,16 +564,24 @@ class UIController {
 
             const sortedTeam = [...team].sort((a, b) => {
                 const order = { 'S': 1, 'OPP': 2, 'OH': 3, 'MB': 4, 'L': 5 };
-                return (order[a.position] || 6) - (order[b.position] || 6);
+                const aPos = a.currentPosition || a.primaryPosition || a.position;
+                const bPos = b.currentPosition || b.primaryPosition || b.position;
+                return (order[aPos] || 6) - (order[bPos] || 6);
             });
 
             sortedTeam.forEach(player => {
+                const displayPosition = player.currentPosition || player.primaryPosition || player.position;
+                const positionType = player.isPrimaryPosition === false ? ' (secondary)' : '';
+                
                 html += `
                     <div class="team-player">
-                        <span>${this.escapeHtml(player.name)} 
-                            <b>(${this.playerManager.positions[player.position]})</b>
-                        </span>
-                        <span>${Math.round(player.rating)}</span>
+                        <div class="team-player-info">
+                            <div class="team-player-name">${this.escapeHtml(player.name)}</div>
+                            <div class="team-player-position ${player.isPrimaryPosition === false ? 'secondary' : ''}">
+                                ${this.playerManager.positions[displayPosition]}${positionType}
+                            </div>
+                        </div>
+                        <div class="team-player-rating">${Math.round(player.rating)}</div>
                     </div>
                 `;
             });
@@ -352,7 +589,7 @@ class UIController {
             html += '</div>';
         });
 
-        if (result.unusedPlayers.length > 0) {
+        if (result.unusedPlayers && result.unusedPlayers.length > 0) {
             html += `
                 <div class="team" style="border-color: var(--accent-orange);">
                     <h3>Unused Players</h3>
@@ -362,12 +599,16 @@ class UIController {
             `;
             
             result.unusedPlayers.forEach(player => {
+                const positions = player.positions || [player.position];
+                const positionsText = positions.map(pos => this.playerManager.positions[pos]).join(', ');
+                
                 html += `
                     <div class="team-player">
-                        <span>${this.escapeHtml(player.name)} 
-                            <b>(${this.playerManager.positions[player.position]})</b>
-                        </span>
-                        <span>${Math.round(player.rating)}</span>
+                        <div class="team-player-info">
+                            <div class="team-player-name">${this.escapeHtml(player.name)}</div>
+                            <div class="team-player-position">${positionsText}</div>
+                        </div>
+                        <div class="team-player-rating">${Math.round(player.rating)}</div>
                     </div>
                 `;
             });
@@ -438,7 +679,7 @@ class UIController {
     }
 
     /**
-     * Update player list display
+     * Updated player list display with multiple positions
      */
     updatePlayersListDisplay() {
         const container = document.getElementById('playersList');
@@ -464,19 +705,37 @@ class UIController {
         sortedPlayers.forEach(player => {
             const playerStats = this.playerManager.getPlayerStats(player.id);
             
+            // Format positions display
+            let positionsDisplay = '';
+            if (player.positions && player.positions.length > 1) {
+                const positionNames = player.positions.map(pos => this.playerManager.positions[pos]);
+                positionsDisplay = `${positionNames.join(' / ')} (primary: ${playerStats.primaryPositionName})`;
+            } else {
+                positionsDisplay = playerStats.primaryPositionName || this.playerManager.positions[player.position] || 'Unknown';
+            }
+            
             html += `
                 <div class="player-item">
                     <div class="player-content-wrapper">
                         <div class="player-info-item">
                             <strong>${this.escapeHtml(player.name)}</strong>
+                            ${player.positions && player.positions.length > 1 ? 
+                                '<span class="multi-position-badge">Multi-pos</span>' : ''
+                            }
                             <span style="color:var(--text-secondary); font-size:0.9rem;">
-                                ${playerStats.positionName} (Rank #${playerStats.positionRank}/${playerStats.totalInPosition})
+                                ${positionsDisplay}
+                            </span>
+                            <span style="color:var(--text-secondary); font-size:0.9rem;">
+                                Rank: #${playerStats.positionRank}/${playerStats.totalInPrimaryPosition} in primary position
                             </span>
                             <span style="color:var(--text-secondary); font-size:0.9rem;">
                                 ELO: ${Math.round(player.rating)} | Comparisons: ${player.comparisons}
                             </span>
                         </div>
                         <div class="player-actions">
+                            <button class="btn btn-secondary" onclick="uiController.handleEditPlayerPositions(${player.id})">
+                                Edit Positions
+                            </button>
                             <button class="btn btn-warning" onclick="uiController.handleResetPlayer(${player.id})">
                                 Reset
                             </button>
@@ -543,7 +802,7 @@ class UIController {
     }
 
     /**
-     * Update position statistics
+     * Updated position statistics with multiple positions
      */
     updatePositionStats() {
         const container = document.getElementById('playersStats');
@@ -553,11 +812,16 @@ class UIController {
         let html = '';
 
         Object.entries(this.playerManager.positions).forEach(([pos, name]) => {
-            const count = stats[pos] || 0;
+            const positionStats = stats[pos] || { primary: 0, canPlay: 0 };
+            
             html += `
-                <div style="text-align: center;">
-                    <div style="font-weight: 600; font-size: 1.2rem;">${count}</div>
-                    <div style="font-size: 0.9rem; color:var(--text-secondary);">${name}s</div>
+                <div style="text-align: center; padding: 0.5rem;">
+                    <div style="font-weight: 600; font-size: 1.2rem;">${positionStats.primary}</div>
+                    <div style="font-size: 0.9rem; color:var(--text-secondary);">${name}s (primary)</div>
+                    ${positionStats.canPlay > positionStats.primary ? 
+                        `<div style="font-size: 0.8rem; color:var(--accent-blue);">+${positionStats.canPlay - positionStats.primary} can play</div>` : 
+                        ''
+                    }
                 </div>
             `;
         });
@@ -566,7 +830,7 @@ class UIController {
     }
 
     /**
-     * Update rankings display
+     * Updated rankings display with multiple positions
      */
     updateRankingsDisplay() {
         const container = document.getElementById('rankingsContainer');
@@ -575,29 +839,34 @@ class UIController {
         container.innerHTML = '';
         const rankings = this.playerManager.getRankingsByPosition();
 
-        Object.entries(rankings).forEach(([position, players]) => {
-            if (players.length === 0) return;
+        Object.entries(rankings).forEach(([position, data]) => {
+            const primaryPlayers = data.primary || [];
+            const allPlayers = data.canPlay || [];
+            
+            if (allPlayers.length === 0) return;
 
             const positionDiv = document.createElement('div');
             positionDiv.className = 'position-ranking';
             
             let html = `<h3 class="position-title">${this.playerManager.positions[position]}s</h3>`;
             
-            players.forEach((player, index) => {
-                const rankClass = index === 0 ? 'gold' : (index === 1 ? 'silver' : (index === 2 ? 'bronze' : ''));
-                
-                html += `
-                    <div class="ranking-item">
-                        <div class="rank-number ${rankClass}">${index + 1}</div>
-                        <div class="player-info">
-                            <div>${this.escapeHtml(player.name)}</div>
-                            <div class="player-rating-display" style="color:var(--text-secondary); font-size: 0.9rem;">
-                                ${Math.round(player.rating)} ELO (${player.comparisons} comparisons)
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
+            // Show players with primary position
+            if (primaryPlayers.length > 0) {
+                html += `<h4 style="color: var(--text-secondary); margin: 1rem 0 0.5rem 0;">Primary Position:</h4>`;
+                primaryPlayers.forEach((player, index) => {
+                    const rankClass = index === 0 ? 'gold' : (index === 1 ? 'silver' : (index === 2 ? 'bronze' : ''));
+                    html += this.generateRankingItem(player, index + 1, rankClass, true);
+                });
+            }
+            
+            // Show all players who can play this position (if there are additional ones)
+            const additionalPlayers = allPlayers.filter(p => !primaryPlayers.find(pp => pp.id === p.id));
+            if (additionalPlayers.length > 0) {
+                html += `<h4 style="color: var(--text-secondary); margin: 1rem 0 0.5rem 0;">Can Play:</h4>`;
+                additionalPlayers.forEach((player, index) => {
+                    html += this.generateRankingItem(player, index + 1, '', false);
+                });
+            }
             
             positionDiv.innerHTML = html;
             container.appendChild(positionDiv);
@@ -605,7 +874,32 @@ class UIController {
     }
 
     /**
-     * Update comparison display
+     * Helper method to generate ranking item
+     */
+    generateRankingItem(player, rank, rankClass, isPrimary) {
+        const positionsText = player.positions && player.positions.length > 1 
+            ? ` (${player.positions.map(pos => this.playerManager.positions[pos]).join('/')})`
+            : '';
+        
+        return `
+            <div class="ranking-item">
+                <div class="rank-number ${rankClass}">${rank}</div>
+                <div class="player-info">
+                    <div>
+                        ${this.escapeHtml(player.name)}
+                        ${!isPrimary ? '<span class="secondary-position-indicator">📍</span>' : ''}
+                        ${positionsText}
+                    </div>
+                    <div class="player-rating-display" style="color:var(--text-secondary); font-size: 0.9rem;">
+                        ${Math.round(player.rating)} ELO (${player.comparisons} comparisons)
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    /**
+     * Updated comparison display with multiple positions
      */
     updateComparisonDisplay() {
         const positionSelect = document.getElementById('positionFilter');
@@ -628,11 +922,17 @@ class UIController {
         const status = this.playerManager.getPositionComparisonStatus(selectedPosition);
         
         if (!status.canCompare) {
+            let message = status.reason;
+            if (status.allPairsCompared) {
+                message = '🎉 All possible unique pairs in this category have been compared!';
+            }
+            
             container.innerHTML = `
                 <div class="no-comparison">
-                    ${status.allPairsCompared ? 
-                        '🎉 All possible unique pairs in this category have been compared!' : 
-                        status.reason
+                    ${message}
+                    ${status.comparisonType === 'all' ? 
+                        '<br><small>Search conducted among all players who can play this position</small>' : 
+                        '<br><small>Search conducted among players with this as primary position</small>'
                     }
                 </div>
             `;
@@ -644,18 +944,34 @@ class UIController {
         const [player1, player2] = status.nextPair;
         this.stateManager.setCurrentPair(status.nextPair);
 
+        // Determine position type for each player
+        const player1PositionType = (player1.primaryPosition === selectedPosition) ? 'primary' : 'secondary';
+        const player2PositionType = (player2.primaryPosition === selectedPosition) ? 'primary' : 'secondary';
+
         container.innerHTML = `
+            <div class="comparison-info" style="text-align: center; margin-bottom: 1rem; color: var(--text-secondary);">
+                Comparing at position: <strong>${this.playerManager.positions[selectedPosition]}</strong>
+                ${status.comparisonType === 'all' ? 
+                    '<br><small>Including players who can play this position</small>' : 
+                    '<br><small>Comparing players with this as primary position</small>'
+                }
+            </div>
             <div class="comparison-area">
                 <div class="player-card" onclick="uiController.handlePlayerComparison(${player1.id}, ${player2.id})">
                     <div class="player-avatar" style="background:linear-gradient(135deg, #2563eb, #3b82f6);">
                         ${player1.name.charAt(0).toUpperCase()}
                     </div>
                     <div class="player-name">${this.escapeHtml(player1.name)}</div>
-                    <div class="player-position">${this.playerManager.positions[player1.position]}</div>
+                    <div class="player-position">
+                        ${this.playerManager.positions[selectedPosition]} (${player1PositionType})
+                    </div>
                     <div class="player-rating">${Math.round(player1.rating)} ELO</div>
                     <div style="font-size: 0.9em; color:var(--text-secondary); margin-top: 5px;">
                         Comparisons: ${player1.comparisons}
                     </div>
+                    ${player1.positions && player1.positions.length > 1 ? 
+                        `<div class="multi-position-info">Multi-pos: ${player1.positions.map(pos => this.playerManager.positions[pos]).join(', ')}</div>` : ''
+                    }
                 </div>
                 <div class="vs-divider">VS</div>
                 <div class="player-card" onclick="uiController.handlePlayerComparison(${player2.id}, ${player1.id})">
@@ -663,11 +979,16 @@ class UIController {
                         ${player2.name.charAt(0).toUpperCase()}
                     </div>
                     <div class="player-name">${this.escapeHtml(player2.name)}</div>
-                    <div class="player-position">${this.playerManager.positions[player2.position]}</div>
+                    <div class="player-position">
+                        ${this.playerManager.positions[selectedPosition]} (${player2PositionType})
+                    </div>
                     <div class="player-rating">${Math.round(player2.rating)} ELO</div>
                     <div style="font-size: 0.9em; color:var(--text-secondary); margin-top: 5px;">
                         Comparisons: ${player2.comparisons}
                     </div>
+                    ${player2.positions && player2.positions.length > 1 ? 
+                        `<div class="multi-position-info">Multi-pos: ${player2.positions.map(pos => this.playerManager.positions[pos]).join(', ')}</div>` : ''
+                    }
                 </div>
             </div>
         `;
@@ -709,7 +1030,10 @@ class UIController {
         const state = this.stateManager.getState();
         
         if (position) {
-            const positionPlayers = this.playerManager.getPlayersByPosition(position);
+            const positionPlayers = this.playerManager.getPlayersByPosition ? 
+                this.playerManager.getPlayersByPosition(position) : 
+                this.playerManager.getPlayersForPosition(position);
+            
             container.innerHTML = `
                 Players in category "${this.playerManager.positions[position]}s": ${positionPlayers.length}<br>
                 Total comparisons made: ${state.comparisons}

@@ -97,9 +97,21 @@ class StateManager {
      * @param {string} name - player name
      * @param {string} position - position
      */
-    addPlayer(name, position) {
+    addPlayer(name, positions) {
         if (!name?.trim()) {
             throw new Error('Player name is required');
+        }
+
+        // Check that positions is an array
+        if (!Array.isArray(positions) || positions.length === 0) {
+            throw new Error('At least one position is required');
+        }
+
+        // Validate positions
+        const validPositions = ['S', 'OPP', 'OH', 'MB', 'L'];
+        const invalidPositions = positions.filter(pos => !validPositions.includes(pos));
+        if (invalidPositions.length > 0) {
+            throw new Error(`Invalid positions: ${invalidPositions.join(', ')}`);
         }
 
         if (this.state.players.some(p => p.name === name)) {
@@ -109,7 +121,8 @@ class StateManager {
         const newPlayer = {
             id: Date.now() + Math.random(),
             name: name.trim(),
-            position,
+            positions: positions, // Now this is an array of positions
+            primaryPosition: positions[0], // Primary position (first in the list)
             rating: 1500,
             comparisons: 0,
             comparedWith: [],
@@ -121,6 +134,33 @@ class StateManager {
         
         this.notify('playerAdded', newPlayer);
         return newPlayer;
+    }
+
+    // Method to update player positions
+    updatePlayerPositions(playerId, positions) {
+        if (!Array.isArray(positions) || positions.length === 0) {
+            throw new Error('At least one position is required');
+        }
+
+        const validPositions = ['S', 'OPP', 'OH', 'MB', 'L'];
+        const invalidPositions = positions.filter(pos => !validPositions.includes(pos));
+        if (invalidPositions.length > 0) {
+            throw new Error(`Invalid positions: ${invalidPositions.join(', ')}`);
+        }
+
+        const updatedPlayers = this.state.players.map(player => {
+            if (player.id === playerId) {
+                return {
+                    ...player,
+                    positions: positions,
+                    primaryPosition: positions[0] // Update primary position
+                };
+            }
+            return player;
+        });
+
+        this.updateState({ players: updatedPlayers });
+        this.notify('playerPositionsUpdated', { playerId, positions });
     }
 
     /**
@@ -525,16 +565,19 @@ class StateManager {
     /**
      * Normalize player data
      */
+    // Update import methods to support multiple positions
     normalizePlayerData(playerData, rowNumber) {
         const fieldMapping = {
             'name': ['name', 'player_name', 'playername', 'player', 'Name'],
-            'position': ['position', 'pos', 'Position', 'Pos']
+            'positions': ['positions', 'position', 'pos', 'Position', 'Pos'],
+            'primary_position': ['primary_position', 'primary', 'main_position']
         };
 
         const normalized = {
             id: Date.now() + Math.random(),
             name: '',
-            position: 'OH',
+            positions: ['OH'], // Default array with one position
+            primaryPosition: 'OH',
             rating: 1500,
             comparisons: 0,
             comparedWith: [],
@@ -551,9 +594,14 @@ class StateManager {
             throw new Error(`Row ${rowNumber}: Name too long`);
         }
 
-        const positionField = this.findField(playerData, fieldMapping.position);
-        if (positionField) {
-            const pos = positionField.toString().toUpperCase().trim();
+        // Handle positions - can be string "OH,MB" or separate fields
+        const positionsField = this.findField(playerData, fieldMapping.positions);
+        if (positionsField) {
+            const positionsStr = positionsField.toString().toUpperCase().trim();
+            
+            // If positions are separated by commas, semicolons, or spaces
+            const positionsArray = positionsStr.split(/[,;\s]+/).filter(pos => pos.length > 0);
+            
             const validPositions = {
                 'S': 'S', 'SETTER': 'S', 'SET': 'S',
                 'OPP': 'OPP', 'OPPOSITE': 'OPP', 'OP': 'OPP',
@@ -561,7 +609,34 @@ class StateManager {
                 'MB': 'MB', 'MIDDLE': 'MB', 'MIDDLE BLOCKER': 'MB',
                 'L': 'L', 'LIBERO': 'L', 'LIB': 'L'
             };
-            normalized.position = validPositions[pos] || 'OH';
+            
+            const normalizedPositions = positionsArray
+                .map(pos => validPositions[pos])
+                .filter(pos => pos !== undefined);
+            
+            if (normalizedPositions.length > 0) {
+                // Remove duplicates
+                normalized.positions = [...new Set(normalizedPositions)];
+                normalized.primaryPosition = normalized.positions[0];
+            }
+        }
+
+        // Check primary position separately
+        const primaryField = this.findField(playerData, fieldMapping.primary_position);
+        if (primaryField) {
+            const primaryPos = primaryField.toString().toUpperCase().trim();
+            const validPositions = {
+                'S': 'S', 'SETTER': 'S', 'SET': 'S',
+                'OPP': 'OPP', 'OPPOSITE': 'OPP', 'OP': 'OPP',
+                'OH': 'OH', 'OUTSIDE': 'OH', 'OUTSIDE HITTER': 'OH',
+                'MB': 'MB', 'MIDDLE': 'MB', 'MIDDLE BLOCKER': 'MB',
+                'L': 'L', 'LIBERO': 'L', 'LIB': 'L'
+            };
+            
+            const normalizedPrimary = validPositions[primaryPos];
+            if (normalizedPrimary && normalized.positions.includes(normalizedPrimary)) {
+                normalized.primaryPosition = normalizedPrimary;
+            }
         }
 
         return normalized;
@@ -583,11 +658,15 @@ class StateManager {
      * Export players as CSV
      */
     exportPlayersAsCSV() {
-        const headers = ['name', 'position'];
+        const headers = ['name', 'positions', 'primary_position'];
         const csvLines = [headers.join(',')];
         
         this.state.players.forEach(player => {
-            const row = [`"${player.name}"`, player.position];
+            const row = [
+                `"${player.name}"`, 
+                `"${player.positions.join(',')}"`,
+                player.primaryPosition
+            ];
             csvLines.push(row.join(','));
         });
         
@@ -597,14 +676,15 @@ class StateManager {
     /**
      * Generate sample CSV
      */
+    // Update sample CSV
     generateSampleCSV() {
         const sampleData = [
-            ['name', 'position'],
-            ['Andrei Popov', 'OH'],
-            ['Maria Garcia', 'S'],
-            ['Alex Johnson', 'MB'],
-            ['Sarah Wilson', 'L'],
-            ['Mike Brown', 'OPP']
+            ['name', 'positions', 'primary_position'],
+            ['Andrei Popov', 'OH,OPP', 'OH'],
+            ['Maria Garcia', 'S', 'S'],
+            ['Alex Johnson', 'MB,OH', 'MB'],
+            ['Sarah Wilson', 'L', 'L'],
+            ['Mike Brown', 'OPP,OH', 'OPP']
         ];
         
         return sampleData.map(row => 

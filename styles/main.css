@@ -8,6 +8,7 @@
     --accent-blue: #3b82f6;
     --accent-red: #ef4444;
     --accent-orange: #f97316;
+    --accent-green: #10b981;
 }
 
 * {
@@ -170,6 +171,26 @@ body {
     font-weight: bold;
 }
 
+/* Enhanced player card styles for multiple positions */
+.player-card .multi-position-info {
+    font-size: 0.75em;
+    color: var(--accent-blue);
+    margin-top: 0.5rem;
+    padding: 0.3rem 0.5rem;
+    background: rgba(59, 130, 246, 0.1);
+    border-radius: 4px;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+/* Comparison info styles */
+.comparison-info {
+    background: var(--surface-2);
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    margin-bottom: 1rem;
+}
+
 /* Rankings */
 .position-title {
     font-size: 1.5rem;
@@ -230,9 +251,29 @@ body {
     background: linear-gradient(135deg, #e67e22, #d35400);
 }
 
+/* Enhanced ranking item styles */
+.ranking-item .player-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.ranking-item .player-info > div:first-child {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+}
+
+.ranking-item .secondary-position-indicator {
+    font-size: 0.9rem;
+    margin: 0;
+    opacity: 0.7;
+    color: var(--accent-orange);
+}
+
 /* Form & Button Styles */
 .setup-form {
-    max-width: 500px;
+    max-width: 600px;
     margin: 0 auto 2.5rem auto;
     display: grid;
     gap: 1.25rem;
@@ -263,6 +304,118 @@ body {
     -webkit-appearance: none; /* Remove iOS styling */
     -moz-appearance: none; /* Remove Firefox styling */
     appearance: none; /* Remove default browser styling */
+}
+
+/* Multiple Position Selection Styles */
+.positions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0.8rem;
+    margin-top: 0.5rem;
+}
+
+.position-checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.8rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: var(--surface-2);
+    user-select: none;
+}
+
+.position-checkbox-label:hover {
+    border-color: var(--accent-blue);
+    background: var(--surface-1);
+}
+
+.position-checkbox-label input[type="checkbox"] {
+    margin: 0;
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+}
+
+.position-checkbox-label input[type="checkbox"]:checked + span {
+    color: var(--accent-blue);
+    font-weight: 600;
+}
+
+.position-checkbox-label:has(input:checked) {
+    border-color: var(--accent-blue);
+    background: rgba(59, 130, 246, 0.1);
+}
+
+/* Multi-position player indicators */
+.multi-position-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--accent-green), #059669);
+    color: white;
+    font-size: 0.7rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 12px;
+    margin-left: 0.5rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.multi-position-info {
+    font-size: 0.8em;
+    color: var(--accent-blue);
+    margin-top: 0.5rem;
+    font-style: italic;
+}
+
+.secondary-position-indicator {
+    font-size: 0.8rem;
+    margin-left: 0.3rem;
+    opacity: 0.8;
+    color: var(--accent-orange);
+}
+
+/* Enhanced team player display */
+.team-player {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.team-player:last-child {
+    border-bottom: none;
+}
+
+.team-player-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.team-player-name {
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.team-player-position {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-top: 0.2rem;
+}
+
+.team-player-position.secondary {
+    color: var(--accent-orange);
+    font-style: italic;
+}
+
+.team-player-rating {
+    font-weight: 600;
+    color: var(--accent-blue);
+    min-width: 60px;
+    text-align: right;
 }
 
 /* Mobile-specific fixes */
@@ -307,6 +460,39 @@ body {
     #compositionControls .form-group input {
         flex: 0 0 80px !important;
         min-height: 48px !important;
+    }
+
+    /* Mobile position selection */
+    .positions-grid {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+    
+    .position-checkbox-label {
+        padding: 1rem;
+        font-size: 0.95rem;
+    }
+
+    /* Mobile team player display */
+    .team-player {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .team-player-rating {
+        align-self: flex-end;
+    }
+
+    /* Mobile player actions */
+    .player-actions {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .player-actions .btn {
+        min-width: 80px;
+        font-size: 0.8rem;
     }
 }
     
@@ -380,6 +566,19 @@ body {
     border-top: 1px solid var(--border-color);
 }
 
+/* Modal position selection styles */
+.modal .positions-grid {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.modal .position-checkbox-label {
+    padding: 0.6rem;
+    font-size: 0.9rem;
+}
+
 /* Import Specific Styles */
 .import-options {
     display: flex;
@@ -440,7 +639,7 @@ body {
 }
 
 .import-result.success {
-    border-left: 4px solid #10b981;
+    border-left: 4px solid var(--accent-green);
     background: rgba(16, 185, 129, 0.1);
 }
 
@@ -554,14 +753,14 @@ body {
     padding: 1.5rem;
     display: flex;
     justify-content: space-between;
-    align-items: flex-start; /* Align to top */
+    align-items: flex-start;
 }
 
 .player-item .btn {
-    margin-top: 0.25rem; /* Add spacing to the button */
+    margin-top: 0.25rem;
 }
 
-player-content-wrapper {
+.player-content-wrapper {
     display: flex;
     flex-direction: column;
     height: 100%;
@@ -579,6 +778,7 @@ player-content-wrapper {
     display: flex;
     gap: 0.5rem;
     margin-top: 1rem;
+    flex-wrap: wrap;
 }
 
 .player-actions .btn {
@@ -586,15 +786,167 @@ player-content-wrapper {
     font-size: 0.85rem;
 }
 
-.team-player {
-    display: flex;
-    justify-content: space-between;
-    padding: 0.5rem 0;
-    border-bottom: 1px solid var(--border-color);
-}
-
 #importModal #downloadTemplateBtn {
     margin-top: 1rem !important;
+}
+
+/* Position Statistics Enhanced */
+.position-stats-enhanced {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin: 2rem 0;
+    padding: 1rem;
+    background: var(--surface-2);
+    border-radius: 8px;
+}
+
+.position-stat-item {
+    text-align: center;
+    padding: 1rem;
+    border-radius: 8px;
+    background: var(--bg-dark);
+    border: 1px solid var(--border-color);
+}
+
+.position-stat-item .stat-number {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.position-stat-item .stat-label {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-top: 0.3rem;
+}
+
+.position-stat-item .stat-secondary {
+    font-size: 0.8rem;
+    color: var(--accent-blue);
+    margin-top: 0.2rem;
+}
+
+/* Team flexibility indicators */
+.team-flexibility-info {
+    margin-top: 1rem;
+    padding: 0.75rem;
+    background: rgba(59, 130, 246, 0.1);
+    border-radius: 6px;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.team-flexibility-info .flexibility-score {
+    font-weight: 600;
+    color: var(--accent-blue);
+}
+
+.team-flexibility-info .flexibility-details {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-top: 0.3rem;
+}
+
+/* Team composition summary */
+.team-composition-summary {
+    margin-top: 1rem;
+    padding: 0.75rem;
+    background: var(--surface-1);
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+}
+
+.team-composition-summary .composition-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+}
+
+.team-composition-summary .composition-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.team-composition-summary .position-count {
+    padding: 0.2rem 0.5rem;
+    background: var(--surface-2);
+    border-radius: 4px;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.team-composition-summary .position-count.flexible {
+    background: rgba(249, 115, 22, 0.1);
+    color: var(--accent-orange);
+    border: 1px solid rgba(249, 115, 22, 0.2);
+}
+
+/* Animations for enhanced UX */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.player-item {
+    animation: fadeInUp 0.3s ease-out;
+}
+
+.team {
+    animation: fadeInUp 0.3s ease-out;
+}
+
+.ranking-item {
+    animation: fadeInUp 0.2s ease-out;
+}
+
+/* Migration notification styles */
+.migration-notification {
+    background: linear-gradient(135deg, var(--accent-green), #059669);
+    color: white;
+    padding: 1rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+    border: none;
+    box-shadow: 0 4px 6px rgba(16, 185, 129, 0.1);
+}
+
+.migration-notification .migration-title {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.migration-notification .migration-details {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+/* Comparison type indicators */
+.comparison-type-indicator {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.comparison-type-indicator.primary {
+    background: linear-gradient(135deg, var(--accent-blue), #1d4ed8);
+    color: white;
+}
+
+.comparison-type-indicator.secondary {
+    background: linear-gradient(135deg, var(--accent-orange), #ea580c);
+    color: white;
 }
 
 /* Footer Styles */
