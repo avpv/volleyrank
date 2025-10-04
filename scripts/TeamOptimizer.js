@@ -1,5 +1,5 @@
 /**
- * Team optimizer with multiple position ratings
+ * Team optimizer with advanced optimization algorithms
  */
 class TeamOptimizer {
     constructor(eloCalculator) {
@@ -15,9 +15,23 @@ class TeamOptimizer {
         this.config = {
             maxIterations: 50000,
             simulatedAnnealingEnabled: true,
+            geneticAlgorithmEnabled: true,
+            tabuSearchEnabled: true,
             initialTemperature: 1000,
-            coolingRate: 0.995
+            coolingRate: 0.995,
+            // GA parameters
+            populationSize: 20,
+            generationCount: 100,
+            mutationRate: 0.15,
+            crossoverRate: 0.7,
+            // Tabu parameters
+            tabuTenure: 50,
+            tabuIterations: 5000,
+            // Adaptive swap parameters
+            adaptiveSwapEnabled: true
         };
+        
+        this.tabuList = [];
     }
 
     /**
@@ -37,7 +51,7 @@ class TeamOptimizer {
                             ...player,
                             assignedPosition: position,
                             positionRating: player.ratings[position] || 1500,
-                            rating: player.ratings[position] || 1500 // For compatibility
+                            rating: player.ratings[position] || 1500
                         });
                     }
                 });
@@ -95,7 +109,7 @@ class TeamOptimizer {
     }
 
     /**
-     * Main optimization method
+     * Main optimization method - uses all algorithms
      */
     async optimizeTeams(composition, teamCount, availablePlayers) {
         const validation = this.validateTeamRequirements(composition, teamCount, availablePlayers);
@@ -104,6 +118,7 @@ class TeamOptimizer {
         }
 
         const playersByPosition = this.groupPlayersByPosition(availablePlayers);
+        const positions = Object.keys(composition).filter(pos => composition[pos] > 0);
         
         // Generate initial solutions
         const candidates = [];
@@ -115,34 +130,63 @@ class TeamOptimizer {
             candidates.push(this.createRandomSolution(composition, teamCount, playersByPosition));
         }
 
-        // Optimize each candidate
+        // Apply different optimization algorithms
         const optimizedCandidates = [];
-        for (let i = 0; i < candidates.length; i++) {
-            let optimized;
-            
-            if (this.config.simulatedAnnealingEnabled) {
-                optimized = await this.optimizeWithSimulatedAnnealing(
+        
+        // 1. Simulated Annealing
+        if (this.config.simulatedAnnealingEnabled) {
+            for (let i = 0; i < Math.min(2, candidates.length); i++) {
+                const optimized = await this.optimizeWithSimulatedAnnealing(
                     candidates[i], 
-                    Object.keys(composition)
+                    positions
                 );
-            } else {
-                optimized = candidates[i];
+                optimizedCandidates.push({
+                    teams: optimized,
+                    algorithm: 'Simulated Annealing'
+                });
             }
-            
-            optimizedCandidates.push(optimized);
+        }
+
+        // 2. Genetic Algorithm
+        if (this.config.geneticAlgorithmEnabled) {
+            const gaResult = await this.optimizeWithGeneticAlgorithm(
+                candidates,
+                composition,
+                teamCount,
+                playersByPosition,
+                positions
+            );
+            optimizedCandidates.push({
+                teams: gaResult,
+                algorithm: 'Genetic Algorithm'
+            });
+        }
+
+        // 3. Tabu Search
+        if (this.config.tabuSearchEnabled && candidates.length > 0) {
+            const tabuResult = await this.optimizeWithTabuSearch(
+                candidates[0],
+                positions
+            );
+            optimizedCandidates.push({
+                teams: tabuResult,
+                algorithm: 'Tabu Search'
+            });
         }
 
         // Select best solution
-        let bestTeams = optimizedCandidates[0];
-        let bestScore = this.evaluateTeamSolution(bestTeams);
+        let bestResult = optimizedCandidates[0];
+        let bestScore = this.evaluateTeamSolution(bestResult.teams);
 
         for (let i = 1; i < optimizedCandidates.length; i++) {
-            const score = this.evaluateTeamSolution(optimizedCandidates[i]);
+            const score = this.evaluateTeamSolution(optimizedCandidates[i].teams);
             if (score < bestScore) {
                 bestScore = score;
-                bestTeams = optimizedCandidates[i];
+                bestResult = optimizedCandidates[i];
             }
         }
+
+        const bestTeams = bestResult.teams;
 
         // Sort teams by strength
         bestTeams.sort((a, b) => {
@@ -159,8 +203,266 @@ class TeamOptimizer {
             balance,
             unusedPlayers,
             validation,
-            algorithm: 'Multi-Position Rating Optimization'
+            algorithm: bestResult.algorithm
         };
+    }
+
+    /**
+     * GENETIC ALGORITHM - new!
+     */
+    async optimizeWithGeneticAlgorithm(initialPopulation, composition, teamCount, playersByPosition, positions) {
+        // Create initial population
+        let population = [...initialPopulation];
+        
+        // Add more solutions to reach populationSize
+        while (population.length < this.config.populationSize) {
+            population.push(this.createRandomSolution(composition, teamCount, playersByPosition));
+        }
+
+        for (let generation = 0; generation < this.config.generationCount; generation++) {
+            // Evaluate entire population
+            const scored = population.map(individual => ({
+                teams: individual,
+                score: this.evaluateTeamSolution(individual)
+            })).sort((a, b) => a.score - b.score);
+
+            // Selection: take top 50%
+            const selected = scored.slice(0, Math.floor(this.config.populationSize / 2));
+
+            // New generation
+            const newPopulation = selected.map(s => s.teams);
+
+            // Crossover (breeding)
+            while (newPopulation.length < this.config.populationSize) {
+                if (Math.random() < this.config.crossoverRate) {
+                    const parent1 = selected[Math.floor(Math.random() * selected.length)].teams;
+                    const parent2 = selected[Math.floor(Math.random() * selected.length)].teams;
+                    const child = this.crossover(parent1, parent2, positions);
+                    newPopulation.push(child);
+                } else {
+                    const parent = selected[Math.floor(Math.random() * selected.length)].teams;
+                    newPopulation.push(JSON.parse(JSON.stringify(parent)));
+                }
+            }
+
+            // Mutation
+            for (let i = Math.floor(this.config.populationSize / 2); i < newPopulation.length; i++) {
+                if (Math.random() < this.config.mutationRate) {
+                    this.mutate(newPopulation[i], positions);
+                }
+            }
+
+            population = newPopulation;
+
+            // Progress update every 10 generations
+            if (generation % 10 === 0) {
+                await new Promise(resolve => setTimeout(resolve, 1));
+            }
+        }
+
+        // Return best solution
+        const finalScored = population.map(individual => ({
+            teams: individual,
+            score: this.evaluateTeamSolution(individual)
+        })).sort((a, b) => a.score - b.score);
+
+        return finalScored[0].teams;
+    }
+
+    /**
+     * Crossover (single-point crossover)
+     */
+    crossover(parent1, parent2, positions) {
+        const child = JSON.parse(JSON.stringify(parent1));
+        const crossoverPoint = Math.floor(Math.random() * positions.length);
+
+        // Take positions after crossover point from parent2
+        for (let i = crossoverPoint; i < positions.length; i++) {
+            const position = positions[i];
+            
+            // Collect players of this position from both parents
+            const p1Players = [];
+            const p2Players = [];
+            
+            parent1.forEach((team, teamIdx) => {
+                team.forEach(player => {
+                    if (player.assignedPosition === position) {
+                        p1Players.push({ player, teamIdx });
+                    }
+                });
+            });
+            
+            parent2.forEach((team, teamIdx) => {
+                team.forEach(player => {
+                    if (player.assignedPosition === position) {
+                        p2Players.push({ player, teamIdx });
+                    }
+                });
+            });
+
+            // Replace players of this position in child with players from parent2
+            child.forEach(team => {
+                for (let j = team.length - 1; j >= 0; j--) {
+                    if (team[j].assignedPosition === position) {
+                        team.splice(j, 1);
+                    }
+                }
+            });
+
+            p2Players.forEach(({ player, teamIdx }) => {
+                child[teamIdx].push(player);
+            });
+        }
+
+        return child;
+    }
+
+    /**
+     * Mutation (random swap)
+     */
+    mutate(teams, positions) {
+        const swapCount = Math.floor(Math.random() * 3) + 1;
+        for (let i = 0; i < swapCount; i++) {
+            this.performSingleSwap(teams, positions);
+        }
+    }
+
+    /**
+     * TABU SEARCH - new!
+     */
+    async optimizeWithTabuSearch(initialTeams, positions) {
+        let currentTeams = JSON.parse(JSON.stringify(initialTeams));
+        let bestTeams = JSON.parse(JSON.stringify(initialTeams));
+        let currentScore = this.evaluateTeamSolution(currentTeams);
+        let bestScore = currentScore;
+        
+        this.tabuList = [];
+        
+        for (let iteration = 0; iteration < this.config.tabuIterations; iteration++) {
+            // Generate neighbors (candidates)
+            const neighbors = this.generateNeighbors(currentTeams, positions, 20);
+            
+            // Select best non-tabu neighbor
+            let bestNeighbor = null;
+            let bestNeighborScore = Infinity;
+            
+            for (const neighbor of neighbors) {
+                const neighborHash = this.hashSolution(neighbor);
+                const score = this.evaluateTeamSolution(neighbor);
+                
+                // Aspiration criterion: accept tabu solution if it's better than best
+                const isTabu = this.tabuList.includes(neighborHash);
+                
+                if (!isTabu || score < bestScore) {
+                    if (score < bestNeighborScore) {
+                        bestNeighbor = neighbor;
+                        bestNeighborScore = score;
+                    }
+                }
+            }
+            
+            if (bestNeighbor) {
+                currentTeams = bestNeighbor;
+                currentScore = bestNeighborScore;
+                
+                // Add to tabu list
+                const hash = this.hashSolution(currentTeams);
+                this.tabuList.push(hash);
+                if (this.tabuList.length > this.config.tabuTenure) {
+                    this.tabuList.shift();
+                }
+                
+                // Update best solution
+                if (currentScore < bestScore) {
+                    bestTeams = JSON.parse(JSON.stringify(currentTeams));
+                    bestScore = currentScore;
+                }
+            }
+            
+            if (iteration % 500 === 0) {
+                await new Promise(resolve => setTimeout(resolve, 1));
+            }
+        }
+        
+        return bestTeams;
+    }
+
+    /**
+     * Generate neighbors for Tabu Search
+     */
+    generateNeighbors(teams, positions, count) {
+        const neighbors = [];
+        
+        for (let i = 0; i < count; i++) {
+            const neighbor = JSON.parse(JSON.stringify(teams));
+            
+            // Use adaptive swap strategy
+            if (this.config.adaptiveSwapEnabled) {
+                this.performAdaptiveSwap(neighbor, positions);
+            } else {
+                this.performSingleSwap(neighbor, positions);
+            }
+            
+            neighbors.push(neighbor);
+        }
+        
+        return neighbors;
+    }
+
+    /**
+     * Hash solution for tabu list
+     */
+    hashSolution(teams) {
+        return teams.map(team => 
+            team.map(p => p.id).sort().join(',')
+        ).join('|');
+    }
+
+    /**
+     * ADAPTIVE SWAP STRATEGY - new!
+     * Intelligent player swap selection
+     */
+    performAdaptiveSwap(teams, positions) {
+        // Find strongest and weakest teams
+        const teamStrengths = teams.map((team, idx) => ({
+            idx,
+            strength: this.calculateTeamStrength(team)
+        }));
+        
+        teamStrengths.sort((a, b) => b.strength - a.strength);
+        
+        const strongestIdx = teamStrengths[0].idx;
+        const weakestIdx = teamStrengths[teamStrengths.length - 1].idx;
+        
+        // 70% probability: swap between strongest and weakest
+        if (Math.random() < 0.7 && strongestIdx !== weakestIdx) {
+            const position = positions[Math.floor(Math.random() * positions.length)];
+            
+            const strongPlayers = teams[strongestIdx].filter(p => p.assignedPosition === position);
+            const weakPlayers = teams[weakestIdx].filter(p => p.assignedPosition === position);
+            
+            if (strongPlayers.length > 0 && weakPlayers.length > 0) {
+                // Find weakest in strong team and strongest in weak team
+                const weakestInStrong = strongPlayers.reduce((min, p) => 
+                    p.positionRating < min.positionRating ? p : min
+                );
+                const strongestInWeak = weakPlayers.reduce((max, p) => 
+                    p.positionRating > max.positionRating ? p : max
+                );
+                
+                const idx1 = teams[strongestIdx].findIndex(p => p.id === weakestInStrong.id);
+                const idx2 = teams[weakestIdx].findIndex(p => p.id === strongestInWeak.id);
+                
+                if (idx1 !== -1 && idx2 !== -1) {
+                    [teams[strongestIdx][idx1], teams[weakestIdx][idx2]] = 
+                    [teams[weakestIdx][idx2], teams[strongestIdx][idx1]];
+                    return;
+                }
+            }
+        }
+        
+        // Otherwise random swap
+        this.performSingleSwap(teams, positions);
     }
 
     /**
@@ -239,7 +541,6 @@ class TeamOptimizer {
                 .filter(p => !usedPlayerIds.has(p.id))
                 .slice(0, neededCount * teamCount);
             
-            // Shuffle
             for (let i = positionPlayers.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [positionPlayers[i], positionPlayers[j]] = [positionPlayers[j], positionPlayers[i]];
@@ -255,7 +556,7 @@ class TeamOptimizer {
     }
 
     /**
-     * Calculate team strength using position-specific ratings
+     * Calculate team strength
      */
     calculateTeamStrength(team) {
         if (!team || team.length === 0) {
@@ -270,7 +571,7 @@ class TeamOptimizer {
     }
 
     /**
-     * Evaluate team solution
+     * Evaluate team solution (целевая функция)
      */
     evaluateTeamSolution(teams) {
         if (!teams || teams.length === 0) return Infinity;
@@ -376,7 +677,13 @@ class TeamOptimizer {
      */
     generateNeighborSolution(teams, positions) {
         const newTeams = JSON.parse(JSON.stringify(teams));
-        this.performSingleSwap(newTeams, positions);
+        
+        if (this.config.adaptiveSwapEnabled) {
+            this.performAdaptiveSwap(newTeams, positions);
+        } else {
+            this.performSingleSwap(newTeams, positions);
+        }
+        
         return newTeams;
     }
 
