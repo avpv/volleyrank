@@ -15,7 +15,7 @@
 
     <div class="container">
         <!-- Welcome Guide for New Users -->
-        <div id="welcomeGuide" style="background: var(--surface-2); border: 2px solid var(--accent-blue); color: var(--text-primary); padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem; display: none;">
+        <div id="welcomeGuide" style="background: var(--surface-2); border: 2px solid var(--accent-blue); color: var(--text-primary); padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem;">
             <h3 style="margin: 0 0 1rem 0; color: var(--accent-blue);">👋 Welcome to VolleyRank!</h3>
             <p style="margin: 0 0 0.5rem 0; color: var(--text-secondary);">Using advanced algorithms and ELO rating system to optimize your volleyball team</p>
             <p style="margin: 0 0 1rem 0; color: var(--text-secondary);">Get started in 3 easy steps:</p>
@@ -244,19 +244,6 @@
     <script src="scripts/TeamOptimizer.js"></script>
     <script src="scripts/UIController.js"></script>
     <script src="scripts/app.js"></script>
-
-    <script>
-        // Show welcome guide for new users
-        document.addEventListener('DOMContentLoaded', function() {
-            const hideWelcome = localStorage.getItem('hideWelcome');
-            const hasPlayers = localStorage.getItem('volleyRankData');
-            
-            if (!hideWelcome && !hasPlayers) {
-                document.getElementById('welcomeGuide').style.display = 'block';
-                document.getElementById('quickStart').style.display = 'block';
-            }
-        });
-    </script>
 
 </body>
 </html>
