@@ -135,11 +135,48 @@ volleyrank/
 │   ├── StateManager.js     # State management with v3.0 data structure
 │   ├── PlayerManager.js    # Multi-position player logic
 │   ├── EloCalculator.js    # Position-specific ELO calculations
-│   ├── TeamOptimizer.js    # Position-aware team balancing
+│   ├── TeamOptimizer.js    # Advanced team balancing (SA/GA/TS)
 │   ├── UIController.js     # UI with multi-position support
 │   └── app.js             # Application initialization
 └── README.md              # This file
 ```
+
+## Optimization Algorithms
+
+### Algorithm Comparison
+
+| Algorithm | Iterations | Key Feature | Best For |
+|-----------|-----------|-------------|----------|
+| **Simulated Annealing** | 50,000 | Probabilistic acceptance | Escaping local optima |
+| **Genetic Algorithm** | 20×100 | Population evolution | Global exploration |
+| **Tabu Search** | 5,000 | Memory-based prohibition | Avoiding cycles |
+| **Adaptive Swaps** | Embedded | Intelligent targeting | Fast convergence |
+
+### Configuration Parameters
+
+```javascript
+{
+  // Simulated Annealing
+  maxIterations: 50000,
+  initialTemperature: 1000,
+  coolingRate: 0.995,
+  
+  // Genetic Algorithm
+  populationSize: 20,
+  generationCount: 100,
+  mutationRate: 0.15,
+  crossoverRate: 0.7,
+  
+  // Tabu Search
+  tabuTenure: 50,
+  tabuIterations: 5000,
+  
+  // Adaptive Swaps
+  adaptiveSwapEnabled: true
+}
+```
+
+
 
 ## Browser Compatibility
 
@@ -175,4 +212,4 @@ Open source - feel free to use and modify for your volleyball team!
 
 ---
 
-**Version 3.0** - Multi-Position Rating System
+**Version 3.0** - Multi-Position Rating System with Advanced Optimization Algorithms
