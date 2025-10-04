@@ -1,5 +1,6 @@
 /**
  * ELO rating system for calculating rating changes
+ * Updated to support multiple position ratings
  */
 class EloCalculator {
     constructor() {
@@ -45,32 +46,38 @@ class EloCalculator {
     }
 
     /**
-     * Calculate rating change
+     * Calculate rating change for a specific position
      * @param {object} winner - winner object
      * @param {object} loser - loser object
+     * @param {string} position - position being compared
      * @returns {object} new ratings
      */
-    calculateRatingChange(winner, loser) {
-        const winnerExpected = this.calculateExpectedScore(winner.rating, loser.rating);
-        const loserExpected = this.calculateExpectedScore(loser.rating, winner.rating);
+    calculateRatingChangeForPosition(winner, loser, position) {
+        const winnerRating = winner.ratings[position] || this.defaultRating;
+        const loserRating = loser.ratings[position] || this.defaultRating;
+        const winnerComparisons = winner.comparisons[position] || 0;
+        const loserComparisons = loser.comparisons[position] || 0;
 
-        const winnerKFactor = this.calculateKFactor(winner.comparisons, winner.rating);
-        const loserKFactor = this.calculateKFactor(loser.comparisons, loser.rating);
+        const winnerExpected = this.calculateExpectedScore(winnerRating, loserRating);
+        const loserExpected = this.calculateExpectedScore(loserRating, winnerRating);
+
+        const winnerKFactor = this.calculateKFactor(winnerComparisons, winnerRating);
+        const loserKFactor = this.calculateKFactor(loserComparisons, loserRating);
 
         const winnerChange = winnerKFactor * (1 - winnerExpected);
         const loserChange = loserKFactor * (0 - loserExpected);
 
         return {
             winner: {
-                oldRating: winner.rating,
-                newRating: winner.rating + winnerChange,
+                oldRating: winnerRating,
+                newRating: winnerRating + winnerChange,
                 change: winnerChange,
                 kFactor: winnerKFactor,
                 expected: winnerExpected
             },
             loser: {
-                oldRating: loser.rating,
-                newRating: loser.rating + loserChange,
+                oldRating: loserRating,
+                newRating: loserRating + loserChange,
                 change: loserChange,
                 kFactor: loserKFactor,
                 expected: loserExpected
@@ -79,36 +86,118 @@ class EloCalculator {
     }
 
     /**
-     * Predict match win probability
+     * Legacy method for backward compatibility
+     */
+    calculateRatingChange(winner, loser) {
+        // Use the first position or default rating
+        const position = winner.positions ? winner.positions[0] : null;
+        if (position) {
+            return this.calculateRatingChangeForPosition(winner, loser, position);
+        }
+        
+        // Fallback for old data structure
+        const winnerRating = winner.rating || this.defaultRating;
+        const loserRating = loser.rating || this.defaultRating;
+        const winnerComparisons = winner.comparisons || 0;
+        const loserComparisons = loser.comparisons || 0;
+
+        const winnerExpected = this.calculateExpectedScore(winnerRating, loserRating);
+        const loserExpected = this.calculateExpectedScore(loserRating, winnerRating);
+
+        const winnerKFactor = this.calculateKFactor(winnerComparisons, winnerRating);
+        const loserKFactor = this.calculateKFactor(loserComparisons, loserRating);
+
+        const winnerChange = winnerKFactor * (1 - winnerExpected);
+        const loserChange = loserKFactor * (0 - loserExpected);
+
+        return {
+            winner: {
+                oldRating: winnerRating,
+                newRating: winnerRating + winnerChange,
+                change: winnerChange,
+                kFactor: winnerKFactor,
+                expected: winnerExpected
+            },
+            loser: {
+                oldRating: loserRating,
+                newRating: loserRating + loserChange,
+                change: loserChange,
+                kFactor: loserKFactor,
+                expected: loserExpected
+            }
+        };
+    }
+
+    /**
+     * Predict match win probability for a specific position
      * @param {object} player1 - first player
      * @param {object} player2 - second player
+     * @param {string} position - position to compare
      * @returns {object} win probabilities
      */
-    predictMatch(player1, player2) {
-        const player1WinProbability = this.calculateExpectedScore(player1.rating, player2.rating);
-        const player2WinProbability = this.calculateExpectedScore(player2.rating, player1.rating);
+    predictMatchAtPosition(player1, player2, position) {
+        const p1Rating = player1.ratings[position] || this.defaultRating;
+        const p2Rating = player2.ratings[position] || this.defaultRating;
+
+        const player1WinProbability = this.calculateExpectedScore(p1Rating, p2Rating);
+        const player2WinProbability = this.calculateExpectedScore(p2Rating, p1Rating);
 
         return {
             player1: {
                 name: player1.name,
-                rating: player1.rating,
+                rating: p1Rating,
+                position: position,
                 winProbability: player1WinProbability,
                 winPercentage: Math.round(player1WinProbability * 100)
             },
             player2: {
                 name: player2.name,
-                rating: player2.rating,
+                rating: p2Rating,
+                position: position,
                 winProbability: player2WinProbability,
                 winPercentage: Math.round(player2WinProbability * 100)
             },
-            ratingDifference: Math.abs(player1.rating - player2.rating),
-            isBalanced: Math.abs(player1.rating - player2.rating) < 200
+            ratingDifference: Math.abs(p1Rating - p2Rating),
+            isBalanced: Math.abs(p1Rating - p2Rating) < 200
         };
     }
 
     /**
-     * Calculate team strength
-     * @param {array} players - array of players
+     * Legacy method for backward compatibility
+     */
+    predictMatch(player1, player2) {
+        const position = player1.positions ? player1.positions[0] : null;
+        if (position) {
+            return this.predictMatchAtPosition(player1, player2, position);
+        }
+
+        const p1Rating = player1.rating || this.defaultRating;
+        const p2Rating = player2.rating || this.defaultRating;
+
+        const player1WinProbability = this.calculateExpectedScore(p1Rating, p2Rating);
+        const player2WinProbability = this.calculateExpectedScore(p2Rating, p1Rating);
+
+        return {
+            player1: {
+                name: player1.name,
+                rating: p1Rating,
+                winProbability: player1WinProbability,
+                winPercentage: Math.round(player1WinProbability * 100)
+            },
+            player2: {
+                name: player2.name,
+                rating: p2Rating,
+                winProbability: player2WinProbability,
+                winPercentage: Math.round(player2WinProbability * 100)
+            },
+            ratingDifference: Math.abs(p1Rating - p2Rating),
+            isBalanced: Math.abs(p1Rating - p2Rating) < 200
+        };
+    }
+
+    /**
+     * Calculate team strength (updated for position-specific ratings)
+     * @param {array} players - array of players with assigned positions
      * @returns {object} team statistics
      */
     calculateTeamStrength(players) {
@@ -121,14 +210,21 @@ class EloCalculator {
             };
         }
 
-        const totalRating = players.reduce((sum, player) => sum + player.rating, 0);
-        const averageRating = totalRating / players.length;
-
-        // Count team composition
+        let totalRating = 0;
         const composition = {};
+
         players.forEach(player => {
-            composition[player.position] = (composition[player.position] || 0) + 1;
+            // Use assigned position rating if available, otherwise use first position
+            const position = player.assignedPosition || (player.positions ? player.positions[0] : null);
+            const rating = position && player.ratings ? 
+                (player.ratings[position] || this.defaultRating) : 
+                (player.rating || this.defaultRating);
+            
+            totalRating += rating;
+            composition[position] = (composition[position] || 0) + 1;
         });
+
+        const averageRating = totalRating / players.length;
 
         return {
             totalRating: Math.round(totalRating),
@@ -242,7 +338,7 @@ class EloCalculator {
     }
 
     /**
-     * Calculate player progress over time
+     * Calculate player progress over time for a specific position
      * @param {array} ratingHistory - rating history
      * @returns {object} progress statistics
      */
@@ -281,6 +377,52 @@ class EloCalculator {
             gamesPlayed: ratingHistory.length,
             recentTrend: Math.round(recentTrend)
         };
+    }
+
+    /**
+     * Get player's best position based on ratings
+     * @param {object} player - player object with ratings
+     * @returns {object} best position info
+     */
+    getBestPosition(player) {
+        if (!player.ratings || !player.positions || player.positions.length === 0) {
+            return null;
+        }
+
+        let bestPosition = null;
+        let bestRating = 0;
+
+        player.positions.forEach(pos => {
+            const rating = player.ratings[pos] || this.defaultRating;
+            if (rating > bestRating) {
+                bestRating = rating;
+                bestPosition = pos;
+            }
+        });
+
+        return {
+            position: bestPosition,
+            rating: bestRating,
+            comparisons: player.comparisons[bestPosition] || 0
+        };
+    }
+
+    /**
+     * Compare player's ratings across positions
+     * @param {object} player - player object with ratings
+     * @returns {array} position comparison data
+     */
+    comparePlayerPositions(player) {
+        if (!player.ratings || !player.positions) {
+            return [];
+        }
+
+        return player.positions.map(pos => ({
+            position: pos,
+            rating: player.ratings[pos] || this.defaultRating,
+            comparisons: player.comparisons[pos] || 0,
+            comparedWith: (player.comparedWith[pos] || []).length
+        })).sort((a, b) => b.rating - a.rating);
     }
 }
 
