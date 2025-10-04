@@ -1,6 +1,5 @@
-
 /**
- * Centralized application state management
+ * Centralized application state management - Multiple Ratings Version
  */
 class StateManager {
     constructor() {
@@ -8,16 +7,16 @@ class StateManager {
             players: [],
             comparisons: 0,
             currentPair: null,
-            selectedPosition: ''
+            selectedPosition: '',
+            currentComparisonPosition: null // Track which position is being compared
         };
         this.subscribers = new Map();
         this.storageKey = 'volleyRankData';
+        this.version = '3.0'; // New version for multiple ratings
     }
 
     /**
      * Subscribe to state changes
-     * @param {string} event - event name
-     * @param {function} callback - callback function
      */
     subscribe(event, callback) {
         if (!this.subscribers.has(event)) {
@@ -28,8 +27,6 @@ class StateManager {
 
     /**
      * Unsubscribe from events
-     * @param {string} event - event name
-     * @param {function} callback - function to remove
      */
     unsubscribe(event, callback) {
         if (this.subscribers.has(event)) {
@@ -43,8 +40,6 @@ class StateManager {
 
     /**
      * Notify subscribers about state change
-     * @param {string} event - event name
-     * @param {*} data - event data
      */
     notify(event, data = null) {
         if (this.subscribers.has(event)) {
@@ -60,7 +55,6 @@ class StateManager {
 
     /**
      * Get current state
-     * @returns {object} current state
      */
     getState() {
         return { ...this.state };
@@ -68,12 +62,10 @@ class StateManager {
 
     /**
      * Safe state update
-     * @param {object} updates - object with updates
      */
     updateState(updates) {
         const oldState = { ...this.state };
         
-        // Validate updates
         if (updates.players && !Array.isArray(updates.players)) {
             throw new Error('Players must be an array');
         }
@@ -82,32 +74,23 @@ class StateManager {
             throw new Error('Comparisons must be a number');
         }
 
-        // Apply updates
         Object.assign(this.state, updates);
-
-        // Auto-save
         this.saveToStorage();
-
-        // Notify subscribers
         this.notify('stateChanged', { oldState, newState: this.state });
     }
 
     /**
-     * Add player
-     * @param {string} name - player name
-     * @param {string} position - position
+     * Add player with multiple ratings structure
      */
     addPlayer(name, positions) {
         if (!name?.trim()) {
             throw new Error('Player name is required');
         }
 
-        // Check that positions is an array
         if (!Array.isArray(positions) || positions.length === 0) {
             throw new Error('At least one position is required');
         }
 
-        // Validate positions
         const validPositions = ['S', 'OPP', 'OH', 'MB', 'L'];
         const invalidPositions = positions.filter(pos => !validPositions.includes(pos));
         if (invalidPositions.length > 0) {
@@ -118,14 +101,24 @@ class StateManager {
             throw new Error('Player with this name already exists');
         }
 
+        // Create ratings object with 1500 for each position
+        const ratings = {};
+        const comparisons = {};
+        const comparedWith = {};
+        
+        positions.forEach(pos => {
+            ratings[pos] = 1500;
+            comparisons[pos] = 0;
+            comparedWith[pos] = [];
+        });
+
         const newPlayer = {
             id: Date.now() + Math.random(),
             name: name.trim(),
-            positions: positions, // Now this is an array of positions
-            primaryPosition: positions[0], // Primary position (first in the list)
-            rating: 1500,
-            comparisons: 0,
-            comparedWith: [],
+            positions: positions,
+            ratings: ratings,
+            comparisons: comparisons,
+            comparedWith: comparedWith,
             createdAt: new Date().toISOString()
         };
 
@@ -136,7 +129,9 @@ class StateManager {
         return newPlayer;
     }
 
-    // Method to update player positions
+    /**
+     * Update player positions
+     */
     updatePlayerPositions(playerId, positions) {
         if (!Array.isArray(positions) || positions.length === 0) {
             throw new Error('At least one position is required');
@@ -150,10 +145,23 @@ class StateManager {
 
         const updatedPlayers = this.state.players.map(player => {
             if (player.id === playerId) {
+                const newRatings = {};
+                const newComparisons = {};
+                const newComparedWith = {};
+                
+                // Keep existing ratings for positions that remain
+                positions.forEach(pos => {
+                    newRatings[pos] = player.ratings[pos] || 1500;
+                    newComparisons[pos] = player.comparisons[pos] || 0;
+                    newComparedWith[pos] = player.comparedWith[pos] || [];
+                });
+
                 return {
                     ...player,
                     positions: positions,
-                    primaryPosition: positions[0] // Update primary position
+                    ratings: newRatings,
+                    comparisons: newComparisons,
+                    comparedWith: newComparedWith
                 };
             }
             return player;
@@ -165,7 +173,6 @@ class StateManager {
 
     /**
      * Remove player
-     * @param {number} playerId - player ID
      */
     removePlayer(playerId) {
         const playerIndex = this.state.players.findIndex(p => p.id === playerId);
@@ -176,9 +183,13 @@ class StateManager {
         const removedPlayer = this.state.players[playerIndex];
         const updatedPlayers = this.state.players.filter(p => p.id !== playerId);
         
-        // Remove from other players' comparison lists
+        // Remove from other players' comparison lists (all positions)
         updatedPlayers.forEach(player => {
-            player.comparedWith = player.comparedWith.filter(name => name !== removedPlayer.name);
+            Object.keys(player.comparedWith).forEach(pos => {
+                player.comparedWith[pos] = player.comparedWith[pos].filter(
+                    name => name !== removedPlayer.name
+                );
+            });
         });
 
         this.updateState({ players: updatedPlayers });
@@ -186,23 +197,36 @@ class StateManager {
     }
 
     /**
-     * Reset player rating
-     * @param {number} playerId - player ID
+     * Reset player ratings for all positions
      */
     resetPlayer(playerId) {
         const updatedPlayers = this.state.players.map(player => {
             if (player.id === playerId) {
+                const resetRatings = {};
+                const resetComparisons = {};
+                const resetComparedWith = {};
+                
+                player.positions.forEach(pos => {
+                    resetRatings[pos] = 1500;
+                    resetComparisons[pos] = 0;
+                    resetComparedWith[pos] = [];
+                });
+                
                 const resetPlayer = {
                     ...player,
-                    rating: 1500,
-                    comparisons: 0,
-                    comparedWith: []
+                    ratings: resetRatings,
+                    comparisons: resetComparisons,
+                    comparedWith: resetComparedWith
                 };
                 
                 // Remove from other players' comparison lists
                 this.state.players.forEach(p => {
                     if (p.id !== playerId) {
-                        p.comparedWith = p.comparedWith.filter(name => name !== player.name);
+                        Object.keys(p.comparedWith).forEach(pos => {
+                            p.comparedWith[pos] = p.comparedWith[pos].filter(
+                                name => name !== player.name
+                            );
+                        });
                     }
                 });
 
@@ -216,11 +240,13 @@ class StateManager {
     }
 
     /**
-     * Update ratings after comparison
-     * @param {number} winnerId - winner ID
-     * @param {number} loserId - loser ID
+     * Update ratings after comparison for specific position
      */
-    updateRatingsAfterComparison(winnerId, loserId) {
+    updateRatingsAfterComparison(winnerId, loserId, position) {
+        if (!position) {
+            throw new Error('Position is required for comparison');
+        }
+
         const updatedPlayers = this.state.players.map(player => {
             if (player.id === winnerId || player.id === loserId) {
                 return { ...player };
@@ -235,23 +261,30 @@ class StateManager {
             throw new Error('Winner or loser not found');
         }
 
-        // ELO calculation
-        const expectedWin = 1 / (1 + Math.pow(10, (loser.rating - winner.rating) / 400));
+        if (!winner.ratings[position] || !loser.ratings[position]) {
+            throw new Error(`Player does not have rating for position ${position}`);
+        }
+
+        // ELO calculation for this specific position
+        const winnerRating = winner.ratings[position];
+        const loserRating = loser.ratings[position];
+        
+        const expectedWin = 1 / (1 + Math.pow(10, (loserRating - winnerRating) / 400));
         const kFactor = 30;
 
-        winner.rating += kFactor * (1 - expectedWin);
-        loser.rating += kFactor * (0 - (1 - expectedWin));
+        winner.ratings[position] += kFactor * (1 - expectedWin);
+        loser.ratings[position] += kFactor * (0 - (1 - expectedWin));
         
-        // Update statistics
-        winner.comparisons++;
-        loser.comparisons++;
+        // Update statistics for this position
+        winner.comparisons[position]++;
+        loser.comparisons[position]++;
 
-        // Update comparison lists
-        if (!winner.comparedWith.includes(loser.name)) {
-            winner.comparedWith.push(loser.name);
+        // Update comparison lists for this position
+        if (!winner.comparedWith[position].includes(loser.name)) {
+            winner.comparedWith[position].push(loser.name);
         }
-        if (!loser.comparedWith.includes(winner.name)) {
-            loser.comparedWith.push(winner.name);
+        if (!loser.comparedWith[position].includes(winner.name)) {
+            loser.comparedWith[position].push(winner.name);
         }
 
         const newComparisons = this.state.comparisons + 1;
@@ -262,16 +295,53 @@ class StateManager {
             currentPair: null
         });
 
-        this.notify('comparisonCompleted', { winner, loser, newComparisons });
+        this.notify('comparisonCompleted', { winner, loser, position, newComparisons });
     }
 
     /**
      * Set current pair for comparison
-     * @param {object} pair - pair of players [player1, player2]
      */
-    setCurrentPair(pair) {
-        this.updateState({ currentPair: pair });
-        this.notify('pairSelected', pair);
+    setCurrentPair(pair, position) {
+        this.updateState({ 
+            currentPair: pair,
+            currentComparisonPosition: position 
+        });
+        this.notify('pairSelected', { pair, position });
+    }
+
+    /**
+     * Migrate old data to new structure
+     */
+    migrateToMultipleRatings(players) {
+        return players.map(player => {
+            // If already has new structure, return as is
+            if (player.ratings && typeof player.ratings === 'object') {
+                return player;
+            }
+
+            // Migrate from old structure
+            const positions = player.positions || [player.position || 'OH'];
+            const ratings = {};
+            const comparisons = {};
+            const comparedWith = {};
+            
+            positions.forEach(pos => {
+                ratings[pos] = player.rating || 1500;
+                comparisons[pos] = player.comparisons || 0;
+                comparedWith[pos] = Array.isArray(player.comparedWith) ? 
+                    [...player.comparedWith] : [];
+            });
+
+            return {
+                id: player.id || Date.now() + Math.random(),
+                name: player.name,
+                positions: positions,
+                ratings: ratings,
+                comparisons: comparisons,
+                comparedWith: comparedWith,
+                createdAt: player.createdAt || new Date().toISOString()
+            };
+        });
     }
 
     /**
@@ -282,6 +352,7 @@ class StateManager {
             const dataToSave = {
                 players: this.state.players,
                 comparisons: this.state.comparisons,
+                version: this.version,
                 savedAt: new Date().toISOString()
             };
             localStorage.setItem(this.storageKey, JSON.stringify(dataToSave));
@@ -292,7 +363,7 @@ class StateManager {
     }
 
     /**
-     * Load from localStorage
+     * Load from localStorage with migration
      */
     loadFromStorage() {
         try {
@@ -300,14 +371,21 @@ class StateManager {
             if (saved) {
                 const data = JSON.parse(saved);
                 
-                const players = Array.isArray(data.players) ? data.players : [];
+                let players = Array.isArray(data.players) ? data.players : [];
                 const comparisons = typeof data.comparisons === 'number' ? data.comparisons : 0;
+
+                // Migrate if old version
+                if (!data.version || data.version !== this.version) {
+                    players = this.migrateToMultipleRatings(players);
+                    this.notify('dataMigrated', { 
+                        message: 'Data migrated to multiple ratings system',
+                        playersUpdated: players.length 
+                    });
+                }
 
                 const playersWithIds = players.map(player => ({
                     ...player,
-                    id: player.id || Date.now() + Math.random(),
-                    comparisons: player.comparisons || 0,
-                    comparedWith: player.comparedWith || []
+                    id: player.id || Date.now() + Math.random()
                 }));
 
                 this.updateState({ 
@@ -332,20 +410,8 @@ class StateManager {
      * Initialize demo data
      */
     initializeDemoData() {
-        const demoPlayers = [
-            {
-                id: 1,
-                name: "Andrei Popov",
-                position: "OH",
-                rating: 1500,
-                comparisons: 0,
-                comparedWith: [],
-                createdAt: new Date().toISOString()
-            }
-        ];
-
         this.updateState({ 
-            players: demoPlayers, 
+            players: [], 
             comparisons: 0,
             currentPair: null,
             selectedPosition: ''
@@ -374,20 +440,18 @@ class StateManager {
 
     /**
      * Export data
-     * @returns {string} JSON string with data
      */
     exportData() {
         return JSON.stringify({
             players: this.state.players,
             comparisons: this.state.comparisons,
-            exportedAt: new Date().toISOString(),
-            version: '2.0'
+            version: this.version,
+            exportedAt: new Date().toISOString()
         }, null, 2);
     }
 
     /**
-     * Import full application data
-     * @param {string} jsonData - JSON string with complete app data
+     * Import data
      */
     importData(jsonData) {
         try {
@@ -397,24 +461,16 @@ class StateManager {
                 throw new Error('Invalid data format: players must be an array');
             }
 
-            const validatedPlayers = data.players.map((player, index) => ({
-                id: player.id || Date.now() + index,
-                name: player.name || `Player ${index + 1}`,
-                position: player.position || 'OH',
-                rating: typeof player.rating === 'number' ? player.rating : 1500,
-                comparisons: typeof player.comparisons === 'number' ? player.comparisons : 0,
-                comparedWith: Array.isArray(player.comparedWith) ? player.comparedWith : [],
-                createdAt: player.createdAt || new Date().toISOString()
-            }));
+            let players = this.migrateToMultipleRatings(data.players);
 
             this.updateState({
-                players: validatedPlayers,
+                players: players,
                 comparisons: typeof data.comparisons === 'number' ? data.comparisons : 0,
                 currentPair: null,
                 selectedPosition: ''
             });
 
-            this.notify('dataImported', { playersCount: validatedPlayers.length });
+            this.notify('dataImported', { playersCount: players.length });
             
         } catch (error) {
             console.error('Failed to import data:', error);
@@ -424,10 +480,7 @@ class StateManager {
     }
 
     /**
-     * Import players from CSV or JSON
-     * @param {string} data - CSV or JSON string
-     * @param {string} format - 'csv' or 'json'
-     * @returns {object} import result
+     * Import players from CSV/JSON
      */
     importPlayers(data, format = 'auto') {
         try {
@@ -502,9 +555,6 @@ class StateManager {
         }
     }
 
-    /**
-     * Parse CSV data
-     */
     parseCSV(csvData) {
         const lines = csvData.trim().split('\n');
         if (lines.length < 2) {
@@ -531,9 +581,6 @@ class StateManager {
         return data;
     }
 
-    /**
-     * Parse CSV line with quotes
-     */
     parseCSVLine(line) {
         const values = [];
         let current = '';
@@ -562,44 +609,31 @@ class StateManager {
         return values;
     }
 
-    /**
-     * Normalize player data
-     */
-    // Update import methods to support multiple positions
     normalizePlayerData(playerData, rowNumber) {
         const fieldMapping = {
             'name': ['name', 'player_name', 'playername', 'player', 'Name'],
-            'positions': ['positions', 'position', 'pos', 'Position', 'Pos'],
-            'primary_position': ['primary_position', 'primary', 'main_position']
+            'positions': ['positions', 'position', 'pos', 'Position', 'Pos']
         };
 
-        const normalized = {
-            id: Date.now() + Math.random(),
-            name: '',
-            positions: ['OH'], // Default array with one position
-            primaryPosition: 'OH',
-            rating: 1500,
-            comparisons: 0,
-            comparedWith: [],
-            createdAt: new Date().toISOString()
-        };
+        const ratings = {};
+        const comparisons = {};
+        const comparedWith = {};
 
         const nameField = this.findField(playerData, fieldMapping.name);
         if (!nameField || !nameField.trim()) {
             throw new Error(`Row ${rowNumber}: Player name required`);
         }
         
-        normalized.name = nameField.trim();
-        if (normalized.name.length > 50) {
+        const name = nameField.trim();
+        if (name.length > 50) {
             throw new Error(`Row ${rowNumber}: Name too long`);
         }
 
-        // Handle positions - can be string "OH,MB" or separate fields
+        let positions = ['OH']; // Default
+
         const positionsField = this.findField(playerData, fieldMapping.positions);
         if (positionsField) {
             const positionsStr = positionsField.toString().toUpperCase().trim();
-            
-            // If positions are separated by commas, semicolons, or spaces
             const positionsArray = positionsStr.split(/[,;\s]+/).filter(pos => pos.length > 0);
             
             const validPositions = {
@@ -615,36 +649,28 @@ class StateManager {
                 .filter(pos => pos !== undefined);
             
             if (normalizedPositions.length > 0) {
-                // Remove duplicates
-                normalized.positions = [...new Set(normalizedPositions)];
-                normalized.primaryPosition = normalized.positions[0];
+                positions = [...new Set(normalizedPositions)];
             }
         }
 
-        // Check primary position separately
-        const primaryField = this.findField(playerData, fieldMapping.primary_position);
-        if (primaryField) {
-            const primaryPos = primaryField.toString().toUpperCase().trim();
-            const validPositions = {
-                'S': 'S', 'SETTER': 'S', 'SET': 'S',
-                'OPP': 'OPP', 'OPPOSITE': 'OPP', 'OP': 'OPP',
-                'OH': 'OH', 'OUTSIDE': 'OH', 'OUTSIDE HITTER': 'OH',
-                'MB': 'MB', 'MIDDLE': 'MB', 'MIDDLE BLOCKER': 'MB',
-                'L': 'L', 'LIBERO': 'L', 'LIB': 'L'
-            };
-            
-            const normalizedPrimary = validPositions[primaryPos];
-            if (normalizedPrimary && normalized.positions.includes(normalizedPrimary)) {
-                normalized.primaryPosition = normalizedPrimary;
-            }
-        }
+        // Initialize ratings for all positions
+        positions.forEach(pos => {
+            ratings[pos] = 1500;
+            comparisons[pos] = 0;
+            comparedWith[pos] = [];
+        });
 
-        return normalized;
+        return {
+            id: Date.now() + Math.random(),
+            name: name,
+            positions: positions,
+            ratings: ratings,
+            comparisons: comparisons,
+            comparedWith: comparedWith,
+            createdAt: new Date().toISOString()
+        };
     }
 
-    /**
-     * Find field by multiple names
-     */
     findField(data, fieldNames) {
         for (const fieldName of fieldNames) {
             if (data.hasOwnProperty(fieldName) && data[fieldName] != null) {
@@ -654,18 +680,14 @@ class StateManager {
         return undefined;
     }
 
-    /**
-     * Export players as CSV
-     */
     exportPlayersAsCSV() {
-        const headers = ['name', 'positions', 'primary_position'];
+        const headers = ['name', 'positions'];
         const csvLines = [headers.join(',')];
         
         this.state.players.forEach(player => {
             const row = [
                 `"${player.name}"`, 
-                `"${player.positions.join(',')}"`,
-                player.primaryPosition
+                `"${player.positions.join(',')}"`
             ];
             csvLines.push(row.join(','));
         });
@@ -673,18 +695,14 @@ class StateManager {
         return csvLines.join('\n');
     }
 
-    /**
-     * Generate sample CSV
-     */
-    // Update sample CSV
     generateSampleCSV() {
         const sampleData = [
-            ['name', 'positions', 'primary_position'],
-            ['Andrei Popov', 'OH,OPP', 'OH'],
-            ['Maria Garcia', 'S', 'S'],
-            ['Alex Johnson', 'MB,OH', 'MB'],
-            ['Sarah Wilson', 'L', 'L'],
-            ['Mike Brown', 'OPP,OH', 'OPP']
+            ['name', 'positions'],
+            ['John Smith', 'OH,MB'],
+            ['Alice Johnson', 'S'],
+            ['Bob Williams', 'MB'],
+            ['Sarah Davis', 'L'],
+            ['Mike Brown', 'OPP,OH']
         ];
         
         return sampleData.map(row => 
