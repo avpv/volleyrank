@@ -22,7 +22,7 @@
             <ol style="margin: 0 0 1rem 0; padding-left: 1.5rem; color: var(--text-primary);">
                 <li><strong>Add players</strong> with their positions below</li>
                 <li><strong>Compare players</strong> to build accurate skill ratings using proven mathematical models</li>
-                <li><strong>Create balanced teams</strong> automatically with AI-powered optimization</li>
+                <li><strong>Create balanced teams</strong> automatically with algorithms optimization</li>
             </ol>
             <button onclick="document.getElementById('welcomeGuide').style.display='none'; localStorage.setItem('hideWelcome', 'true');" style="background: var(--accent-blue); border: none; color: white; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-weight: 600;">Got it!</button>
         </div>
@@ -38,7 +38,7 @@
         <div id="setup" class="tab-content active">
             <h2>Player Management</h2>
             
-            <div id="quickStart" style="background: var(--surface-2); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; margin-bottom: 2rem; display: none;">
+            <div id="quickStart" style="background: var(--surface-2); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; margin-bottom: 2rem;">
                 <h4 style="margin: 0 0 0.5rem 0; color: var(--accent-blue);">🚀 Quick Start</h4>
                 <p style="margin: 0; color: var(--text-secondary); font-size: 0.9rem;">
                     Add your first player below, or <a href="#" onclick="event.preventDefault(); window.uiController && window.uiController.showImportModal();" style="color: var(--accent-blue); text-decoration: underline;">import multiple players</a> from CSV/JSON
