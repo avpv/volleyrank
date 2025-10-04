@@ -129,18 +129,6 @@
                         </label>
                     </div>
                 </div>
-
-                <div class="form-group">
-                    <label>Primary Position</label>
-                    <select id="primaryPosition">
-                        <option value="">Select primary position</option>
-                        <option value="S">Setter</option>
-                        <option value="OPP">Opposite</option>
-                        <option value="OH">Outside Hitter</option>
-                        <option value="MB">Middle Blocker</option>
-                        <option value="L">Libero</option>
-                    </select>
-                </div>
                 
                 <div style="display: flex; gap: 1rem; margin-top: 1rem; flex-wrap: wrap;">
                     <button class="btn btn-primary" id="addPlayerBtn">Add Player</button>
@@ -154,7 +142,7 @@
                 </div>
             </div>
 
-            <!-- Updated Import Modal -->
+            <!-- Import Modal -->
             <div id="importModal" class="modal" style="display: none;">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -178,8 +166,8 @@
                                     <input type="file" id="importFileInput" accept=".csv,.json,.txt">
                                     <div class="file-info">
                                         Supported formats: CSV, JSON<br>
-                                        <strong>New CSV format:</strong> name,positions,primary_position<br>
-                                        Example: "John Smith","OH,MB","OH"
+                                        <strong>CSV format:</strong> name,positions<br>
+                                        Example: "John Smith","OH,MB"
                                     </div>
                                 </div>
                             </div>
@@ -189,17 +177,15 @@
                                     <label>Paste CSV or JSON Data</label>
                                     <textarea id="importDataTextarea" rows="8" placeholder="Paste your data here..."></textarea>
                                     <div class="file-info">
-                                        <strong>CSV format:</strong> name,positions,primary_position<br>
-                                        Example: "Player","OH,MB","OH"<br>
-                                        <strong>JSON format:</strong> [{"name":"Player","positions":["OH","MB"],"primary_position":"OH"}]<br>
-                                        <strong>Old format still supported:</strong> name,position<br>
-                                        Note: All players start with 1500 ELO rating
+                                        <strong>CSV format:</strong> name,positions<br>
+                                        Example: "Player","OH,MB"<br>
+                                        <strong>JSON format:</strong> [{"name":"Player","positions":["OH","MB"]}]
                                     </div>
                                 </div>
                             </div>
 
                             <div id="templateSection" class="import-section" style="display: none;">
-                                <p>Download a sample CSV template with multiple positions support:</p>
+                                <p>Download a sample CSV template:</p>
                                 <button class="btn btn-secondary" id="downloadTemplateBtn">Download CSV Template</button>
                             </div>
                         </div>
