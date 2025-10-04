@@ -244,18 +244,5 @@
     <script src="scripts/UIController.js"></script>
     <script src="scripts/app.js"></script>
 
-    <script>
-        // Show welcome guide for new users
-        document.addEventListener('DOMContentLoaded', function() {
-            const hideWelcome = localStorage.getItem('hideWelcome');
-            const hasPlayers = localStorage.getItem('volleyRankData');
-            
-            if (!hideWelcome && !hasPlayers) {
-                document.getElementById('welcomeGuide').style.display = 'block';
-                document.getElementById('quickStart').style.display = 'block';
-            }
-        });
-    </script>
-
 </body>
 </html>
