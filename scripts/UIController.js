@@ -295,6 +295,8 @@ class UIController {
     }
 
     handlePositionChange() {
+        // Clear cached pair when position changes
+        this.stateManager.updateState({ currentPair: null });
         this.updateComparisonDisplay();
     }
 
@@ -421,7 +423,6 @@ class UIController {
             });
 
             this.showNotification('All player ratings reset to default', 'success');
-            this.updateComparisonDisplay();
             
         } catch (error) {
             this.showNotification(`Failed to reset ratings: ${error.message}`, 'error');
@@ -616,6 +617,7 @@ class UIController {
         if (!positionSelect || !container) return;
 
         const selectedPosition = positionSelect.value;
+        const state = this.stateManager.getState();
         
         if (!selectedPosition) {
             container.innerHTML = `
@@ -627,6 +629,22 @@ class UIController {
             return;
         }
 
+        // Check if we have cached pair for this position
+        if (state.currentPair && state.currentComparisonPosition === selectedPosition) {
+            const [player1, player2] = state.currentPair;
+            // Verify players still exist and can play this position
+            const p1Valid = state.players.find(p => p.id === player1.id)?.positions?.includes(selectedPosition);
+            const p2Valid = state.players.find(p => p.id === player2.id)?.positions?.includes(selectedPosition);
+            
+            if (p1Valid && p2Valid) {
+                // Use cached pair
+                this.displayComparisonPair(player1, player2, selectedPosition);
+                this.updateComparisonStats(selectedPosition);
+                return;
+            }
+        }
+
+        // Find new pair only if no valid cached pair
         const status = this.playerManager.getPositionComparisonStatus(selectedPosition);
         
         if (!status.canCompare) {
@@ -642,7 +660,12 @@ class UIController {
 
         const [player1, player2] = status.nextPair;
         this.stateManager.setCurrentPair(status.nextPair, selectedPosition);
+        this.displayComparisonPair(player1, player2, selectedPosition);
+        this.updateComparisonStats(selectedPosition);
+    }
 
+    displayComparisonPair(player1, player2, selectedPosition) {
+        const container = document.getElementById('comparisonContainer');
         container.innerHTML = `
             <div class="comparison-info" style="text-align: center; margin-bottom: 1rem;">
                 Comparing at: <strong>${this.playerManager.positions[selectedPosition]}</strong>
@@ -673,8 +696,6 @@ class UIController {
                 </div>
             </div>
         `;
-
-        this.updateComparisonStats(selectedPosition);
     }
 
     handlePlayerComparison(winnerId, loserId, position) {
@@ -682,10 +703,10 @@ class UIController {
 
         try {
             this.isProcessing = true;
-            this.stateManager.updateRatingsAfterComparison(winnerId, loserId, position);
             
+            // Delay before updating to allow smooth animation
             setTimeout(() => {
-                this.updateComparisonDisplay();
+                this.stateManager.updateRatingsAfterComparison(winnerId, loserId, position);
                 this.isProcessing = false;
             }, 300);
             
