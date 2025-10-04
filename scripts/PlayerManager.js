@@ -122,6 +122,7 @@ class PlayerManager {
 
     /**
      * Find next pair for comparison at specific position
+     * DETERMINISTIC - always returns same pair for same state
      */
     findNextComparisonPair(position) {
         const positionPlayers = this.getPlayersForPosition(position);
@@ -138,14 +139,22 @@ class PlayerManager {
         let comparisonPool = positionPlayers.filter(
             p => (p.comparisons[position] || 0) === minComparisons
         );
-        comparisonPool = this.shuffleArray([...comparisonPool]);
+        
+        // IMPORTANT: Sort deterministically instead of shuffle
+        // This ensures same pair is returned for same state
+        comparisonPool.sort((a, b) => {
+            // Sort by ID for deterministic order
+            return a.id - b.id;
+        });
         
         let foundPair = this.findValidPairForPosition(comparisonPool, position);
         
         if (!foundPair) {
-            const allPositionPlayers = [...positionPlayers].sort((a, b) => 
-                (a.comparisons[position] || 0) - (b.comparisons[position] || 0)
-            );
+            const allPositionPlayers = [...positionPlayers].sort((a, b) => {
+                const compDiff = (a.comparisons[position] || 0) - (b.comparisons[position] || 0);
+                // If same comparisons, sort by ID for determinism
+                return compDiff !== 0 ? compDiff : a.id - b.id;
+            });
             foundPair = this.findValidPairForPosition(allPositionPlayers, position);
         }
 
@@ -171,17 +180,6 @@ class PlayerManager {
             }
         }
         return null;
-    }
-
-    /**
-     * Random array shuffle
-     */
-    shuffleArray(array) {
-        for (let i = array.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [array[i], array[j]] = [array[j], array[i]];
-        }
-        return array;
     }
 
     /**
