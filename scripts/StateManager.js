@@ -167,7 +167,10 @@ class StateManager {
             return player;
         });
 
-        this.updateState({ players: updatedPlayers });
+        this.updateState({ 
+            players: updatedPlayers,
+            currentPair: null // Clear cached pair when positions change
+        });
         this.notify('playerPositionsUpdated', { playerId, positions });
     }
 
@@ -192,7 +195,10 @@ class StateManager {
             });
         });
 
-        this.updateState({ players: updatedPlayers });
+        this.updateState({ 
+            players: updatedPlayers,
+            currentPair: null // Clear cached pair when player removed
+        });
         this.notify('playerRemoved', removedPlayer);
     }
 
@@ -236,7 +242,10 @@ class StateManager {
             return player;
         });
 
-        this.updateState({ players: updatedPlayers });
+        this.updateState({ 
+            players: updatedPlayers,
+            currentPair: null // Clear cached pair when player reset
+        });
     }
 
     /**
@@ -292,7 +301,7 @@ class StateManager {
         this.updateState({ 
             players: updatedPlayers,
             comparisons: newComparisons,
-            currentPair: null
+            currentPair: null // Clear current pair after comparison
         });
 
         this.notify('comparisonCompleted', { winner, loser, position, newComparisons });
@@ -300,13 +309,25 @@ class StateManager {
 
     /**
      * Set current pair for comparison
+     * Only update if pair actually changed to prevent unnecessary re-renders
      */
     setCurrentPair(pair, position) {
-        this.updateState({ 
-            currentPair: pair,
-            currentComparisonPosition: position 
-        });
-        this.notify('pairSelected', { pair, position });
+        const currentPair = this.state.currentPair;
+        
+        // Check if pair actually changed
+        const pairChanged = !currentPair || 
+            !pair || 
+            currentPair[0]?.id !== pair[0]?.id || 
+            currentPair[1]?.id !== pair[1]?.id ||
+            this.state.currentComparisonPosition !== position;
+        
+        if (pairChanged) {
+            this.updateState({ 
+                currentPair: pair,
+                currentComparisonPosition: position 
+            });
+            this.notify('pairSelected', { pair, position });
+        }
     }
 
     /**
