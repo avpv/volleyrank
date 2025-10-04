@@ -10,93 +10,39 @@
 <body>
     <div class="header">
         <h1>🏐 VolleyRank</h1>
-        <p>An ELO rating system for your volleyball team</p>
+        <p>Compare players and create balanced teams</p>
     </div>
 
     <div class="container">
+        <!-- Welcome Guide for New Users -->
+        <div id="welcomeGuide" style="background: linear-gradient(135deg, #2563eb, #3b82f6); color: white; padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem; display: none;">
+            <h3 style="margin: 0 0 1rem 0; color: white;">👋 Welcome to VolleyRank!</h3>
+            <p style="margin: 0 0 1rem 0; opacity: 0.95;">Get started in 3 easy steps:</p>
+            <ol style="margin: 0 0 1rem 0; padding-left: 1.5rem; opacity: 0.95;">
+                <li><strong>Add players</strong> with their positions below</li>
+                <li><strong>Compare players</strong> to build accurate skill ratings</li>
+                <li><strong>Create balanced teams</strong> automatically</li>
+            </ol>
+            <button onclick="document.getElementById('welcomeGuide').style.display='none'; localStorage.setItem('hideWelcome', 'true');" style="background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-weight: 600;">Got it!</button>
+        </div>
+
         <div class="tabs">
-            <button class="tab active">Settings</button>
-            <button class="tab">Compare</button>
-            <button class="tab">Rankings</button>
-            <button class="tab">Teams</button>
-        </div>
-
-        <!-- Compare Tab -->
-        <div id="compare" class="tab-content active">
-            <div class="position-selector">
-                <select id="positionFilter">
-                    <option value="">Select a position to compare</option>
-                    <option value="S">Setters</option>
-                    <option value="OPP">Opposites</option>
-                    <option value="OH">Outside Hitters</option>
-                    <option value="MB">Middle Blockers</option>
-                    <option value="L">Liberos</option>
-                </select>
-            </div>
-            
-            <div id="comparisonContainer">
-                <div class="no-comparison">
-                    Select a position to start comparing players
-                </div>
-            </div>
-
-            <div class="comparison-stats" id="comparisonStats"></div>
-        </div>
-
-        <!-- Rankings Tab -->
-        <div id="rankings" class="tab-content">
-             <h2>Player Rankings by Position</h2>
-            <div class="rankings-grid" id="rankingsContainer">
-                <!-- Rankings will be loaded dynamically -->
-            </div>
-        </div>
-
-        <!-- Teams Tab -->
-        <div id="teams" class="tab-content">
-            <h2>Create Balanced Teams</h2>
-            
-            <div class="team-builder">
-                <div class="form-group" style="display:flex; flex-direction:row; align-items:center; margin-bottom: 1rem; margin-top: 1rem;">
-                    <label style="margin-bottom:0;">Number of teams:</label>
-                    <input type="number" id="teamCount" value="2" min="1" max="6" style="flex: 0 0 80px;">
-                    <span style="color: var(--text-secondary); margin-left: 1.5rem;">Players per team: <span id="playersPerTeam">6</span></span>
-                </div>
-                
-                <h3 style="margin-top: 1.5rem; margin-bottom: 1rem;">Team Composition</h3>
-                <div id="compositionControls" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 1rem; margin-bottom: 2rem; background: var(--surface-2); padding: 1rem; border-radius: 8px;">
-                    <div class="form-group" style="flex-direction:row; align-items:center">
-                        <label style="flex: 0; margin-bottom:0;" title="Setter">S:</label>
-                        <input type="number" id="comp_S" class="composition-input" value="1" min="0" max="6" style="flex: 0 0 60px;">
-                    </div>
-                    <div class="form-group" style="flex-direction:row; align-items:center">
-                        <label style="flex: 0; margin-bottom:0;" title="Opposite">OPP:</label>
-                        <input type="number" id="comp_OPP" class="composition-input" value="1" min="0" max="6" style="flex: 0 0 60px;">
-                    </div>
-                    <div class="form-group" style="flex-direction:row; align-items:center">
-                        <label style="flex: 0; margin-bottom:0;" title="Outside Hitter">OH:</label>
-                        <input type="number" id="comp_OH" class="composition-input" value="2" min="0" max="6" style="flex: 0 0 60px;">
-                    </div>
-                    <div class="form-group" style="flex-direction:row; align-items:center">
-                        <label style="flex: 0; margin-bottom:0;" title="Middle Blocker">MB:</label>
-                        <input type="number" id="comp_MB" class="composition-input" value="2" min="0" max="6" style="flex: 0 0 60px;">
-                    </div>
-                    <div class="form-group" style="flex-direction:row; align-items:center">
-                        <label style="flex: 0; margin-bottom:0;" title="Libero">L:</label>
-                        <input type="number" id="comp_L" class="composition-input" value="0" min="0" max="6" style="flex: 0 0 60px;">
-                    </div>
-                </div>
-
-                <button class="btn btn-primary" id="optimizeTeamsBtn">Create Teams</button>
-
-                <div id="teamsDisplay" class="teams-display" style="margin-top: 2.5rem;">
-                    <!-- Teams will be shown here -->
-                </div>
-            </div>
+            <button class="tab active" title="Add and manage players">Settings</button>
+            <button class="tab" title="Compare players to build ratings">Compare</button>
+            <button class="tab" title="View player rankings by position">Rankings</button>
+            <button class="tab" title="Create balanced teams">Teams</button>
         </div>
 
         <!-- Settings Tab -->
-        <div id="setup" class="tab-content">
+        <div id="setup" class="tab-content active">
             <h2>Player Management</h2>
+            
+            <div id="quickStart" style="background: var(--surface-2); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; margin-bottom: 2rem; display: none;">
+                <h4 style="margin: 0 0 0.5rem 0; color: var(--accent-blue);">🚀 Quick Start</h4>
+                <p style="margin: 0; color: var(--text-secondary); font-size: 0.9rem;">
+                    Add your first player below, or <a href="#" onclick="event.preventDefault(); window.uiController && window.uiController.showImportModal();" style="color: var(--accent-blue); text-decoration: underline;">import multiple players</a> from CSV/JSON
+                </p>
+            </div>
             
             <div class="setup-form">
                 <div class="form-group">
@@ -206,6 +152,79 @@
                 <!-- Player list -->
             </div>
         </div>
+
+        <!-- Compare Tab -->
+        <div id="compare" class="tab-content">
+            <div class="position-selector">
+                <select id="positionFilter">
+                    <option value="">Select a position to compare</option>
+                    <option value="S">Setters</option>
+                    <option value="OPP">Opposites</option>
+                    <option value="OH">Outside Hitters</option>
+                    <option value="MB">Middle Blockers</option>
+                    <option value="L">Liberos</option>
+                </select>
+            </div>
+            
+            <div id="comparisonContainer">
+                <div class="no-comparison">
+                    Select a position to start comparing players
+                </div>
+            </div>
+
+            <div class="comparison-stats" id="comparisonStats"></div>
+        </div>
+
+        <!-- Rankings Tab -->
+        <div id="rankings" class="tab-content">
+             <h2>Player Rankings by Position</h2>
+            <div class="rankings-grid" id="rankingsContainer">
+                <!-- Rankings will be loaded dynamically -->
+            </div>
+        </div>
+
+        <!-- Teams Tab -->
+        <div id="teams" class="tab-content">
+            <h2>Create Balanced Teams</h2>
+            
+            <div class="team-builder">
+                <div class="form-group" style="display:flex; flex-direction:row; align-items:center; margin-bottom: 1rem; margin-top: 1rem;">
+                    <label style="margin-bottom:0;">Number of teams:</label>
+                    <input type="number" id="teamCount" value="2" min="1" max="6" style="flex: 0 0 80px;">
+                    <span style="color: var(--text-secondary); margin-left: 1.5rem;">Players per team: <span id="playersPerTeam">6</span></span>
+                </div>
+                
+                <h3 style="margin-top: 1.5rem; margin-bottom: 1rem;">Team Composition</h3>
+                <div id="compositionControls" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 1rem; margin-bottom: 2rem; background: var(--surface-2); padding: 1rem; border-radius: 8px;">
+                    <div class="form-group" style="flex-direction:row; align-items:center">
+                        <label style="flex: 0; margin-bottom:0;" title="Setter">S:</label>
+                        <input type="number" id="comp_S" class="composition-input" value="1" min="0" max="6" style="flex: 0 0 60px;">
+                    </div>
+                    <div class="form-group" style="flex-direction:row; align-items:center">
+                        <label style="flex: 0; margin-bottom:0;" title="Opposite">OPP:</label>
+                        <input type="number" id="comp_OPP" class="composition-input" value="1" min="0" max="6" style="flex: 0 0 60px;">
+                    </div>
+                    <div class="form-group" style="flex-direction:row; align-items:center">
+                        <label style="flex: 0; margin-bottom:0;" title="Outside Hitter">OH:</label>
+                        <input type="number" id="comp_OH" class="composition-input" value="2" min="0" max="6" style="flex: 0 0 60px;">
+                    </div>
+                    <div class="form-group" style="flex-direction:row; align-items:center">
+                        <label style="flex: 0; margin-bottom:0;" title="Middle Blocker">MB:</label>
+                        <input type="number" id="comp_MB" class="composition-input" value="2" min="0" max="6" style="flex: 0 0 60px;">
+                    </div>
+                    <div class="form-group" style="flex-direction:row; align-items:center">
+                        <label style="flex: 0; margin-bottom:0;" title="Libero">L:</label>
+                        <input type="number" id="comp_L" class="composition-input" value="0" min="0" max="6" style="flex: 0 0 60px;">
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" id="optimizeTeamsBtn">Create Teams</button>
+
+                <div id="teamsDisplay" class="teams-display" style="margin-top: 2.5rem;">
+                    <!-- Teams will be shown here -->
+                </div>
+            </div>
+        </div>
     </div>
 
     <footer class="app-footer">
@@ -224,6 +243,19 @@
     <script src="scripts/TeamOptimizer.js"></script>
     <script src="scripts/UIController.js"></script>
     <script src="scripts/app.js"></script>
+
+    <script>
+        // Show welcome guide for new users
+        document.addEventListener('DOMContentLoaded', function() {
+            const hideWelcome = localStorage.getItem('hideWelcome');
+            const hasPlayers = localStorage.getItem('volleyRankData');
+            
+            if (!hideWelcome && !hasPlayers) {
+                document.getElementById('welcomeGuide').style.display = 'block';
+                document.getElementById('quickStart').style.display = 'block';
+            }
+        });
+    </script>
 
 </body>
 </html>
