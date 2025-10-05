@@ -714,23 +714,35 @@ body {
 }
 
 .btn-primary {
-    background: var(--accent-blue);
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
     color: white;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
 }
 
 .btn-danger {
-    background: var(--accent-red);
+    background: linear-gradient(135deg, #ef4444, #dc2626);
     color: white;
 }
 
+.btn-danger:hover {
+    background: linear-gradient(135deg, #dc2626, #b91c1c);
+}
+
 .btn-warning {
-    background: var(--accent-orange);
+    background: linear-gradient(135deg, #f59e0b, #d97706);
     color: white;
+}
+
+.btn-warning:hover {
+    background: linear-gradient(135deg, #d97706, #b45309);
 }
 
 .btn-secondary {
     background: var(--surface-2);
-    color: var(--text-secondary);
+    color: var(--text-primary);
     border: 1px solid var(--border-color);
     text-transform: none;
 }
