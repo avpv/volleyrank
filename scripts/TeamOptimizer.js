@@ -208,7 +208,7 @@ class TeamOptimizer {
     }
 
     /**
-     * GENETIC ALGORITHM - new!
+     * GENETIC ALGORITHM
      */
     async optimizeWithGeneticAlgorithm(initialPopulation, composition, teamCount, playersByPosition, positions) {
         // Create initial population
@@ -328,7 +328,7 @@ class TeamOptimizer {
     }
 
     /**
-     * TABU SEARCH - new!
+     * TABU SEARCH
      */
     async optimizeWithTabuSearch(initialTeams, positions) {
         let currentTeams = JSON.parse(JSON.stringify(initialTeams));
@@ -419,7 +419,7 @@ class TeamOptimizer {
     }
 
     /**
-     * ADAPTIVE SWAP STRATEGY - new!
+     * ADAPTIVE SWAP STRATEGY
      * Intelligent player swap selection
      */
     performAdaptiveSwap(teams, positions) {
@@ -475,19 +475,25 @@ class TeamOptimizer {
         for (const [position, neededCount] of Object.entries(composition)) {
             if (neededCount === 0) continue;
             
+            const totalNeeded = neededCount * teamCount;
             const positionPlayers = (playersByPosition[position] || [])
                 .filter(p => !usedPlayerIds.has(p.id))
-                .sort((a, b) => b.positionRating - a.positionRating)
-                .slice(0, neededCount * teamCount);
+                .sort((a, b) => b.positionRating - a.positionRating);
             
-            positionPlayers.forEach(player => {
-                const teamRatings = teams.map(team => 
-                    team.reduce((sum, p) => sum + (p.positionRating || p.rating), 0)
-                );
-                const minRatingIndex = teamRatings.indexOf(Math.min(...teamRatings));
-                teams[minRatingIndex].push(player);
-                usedPlayerIds.add(player.id);
-            });
+            // Ensure we have exactly the right number of players
+            const playersToAssign = positionPlayers.slice(0, totalNeeded);
+            
+            // Distribute evenly - each team gets exactly neededCount players
+            for (let teamIdx = 0; teamIdx < teamCount; teamIdx++) {
+                for (let i = 0; i < neededCount; i++) {
+                    const playerIdx = teamIdx * neededCount + i;
+                    if (playerIdx < playersToAssign.length) {
+                        const player = playersToAssign[playerIdx];
+                        teams[teamIdx].push(player);
+                        usedPlayerIds.add(player.id);
+                    }
+                }
+            }
         }
         
         return teams;
@@ -503,24 +509,25 @@ class TeamOptimizer {
         for (const [position, neededCount] of Object.entries(composition)) {
             if (neededCount === 0) continue;
 
+            const totalNeeded = neededCount * teamCount;
             let positionPlayers = (playersByPosition[position] || [])
                 .filter(p => !usedPlayerIds.has(p.id))
                 .sort((a, b) => b.positionRating - a.positionRating)
-                .slice(0, neededCount * teamCount);
+                .slice(0, totalNeeded);
 
-            for (let i = 0; i < positionPlayers.length; i++) {
-                const roundNumber = Math.floor(i / teamCount);
-                const isEvenRound = roundNumber % 2 === 0;
+            // Snake draft distribution - ensures each team gets exactly neededCount players
+            let playerIndex = 0;
+            for (let round = 0; round < neededCount; round++) {
+                const isEvenRound = round % 2 === 0;
                 
-                let teamIndex;
-                if (isEvenRound) {
-                    teamIndex = i % teamCount;
-                } else {
-                    teamIndex = teamCount - 1 - (i % teamCount);
+                for (let teamIdx = 0; teamIdx < teamCount; teamIdx++) {
+                    if (playerIndex < positionPlayers.length) {
+                        const actualTeamIdx = isEvenRound ? teamIdx : (teamCount - 1 - teamIdx);
+                        teams[actualTeamIdx].push(positionPlayers[playerIndex]);
+                        usedPlayerIds.add(positionPlayers[playerIndex].id);
+                        playerIndex++;
+                    }
                 }
-                
-                teams[teamIndex].push(positionPlayers[i]);
-                usedPlayerIds.add(positionPlayers[i].id);
             }
         }
 
@@ -537,19 +544,27 @@ class TeamOptimizer {
         for (const [position, neededCount] of Object.entries(composition)) {
             if (neededCount === 0) continue;
 
+            const totalNeeded = neededCount * teamCount;
             let positionPlayers = (playersByPosition[position] || [])
                 .filter(p => !usedPlayerIds.has(p.id))
-                .slice(0, neededCount * teamCount);
+                .slice(0, totalNeeded);
             
+            // Shuffle players
             for (let i = positionPlayers.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [positionPlayers[i], positionPlayers[j]] = [positionPlayers[j], positionPlayers[i]];
             }
 
-            positionPlayers.forEach((player, index) => {
-                teams[index % teamCount].push(player);
-                usedPlayerIds.add(player.id);
-            });
+            // Distribute evenly - each team gets exactly neededCount players
+            for (let teamIdx = 0; teamIdx < teamCount; teamIdx++) {
+                for (let i = 0; i < neededCount; i++) {
+                    const playerIdx = teamIdx * neededCount + i;
+                    if (playerIdx < positionPlayers.length) {
+                        teams[teamIdx].push(positionPlayers[playerIdx]);
+                        usedPlayerIds.add(positionPlayers[playerIdx].id);
+                    }
+                }
+            }
         }
 
         return teams;
@@ -571,7 +586,7 @@ class TeamOptimizer {
     }
 
     /**
-     * Evaluate team solution (целевая функция)
+     * Evaluate team solution
      */
     evaluateTeamSolution(teams) {
         if (!teams || teams.length === 0) return Infinity;
