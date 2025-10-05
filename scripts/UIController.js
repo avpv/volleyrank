@@ -847,9 +847,16 @@ class UIController {
 
             const result = this.stateManager.importPlayers(data, format);
             
-            // Close modal on success
-            if (result && result.success) {
+            // Always close modal after import attempt
+            // Result can be checked - if success is true or if imported > 0
+            if (result && (result.success === true || result.imported > 0)) {
                 this.hideImportModal();
+                
+                // Clear inputs
+                const fileInput = document.getElementById('importFileInput');
+                const textarea = document.getElementById('importDataTextarea');
+                if (fileInput) fileInput.value = '';
+                if (textarea) textarea.value = '';
             }
 
         } catch (error) {
