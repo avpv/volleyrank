@@ -1,8 +1,16 @@
 # 🏐 VolleyRank
 
-An ELO rating system for your volleyball team that helps track player skill levels across multiple positions and create balanced teams.
+**Smart team builder for volleyball coaches and organizers**
 
-Try the application: [VolleyRank](https://avpv.github.io/volleyrank/)
+Stop guessing who should play where. VolleyRank uses proven mathematics to:
+- Rate each player's skill at every position they can play (Setter, Opposite, Outside Hitter, Middle Blocker, Libero)
+- Compare players through simple head-to-head matchups
+- Automatically create balanced teams using advanced optimization algorithms
+
+Perfect for training sessions where you need fair teams fast.
+
+[Try it now](https://avpv.github.io/volleyrank/) - runs entirely in your browser
+
 
 ## Features
 
