@@ -845,7 +845,12 @@ class UIController {
                 }
             }
 
-            this.stateManager.importPlayers(data, format);
+            const result = this.stateManager.importPlayers(data, format);
+            
+            // Close modal on success
+            if (result && result.success) {
+                this.hideImportModal();
+            }
 
         } catch (error) {
             this.showNotification(`Import failed: ${error.message}`, 'error');
