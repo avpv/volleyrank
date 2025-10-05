@@ -472,15 +472,26 @@ class TeamOptimizer {
         let teams = Array.from({ length: teamCount }, () => []);
         const usedPlayerIds = new Set();
         
-        for (const [position, neededCount] of Object.entries(composition)) {
-            if (neededCount === 0) continue;
-            
+        // Process positions in order of scarcity (fewer players first)
+        const positionOrder = Object.entries(composition)
+            .filter(([pos, count]) => count > 0)
+            .sort((a, b) => {
+                const aAvailable = (playersByPosition[a[0]] || []).length;
+                const bAvailable = (playersByPosition[b[0]] || []).length;
+                const aRatio = aAvailable / (a[1] * teamCount);
+                const bRatio = bAvailable / (b[1] * teamCount);
+                return aRatio - bRatio; // Process scarce positions first
+            });
+        
+        for (const [position, neededCount] of positionOrder) {
             const totalNeeded = neededCount * teamCount;
+            
+            // Filter out already used players
             const positionPlayers = (playersByPosition[position] || [])
                 .filter(p => !usedPlayerIds.has(p.id))
                 .sort((a, b) => b.positionRating - a.positionRating);
             
-            // Ensure we have exactly the right number of players
+            // Take only what we need
             const playersToAssign = positionPlayers.slice(0, totalNeeded);
             
             // Distribute evenly - each team gets exactly neededCount players
@@ -506,10 +517,21 @@ class TeamOptimizer {
         let teams = Array.from({ length: teamCount }, () => []);
         const usedPlayerIds = new Set();
 
-        for (const [position, neededCount] of Object.entries(composition)) {
-            if (neededCount === 0) continue;
+        // Process positions in order of scarcity
+        const positionOrder = Object.entries(composition)
+            .filter(([pos, count]) => count > 0)
+            .sort((a, b) => {
+                const aAvailable = (playersByPosition[a[0]] || []).length;
+                const bAvailable = (playersByPosition[b[0]] || []).length;
+                const aRatio = aAvailable / (a[1] * teamCount);
+                const bRatio = bAvailable / (b[1] * teamCount);
+                return aRatio - bRatio;
+            });
 
+        for (const [position, neededCount] of positionOrder) {
             const totalNeeded = neededCount * teamCount;
+            
+            // Filter out already used players
             let positionPlayers = (playersByPosition[position] || [])
                 .filter(p => !usedPlayerIds.has(p.id))
                 .sort((a, b) => b.positionRating - a.positionRating)
@@ -541,10 +563,21 @@ class TeamOptimizer {
         let teams = Array.from({ length: teamCount }, () => []);
         const usedPlayerIds = new Set();
 
-        for (const [position, neededCount] of Object.entries(composition)) {
-            if (neededCount === 0) continue;
+        // Process positions in order of scarcity
+        const positionOrder = Object.entries(composition)
+            .filter(([pos, count]) => count > 0)
+            .sort((a, b) => {
+                const aAvailable = (playersByPosition[a[0]] || []).length;
+                const bAvailable = (playersByPosition[b[0]] || []).length;
+                const aRatio = aAvailable / (a[1] * teamCount);
+                const bRatio = bAvailable / (b[1] * teamCount);
+                return aRatio - bRatio;
+            });
 
+        for (const [position, neededCount] of positionOrder) {
             const totalNeeded = neededCount * teamCount;
+            
+            // Filter out already used players
             let positionPlayers = (playersByPosition[position] || [])
                 .filter(p => !usedPlayerIds.has(p.id))
                 .slice(0, totalNeeded);
