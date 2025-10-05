@@ -291,6 +291,7 @@ class UIController {
             this.updateRankingsDisplay();
         } else if (tabName === 'compare') {
             this.updateComparisonDisplay();
+            this.updatePositionProgressBars();
         }
     }
 
@@ -449,6 +450,7 @@ class UIController {
         this.updateComparisonDisplay();
         this.updatePlayersPerTeam();
         this.updatePositionStats();
+        this.updatePositionProgressBars();
     }
 
     updatePlayersListDisplay() {
@@ -610,6 +612,58 @@ class UIController {
         });
     }
 
+    updatePositionProgressBars() {
+        const container = document.getElementById('positionProgressBars');
+        if (!container) return;
+
+        const positions = ['S', 'OPP', 'OH', 'MB', 'L'];
+        let html = '<h3 style="margin-bottom: 1.5rem; color: var(--text-primary);">Position Progress</h3>';
+
+        positions.forEach(pos => {
+            const players = this.playerManager.getPlayersForPosition(pos);
+            
+            if (players.length < 2) {
+                html += `
+                    <div class="position-progress-item disabled">
+                        <div class="position-progress-header">
+                            <span>${this.playerManager.positions[pos]}</span>
+                            <span class="not-enough-players">Need 2+ players</span>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            const totalPairs = (players.length * (players.length - 1)) / 2;
+            const comparedPairs = new Set();
+            
+            players.forEach(player => {
+                const comparedWith = player.comparedWith[pos] || [];
+                comparedWith.forEach(opponentName => {
+                    const pair = [player.name, opponentName].sort().join('|');
+                    comparedPairs.add(pair);
+                });
+            });
+            
+            const completed = comparedPairs.size;
+            const percentage = Math.round((completed / totalPairs) * 100);
+            
+            html += `
+                <div class="position-progress-item">
+                    <div class="position-progress-header">
+                        <span>${this.playerManager.positions[pos]}</span>
+                        <span>${completed}/${totalPairs} (${percentage}%)</span>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill" style="width: ${percentage}%"></div>
+                    </div>
+                </div>
+            `;
+        });
+
+        container.innerHTML = html;
+    }
+
     updateComparisonDisplay() {
         const positionSelect = document.getElementById('positionFilter');
         const container = document.getElementById('comparisonContainer');
@@ -626,6 +680,7 @@ class UIController {
                 </div>
             `;
             this.updateComparisonStats('');
+            this.updatePositionProgressBars();
             return;
         }
 
@@ -640,6 +695,7 @@ class UIController {
                 // Use cached pair
                 this.displayComparisonPair(player1, player2, selectedPosition);
                 this.updateComparisonStats(selectedPosition);
+                this.updatePositionProgressBars();
                 return;
             }
         }
@@ -655,6 +711,7 @@ class UIController {
             
             container.innerHTML = `<div class="no-comparison">${message}</div>`;
             this.updateComparisonStats(selectedPosition);
+            this.updatePositionProgressBars();
             return;
         }
 
@@ -662,6 +719,7 @@ class UIController {
         this.stateManager.setCurrentPair(status.nextPair, selectedPosition);
         this.displayComparisonPair(player1, player2, selectedPosition);
         this.updateComparisonStats(selectedPosition);
+        this.updatePositionProgressBars();
     }
 
     displayComparisonPair(player1, player2, selectedPosition) {
@@ -724,12 +782,54 @@ class UIController {
         
         if (position) {
             const players = this.playerManager.getPlayersForPosition(position);
+            
+            // Calculate progress
+            const totalPossiblePairs = (players.length * (players.length - 1)) / 2;
+            const comparedPairs = new Set();
+            
+            players.forEach(player => {
+                const comparedWith = player.comparedWith[position] || [];
+                comparedWith.forEach(opponentName => {
+                    const pair = [player.name, opponentName].sort().join('|');
+                    comparedPairs.add(pair);
+                });
+            });
+            
+            const completedComparisons = comparedPairs.size;
+            const remainingComparisons = totalPossiblePairs - completedComparisons;
+            const progressPercentage = totalPossiblePairs > 0 ? 
+                Math.round((completedComparisons / totalPossiblePairs) * 100) : 0;
+            
             container.innerHTML = `
-                Players for ${this.playerManager.positions[position]}: ${players.length}<br>
-                Total comparisons: ${state.comparisons}
+                <div style="margin-bottom: 1rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                        <span style="color: var(--text-secondary);">
+                            ${this.playerManager.positions[position]} Progress
+                        </span>
+                        <span style="color: var(--text-primary); font-weight: 600;">
+                            ${completedComparisons} / ${totalPossiblePairs} comparisons
+                        </span>
+                    </div>
+                    <div style="width: 100%; height: 8px; background: var(--surface-2); border-radius: 4px; overflow: hidden; border: 1px solid var(--border-color);">
+                        <div style="width: ${progressPercentage}%; height: 100%; background: linear-gradient(90deg, var(--accent-blue), var(--accent-green)); transition: width 0.3s ease;"></div>
+                    </div>
+                    <div style="margin-top: 0.5rem; color: var(--text-secondary); font-size: 0.9rem;">
+                        ${remainingComparisons > 0 ? 
+                            `${remainingComparisons} comparison${remainingComparisons === 1 ? '' : 's'} remaining` : 
+                            'All pairs compared!'
+                        }
+                    </div>
+                </div>
+                <div style="color: var(--text-secondary); font-size: 0.9rem;">
+                    Players: ${players.length} • Total comparisons across all positions: ${state.comparisons}
+                </div>
             `;
         } else {
-            container.innerHTML = `Total comparisons: ${state.comparisons}`;
+            container.innerHTML = `
+                <div style="color: var(--text-secondary);">
+                    Total comparisons: ${state.comparisons}
+                </div>
+            `;
         }
     }
 
