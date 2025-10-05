@@ -994,3 +994,62 @@ body {
 .app-footer a:hover .github-icon {
     transform: scale(1.1);
 }
+
+/* Position Progress Bars */
+.position-progress-bars {
+    background: var(--surface-2);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border: 1px solid var(--border-color);
+}
+
+.position-progress-item {
+    margin-bottom: 1rem;
+}
+
+.position-progress-item:last-child {
+    margin-bottom: 0;
+}
+
+.position-progress-item.disabled {
+    opacity: 0.5;
+}
+
+.position-progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.position-progress-header span:first-child {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.position-progress-header span:last-child {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+.not-enough-players {
+    color: var(--accent-orange) !important;
+    font-style: italic;
+}
+
+.progress-bar-container {
+    width: 100%;
+    height: 6px;
+    background: var(--bg-dark);
+    border-radius: 3px;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-blue), var(--accent-green));
+    transition: width 0.3s ease;
+}
