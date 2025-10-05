@@ -14,19 +14,6 @@
     </div>
 
     <div class="container">
-        <!-- Welcome Guide for New Users -->
-        <div id="welcomeGuide" style="background: var(--surface-2); border: 2px solid var(--accent-blue); color: var(--text-primary); padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem;">
-            <h3 style="margin: 0 0 1rem 0; color: var(--accent-blue);">👋 Welcome to VolleyRank!</h3>
-            <p style="margin: 0 0 0.5rem 0; color: var(--text-secondary);">Using advanced algorithms and ELO rating system to optimize your volleyball team</p>
-            <p style="margin: 0 0 1rem 0; color: var(--text-secondary);">Get started in 3 easy steps:</p>
-            <ol style="margin: 0 0 1rem 0; padding-left: 1.5rem; color: var(--text-primary);">
-                <li><strong>Add players</strong> with their positions below</li>
-                <li><strong>Compare players</strong> to build accurate skill ratings using proven mathematical models</li>
-                <li><strong>Create balanced teams</strong> automatically with algorithmic optimization</li>
-            </ol>
-            <button onclick="document.getElementById('welcomeGuide').style.display='none'; localStorage.setItem('hideWelcome', 'true');" style="background: var(--accent-blue); border: none; color: white; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-weight: 600;">Got it!</button>
-        </div>
-
         <div class="tabs">
             <button class="tab active" title="Add and manage players">Settings</button>
             <button class="tab" title="Compare players to build ratings">Compare</button>
@@ -37,6 +24,19 @@
         <!-- Settings Tab -->
         <div id="setup" class="tab-content active">
             <h2>Player Management</h2>
+            
+            <!-- Welcome Guide for New Users -->
+            <div id="welcomeGuide" style="background: var(--surface-2); border: 2px solid var(--accent-blue); color: var(--text-primary); padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem;">
+                <h3 style="margin: 0 0 1rem 0; color: var(--accent-blue);">👋 Welcome to VolleyRank!</h3>
+                <p style="margin: 0 0 0.5rem 0; color: var(--text-secondary);">Using advanced algorithms and ELO rating system to optimize your volleyball team</p>
+                <p style="margin: 0 0 1rem 0; color: var(--text-secondary);">Get started in 3 easy steps:</p>
+                <ol style="margin: 0 0 1rem 0; padding-left: 1.5rem; color: var(--text-primary);">
+                    <li><strong>Add players</strong> with their positions below</li>
+                    <li><strong>Compare players</strong> to build accurate skill ratings using proven mathematical models</li>
+                    <li><strong>Create balanced teams</strong> automatically with algorithmic optimization</li>
+                </ol>
+                <button onclick="document.getElementById('welcomeGuide').style.display='none'; localStorage.setItem('hideWelcome', 'true');" style="background: var(--accent-blue); border: none; color: white; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-weight: 600;">Got it!</button>
+            </div>
             
             <div id="quickStart" style="background: var(--surface-2); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; margin-bottom: 2rem;">
                 <h4 style="margin: 0 0 0.5rem 0; color: var(--accent-blue);">🚀 Quick Start</h4>
