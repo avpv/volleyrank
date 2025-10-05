@@ -366,7 +366,6 @@ class UIController {
         const container = document.getElementById('teamsDisplay');
         if (!container) return;
 
-        const teamLabels = ['A', 'B', 'C', 'D', 'E', 'F'];
         let html = '';
 
         result.teams.forEach((team, index) => {
@@ -374,7 +373,7 @@ class UIController {
             
             html += `
                 <div class="team">
-                    <h3>Team ${teamLabels[index]} 
+                    <h3>Team ${index + 1}
                         <span style="font-weight: normal; color: var(--text-secondary);">
                             (${teamStats.totalRating} ELO, avg ${teamStats.averageRating})
                         </span>
