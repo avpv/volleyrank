@@ -160,7 +160,7 @@ class TeamOptimizer {
         }
 
         // Run GA and Tabu Search in parallel on best candidates
-        const [gaResult, tabuResult] = await Promise.all([
+        const [gaResult, tabuResult, saResult] = await Promise.all([
             this.optimizeWithGeneticAlgorithm(
                 candidates,
                 composition,
@@ -168,11 +168,12 @@ class TeamOptimizer {
                 playersByPosition,
                 positions
             ),
-            this.optimizeWithTabuSearch(candidates[0], positions)
+            this.optimizeWithTabuSearch(candidates[0], positions),
+            this.optimizeWithSimulatedAnnealing(candidates[0], positions)
         ]);
 
         // Compare results and select the best
-        const results = [gaResult, tabuResult];
+        const results = [gaResult, tabuResult, saResult];
         const scores = results.map(r => this.evaluateTeamSolution(r));
         const bestIdx = scores.indexOf(Math.min(...scores));
         
@@ -189,12 +190,18 @@ class TeamOptimizer {
         const balance = this.evaluateTeamBalance(bestTeams);
         const unusedPlayers = this.getUnusedPlayers(bestTeams, availablePlayers);
 
+        const algorithmNames = [
+            'Genetic Algorithm + Local Search',
+            'Tabu Search + Local Search',
+            'Simulated Annealing + Local Search'
+        ];
+
         return {
             teams: bestTeams,
             balance,
             unusedPlayers,
             validation,
-            algorithm: bestIdx === 0 ? 'Genetic Algorithm + Local Search' : 'Tabu Search + Local Search'
+            algorithm: algorithmNames[bestIdx]
         };
     }
 
