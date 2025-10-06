@@ -54,7 +54,7 @@ Perfect for training sessions where you need fair teams fast.
 
 ### 4. Create Teams
 - Go to the **Teams** tab
-- Set the number of teams (2-6)
+- Set the number of teams (2-+inf)
 - Define team composition (players per position)
 - Click "Create Teams" for optimally balanced team suggestions
 - The optimizer uses each player's rating for their assigned position
