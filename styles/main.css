@@ -293,6 +293,7 @@ body {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 1.5rem;
+    align-items: stretch; /* Stretch all items to same height */
 }
 
 .player-item {
@@ -304,6 +305,11 @@ body {
     position: relative;
     overflow: hidden;
     animation: fadeInUp 0.3s ease-out;
+    
+    /* Make it a flex container with column direction */
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 
 .player-item::before {
@@ -334,6 +340,7 @@ body {
     flex-direction: column;
     gap: 1rem;
     width: 100%;
+    flex: 1; /* Grow to fill available space */
 }
 
 .player-header-row {
@@ -412,7 +419,7 @@ body {
 .player-actions {
     display: flex;
     gap: 0.5rem;
-    margin-top: 1rem;
+    margin-top: auto; /* Push to bottom */
     padding-top: 1rem;
     border-top: 1px solid var(--border-color);
     flex-wrap: wrap;
