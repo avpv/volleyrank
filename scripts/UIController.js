@@ -362,31 +362,18 @@ class UIController {
                                 This will reset ALL players' ratings to 1500 and clear ALL comparison history for selected positions. This action cannot be undone!
                             </div>
                         </div>
-                        <div style="margin-top: 1rem;">
-                            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
-                                <input type="checkbox" id="confirmResetAll" style="width: auto; height: auto;">
-                                <span style="color: var(--text-secondary); font-size: 0.9rem;">
-                                    I understand this will reset ratings for all players
-                                </span>
-                            </label>
-                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary modal-close">Cancel</button>
-                    <button class="btn btn-danger" id="confirmResetAllBtn" disabled>Reset All</button>
+                    <button class="btn btn-danger" id="confirmResetAllBtn">Reset All</button>
                 </div>
             </div>
         `;
     
         document.body.appendChild(modal);
     
-        const confirmCheckbox = modal.querySelector('#confirmResetAll');
         const confirmBtn = modal.querySelector('#confirmResetAllBtn');
-        
-        confirmCheckbox.addEventListener('change', () => {
-            confirmBtn.disabled = !confirmCheckbox.checked;
-        });
     
         modal.querySelectorAll('.modal-close').forEach(btn => {
             btn.addEventListener('click', () => {
@@ -409,11 +396,6 @@ class UIController {
                 return;
             }
     
-            if (!confirmCheckbox.checked) {
-                this.showNotification('Please confirm the reset action', 'error');
-                return;
-            }
-    
             try {
                 this.stateManager.resetAllPlayersPositions(selectedPositions);
                 
@@ -428,7 +410,7 @@ class UIController {
             }
         });
     }
-
+    
     initializeImportModalHandlers() {
         const modal = document.getElementById('importModal');
         const importMethodSelect = document.getElementById('importMethod');
