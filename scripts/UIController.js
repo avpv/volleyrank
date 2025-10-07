@@ -204,6 +204,231 @@ class UIController {
         });
     }
 
+    showResetPlayerModal(playerId) {
+        const state = this.stateManager.getState();
+        const player = state.players.find(p => p.id === playerId);
+        
+        if (!player) {
+            this.showNotification('Player not found', 'error');
+            return;
+        }
+    
+        const modal = document.createElement('div');
+        modal.className = 'modal';
+        modal.style.display = 'flex';
+        
+        const positionsOptions = player.positions
+            .map(pos => {
+                const rating = Math.round(player.ratings[pos]);
+                const comparisons = player.comparisons[pos];
+                
+                return `
+                    <label class="position-checkbox-label">
+                        <input type="checkbox" name="resetPositions" value="${pos}" checked>
+                        <span>
+                            ${this.playerManager.positions[pos]} 
+                            <span style="color: var(--text-secondary); font-size: 0.85em;">
+                                (${rating} ELO, ${comparisons} comp.)
+                            </span>
+                        </span>
+                    </label>
+                `;
+            }).join('');
+    
+        modal.innerHTML = `
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Reset Ratings - ${this.escapeHtml(player.name)}</h3>
+                    <button class="btn btn-secondary modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Select positions to reset:</label>
+                        <div class="positions-grid">
+                            ${positionsOptions}
+                        </div>
+                        <div style="margin-top: 1rem; padding: 0.75rem; background: rgba(239, 68, 68, 0.1); border-radius: 6px; border: 1px solid rgba(239, 68, 68, 0.2);">
+                            <div style="color: var(--accent-red); font-size: 0.9rem; font-weight: 600; margin-bottom: 0.3rem;">
+                                ⚠️ Warning
+                            </div>
+                            <div style="color: var(--text-secondary); font-size: 0.85rem;">
+                                This will reset ratings to 1500 and clear all comparison history for selected positions.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary modal-close">Cancel</button>
+                    <button class="btn btn-warning" id="confirmResetBtn">Reset Selected</button>
+                </div>
+            </div>
+        `;
+    
+        document.body.appendChild(modal);
+    
+        modal.querySelectorAll('.modal-close').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.body.removeChild(modal);
+            });
+        });
+    
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                document.body.removeChild(modal);
+            }
+        });
+    
+        modal.querySelector('#confirmResetBtn').addEventListener('click', () => {
+            const selectedPositions = Array.from(modal.querySelectorAll('input[name="resetPositions"]:checked'))
+                .map(cb => cb.value);
+    
+            if (selectedPositions.length === 0) {
+                this.showNotification('Please select at least one position', 'error');
+                return;
+            }
+    
+            try {
+                this.stateManager.resetPlayerPositions(player.id, selectedPositions);
+                
+                const posNames = selectedPositions.map(p => this.playerManager.positions[p]).join(', ');
+                this.showNotification(
+                    `Reset ${posNames} for "${player.name}"`, 
+                    'success'
+                );
+                document.body.removeChild(modal);
+            } catch (error) {
+                this.showNotification(`Failed to reset: ${error.message}`, 'error');
+            }
+        });
+    }
+    
+    showResetAllRatingsModal() {
+        const state = this.stateManager.getState();
+        
+        if (state.players.length === 0) {
+            this.showNotification('No players to reset', 'error');
+            return;
+        }
+    
+        const modal = document.createElement('div');
+        modal.className = 'modal';
+        modal.style.display = 'flex';
+        
+        const positionStats = {};
+        Object.keys(this.playerManager.positions).forEach(pos => {
+            const players = this.playerManager.getPlayersForPosition(pos);
+            const totalComparisons = players.reduce((sum, p) => sum + (p.comparisons[pos] || 0), 0);
+            positionStats[pos] = {
+                playerCount: players.length,
+                comparisons: Math.floor(totalComparisons / 2)
+            };
+        });
+    
+        const positionsOptions = Object.entries(this.playerManager.positions)
+            .filter(([pos]) => positionStats[pos].playerCount > 0)
+            .map(([pos, name]) => {
+                const stats = positionStats[pos];
+                
+                return `
+                    <label class="position-checkbox-label">
+                        <input type="checkbox" name="resetAllPositions" value="${pos}" checked>
+                        <span>
+                            ${name}
+                            <span style="color: var(--text-secondary); font-size: 0.85em;">
+                                (${stats.playerCount} players, ${stats.comparisons} comp.)
+                            </span>
+                        </span>
+                    </label>
+                `;
+            }).join('');
+    
+        modal.innerHTML = `
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Reset All Ratings</h3>
+                    <button class="btn btn-secondary modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Select positions to reset for ALL players:</label>
+                        <div class="positions-grid">
+                            ${positionsOptions}
+                        </div>
+                        <div style="margin-top: 1rem; padding: 0.75rem; background: rgba(239, 68, 68, 0.1); border-radius: 6px; border: 1px solid rgba(239, 68, 68, 0.2);">
+                            <div style="color: var(--accent-red); font-size: 0.9rem; font-weight: 600; margin-bottom: 0.3rem;">
+                                ⚠️ Warning
+                            </div>
+                            <div style="color: var(--text-secondary); font-size: 0.85rem;">
+                                This will reset ALL players' ratings to 1500 and clear ALL comparison history for selected positions. This action cannot be undone!
+                            </div>
+                        </div>
+                        <div style="margin-top: 1rem;">
+                            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                                <input type="checkbox" id="confirmResetAll" style="width: auto; height: auto;">
+                                <span style="color: var(--text-secondary); font-size: 0.9rem;">
+                                    I understand this will reset ratings for all players
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary modal-close">Cancel</button>
+                    <button class="btn btn-danger" id="confirmResetAllBtn" disabled>Reset All</button>
+                </div>
+            </div>
+        `;
+    
+        document.body.appendChild(modal);
+    
+        const confirmCheckbox = modal.querySelector('#confirmResetAll');
+        const confirmBtn = modal.querySelector('#confirmResetAllBtn');
+        
+        confirmCheckbox.addEventListener('change', () => {
+            confirmBtn.disabled = !confirmCheckbox.checked;
+        });
+    
+        modal.querySelectorAll('.modal-close').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.body.removeChild(modal);
+            });
+        });
+    
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                document.body.removeChild(modal);
+            }
+        });
+    
+        confirmBtn.addEventListener('click', () => {
+            const selectedPositions = Array.from(modal.querySelectorAll('input[name="resetAllPositions"]:checked'))
+                .map(cb => cb.value);
+    
+            if (selectedPositions.length === 0) {
+                this.showNotification('Please select at least one position', 'error');
+                return;
+            }
+    
+            if (!confirmCheckbox.checked) {
+                this.showNotification('Please confirm the reset action', 'error');
+                return;
+            }
+    
+            try {
+                this.stateManager.resetAllPlayersPositions(selectedPositions);
+                
+                const posNames = selectedPositions.map(p => this.playerManager.positions[p]).join(', ');
+                this.showNotification(
+                    `Reset ${posNames} for all players`, 
+                    'success'
+                );
+                document.body.removeChild(modal);
+            } catch (error) {
+                this.showNotification(`Failed to reset: ${error.message}`, 'error');
+            }
+        });
+    }
+
     initializeImportModalHandlers() {
         const modal = document.getElementById('importModal');
         const importMethodSelect = document.getElementById('importMethod');
@@ -246,6 +471,22 @@ class UIController {
 
         this.stateManager.subscribe('playerRemoved', (player) => {
             this.showNotification(`Player "${player.name}" removed`, 'info');
+        });
+
+        this.stateManager.subscribe('playerPositionsReset', (data) => {
+            const posNames = data.positions.map(p => this.playerManager.positions[p]).join(', ');
+            this.showNotification(
+                `Reset ${posNames} for ${data.player.name}`, 
+                'success'
+            );
+        });
+        
+        this.stateManager.subscribe('allPlayersPositionsReset', (data) => {
+            const posNames = data.positions.map(p => this.playerManager.positions[p]).join(', ');
+            this.showNotification(
+                `Reset ${posNames} for ${data.playersAffected} players`, 
+                'success'
+            );
         });
 
         this.stateManager.subscribe('comparisonCompleted', (data) => {
@@ -407,26 +648,7 @@ class UIController {
     }
 
     handleResetAllRatings() {
-        if (!confirm('Are you sure you want to reset ALL ratings for ALL positions for ALL players?')) {
-            return;
-        }
-
-        try {
-            const state = this.stateManager.getState();
-            state.players.forEach(player => {
-                this.stateManager.resetPlayer(player.id);
-            });
-
-            this.stateManager.updateState({ 
-                comparisons: 0,
-                currentPair: null
-            });
-
-            this.showNotification('All player ratings reset to default', 'success');
-            
-        } catch (error) {
-            this.showNotification(`Failed to reset ratings: ${error.message}`, 'error');
-        }
+        this.showResetAllRatingsModal();
     }
 
     handleClearAll() {
@@ -521,19 +743,7 @@ class UIController {
     }
 
     handleResetPlayer(playerId) {
-        const state = this.stateManager.getState();
-        const player = state.players.find(p => p.id === playerId);
-        
-        if (!player) {
-            this.showNotification('Player not found', 'error');
-            return;
-        }
-
-        if (!confirm(`Reset all ratings for "${player.name}"?`)) {
-            return;
-        }
-
-        this.stateManager.resetPlayer(playerId);
+        this.showResetPlayerModal(playerId);
     }
 
     handleRemovePlayer(playerId) {
