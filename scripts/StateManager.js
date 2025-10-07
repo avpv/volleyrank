@@ -247,6 +247,108 @@ class StateManager {
             currentPair: null // Clear cached pair when player reset
         });
     }
+    
+    /**
+     * resetPlayerPositions
+     */
+    resetPlayerPositions(playerId, positions) {
+        if (!Array.isArray(positions) || positions.length === 0) {
+            throw new Error('At least one position is required');
+        }
+    
+        const targetPlayer = this.state.players.find(p => p.id === playerId);
+        if (!targetPlayer) {
+            throw new Error('Player not found');
+        }
+    
+        const updatedPlayers = this.state.players.map(player => {
+            if (player.id === playerId) {
+                const resetPlayer = { ...player };
+                
+                positions.forEach(pos => {
+                    if (resetPlayer.ratings[pos]) {
+                        resetPlayer.ratings[pos] = 1500;
+                        resetPlayer.comparisons[pos] = 0;
+                        resetPlayer.comparedWith[pos] = [];
+                    }
+                });
+                
+                return resetPlayer;
+            }
+            return player;
+        });
+    
+        // Remove from other players' comparison lists
+        updatedPlayers.forEach(player => {
+            if (player.id !== playerId) {
+                positions.forEach(pos => {
+                    if (player.comparedWith[pos]) {
+                        player.comparedWith[pos] = player.comparedWith[pos].filter(
+                            name => name !== targetPlayer.name
+                        );
+                    }
+                });
+            }
+        });
+    
+        this.updateState({ 
+            players: updatedPlayers,
+            currentPair: null
+        });
+        
+        this.notify('playerPositionsReset', { 
+            player: updatedPlayers.find(p => p.id === playerId), 
+            positions 
+        });
+    }
+
+    /**
+     * resetAllPlayersPositions
+     */
+    resetAllPlayersPositions(positions) {
+        if (!Array.isArray(positions) || positions.length === 0) {
+            throw new Error('At least one position is required');
+        }
+    
+        const updatedPlayers = this.state.players.map(player => {
+            const resetPlayer = { ...player };
+            
+            positions.forEach(pos => {
+                if (resetPlayer.ratings[pos]) {
+                    resetPlayer.ratings[pos] = 1500;
+                    resetPlayer.comparisons[pos] = 0;
+                    resetPlayer.comparedWith[pos] = [];
+                }
+            });
+            
+            return resetPlayer;
+        });
+    
+        // Recalculate total comparisons
+        let totalComparisons = 0;
+        const allPositions = ['S', 'OPP', 'OH', 'MB', 'L'];
+        const nonResetPositions = allPositions.filter(pos => !positions.includes(pos));
+        
+        updatedPlayers.forEach(player => {
+            nonResetPositions.forEach(pos => {
+                if (player.comparisons[pos]) {
+                    totalComparisons += player.comparisons[pos];
+                }
+            });
+        });
+        totalComparisons = Math.floor(totalComparisons / 2);
+    
+        this.updateState({ 
+            players: updatedPlayers,
+            comparisons: totalComparisons,
+            currentPair: null
+        });
+    
+        this.notify('allPlayersPositionsReset', { 
+            positions, 
+            playersAffected: updatedPlayers.length 
+        });
+    }
 
     /**
      * Update ratings after comparison for specific position
