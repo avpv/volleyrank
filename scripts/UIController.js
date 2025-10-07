@@ -661,10 +661,10 @@ class UIController {
         const totalPlayersSpan = document.getElementById('totalPlayers');
         
         if (!container || !totalPlayersSpan) return;
-
+    
         const state = this.stateManager.getState();
         totalPlayersSpan.textContent = state.players.length;
-
+    
         if (state.players.length === 0) {
             container.innerHTML = `
                 <div class="no-comparison" style="grid-column: 1 / -1;">
@@ -673,49 +673,54 @@ class UIController {
             `;
             return;
         }
-
+    
         const sortedPlayers = [...state.players].sort((a, b) => a.name.localeCompare(b.name));
         
         let html = '';
         sortedPlayers.forEach(player => {
-            const playerStats = this.playerManager.getPlayerStats(player.id);
-            
-            // Format positions with ratings
-            let positionsDisplay = '';
+            // Format positions as tiles
+            let positionsTiles = '';
             player.positions.forEach(pos => {
-                const rating = player.ratings[pos];
+                const rating = Math.round(player.ratings[pos]);
                 const comparisons = player.comparisons[pos];
-                positionsDisplay += `<div style="margin: 0.25rem 0;">
-                    <strong>${this.playerManager.positions[pos]}:</strong> ${Math.round(rating)} ELO (${comparisons} comparisons)
-                </div>`;
+                positionsTiles += `
+                    <div class="position-tile">
+                        <div class="position-tile-name">${this.playerManager.positions[pos]}</div>
+                        <div class="position-tile-stats">
+                            <span class="position-tile-rating">${rating}</span> ELO
+                            <span style="margin-left: 0.5rem; opacity: 0.7;">${comparisons} comp.</span>
+                        </div>
+                    </div>
+                `;
             });
             
             html += `
                 <div class="player-item">
                     <div class="player-content-wrapper">
-                        <div class="player-name-header">
-                            ${this.escapeHtml(player.name)}
-                            ${player.positions.length > 1 ? 
-                                '<span class="multi-position-badge">Multi-pos</span>' : ''
-                            }
+                        <div class="player-header-row">
+                            <h3 class="player-name-header">
+                                ${this.escapeHtml(player.name)}
+                                ${player.positions.length > 1 ? 
+                                    '<span class="multi-position-badge">Multi-pos</span>' : ''
+                                }
+                            </h3>
                         </div>
                         
-                        <div class="player-info-item">
-                            <strong>Positions & Ratings</strong>
-                            ${positionsDisplay}
+                        <div class="player-positions-grid">
+                            ${positionsTiles}
                         </div>
-                    </div>
-                    
-                    <div class="player-actions">
-                        <button class="btn btn-secondary" onclick="uiController.handleEditPlayerPositions(${player.id})">
-                            Edit Positions
-                        </button>
-                        <button class="btn btn-warning" onclick="uiController.handleResetPlayer(${player.id})">
-                            Reset
-                        </button>
-                        <button class="btn btn-danger" onclick="uiController.handleRemovePlayer(${player.id})">
-                            Remove
-                        </button>
+                        
+                        <div class="player-actions">
+                            <button class="btn btn-secondary" onclick="uiController.handleEditPlayerPositions(${player.id})">
+                                Edit
+                            </button>
+                            <button class="btn btn-warning" onclick="uiController.handleResetPlayer(${player.id})">
+                                Reset
+                            </button>
+                            <button class="btn btn-danger" onclick="uiController.handleRemovePlayer(${player.id})">
+                                Remove
+                            </button>
+                        </div>
                     </div>
                 </div>
             `;
