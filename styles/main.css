@@ -418,18 +418,20 @@ body {
 /* Player Actions (Buttons) */
 .player-actions {
     display: flex;
-    gap: 0.5rem;
-    margin-top: auto; /* Push to bottom */
-    padding-top: 1rem;
+    gap: 0.4rem;
+    justify-content: space-between;
+    margin-top: auto;
+    padding-top: 0.8rem;
     border-top: 1px solid var(--border-color);
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
 }
 
 .player-actions .btn {
-    flex: 1;
-    min-width: 100px;
-    padding: 0.4rem 0.8rem;
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 0.4rem 0.6rem;
     font-size: 0.8rem;
+    text-align: center;
 }
 
 /* ==========================================================================
@@ -1189,7 +1191,7 @@ body {
     }
     
     .player-actions {
-        flex-direction: column;
+        flex-wrap: wrap;
     }
     
     .player-actions .btn {
