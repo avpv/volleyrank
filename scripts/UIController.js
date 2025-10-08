@@ -580,31 +580,28 @@ class UIController {
         if (!container) return;
     
         const steps = [
-            { icon: '🔍', text: 'Analyzing players...', duration: 500 },
-            { icon: '📊', text: 'Generating initial solutions...', duration: 600 },
-            { icon: '🧬', text: 'Running Genetic Algorithm...', duration: 800 },
-            { icon: '🔄', text: 'Executing Tabu Search...', duration: 700 },
-            { icon: '🔥', text: 'Simulated Annealing in progress...', duration: 900 },
-            { icon: '✨', text: 'Refining with Local Search...', duration: 600 },
-            { icon: '⚖️', text: 'Balancing teams...', duration: 500 }
+            { icon: '🔍', text: 'Analyzing players...', duration: 400 },
+            { icon: '📊', text: 'Generating initial solutions...', duration: 500 },
+            { icon: '🧬', text: 'Running Genetic Algorithm...', duration: 600 },
+            { icon: '🔄', text: 'Executing Tabu Search...', duration: 500 },
+            { icon: '🔥', text: 'Simulated Annealing...', duration: 600 },
+            { icon: '✨', text: 'Local Search refinement...', duration: 400 },
+            { icon: '⚖️', text: 'Finalizing teams...', duration: 400 }
         ];
     
         container.innerHTML = `
             <div class="optimization-animation">
-                <div class="optimization-header">
-                    <div class="optimization-title">Creating Optimal Teams</div>
+                <div class="optimization-content">
+                    <div class="optimization-current-step" id="optimizationCurrentStep"></div>
+                    <div class="optimization-progress">
+                        <div class="optimization-progress-bar" id="optimizationProgressBar"></div>
+                    </div>
                 </div>
-                <div class="optimization-current-step" id="optimizationCurrentStep"></div>
-                <div class="optimization-progress">
-                    <div class="optimization-progress-bar" id="optimizationProgressBar"></div>
-                </div>
-                <div class="optimization-step-counter" id="stepCounter"></div>
             </div>
         `;
     
         const stepContainer = document.getElementById('optimizationCurrentStep');
         const progressBar = document.getElementById('optimizationProgressBar');
-        const stepCounter = document.getElementById('stepCounter');
         
         const totalDuration = steps.reduce((sum, step) => sum + step.duration, 0);
         let elapsed = 0;
@@ -621,9 +618,6 @@ class UIController {
                 </div>
             `;
     
-            // Update step counter
-            stepCounter.textContent = `Step ${i + 1} of ${steps.length}`;
-    
             // Update progress
             elapsed += step.duration;
             const progress = (elapsed / totalDuration) * 100;
@@ -632,61 +626,17 @@ class UIController {
             // Wait
             await new Promise(resolve => setTimeout(resolve, step.duration));
     
-            // Mark as complete
+            // Mark as complete briefly
             const stepEl = stepContainer.querySelector('.optimization-step');
             stepEl.classList.remove('active');
             stepEl.classList.add('complete');
             stepEl.querySelector('.step-spinner').innerHTML = '✓';
             
-            // Brief pause to show completion
-            await new Promise(resolve => setTimeout(resolve, 200));
+            // Brief pause
+            await new Promise(resolve => setTimeout(resolve, 150));
         }
     }
     
-    displayOptimizedTeams(result) {
-        const container = document.getElementById('teamsDisplay');
-        if (!container) return;
-
-        let html = '';
-
-        result.teams.forEach((team, index) => {
-            const teamStats = this.eloCalculator.calculateTeamStrength(team);
-            
-            html += `
-                <div class="team">
-                    <h3>Team ${index + 1}
-                        <span style="font-weight: normal; color: var(--text-secondary);">
-                            (${teamStats.totalRating} ELO, avg ${teamStats.averageRating})
-                        </span>
-                    </h3>
-                    <div style="color: var(--text-secondary); margin-bottom: 1rem;">
-                        Players: ${team.length}
-                    </div>
-            `;
-
-            team.forEach(player => {
-                const displayPosition = player.assignedPosition || player.positions[0];
-                const rating = player.ratings[displayPosition] || player.rating || 1500;
-                
-                html += `
-                    <div class="team-player">
-                        <div class="team-player-info">
-                            <div class="team-player-name">${this.escapeHtml(player.name)}</div>
-                            <div class="team-player-position">
-                                ${this.playerManager.positions[displayPosition]}
-                            </div>
-                        </div>
-                        <div class="team-player-rating">${Math.round(rating)}</div>
-                    </div>
-                `;
-            });
-
-            html += '</div>';
-        });
-
-        container.innerHTML = html;
-    }
-
     handleResetAllRatings() {
         this.showResetAllRatingsModal();
     }
