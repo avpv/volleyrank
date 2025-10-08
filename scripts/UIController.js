@@ -595,15 +595,17 @@ class UIController {
                     <div class="optimization-title">🎯 Creating Optimal Teams</div>
                     <div class="optimization-subtitle">Using advanced algorithms</div>
                 </div>
-                <div class="optimization-steps" id="optimizationSteps"></div>
+                <div class="optimization-current-step" id="optimizationCurrentStep"></div>
                 <div class="optimization-progress">
                     <div class="optimization-progress-bar" id="optimizationProgressBar"></div>
                 </div>
+                <div class="optimization-step-counter" id="stepCounter"></div>
             </div>
         `;
     
-        const stepsContainer = document.getElementById('optimizationSteps');
+        const stepContainer = document.getElementById('optimizationCurrentStep');
         const progressBar = document.getElementById('optimizationProgressBar');
+        const stepCounter = document.getElementById('stepCounter');
         
         const totalDuration = steps.reduce((sum, step) => sum + step.duration, 0);
         let elapsed = 0;
@@ -611,15 +613,17 @@ class UIController {
         for (let i = 0; i < steps.length; i++) {
             const step = steps[i];
             
-            // Add step
-            const stepEl = document.createElement('div');
-            stepEl.className = 'optimization-step active';
-            stepEl.innerHTML = `
-                <div class="step-icon">${step.icon}</div>
-                <div class="step-text">${step.text}</div>
-                <div class="step-spinner"></div>
+            // Replace step content
+            stepContainer.innerHTML = `
+                <div class="optimization-step active">
+                    <div class="step-icon">${step.icon}</div>
+                    <div class="step-text">${step.text}</div>
+                    <div class="step-spinner"></div>
+                </div>
             `;
-            stepsContainer.appendChild(stepEl);
+    
+            // Update step counter
+            stepCounter.textContent = `Step ${i + 1} of ${steps.length}`;
     
             // Update progress
             elapsed += step.duration;
@@ -630,15 +634,16 @@ class UIController {
             await new Promise(resolve => setTimeout(resolve, step.duration));
     
             // Mark as complete
+            const stepEl = stepContainer.querySelector('.optimization-step');
             stepEl.classList.remove('active');
             stepEl.classList.add('complete');
             stepEl.querySelector('.step-spinner').innerHTML = '✓';
+            
+            // Brief pause to show completion
+            await new Promise(resolve => setTimeout(resolve, 200));
         }
-    
-        // Final state
-        await new Promise(resolve => setTimeout(resolve, 200));
     }
-
+    
     displayOptimizedTeams(result) {
         const container = document.getElementById('teamsDisplay');
         if (!container) return;
