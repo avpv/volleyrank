@@ -1138,21 +1138,33 @@ body {
     border-radius: 8px;
     padding: 1.5rem;
     animation: fadeInUp 0.3s ease-out;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+    transition: all 0.2s ease;
+}
+
+.team:hover {
+    border-color: var(--accent-blue);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
 }
 
 .team h3 {
-    font-size: 1.15rem;
+    font-size: 1rem;
     font-weight: 600;
     margin-bottom: 1rem;
     letter-spacing: -0.01em;
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-primary);
 }
 
 .team-stats-header {
-    font-weight: normal;
+    font-weight: 500;
     color: var(--text-secondary);
+    font-size: 0.85rem;
 }
 
 .team-stats-header.hidden {
@@ -1162,14 +1174,25 @@ body {
 .team-player-count {
     color: var(--text-secondary);
     margin-bottom: 1rem;
+    font-size: 0.85rem;
+    font-weight: 500;
 }
 
 .team-player {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0.75rem 0;
-    border-bottom: 1px solid var(--border-color);
+    padding: 0.875rem 0;
+    border-bottom: 1px solid rgba(57, 68, 86, 0.3);
+    transition: background 0.15s ease;
+}
+
+.team-player:hover {
+    background: rgba(74, 144, 226, 0.03);
+    margin: 0 -0.5rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    border-radius: 4px;
 }
 
 .team-player:last-child {
