@@ -635,8 +635,8 @@ body {
 }
 
 .position-stat-number {
-    font-size: 2rem;
-    font-weight: 700;
+    font-size: 1.5rem;
+    font-weight: 600;
     color: var(--accent-blue);
     line-height: 1;
     margin-bottom: 0.5rem;
@@ -1955,7 +1955,7 @@ html {
     }
 
     .position-stat-number {
-        font-size: 1.75rem !important;
+        font-size: 1.35rem !important;
     }
 
     .position-stat-label {
