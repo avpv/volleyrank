@@ -1,5 +1,5 @@
 /**
- * UI Controller with multiple position ratings support
+ * UI Controller
  */
 class UIController {
     constructor(stateManager, playerManager, eloCalculator, teamOptimizer) {
@@ -10,6 +10,7 @@ class UIController {
         
         this.currentTab = 'compare';
         this.isProcessing = false;
+        this.currentTeams = null;
         
         this.initializeEventListeners();
         this.subscribeToStateChanges();
@@ -55,6 +56,8 @@ class UIController {
         const clearAllBtn = document.getElementById('clearAllBtn');
         const resetAllRatingsBtn = document.getElementById('resetAllRatingsBtn');
         const exportPlayersBtn = document.getElementById('exportPlayersBtn');
+        const showEloRatingsCheckbox = document.getElementById('showEloRatings');
+        const exportTeamsBtn = document.getElementById('exportTeamsBtn');
         
         if (clearAllBtn) {
             clearAllBtn.addEventListener('click', () => this.handleClearAll());
@@ -66,6 +69,14 @@ class UIController {
 
         if (exportPlayersBtn) {
             exportPlayersBtn.addEventListener('click', () => this.handleExportPlayers());
+        }
+
+        if (showEloRatingsCheckbox) {
+            showEloRatingsCheckbox.addEventListener('change', () => this.handleToggleEloDisplay());
+        }
+
+        if (exportTeamsBtn) {
+            exportTeamsBtn.addEventListener('click', () => this.handleExportTeams());
         }
 
         setTimeout(() => this.initializeImportModalHandlers(), 100);
@@ -227,7 +238,7 @@ class UIController {
                         <input type="checkbox" name="resetPositions" value="${pos}" checked>
                         <span>
                             ${this.playerManager.positions[pos]} 
-                            <span style="color: var(--text-secondary); font-size: 0.85em;">
+                            <span class="position-stats-inline">
                                 (${rating} ELO, ${comparisons} comp.)
                             </span>
                         </span>
@@ -247,11 +258,9 @@ class UIController {
                         <div class="positions-grid">
                             ${positionsOptions}
                         </div>
-                        <div style="margin-top: 1rem; padding: 0.75rem; background: rgba(239, 68, 68, 0.1); border-radius: 6px; border: 1px solid rgba(239, 68, 68, 0.2);">
-                            <div style="color: var(--accent-red); font-size: 0.9rem; font-weight: 600; margin-bottom: 0.3rem;">
-                                ⚠️ Warning
-                            </div>
-                            <div style="color: var(--text-secondary); font-size: 0.85rem;">
+                        <div class="warning-box">
+                            <div class="warning-title">⚠️ Warning</div>
+                            <div class="warning-text">
                                 This will reset ratings to 1500 and clear all comparison history for selected positions.
                             </div>
                         </div>
@@ -334,7 +343,7 @@ class UIController {
                         <input type="checkbox" name="resetAllPositions" value="${pos}" checked>
                         <span>
                             ${name}
-                            <span style="color: var(--text-secondary); font-size: 0.85em;">
+                            <span class="position-stats-inline">
                                 (${stats.playerCount} players, ${stats.comparisons} comp.)
                             </span>
                         </span>
@@ -354,11 +363,9 @@ class UIController {
                         <div class="positions-grid">
                             ${positionsOptions}
                         </div>
-                        <div style="margin-top: 1rem; padding: 0.75rem; background: rgba(239, 68, 68, 0.1); border-radius: 6px; border: 1px solid rgba(239, 68, 68, 0.2);">
-                            <div style="color: var(--accent-red); font-size: 0.9rem; font-weight: 600; margin-bottom: 0.3rem;">
-                                ⚠️ Warning
-                            </div>
-                            <div style="color: var(--text-secondary); font-size: 0.85rem;">
+                        <div class="warning-box warning-box-danger">
+                            <div class="warning-title">⚠️ Warning</div>
+                            <div class="warning-text">
                                 This will reset ALL players' ratings to 1500 and clear ALL comparison history for selected positions. This action cannot be undone!
                             </div>
                         </div>
@@ -549,7 +556,9 @@ class UIController {
                 state.players
             );
     
+            this.currentTeams = result;
             this.displayOptimizedTeams(result);
+            this.showTeamsControls();
             this.showNotification(
                 `Teams created! Balance difference: ${result.balance.maxDifference} ELO`, 
                 'success'
@@ -641,6 +650,7 @@ class UIController {
         const container = document.getElementById('teamsDisplay');
         if (!container) return;
     
+        const showElo = document.getElementById('showEloRatings')?.checked !== false;
         let html = '';
     
         result.teams.forEach((team, index) => {
@@ -648,12 +658,13 @@ class UIController {
             
             html += `
                 <div class="team">
-                    <h3>Team ${index + 1}
-                        <span style="font-weight: normal; color: var(--text-secondary);">
+                    <h3>
+                        Team ${index + 1}
+                        <span class="team-stats-header ${showElo ? '' : 'hidden'}">
                             (${teamStats.totalRating} ELO, avg ${teamStats.averageRating})
                         </span>
                     </h3>
-                    <div style="color: var(--text-secondary); margin-bottom: 1rem;">
+                    <div class="team-player-count">
                         Players: ${team.length}
                     </div>
             `;
@@ -670,7 +681,7 @@ class UIController {
                                 ${this.playerManager.positions[displayPosition]}
                             </div>
                         </div>
-                        <div class="team-player-rating">${Math.round(rating)}</div>
+                        <div class="team-player-rating ${showElo ? '' : 'hidden'}">${Math.round(rating)}</div>
                     </div>
                 `;
             });
@@ -683,6 +694,81 @@ class UIController {
     
     handleResetAllRatings() {
         this.showResetAllRatingsModal();
+    }
+
+    handleToggleEloDisplay() {
+        if (!this.currentTeams) return;
+        this.displayOptimizedTeams(this.currentTeams);
+    }
+
+    handleExportTeams() {
+        if (!this.currentTeams) {
+            this.showNotification('No teams to export', 'error');
+            return;
+        }
+
+        try {
+            const showElo = document.getElementById('showEloRatings')?.checked !== false;
+            const lines = [];
+            
+            // Header
+            const header = showElo ? 
+                ['Team', 'Player', 'Position', 'ELO Rating'] : 
+                ['Team', 'Player', 'Position'];
+            lines.push(header.join(','));
+
+            // Team data
+            this.currentTeams.teams.forEach((team, teamIndex) => {
+                team.forEach(player => {
+                    const displayPosition = player.assignedPosition || player.positions[0];
+                    const rating = player.ratings[displayPosition] || player.rating || 1500;
+                    const positionName = this.playerManager.positions[displayPosition];
+                    
+                    const row = [
+                        `Team ${teamIndex + 1}`,
+                        `"${player.name.replace(/"/g, '""')}"`,
+                        positionName
+                    ];
+                    
+                    if (showElo) {
+                        row.push(Math.round(rating));
+                    }
+                    
+                    lines.push(row.join(','));
+                });
+            });
+
+            // Add team statistics
+            lines.push('');
+            lines.push('Team Statistics');
+            lines.push('Team,Total ELO,Average ELO,Players');
+            
+            this.currentTeams.teams.forEach((team, teamIndex) => {
+                const teamStats = this.eloCalculator.calculateTeamStrength(team);
+                lines.push([
+                    `Team ${teamIndex + 1}`,
+                    teamStats.totalRating,
+                    teamStats.averageRating,
+                    team.length
+                ].join(','));
+            });
+
+            const csv = lines.join('\n');
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `volleyrank-teams-${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            
+            this.showNotification('Teams exported successfully!', 'success');
+        } catch (error) {
+            this.showNotification(`Export failed: ${error.message}`, 'error');
+        }
     }
 
     handleClearAll() {
@@ -762,7 +848,7 @@ class UIController {
                         <div class="position-tile-name">${this.playerManager.positions[pos]}</div>
                         <div class="position-tile-stats">
                             <span class="position-tile-rating">${rating}</span> ELO
-                            <span style="margin-left: 0.5rem; opacity: 0.7;">${comparisons} comp.</span>
+                            <span class="position-tile-comparisons">${comparisons} comp.</span>
                         </div>
                     </div>
                 `;
@@ -834,9 +920,9 @@ class UIController {
             const positionStats = stats[pos] || { canPlay: 0 };
             
             html += `
-                <div style="text-align: center; padding: 0.5rem;">
-                    <div style="font-weight: 600; font-size: 1.2rem;">${positionStats.canPlay}</div>
-                    <div style="font-size: 0.9rem; color:var(--text-secondary);">${name}s</div>
+                <div class="position-stat-card">
+                    <div class="position-stat-number">${positionStats.canPlay}</div>
+                    <div class="position-stat-label">${name}s</div>
                 </div>
             `;
         });
@@ -869,7 +955,7 @@ class UIController {
                         <div class="rank-number ${rankClass}">${index + 1}</div>
                         <div class="player-info">
                             <div>${this.escapeHtml(player.name)}</div>
-                            <div style="color:var(--text-secondary); font-size: 0.9rem;">
+                            <div class="ranking-stats">
                                 ${Math.round(rating)} ELO (${comparisons} comparisons)
                             </div>
                         </div>
@@ -887,7 +973,7 @@ class UIController {
         if (!container) return;
 
         const positions = ['S', 'OPP', 'OH', 'MB', 'L'];
-        let html = '<h3 style="margin-bottom: 1.5rem; color: var(--text-primary);">Position Progress</h3>';
+        let html = '<h3 class="position-progress-title">Position Progress</h3>';
 
         positions.forEach(pos => {
             const players = this.playerManager.getPlayersForPosition(pos);
@@ -995,30 +1081,30 @@ class UIController {
     displayComparisonPair(player1, player2, selectedPosition) {
         const container = document.getElementById('comparisonContainer');
         container.innerHTML = `
-            <div class="comparison-info" style="text-align: center; margin-bottom: 1rem;">
+            <div class="comparison-info">
                 Comparing at: <strong>${this.playerManager.positions[selectedPosition]}</strong>
             </div>
             <div class="comparison-area">
                 <div class="player-card" onclick="uiController.handlePlayerComparison(${player1.id}, ${player2.id}, '${selectedPosition}')">
-                    <div class="player-avatar" style="background:linear-gradient(135deg, #2563eb, #3b82f6);">
+                    <div class="player-avatar player-avatar-blue">
                         ${player1.name.charAt(0).toUpperCase()}
                     </div>
                     <div class="player-name">${this.escapeHtml(player1.name)}</div>
                     <div class="player-position">${this.playerManager.positions[selectedPosition]}</div>
                     <div class="player-rating">${Math.round(player1.ratings[selectedPosition])} ELO</div>
-                    <div style="font-size: 0.9em; color:var(--text-secondary); margin-top: 5px;">
+                    <div class="player-comparisons">
                         Comparisons: ${player1.comparisons[selectedPosition]}
                     </div>
                 </div>
                 <div class="vs-divider">VS</div>
                 <div class="player-card" onclick="uiController.handlePlayerComparison(${player2.id}, ${player1.id}, '${selectedPosition}')">
-                    <div class="player-avatar" style="background:linear-gradient(135deg, #a855f7, #ec4899);">
+                    <div class="player-avatar player-avatar-purple">
                         ${player2.name.charAt(0).toUpperCase()}
                     </div>
                     <div class="player-name">${this.escapeHtml(player2.name)}</div>
                     <div class="player-position">${this.playerManager.positions[selectedPosition]}</div>
                     <div class="player-rating">${Math.round(player2.ratings[selectedPosition])} ELO</div>
-                    <div style="font-size: 0.9em; color:var(--text-secondary); margin-top: 5px;">
+                    <div class="player-comparisons">
                         Comparisons: ${player2.comparisons[selectedPosition]}
                     </div>
                 </div>
@@ -1071,32 +1157,32 @@ class UIController {
                 Math.round((completedComparisons / totalPossiblePairs) * 100) : 0;
             
             container.innerHTML = `
-                <div style="margin-bottom: 1rem;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                        <span style="color: var(--text-secondary);">
+                <div class="comparison-stats-progress">
+                    <div class="comparison-stats-header">
+                        <span class="comparison-stats-label">
                             ${this.playerManager.positions[position]} Progress
                         </span>
-                        <span style="color: var(--text-primary); font-weight: 600;">
+                        <span class="comparison-stats-value">
                             ${completedComparisons} / ${totalPossiblePairs} comparisons
                         </span>
                     </div>
-                    <div style="width: 100%; height: 8px; background: var(--surface-2); border-radius: 4px; overflow: hidden; border: 1px solid var(--border-color);">
-                        <div style="width: ${progressPercentage}%; height: 100%; background: linear-gradient(90deg, var(--accent-blue), var(--accent-green)); transition: width 0.3s ease;"></div>
+                    <div class="comparison-progress-bar">
+                        <div class="comparison-progress-fill" style="width: ${progressPercentage}%;"></div>
                     </div>
-                    <div style="margin-top: 0.5rem; color: var(--text-secondary); font-size: 0.9rem;">
+                    <div class="comparison-stats-remaining">
                         ${remainingComparisons > 0 ? 
                             `${remainingComparisons} comparison${remainingComparisons === 1 ? '' : 's'} remaining` : 
                             'All pairs compared!'
                         }
                     </div>
                 </div>
-                <div style="color: var(--text-secondary); font-size: 0.9rem;">
+                <div class="comparison-stats-total">
                     Players: ${players.length} • Total comparisons across all positions: ${state.comparisons}
                 </div>
             `;
         } else {
             container.innerHTML = `
-                <div style="color: var(--text-secondary);">
+                <div class="comparison-stats-total">
                     Total comparisons: ${state.comparisons}
                 </div>
             `;
@@ -1262,6 +1348,23 @@ class UIController {
         const container = document.getElementById('teamsDisplay');
         if (container) {
             container.innerHTML = '';
+        }
+        
+        this.currentTeams = null;
+        this.hideTeamsControls();
+    }
+
+    showTeamsControls() {
+        const controls = document.getElementById('teamsControls');
+        if (controls) {
+            controls.classList.remove('hidden');
+        }
+    }
+
+    hideTeamsControls() {
+        const controls = document.getElementById('teamsControls');
+        if (controls) {
+            controls.classList.add('hidden');
         }
     }
 
