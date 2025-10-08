@@ -209,6 +209,18 @@ body {
     box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
 }
 
+/* Button Groups */
+.button-group {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+}
+
+.button-group-secondary {
+    margin-top: 0.5rem;
+}
+
 /* ==========================================================================
    POSITION SELECTION (CHECKBOXES GRID)
    ========================================================================== */
@@ -449,6 +461,11 @@ body {
     color: var(--text-primary);
 }
 
+.position-tile-comparisons {
+    margin-left: 0.5rem;
+    opacity: 0.7;
+}
+
 .player-actions {
     display: flex;
     gap: 0.5rem;
@@ -472,12 +489,16 @@ body {
    ========================================================================== */
 
 .teams-controls {
-    display: none;
     margin-top: 1.5rem;
     padding: 1rem;
     background: var(--surface-2);
     border-radius: 8px;
     border: 1px solid var(--border-color);
+    transition: opacity 0.3s ease, max-height 0.3s ease;
+}
+
+.teams-controls.hidden {
+    display: none;
 }
 
 .teams-controls-inner {
@@ -598,33 +619,30 @@ body {
     border: 1px solid var(--border-color);
 }
 
-.players-stats > div {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+.position-stat-card {
+    text-align: center;
     padding: 1rem;
+    border-radius: 8px;
     background: var(--surface-1);
     border: 1px solid var(--border-color);
-    border-radius: 6px;
     transition: all 0.2s ease;
 }
 
-.players-stats > div:hover {
+.position-stat-card:hover {
     transform: translateY(-2px);
     border-color: var(--accent-blue);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.players-stats > div > div:first-child {
-    font-weight: 700;
+.position-stat-number {
     font-size: 2rem;
+    font-weight: 700;
     color: var(--accent-blue);
     line-height: 1;
     margin-bottom: 0.5rem;
 }
 
-.players-stats > div > div:last-child {
+.position-stat-label {
     font-size: 0.8rem;
     color: var(--text-secondary);
     text-transform: uppercase;
@@ -873,6 +891,54 @@ body {
     margin-top: 1.5rem;
 }
 
+.comparison-stats-progress {
+    margin-bottom: 1rem;
+}
+
+.comparison-stats-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.comparison-stats-label {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.comparison-stats-value {
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.comparison-progress-bar {
+    width: 100%;
+    height: 8px;
+    background: var(--surface-2);
+    border-radius: 4px;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+}
+
+.comparison-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-blue), var(--accent-green));
+    transition: width 0.3s ease;
+}
+
+.comparison-stats-remaining {
+    margin-top: 0.5rem;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.comparison-stats-total {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
 .no-comparison {
     text-align: center;
     padding: 3rem 1rem;
@@ -890,6 +956,13 @@ body {
     padding: 1.5rem;
     margin-bottom: 2rem;
     border: 1px solid var(--border-color);
+}
+
+.position-progress-title {
+    margin-bottom: 1.5rem;
+    color: var(--text-primary);
+    font-size: 1.1rem;
+    font-weight: 600;
 }
 
 .position-progress-item {
@@ -1072,11 +1145,18 @@ body {
     font-weight: 600;
     margin-bottom: 1rem;
     letter-spacing: -0.01em;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 .team-stats-header {
     font-weight: normal;
     color: var(--text-secondary);
+}
+
+.team-stats-header.hidden {
+    display: none;
 }
 
 .team-player-count {
@@ -1124,6 +1204,11 @@ body {
     min-width: 60px;
     text-align: right;
     font-size: 0.95rem;
+    transition: opacity 0.3s ease;
+}
+
+.team-player-rating.hidden {
+    display: none;
 }
 
 /* ==========================================================================
@@ -1214,6 +1299,38 @@ body {
 .modal .position-checkbox-label {
     padding: 0.75rem;
     font-size: 0.9rem;
+}
+
+/* Warning Boxes in Modals */
+.warning-box {
+    margin-top: 1rem;
+    padding: 0.75rem;
+    background: rgba(239, 68, 68, 0.1);
+    border-radius: 6px;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.warning-box-danger {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: rgba(239, 68, 68, 0.2);
+}
+
+.warning-title {
+    color: var(--accent-red);
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+}
+
+.warning-text {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+/* Position Stats Inline */
+.position-stats-inline {
+    color: var(--text-secondary);
+    font-size: 0.85em;
 }
 
 /* ==========================================================================
@@ -1369,6 +1486,14 @@ body {
     color: var(--text-muted);
     margin-top: 0.5rem;
     line-height: 1.6;
+}
+
+.file-info div {
+    margin-bottom: 0.25rem;
+}
+
+.file-info div:last-child {
+    margin-bottom: 0;
 }
 
 #importDataTextarea {
@@ -1678,6 +1803,10 @@ body {
     border-color: var(--accent-blue) !important;
 }
 
+.hidden {
+    display: none !important;
+}
+
 /* ==========================================================================
    SCROLLBAR STYLING
    ========================================================================== */
@@ -1821,16 +1950,27 @@ html {
         padding: 1rem !important;
     }
 
-    .players-stats > div {
+    .position-stat-card {
         padding: 0.75rem !important;
     }
 
-    .players-stats > div > div:first-child {
+    .position-stat-number {
         font-size: 1.75rem !important;
     }
 
-    .players-stats > div > div:last-child {
+    .position-stat-label {
         font-size: 0.75rem !important;
+    }
+
+    .button-group,
+    .button-group-secondary {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .button-group .btn,
+    .button-group-secondary .btn {
+        width: 100%;
     }
 
     .positions-grid {
