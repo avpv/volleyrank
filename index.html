@@ -77,13 +77,13 @@
                     </div>
                 </div>
                 
-                <div style="display: flex; gap: 1rem; margin-top: 1rem; flex-wrap: wrap;">
+                <div class="button-group">
                     <button class="btn btn-primary" id="addPlayerBtn">Add Player</button>
                     <button class="btn btn-secondary" id="importPlayersBtn" onclick="window.uiController && window.uiController.showImportModal()">Import Players</button>
                     <button class="btn btn-secondary" id="exportPlayersBtn">Export Players</button>
                 </div>
                 
-                <div style="display: flex; gap: 1rem; margin-top: 0.5rem; flex-wrap: wrap;">
+                <div class="button-group button-group-secondary">
                     <button class="btn btn-warning" id="resetAllRatingsBtn">Reset All Ratings</button>
                     <button class="btn btn-danger" id="clearAllBtn">Remove All Players</button>
                 </div>
@@ -112,9 +112,9 @@
                                     <label>Select File</label>
                                     <input type="file" id="importFileInput" accept=".csv,.json,.txt">
                                     <div class="file-info">
-                                        Supported formats: CSV, JSON<br>
-                                        <strong>CSV format:</strong> name,positions<br>
-                                        Example: "John Smith","OH,MB"
+                                        <div>Supported formats: CSV, JSON</div>
+                                        <div><strong>CSV format:</strong> name,positions</div>
+                                        <div>Example: "John Smith","OH,MB"</div>
                                     </div>
                                 </div>
                             </div>
@@ -124,9 +124,9 @@
                                     <label>Paste CSV or JSON Data</label>
                                     <textarea id="importDataTextarea" rows="8" placeholder="Paste your data here..."></textarea>
                                     <div class="file-info">
-                                        <strong>CSV format:</strong> name,positions<br>
-                                        Example: "Player","OH,MB"<br>
-                                        <strong>JSON format:</strong> [{"name":"Player","positions":["OH","MB"]}]
+                                        <div><strong>CSV format:</strong> name,positions</div>
+                                        <div>Example: "Player","OH,MB"</div>
+                                        <div><strong>JSON format:</strong> [{"name":"Player","positions":["OH","MB"]}]</div>
                                     </div>
                                 </div>
                             </div>
@@ -223,10 +223,10 @@
 
                 <button class="btn btn-primary" id="optimizeTeamsBtn">Create Teams</button>
 
-                <div id="teamsControls" class="teams-controls">
+                <div id="teamsControls" class="teams-controls hidden">
                     <div class="teams-controls-inner">
                         <label class="position-checkbox-label">
-                            <input type="checkbox" id="hideEloRatings" checked>
+                            <input type="checkbox" id="showEloRatings" checked>
                             <span>Show ELO Ratings</span>
                         </label>
                         <button class="btn btn-secondary" id="exportTeamsBtn">Export Teams</button>
