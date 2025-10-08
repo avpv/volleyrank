@@ -592,8 +592,7 @@ class UIController {
         container.innerHTML = `
             <div class="optimization-animation">
                 <div class="optimization-header">
-                    <div class="optimization-title">🎯 Creating Optimal Teams</div>
-                    <div class="optimization-subtitle">Using advanced algorithms</div>
+                    <div class="optimization-title">Creating Optimal Teams</div>
                 </div>
                 <div class="optimization-current-step" id="optimizationCurrentStep"></div>
                 <div class="optimization-progress">
