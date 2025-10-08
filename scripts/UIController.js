@@ -526,34 +526,35 @@ class UIController {
 
     async handleOptimizeTeams() {
         if (this.isProcessing) return;
-
+    
         try {
             this.isProcessing = true;
-            this.showTeamOptimizationProgress('Analyzing players...');
-
+            
             const teamCount = parseInt(document.getElementById('teamCount')?.value) || 2;
             const composition = this.getTeamComposition();
             const state = this.stateManager.getState();
-
+    
             if (Object.values(composition).every(count => count === 0)) {
                 this.showNotification('Please select at least one player per team', 'error');
+                this.isProcessing = false;
                 return;
             }
-
-            this.showTeamOptimizationProgress('Creating optimal teams...');
+    
+            // Start animation
+            await this.showOptimizationAnimation();
             
             const result = await this.teamOptimizer.optimizeTeams(
                 composition, 
                 teamCount, 
                 state.players
             );
-
+    
             this.displayOptimizedTeams(result);
             this.showNotification(
                 `Teams created! Balance difference: ${result.balance.maxDifference} ELO`, 
                 'success'
             );
-
+    
         } catch (error) {
             this.showNotification(`Failed to create teams: ${error.message}`, 'error');
             this.clearTeamsDisplay();
@@ -574,15 +575,68 @@ class UIController {
         return composition;
     }
 
-    showTeamOptimizationProgress(message) {
+    async showOptimizationAnimation() {
         const container = document.getElementById('teamsDisplay');
-        if (container) {
-            container.innerHTML = `
-                <div class="no-comparison" style="color: var(--text-secondary);">
-                    ${message}
+        if (!container) return;
+    
+        const steps = [
+            { icon: '🔍', text: 'Analyzing players...', duration: 500 },
+            { icon: '📊', text: 'Generating initial solutions...', duration: 600 },
+            { icon: '🧬', text: 'Running Genetic Algorithm...', duration: 800 },
+            { icon: '🔄', text: 'Executing Tabu Search...', duration: 700 },
+            { icon: '🔥', text: 'Simulated Annealing in progress...', duration: 900 },
+            { icon: '✨', text: 'Refining with Local Search...', duration: 600 },
+            { icon: '⚖️', text: 'Balancing teams...', duration: 500 }
+        ];
+    
+        container.innerHTML = `
+            <div class="optimization-animation">
+                <div class="optimization-header">
+                    <div class="optimization-title">🎯 Creating Optimal Teams</div>
+                    <div class="optimization-subtitle">Using advanced algorithms</div>
                 </div>
+                <div class="optimization-steps" id="optimizationSteps"></div>
+                <div class="optimization-progress">
+                    <div class="optimization-progress-bar" id="optimizationProgressBar"></div>
+                </div>
+            </div>
+        `;
+    
+        const stepsContainer = document.getElementById('optimizationSteps');
+        const progressBar = document.getElementById('optimizationProgressBar');
+        
+        const totalDuration = steps.reduce((sum, step) => sum + step.duration, 0);
+        let elapsed = 0;
+    
+        for (let i = 0; i < steps.length; i++) {
+            const step = steps[i];
+            
+            // Add step
+            const stepEl = document.createElement('div');
+            stepEl.className = 'optimization-step active';
+            stepEl.innerHTML = `
+                <div class="step-icon">${step.icon}</div>
+                <div class="step-text">${step.text}</div>
+                <div class="step-spinner"></div>
             `;
+            stepsContainer.appendChild(stepEl);
+    
+            // Update progress
+            elapsed += step.duration;
+            const progress = (elapsed / totalDuration) * 100;
+            progressBar.style.width = progress + '%';
+    
+            // Wait
+            await new Promise(resolve => setTimeout(resolve, step.duration));
+    
+            // Mark as complete
+            stepEl.classList.remove('active');
+            stepEl.classList.add('complete');
+            stepEl.querySelector('.step-spinner').innerHTML = '✓';
         }
+    
+        // Final state
+        await new Promise(resolve => setTimeout(resolve, 200));
     }
 
     displayOptimizedTeams(result) {
