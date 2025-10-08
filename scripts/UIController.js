@@ -636,6 +636,50 @@ class UIController {
             await new Promise(resolve => setTimeout(resolve, 150));
         }
     }
+
+    displayOptimizedTeams(result) {
+        const container = document.getElementById('teamsDisplay');
+        if (!container) return;
+    
+        let html = '';
+    
+        result.teams.forEach((team, index) => {
+            const teamStats = this.eloCalculator.calculateTeamStrength(team);
+            
+            html += `
+                <div class="team">
+                    <h3>Team ${index + 1}
+                        <span style="font-weight: normal; color: var(--text-secondary);">
+                            (${teamStats.totalRating} ELO, avg ${teamStats.averageRating})
+                        </span>
+                    </h3>
+                    <div style="color: var(--text-secondary); margin-bottom: 1rem;">
+                        Players: ${team.length}
+                    </div>
+            `;
+    
+            team.forEach(player => {
+                const displayPosition = player.assignedPosition || player.positions[0];
+                const rating = player.ratings[displayPosition] || player.rating || 1500;
+                
+                html += `
+                    <div class="team-player">
+                        <div class="team-player-info">
+                            <div class="team-player-name">${this.escapeHtml(player.name)}</div>
+                            <div class="team-player-position">
+                                ${this.playerManager.positions[displayPosition]}
+                            </div>
+                        </div>
+                        <div class="team-player-rating">${Math.round(rating)}</div>
+                    </div>
+                `;
+            });
+    
+            html += '</div>';
+        });
+    
+        container.innerHTML = html;
+    }
     
     handleResetAllRatings() {
         this.showResetAllRatingsModal();
