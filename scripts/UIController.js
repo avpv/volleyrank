@@ -738,21 +738,6 @@ class UIController {
                 });
             });
 
-            // Add team statistics
-            lines.push('');
-            lines.push('Team Statistics');
-            lines.push('Team,Total ELO,Average ELO,Players');
-            
-            this.currentTeams.teams.forEach((team, teamIndex) => {
-                const teamStats = this.eloCalculator.calculateTeamStrength(team);
-                lines.push([
-                    `Team ${teamIndex + 1}`,
-                    teamStats.totalRating,
-                    teamStats.averageRating,
-                    team.length
-                ].join(','));
-            });
-
             const csv = lines.join('\n');
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
