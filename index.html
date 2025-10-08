@@ -26,22 +26,22 @@
             <h2>Player Management</h2>
             
             <!-- Welcome Guide for New Users -->
-            <div id="welcomeGuide" style="background: var(--surface-2); border: 2px solid var(--accent-blue); color: var(--text-primary); padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem;">
-                <h3 style="margin: 0 0 1rem 0; color: var(--accent-blue);">👋 Welcome to VolleyRank!</h3>
-                <p style="margin: 0 0 0.5rem 0; color: var(--text-secondary);">Using advanced algorithms and ELO rating system to optimize your volleyball team</p>
-                <p style="margin: 0 0 1rem 0; color: var(--text-secondary);">Get started in 3 easy steps:</p>
-                <ol style="margin: 0 0 1rem 0; padding-left: 1.5rem; color: var(--text-primary);">
+            <div id="welcomeGuide" class="welcome-guide">
+                <h3>👋 Welcome to VolleyRank!</h3>
+                <p>Using advanced algorithms and ELO rating system to optimize your volleyball team</p>
+                <p>Get started in 3 easy steps:</p>
+                <ol>
                     <li><strong>Add players</strong> with their positions below</li>
                     <li><strong>Compare players</strong> to build accurate skill ratings using proven mathematical models</li>
                     <li><strong>Create balanced teams</strong> automatically with algorithmic optimization</li>
                 </ol>
-                <button onclick="document.getElementById('welcomeGuide').style.display='none'; localStorage.setItem('hideWelcome', 'true');" style="background: var(--accent-blue); border: none; color: white; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-weight: 600;">Got it!</button>
+                <button onclick="document.getElementById('welcomeGuide').style.display='none';">Got it!</button>
             </div>
             
-            <div id="quickStart" style="background: var(--surface-2); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; margin-bottom: 2rem;">
-                <h4 style="margin: 0 0 0.5rem 0; color: var(--accent-blue);">🚀 Quick Start</h4>
-                <p style="margin: 0; color: var(--text-secondary); font-size: 0.9rem;">
-                    Add your first player below, or <a href="#" onclick="event.preventDefault(); window.uiController && window.uiController.showImportModal();" style="color: var(--accent-blue); text-decoration: underline;">import multiple players</a> from CSV/JSON
+            <div id="quickStart" class="quick-start">
+                <h4>🚀 Quick Start</h4>
+                <p>
+                    Add your first player below, or <a href="#" onclick="event.preventDefault(); window.uiController && window.uiController.showImportModal();">import multiple players</a> from CSV/JSON
                 </p>
             </div>
             
@@ -144,11 +144,11 @@
                 </div>
             </div>
 
-            <div id="playersStats" style="margin: 2.5rem 0; padding: 1rem; background: var(--surface-2); border-radius: 8px; display: flex; flex-wrap: wrap; gap: 1.5rem; justify-content: center;">
+            <div id="playersStats" class="players-stats">
                 <!-- Position stats will be inserted here -->
             </div>
 
-            <h3 style="margin-bottom: 1.5rem;">Current Players (Total: <span id="totalPlayers">0</span>)</h3>
+            <h3 class="current-players-header">Current Players (Total: <span id="totalPlayers">0</span>)</h3>
             <div id="playersList" class="players-list">
                 <!-- Player list -->
             </div>
@@ -191,39 +191,49 @@
             <h2>Create Balanced Teams</h2>
             
             <div class="team-builder">
-                <div class="form-group" style="display:flex; flex-direction:row; align-items:center; margin-bottom: 1rem; margin-top: 1rem;">
-                    <label style="margin-bottom:0;">Number of teams:</label>
-                    <input type="number" id="teamCount" value="2" min="1" style="flex: 0 0 80px;">
-                    <span style="color: var(--text-secondary); margin-left: 1.5rem;">Players per team: <span id="playersPerTeam">6</span></span>
+                <div class="form-group team-count-row">
+                    <label>Number of teams:</label>
+                    <input type="number" id="teamCount" value="2" min="1">
+                    <span class="team-count-info">Players per team: <span id="playersPerTeam">6</span></span>
                 </div>
                 
-                <h3 style="margin-top: 1.5rem; margin-bottom: 1rem;">Team Composition</h3>
-                <div id="compositionControls" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 1rem; margin-bottom: 2rem; background: var(--surface-2); padding: 1rem; border-radius: 8px;">
-                    <div class="form-group" style="flex-direction:row; align-items:center">
-                        <label style="flex: 0; margin-bottom:0;" title="Setter">S:</label>
-                        <input type="number" id="comp_S" class="composition-input" value="1" min="0" max="6" style="flex: 0 0 60px;">
+                <h3 class="team-composition-header">Team Composition</h3>
+                <div id="compositionControls" class="composition-controls">
+                    <div class="form-group">
+                        <label title="Setter">S:</label>
+                        <input type="number" id="comp_S" class="composition-input" value="1" min="0" max="6">
                     </div>
-                    <div class="form-group" style="flex-direction:row; align-items:center">
-                        <label style="flex: 0; margin-bottom:0;" title="Opposite">OPP:</label>
-                        <input type="number" id="comp_OPP" class="composition-input" value="1" min="0" max="6" style="flex: 0 0 60px;">
+                    <div class="form-group">
+                        <label title="Opposite">OPP:</label>
+                        <input type="number" id="comp_OPP" class="composition-input" value="1" min="0" max="6">
                     </div>
-                    <div class="form-group" style="flex-direction:row; align-items:center">
-                        <label style="flex: 0; margin-bottom:0;" title="Outside Hitter">OH:</label>
-                        <input type="number" id="comp_OH" class="composition-input" value="2" min="0" max="6" style="flex: 0 0 60px;">
+                    <div class="form-group">
+                        <label title="Outside Hitter">OH:</label>
+                        <input type="number" id="comp_OH" class="composition-input" value="2" min="0" max="6">
                     </div>
-                    <div class="form-group" style="flex-direction:row; align-items:center">
-                        <label style="flex: 0; margin-bottom:0;" title="Middle Blocker">MB:</label>
-                        <input type="number" id="comp_MB" class="composition-input" value="2" min="0" max="6" style="flex: 0 0 60px;">
+                    <div class="form-group">
+                        <label title="Middle Blocker">MB:</label>
+                        <input type="number" id="comp_MB" class="composition-input" value="2" min="0" max="6">
                     </div>
-                    <div class="form-group" style="flex-direction:row; align-items:center">
-                        <label style="flex: 0; margin-bottom:0;" title="Libero">L:</label>
-                        <input type="number" id="comp_L" class="composition-input" value="0" min="0" max="6" style="flex: 0 0 60px;">
+                    <div class="form-group">
+                        <label title="Libero">L:</label>
+                        <input type="number" id="comp_L" class="composition-input" value="0" min="0" max="6">
                     </div>
                 </div>
 
                 <button class="btn btn-primary" id="optimizeTeamsBtn">Create Teams</button>
 
-                <div id="teamsDisplay" class="teams-display" style="margin-top: 2.5rem;">
+                <div id="teamsControls" class="teams-controls">
+                    <div class="teams-controls-inner">
+                        <label class="position-checkbox-label">
+                            <input type="checkbox" id="hideEloRatings" checked>
+                            <span>Show ELO Ratings</span>
+                        </label>
+                        <button class="btn btn-secondary" id="exportTeamsBtn">Export Teams</button>
+                    </div>
+                </div>
+
+                <div id="teamsDisplay" class="teams-display">
                     <!-- Teams will be shown here -->
                 </div>
             </div>
