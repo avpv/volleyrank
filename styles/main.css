@@ -468,6 +468,268 @@ body {
 }
 
 /* ==========================================================================
+   TEAMS CONTROLS
+   ========================================================================== */
+
+.teams-controls {
+    display: none;
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background: var(--surface-2);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.teams-controls-inner {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.teams-controls .position-checkbox-label {
+    margin: 0;
+    flex: 0 0 auto;
+}
+
+/* ==========================================================================
+   WELCOME GUIDE & QUICK START
+   ========================================================================== */
+
+.welcome-guide {
+    background: var(--surface-2);
+    border: 2px solid var(--accent-blue);
+    color: var(--text-primary);
+    padding: 1.5rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+}
+
+.welcome-guide h3 {
+    margin: 0 0 1rem 0;
+    color: var(--accent-blue);
+    font-size: 1.15rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+}
+
+.welcome-guide p {
+    margin: 0 0 0.5rem 0;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.welcome-guide ol {
+    margin: 0 0 1rem 0;
+    padding-left: 1.5rem;
+    color: var(--text-primary);
+}
+
+.welcome-guide ol li {
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.welcome-guide button {
+    background: var(--gradient-primary);
+    border: none;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    transition: all 0.2s ease;
+}
+
+.welcome-guide button:hover {
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+}
+
+.quick-start {
+    background: var(--surface-2);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 2rem;
+}
+
+.quick-start h4 {
+    margin: 0 0 0.5rem 0;
+    color: var(--accent-blue);
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.quick-start p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.quick-start a {
+    color: var(--accent-blue);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.quick-start a:hover {
+    color: var(--text-primary);
+    text-decoration: underline;
+}
+
+/* ==========================================================================
+   PLAYERS STATS - PROFESSIONAL DESIGN
+   ========================================================================== */
+
+.players-stats {
+    margin: 2rem 0;
+    padding: 1.5rem;
+    background: var(--surface-2);
+    border-radius: 8px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 1rem;
+    border: 1px solid var(--border-color);
+}
+
+.players-stats > div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    background: var(--surface-1);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.players-stats > div:hover {
+    transform: translateY(-2px);
+    border-color: var(--accent-blue);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.players-stats > div > div:first-child {
+    font-weight: 700;
+    font-size: 2rem;
+    color: var(--accent-blue);
+    line-height: 1;
+    margin-bottom: 0.5rem;
+}
+
+.players-stats > div > div:last-child {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+    text-align: center;
+}
+
+/* ==========================================================================
+   CURRENT PLAYERS HEADER
+   ========================================================================== */
+
+.current-players-header {
+    margin-bottom: 1.5rem;
+}
+
+/* ==========================================================================
+   TEAM COMPOSITION CONTROLS
+   ========================================================================== */
+
+.composition-controls {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+    background: var(--surface-2);
+    padding: 1.5rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.composition-controls .form-group {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: var(--surface-1);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.composition-controls .form-group:hover {
+    border-color: var(--accent-blue);
+    background: var(--surface-3);
+}
+
+.composition-controls .form-group label {
+    flex: 1;
+    margin: 0;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+}
+
+.team-count-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 1rem;
+    margin-top: 1rem;
+}
+
+.team-count-row label {
+    margin-bottom: 0;
+}
+
+.team-count-row input {
+    flex: 0 0 80px;
+}
+
+.team-count-info {
+    color: var(--text-secondary);
+    margin-left: 1.5rem;
+}
+
+.team-composition-header {
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+#teamCount,
+.composition-input {
+    width: 80px !important;
+    min-width: 80px !important;
+    max-width: 80px !important;
+    text-align: center !important;
+    font-weight: 600 !important;
+}
+
+.composition-controls .form-group input {
+    flex: 0 0 60px;
+}
+
+/* ==========================================================================
+   TEAMS DISPLAY
+   ========================================================================== */
+
+.teams-display {
+    margin-top: 2.5rem;
+}
+
+/* ==========================================================================
    COMPARISON SECTION
    ========================================================================== */
 
@@ -484,6 +746,11 @@ body {
     background: var(--surface-2);
     color: var(--text-primary);
     min-width: 250px;
+}
+
+.comparison-info {
+    text-align: center;
+    margin-bottom: 1rem;
 }
 
 .comparison-area {
@@ -545,6 +812,20 @@ body {
     color: white;
 }
 
+.player-avatar-blue {
+    background: linear-gradient(135deg, #2563eb, #3b82f6);
+}
+
+.player-avatar-purple {
+    background: linear-gradient(135deg, #a855f7, #ec4899);
+}
+
+.player-comparisons {
+    font-size: 0.9em;
+    color: var(--text-secondary);
+    margin-top: 5px;
+}
+
 .player-card .multi-position-info {
     font-size: 0.75em;
     color: var(--accent-blue);
@@ -560,14 +841,6 @@ body {
     font-size: 1.5rem;
     font-weight: 700;
     letter-spacing: 0.1em;
-}
-
-.comparison-info {
-    background: var(--surface-2);
-    padding: 1rem;
-    border-radius: 6px;
-    border: 1px solid var(--border-color);
-    margin-bottom: 1rem;
 }
 
 .player-position {
@@ -707,6 +980,11 @@ body {
     border-bottom: none;
 }
 
+.ranking-stats {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
 .rank-number {
     width: 36px;
     height: 36px;
@@ -794,6 +1072,16 @@ body {
     font-weight: 600;
     margin-bottom: 1rem;
     letter-spacing: -0.01em;
+}
+
+.team-stats-header {
+    font-weight: normal;
+    color: var(--text-secondary);
+}
+
+.team-player-count {
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
 }
 
 .team-player {
@@ -1060,195 +1348,6 @@ body {
     100% {
         transform: translateX(100%);
     }
-}
-
-/* ==========================================================================
-   WELCOME GUIDE & QUICK START
-   ========================================================================== */
-
-#welcomeGuide {
-    background: var(--surface-2) !important;
-    border: 1px solid var(--accent-blue) !important;
-    padding: 1.5rem !important;
-    border-radius: 8px !important;
-    margin-bottom: 2rem !important;
-}
-
-#welcomeGuide h3 {
-    margin: 0 0 0.75rem 0 !important;
-    color: var(--accent-blue) !important;
-    font-size: 1.15rem !important;
-    font-weight: 600 !important;
-    letter-spacing: -0.01em !important;
-}
-
-#welcomeGuide p {
-    margin: 0 0 0.5rem 0 !important;
-    color: var(--text-secondary) !important;
-    font-size: 0.9rem !important;
-}
-
-#welcomeGuide ol {
-    margin: 0 0 1rem 0 !important;
-    padding-left: 1.5rem !important;
-    color: var(--text-primary) !important;
-}
-
-#welcomeGuide ol li {
-    margin-bottom: 0.5rem !important;
-    font-size: 0.9rem !important;
-}
-
-#welcomeGuide button {
-    background: var(--gradient-primary) !important;
-    border: none !important;
-    color: white !important;
-    padding: 0.5rem 1rem !important;
-    border-radius: 6px !important;
-    cursor: pointer !important;
-    font-weight: 600 !important;
-    font-size: 0.85rem !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.05em !important;
-    transition: all 0.2s ease !important;
-}
-
-#welcomeGuide button:hover {
-    filter: brightness(1.1) !important;
-    transform: translateY(-1px) !important;
-}
-
-#quickStart {
-    background: var(--surface-2) !important;
-    border: 1px solid var(--border-color) !important;
-    border-radius: 8px !important;
-    padding: 1rem !important;
-    margin-bottom: 2rem !important;
-}
-
-#quickStart h4 {
-    margin: 0 0 0.5rem 0 !important;
-    color: var(--accent-blue) !important;
-    font-size: 1rem !important;
-    font-weight: 600 !important;
-}
-
-#quickStart p {
-    margin: 0 !important;
-    color: var(--text-secondary) !important;
-    font-size: 0.9rem !important;
-}
-
-#quickStart a {
-    color: var(--accent-blue) !important;
-    text-decoration: none !important;
-    font-weight: 500 !important;
-    transition: color 0.2s ease !important;
-}
-
-#quickStart a:hover {
-    color: var(--text-primary) !important;
-    text-decoration: underline !important;
-}
-
-/* ==========================================================================
-   PLAYERS STATS - PROFESSIONAL DESIGN
-   ========================================================================== */
-
-#playersStats {
-    margin: 2rem 0 !important;
-    padding: 1.5rem !important;
-    background: var(--surface-2) !important;
-    border-radius: 8px !important;
-    display: grid !important;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)) !important;
-    gap: 1rem !important;
-    border: 1px solid var(--border-color) !important;
-}
-
-#playersStats > div {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
-    padding: 1rem !important;
-    background: var(--surface-1) !important;
-    border: 1px solid var(--border-color) !important;
-    border-radius: 6px !important;
-    transition: all 0.2s ease !important;
-}
-
-#playersStats > div:hover {
-    transform: translateY(-2px) !important;
-    border-color: var(--accent-blue) !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-}
-
-#playersStats > div > div:first-child {
-    font-weight: 700 !important;
-    font-size: 2rem !important;
-    color: var(--accent-blue) !important;
-    line-height: 1 !important;
-    margin-bottom: 0.5rem !important;
-}
-
-#playersStats > div > div:last-child {
-    font-size: 0.8rem !important;
-    color: var(--text-secondary) !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.05em !important;
-    font-weight: 600 !important;
-    text-align: center !important;
-}
-
-/* ==========================================================================
-   TEAM COMPOSITION - UNIFIED INPUT WIDTH
-   ========================================================================== */
-
-#teamCount,
-.composition-input {
-    width: 80px !important;
-    min-width: 80px !important;
-    max-width: 80px !important;
-    text-align: center !important;
-    font-weight: 600 !important;
-}
-
-#compositionControls {
-    display: grid !important;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)) !important;
-    gap: 1rem !important;
-    margin-bottom: 2rem !important;
-    background: var(--surface-2) !important;
-    padding: 1.5rem !important;
-    border-radius: 8px !important;
-    border: 1px solid var(--border-color) !important;
-}
-
-#compositionControls .form-group {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    gap: 0.75rem !important;
-    padding: 0.75rem !important;
-    background: var(--surface-1) !important;
-    border: 1px solid var(--border-color) !important;
-    border-radius: 6px !important;
-    transition: all 0.2s ease !important;
-}
-
-#compositionControls .form-group:hover {
-    border-color: var(--accent-blue) !important;
-    background: var(--surface-3) !important;
-}
-
-#compositionControls .form-group label {
-    flex: 1 !important;
-    margin: 0 !important;
-    font-weight: 600 !important;
-    font-size: 0.9rem !important;
-    color: var(--text-primary) !important;
 }
 
 /* ==========================================================================
@@ -1689,24 +1788,24 @@ html {
         padding-right: 2.5rem;
     }
     
-    #compositionControls {
+    .composition-controls {
         display: flex !important;
         flex-direction: column !important;
         gap: 0.75rem !important;
         padding: 1rem !important;
     }
     
-    #compositionControls .form-group {
+    .composition-controls .form-group {
         padding: 0.75rem !important;
     }
     
-    #compositionControls .form-group label {
+    .composition-controls .form-group label {
         flex: 1 !important;
         margin-bottom: 0 !important;
         font-size: 0.95rem !important;
     }
 
-    #compositionControls .form-group input,
+    .composition-controls .form-group input,
     #teamCount,
     .composition-input {
         flex: 0 0 80px !important;
@@ -1716,21 +1815,21 @@ html {
         min-height: 44px !important;
     }
 
-    #playersStats {
+    .players-stats {
         grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)) !important;
         gap: 0.75rem !important;
         padding: 1rem !important;
     }
 
-    #playersStats > div {
+    .players-stats > div {
         padding: 0.75rem !important;
     }
 
-    #playersStats > div > div:first-child {
+    .players-stats > div > div:first-child {
         font-size: 1.75rem !important;
     }
 
-    #playersStats > div > div:last-child {
+    .players-stats > div > div:last-child {
         font-size: 0.75rem !important;
     }
 
