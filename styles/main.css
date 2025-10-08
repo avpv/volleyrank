@@ -520,7 +520,7 @@ body {
 
 .welcome-guide {
     background: var(--surface-2);
-    border: 2px solid var(--accent-blue);
+    border: 1px solid var(--accent-blue);
     color: var(--text-primary);
     padding: 1.5rem;
     border-radius: 12px;
