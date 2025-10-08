@@ -473,11 +473,29 @@ body {
     cursor: pointer;
     transition: all 0.3s ease;
     position: relative;
+    overflow: hidden;
+}
+
+.player-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg, var(--accent-blue), var(--accent-green));
+    opacity: 0;
+    transition: opacity 0.3s ease;
 }
 
 .player-card:hover {
     transform: translateY(-8px);
     border-color: var(--accent-blue);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.player-card:hover::before {
+    opacity: 1;
 }
 
 .player-avatar {
