@@ -62,9 +62,9 @@ body {
 
 .header h1 {
     color: var(--text-primary);
-    font-size: 1.5rem;
+    font-size: 1.25rem;
     margin: 0;
-    font-weight: 700;
+    font-weight: 600;
     letter-spacing: -0.02em;
     white-space: nowrap;
 }
@@ -74,7 +74,7 @@ body {
     text-align: center;
     margin-bottom: 2rem;
     font-weight: 600;
-    font-size: 1.5rem;
+    font-size: 1.25rem;
     letter-spacing: -0.02em;
     color: var(--text-primary);
 }
@@ -398,7 +398,7 @@ body {
 }
 
 .player-name-header {
-    font-size: 1.25rem;
+    font-size: 1.1rem;
     font-weight: 600;
     color: var(--text-primary);
     margin: 0;
@@ -530,7 +530,7 @@ body {
 .welcome-guide h3 {
     margin: 0 0 1rem 0;
     color: var(--accent-blue);
-    font-size: 1.15rem;
+    font-size: 1rem;
     font-weight: 600;
     letter-spacing: -0.01em;
 }
@@ -582,7 +582,7 @@ body {
 .quick-start h4 {
     margin: 0 0 0.5rem 0;
     color: var(--accent-blue);
-    font-size: 1rem;
+    font-size: 0.95rem;
     font-weight: 600;
 }
 
@@ -657,6 +657,8 @@ body {
 
 .current-players-header {
     margin-bottom: 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
 }
 
 /* ==========================================================================
@@ -724,6 +726,8 @@ body {
 .team-composition-header {
     margin-top: 1.5rem;
     margin-bottom: 1rem;
+    font-size: 1rem;
+    font-weight: 600;
 }
 
 #teamCount,
@@ -870,14 +874,14 @@ body {
 }
 
 .player-name {
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: 600;
     color: var(--text-primary);
     margin-top: 0.75rem;
 }
 
 .player-rating {
-    font-size: 1.25rem;
+    font-size: 1.15rem;
     font-weight: 700;
     color: var(--accent-blue);
     margin-top: 0.5rem;
@@ -961,7 +965,7 @@ body {
 .position-progress-title {
     margin-bottom: 1.5rem;
     color: var(--text-primary);
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: 600;
 }
 
@@ -1033,7 +1037,7 @@ body {
 }
 
 .position-title {
-    font-size: 1.25rem;
+    font-size: 1rem;
     font-weight: 600;
     margin-bottom: 1.25rem;
     border-bottom: 2px solid var(--accent-blue);
@@ -1274,7 +1278,7 @@ body {
 .modal-header h3 {
     margin: 0;
     color: var(--text-primary);
-    font-size: 1.25rem;
+    font-size: 1.1rem;
     font-weight: 600;
     letter-spacing: -0.01em;
 }
@@ -1890,7 +1894,7 @@ html {
 }
 
 .team-builder h3 {
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: 600;
     color: var(--text-primary);
     letter-spacing: -0.01em;
@@ -1909,7 +1913,7 @@ html {
     }
 
     .header h1 {
-        font-size: 1.25rem;
+        font-size: 1.1rem;
     }
 
     .header p {
@@ -2010,7 +2014,7 @@ html {
     }
     
     .player-name-header {
-        font-size: 1.15rem;
+        font-size: 1.05rem;
     }
     
     .player-positions-grid {
