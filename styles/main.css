@@ -1262,75 +1262,61 @@ body {
 .optimization-animation {
     background: var(--surface-2);
     border: 1px solid var(--border-color);
-    border-radius: 16px;
-    padding: 2rem;
+    border-radius: 12px;
+    padding: 1.5rem;
     animation: fadeIn 0.3s ease;
 }
 
-.optimization-header {
-    text-align: center;
-    margin-bottom: 2rem;
-}
-
-.optimization-title {
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    margin-bottom: 0.5rem;
-}
-
-.optimization-subtitle {
-    font-size: 1rem;
-    color: var(--text-secondary);
+.optimization-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
 }
 
 .optimization-current-step {
-    min-height: 80px;
+    min-height: 50px;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 2rem;
 }
 
 .optimization-step {
     display: flex;
     align-items: center;
     gap: 1rem;
-    padding: 1.5rem;
+    padding: 0.75rem 1rem;
     background: var(--bg-dark);
     border: 1px solid var(--border-color);
-    border-radius: 12px;
+    border-radius: 8px;
     transition: all 0.3s ease;
     width: 100%;
-    animation: slideIn 0.3s ease;
+    animation: slideIn 0.25s ease;
 }
 
 .optimization-step.active {
     border-color: var(--accent-blue);
     background: linear-gradient(90deg, var(--bg-dark), rgba(59, 130, 246, 0.05));
-    animation: pulse 1.5s ease-in-out infinite;
 }
 
 .optimization-step.complete {
     border-color: var(--accent-green);
-    animation: none;
 }
 
 .step-icon {
-    font-size: 2.5rem;
+    font-size: 1.5rem;
     flex-shrink: 0;
 }
 
 .step-text {
     flex: 1;
-    font-size: 1.2rem;
+    font-size: 0.95rem;
     font-weight: 500;
     color: var(--text-primary);
 }
 
 .step-spinner {
-    width: 28px;
-    height: 28px;
+    width: 20px;
+    height: 20px;
     flex-shrink: 0;
     display: flex;
     align-items: center;
@@ -1339,35 +1325,34 @@ body {
 
 .optimization-step.active .step-spinner::before {
     content: '';
-    width: 24px;
-    height: 24px;
-    border: 3px solid var(--border-color);
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--border-color);
     border-top-color: var(--accent-blue);
     border-radius: 50%;
-    animation: spin 0.8s linear infinite;
+    animation: spin 0.6s linear infinite;
 }
 
 .optimization-step.complete .step-spinner {
     color: var(--accent-green);
-    font-size: 1.4rem;
+    font-size: 1rem;
     font-weight: bold;
 }
 
 .optimization-progress {
     width: 100%;
-    height: 12px;
+    height: 8px;
     background: var(--bg-dark);
-    border-radius: 6px;
+    border-radius: 4px;
     overflow: hidden;
     border: 1px solid var(--border-color);
     position: relative;
-    margin-bottom: 1rem;
 }
 
 .optimization-progress-bar {
     height: 100%;
     background: linear-gradient(90deg, var(--accent-blue), var(--accent-green));
-    border-radius: 6px;
+    border-radius: 4px;
     transition: width 0.3s ease;
     position: relative;
     overflow: hidden;
@@ -1386,33 +1371,17 @@ body {
         rgba(255, 255, 255, 0.3),
         transparent
     );
-    animation: shimmer 1.5s infinite;
-}
-
-.optimization-step-counter {
-    text-align: center;
-    color: var(--text-secondary);
-    font-size: 0.9rem;
-    font-weight: 500;
+    animation: shimmer 1.2s infinite;
 }
 
 @keyframes slideIn {
     from {
         opacity: 0;
-        transform: translateX(-20px);
+        transform: translateX(-15px);
     }
     to {
         opacity: 1;
         transform: translateX(0);
-    }
-}
-
-@keyframes pulse {
-    0%, 100% {
-        transform: scale(1);
-    }
-    50% {
-        transform: scale(1.02);
     }
 }
 
@@ -1434,30 +1403,18 @@ body {
 /* Mobile responsive */
 @media (max-width: 768px) {
     .optimization-animation {
-        padding: 1.5rem;
-    }
-    
-    .optimization-title {
-        font-size: 1.4rem;
-    }
-    
-    .optimization-subtitle {
-        font-size: 0.9rem;
-    }
-    
-    .optimization-current-step {
-        min-height: 70px;
-    }
-    
-    .optimization-step {
         padding: 1rem;
     }
     
+    .optimization-step {
+        padding: 0.6rem 0.8rem;
+    }
+    
     .step-icon {
-        font-size: 2rem;
+        font-size: 1.25rem;
     }
     
     .step-text {
-        font-size: 1rem;
+        font-size: 0.85rem;
     }
 }
