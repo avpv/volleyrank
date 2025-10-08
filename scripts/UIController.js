@@ -674,7 +674,29 @@ class UIController {
             return;
         }
     
-        const sortedPlayers = [...state.players].sort((a, b) => a.name.localeCompare(b.name));
+        const positionOrder = ['S', 'OPP', 'OH', 'MB', 'L'];
+        const sortedPlayers = [...state.players].sort((a, b) => {
+            // Compare positions in order
+            const maxLength = Math.max(a.positions.length, b.positions.length);
+            for (let i = 0; i < maxLength; i++) {
+                const posA = a.positions[i];
+                const posB = b.positions[i];
+                
+                // If one player has fewer positions, they come after
+                if (!posA) return 1;
+                if (!posB) return -1;
+                
+                const indexA = positionOrder.indexOf(posA);
+                const indexB = positionOrder.indexOf(posB);
+                
+                if (indexA !== indexB) {
+                    return indexA - indexB;
+                }
+            }
+            
+            // If all positions are equal, sort by name
+            return a.name.localeCompare(b.name);
+        });
         
         let html = '';
         sortedPlayers.forEach(player => {
