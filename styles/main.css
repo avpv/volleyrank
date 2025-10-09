@@ -99,37 +99,63 @@ body {
 
 .tabs {
     display: flex;
-    margin-bottom: 0;
-    border-bottom: 1px solid var(--border-color);
-    background: var(--surface-1);
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    padding: 0.5rem;
+    background: var(--surface-2);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
 }
 
 .tab {
     flex: 1;
-    padding: 1rem;
+    padding: 0.875rem 1.25rem;
     text-align: center;
     background: transparent;
     border: none;
-    border-bottom: 2px solid transparent;
+    border-radius: 8px;
     cursor: pointer;
-    font-size: 0.9rem;
+    font-size: 0.875rem;
     font-weight: 600;
     color: var(--text-muted);
-    transition: all 0.2s ease;
-    margin-bottom: -1px;
-    letter-spacing: 0.03em;
-    text-transform: uppercase;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    letter-spacing: 0.01em;
+    position: relative;
+    overflow: hidden;
+    text-decoration: none;
+    display: block;
+}
+
+.tab::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(74, 144, 226, 0.1), rgba(74, 144, 226, 0.05));
+    opacity: 0;
+    transition: opacity 0.25s ease;
 }
 
 .tab:hover {
     color: var(--text-secondary);
-    background: rgba(74, 144, 226, 0.05);
+    transform: translateY(-1px);
+}
+
+.tab:hover::before {
+    opacity: 1;
 }
 
 .tab.active {
-    color: var(--accent-blue);
-    border-bottom-color: var(--accent-blue);
-    background: rgba(74, 144, 226, 0.08);
+    color: white;
+    background: var(--gradient-primary);
+    box-shadow: 0 4px 12px rgba(74, 144, 226, 0.25), 0 2px 4px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+.tab.active::before {
+    opacity: 0;
 }
 
 /* ==========================================================================
@@ -140,23 +166,24 @@ body {
     display: none;
     background: var(--surface-1);
     border: 1px solid var(--border-color);
-    border-top: none;
-    border-radius: 0 0 8px 8px;
+    border-radius: 12px;
     padding: 2.5rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .tab-content.active {
     display: block;
-    animation: fadeIn 0.3s ease;
 }
 
-@keyframes fadeIn {
+@keyframes slideIn {
     from { 
         opacity: 0; 
+        transform: translateY(-8px);
     }
     to { 
         opacity: 1; 
+        transform: translateY(0);
     }
 }
 
@@ -1921,13 +1948,21 @@ html {
         font-size: 0.8rem;
     }
 
+    .tabs {
+        padding: 0.4rem;
+        gap: 0.4rem;
+        border-radius: 10px;
+    }
+
     .tab {
-        font-size: 0.75rem;
-        padding: 0.875rem 0.5rem;
+        font-size: 0.8rem;
+        padding: 0.75rem 0.5rem;
+        border-radius: 6px;
     }
 
     .tab-content {
         padding: 1.5rem;
+        border-radius: 10px;
     }
 
     .form-group input, 
