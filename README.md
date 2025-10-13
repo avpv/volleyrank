@@ -137,17 +137,53 @@ name,positions
 
 ```
 volleyrank/
-├── index.html              # Main HTML with multi-position UI
-├── styles/main.css         # All CSS styles
-├── scripts/
-│   ├── StateManager.js     # State management with v3.0 data structure
-│   ├── PlayerManager.js    # Multi-position player logic
-│   ├── EloCalculator.js    # Position-specific ELO calculations
-│   ├── TeamOptimizer.js    # Advanced team balancing (SA/GA/TS)
-│   ├── UIController.js     # UI with multi-position support
-│   └── app.js             # Application initialization
-└── README.md              # This file
-```
+│
+├── 📄 Entry Points (3)
+│   ├── index.html
+│   ├── 404.html
+│   └── README.md
+│
+├── 📁 assets/ (3)
+│   └── styles/
+│       ├── main.css
+│       ├── components.css
+│       └── pages.css
+│
+└── 📁 src/ (21)
+    ├── app.js
+    │
+    ├── core/ (4)
+    │   ├── Router.js
+    │   ├── EventBus.js
+    │   ├── StateManager.js
+    │   └── StorageAdapter.js
+    │
+    ├── services/ (4)
+    │   ├── PlayerService.js
+    │   ├── EloService.js
+    │   ├── ComparisonService.js
+    │   └── TeamOptimizerService.js
+    │
+    ├── components/ (4)
+    │   └── base/
+    │       ├── Component.js
+    │       ├── Toast.js
+    │       ├── Modal.js
+    │       └── Button.js
+    │
+    ├── pages/ (5)
+    │   ├── BasePage.js
+    │   ├── SettingsPage.js
+    │   ├── ComparePage.js
+    │   ├── RankingsPage.js
+    │   └── TeamsPage.js
+    │
+    └── utils/ (4)
+        ├── constants.js
+        ├── validation.js
+        ├── csv.js
+        └── formatters.js
+  ```
 
 ## Optimization Algorithms
 
