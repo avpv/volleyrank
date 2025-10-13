@@ -2,7 +2,7 @@
  * Component - Base class for all UI components
  * Provides lifecycle hooks and consistent API
  */
-import eventBus from '../core/EventBus.js';
+import eventBus from '../../core/EventBus.js';
 
 class Component {
     constructor(container, props = {}) {
