@@ -1,5 +1,6 @@
+
 /**
- * SettingsPage - Player management page
+ * SettingsPage - Player management page with full modal support
  */
 import BasePage from './BasePage.js';
 import playerService from '../services/PlayerService.js';
@@ -21,6 +22,7 @@ class SettingsPage extends BasePage {
         this.on('player:removed', () => this.update());
         this.on('player:updated', () => this.update());
         this.on('player:reset', () => this.update());
+        this.on('players:reset-all-positions', () => this.update());
         this.on('state:changed', () => this.update());
     }
 
@@ -152,7 +154,6 @@ class SettingsPage extends BasePage {
             return this.renderEmpty('No players yet. Add your first player above!', '👥');
         }
 
-        // Sort players by positions
         const sorted = [...players].sort((a, b) => {
             const posOrder = ['S', 'OPP', 'OH', 'MB', 'L'];
             const aPos = a.positions[0];
@@ -202,6 +203,9 @@ class SettingsPage extends BasePage {
                 </div>
 
                 <div class="player-actions">
+                    <button class="btn btn-sm btn-secondary" data-action="edit" data-player-id="${player.id}">
+                        Edit
+                    </button>
                     <button class="btn btn-sm btn-warning" data-action="reset" data-player-id="${player.id}">
                         Reset
                     </button>
@@ -214,8 +218,6 @@ class SettingsPage extends BasePage {
     }
 
     attachEventListeners() {
-        console.log('SettingsPage: Attaching event listeners');
-        
         // Form submission
         const form = this.$('#playerForm');
         if (form) {
@@ -229,14 +231,8 @@ class SettingsPage extends BasePage {
         const importBtn = this.$('#importBtn');
         const exportBtn = this.$('#exportBtn');
         
-        console.log('Import button found:', !!importBtn);
-        console.log('Export button found:', !!exportBtn);
-        
         if (importBtn) {
-            importBtn.addEventListener('click', () => {
-                console.log('Import button clicked!');
-                this.showImportModal();
-            });
+            importBtn.addEventListener('click', () => this.showImportModal());
         }
         
         if (exportBtn) {
@@ -248,7 +244,7 @@ class SettingsPage extends BasePage {
         const clearAllBtn = this.$('#clearAllBtn');
         
         if (resetAllBtn) {
-            resetAllBtn.addEventListener('click', () => this.handleResetAll());
+            resetAllBtn.addEventListener('click', () => this.showResetAllModal());
         }
         
         if (clearAllBtn) {
@@ -256,7 +252,7 @@ class SettingsPage extends BasePage {
         }
 
         // Player actions
-        this.$('[data-action]').forEach(btn => {
+        this.$$('[data-action]').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const action = btn.getAttribute('data-action');
                 const playerId = parseFloat(btn.getAttribute('data-player-id'));
@@ -292,10 +288,12 @@ class SettingsPage extends BasePage {
     handlePlayerAction(action, playerId) {
         try {
             switch (action) {
+                case 'edit':
+                    this.showEditPositionsModal(playerId);
+                    break;
+                    
                 case 'reset':
-                    if (confirm('Reset all ratings for this player?')) {
-                        playerService.reset(playerId);
-                    }
+                    this.showResetPlayerModal(playerId);
                     break;
                     
                 case 'remove':
@@ -310,15 +308,227 @@ class SettingsPage extends BasePage {
         }
     }
 
-    showImportModal() {
-        console.log('showImportModal called');
+    // ===== MODAL: Edit Positions =====
+    showEditPositionsModal(playerId) {
+        const player = playerService.getById(playerId);
+        if (!player) {
+            toast.error('Player not found');
+            return;
+        }
+
+        const modal = new Modal({
+            title: `Edit Positions - ${player.name}`,
+            content: this.renderEditPositionsContent(player),
+            showCancel: true,
+            showConfirm: true,
+            confirmText: 'Save',
+            cancelText: 'Cancel',
+            onConfirm: () => {
+                const selected = this.getSelectedModalPositions('editPositions');
+                if (selected.length === 0) {
+                    toast.error('Please select at least one position');
+                    return false;
+                }
+                try {
+                    playerService.updatePositions(playerId, selected);
+                    toast.success(`Positions updated for ${player.name}`);
+                    return true;
+                } catch (error) {
+                    toast.error(error.message);
+                    return false;
+                }
+            }
+        });
+
+        this.addComponent(modal);
+        modal.mount();
+        modal.open();
+    }
+
+    renderEditPositionsContent(player) {
+        return `
+            <div class="modal-content-inner">
+                <div class="form-group">
+                    <label>Positions (select all applicable):</label>
+                    <div class="positions-grid">
+                        ${Object.entries(playerService.positions).map(([key, name]) => `
+                            <label class="position-checkbox">
+                                <input 
+                                    type="checkbox" 
+                                    name="editPositions" 
+                                    value="${key}"
+                                    ${player.positions.includes(key) ? 'checked' : ''}
+                                >
+                                <span class="position-label">${name} (${key})</span>
+                            </label>
+                        `).join('')}
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    // ===== MODAL: Reset Player =====
+    showResetPlayerModal(playerId) {
+        const player = playerService.getById(playerId);
+        if (!player) {
+            toast.error('Player not found');
+            return;
+        }
+
+        const modal = new Modal({
+            title: `Reset Ratings - ${player.name}`,
+            content: this.renderResetPlayerContent(player),
+            showCancel: true,
+            showConfirm: true,
+            confirmText: 'Reset Selected',
+            cancelText: 'Cancel',
+            onConfirm: () => {
+                const selected = this.getSelectedModalPositions('resetPositions');
+                if (selected.length === 0) {
+                    toast.error('Please select at least one position');
+                    return false;
+                }
+                try {
+                    playerService.resetPositions(playerId, selected);
+                    const posNames = selected.map(p => playerService.positions[p]).join(', ');
+                    toast.success(`Reset ${posNames} for ${player.name}`);
+                    return true;
+                } catch (error) {
+                    toast.error(error.message);
+                    return false;
+                }
+            }
+        });
+
+        this.addComponent(modal);
+        modal.mount();
+        modal.open();
+    }
+
+    renderResetPlayerContent(player) {
+        return `
+            <div class="modal-content-inner">
+                <div class="form-group">
+                    <label>Select positions to reset:</label>
+                    <div class="positions-grid">
+                        ${player.positions.map(pos => {
+                            const rating = Math.round(player.ratings[pos]);
+                            const comparisons = player.comparisons[pos];
+                            return `
+                                <label class="position-checkbox">
+                                    <input 
+                                        type="checkbox" 
+                                        name="resetPositions" 
+                                        value="${pos}"
+                                        checked
+                                    >
+                                    <span class="position-label">
+                                        ${playerService.positions[pos]}
+                                        <span class="position-stats-inline">(${rating} ELO, ${comparisons} comp.)</span>
+                                    </span>
+                                </label>
+                            `;
+                        }).join('')}
+                    </div>
+                    <div class="warning-box">
+                        <div class="warning-title">⚠️ Warning</div>
+                        <div class="warning-text">
+                            This will reset ratings to 1500 and clear all comparison history for selected positions.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    // ===== MODAL: Reset All =====
+    showResetAllModal() {
+        const players = playerService.getAll();
+        if (players.length === 0) {
+            toast.error('No players to reset');
+            return;
+        }
+
+        const modal = new Modal({
+            title: 'Reset All Ratings',
+            content: this.renderResetAllContent(),
+            showCancel: true,
+            showConfirm: true,
+            confirmText: 'Reset All',
+            cancelText: 'Cancel',
+            onConfirm: () => {
+                const selected = this.getSelectedModalPositions('resetAllPositions');
+                if (selected.length === 0) {
+                    toast.error('Please select at least one position');
+                    return false;
+                }
+                try {
+                    playerService.resetAllPositions(selected);
+                    const posNames = selected.map(p => playerService.positions[p]).join(', ');
+                    toast.success(`Reset ${posNames} for all players`);
+                    return true;
+                } catch (error) {
+                    toast.error(error.message);
+                    return false;
+                }
+            }
+        });
+
+        this.addComponent(modal);
+        modal.mount();
+        modal.open();
+    }
+
+    renderResetAllContent() {
+        const stats = playerService.getPositionStats();
         
+        return `
+            <div class="modal-content-inner">
+                <div class="form-group">
+                    <label>Select positions to reset for ALL players:</label>
+                    <div class="positions-grid">
+                        ${Object.entries(playerService.positions)
+                            .filter(([pos]) => stats[pos].count > 0)
+                            .map(([pos, name]) => {
+                                const posStats = stats[pos];
+                                const totalComps = posStats.players.reduce((sum, p) => 
+                                    sum + (p.comparisons[pos] || 0), 0);
+                                return `
+                                    <label class="position-checkbox">
+                                        <input 
+                                            type="checkbox" 
+                                            name="resetAllPositions" 
+                                            value="${pos}"
+                                            checked
+                                        >
+                                        <span class="position-label">
+                                            ${name}
+                                            <span class="position-stats-inline">
+                                                (${posStats.count} players, ${Math.floor(totalComps / 2)} comp.)
+                                            </span>
+                                        </span>
+                                    </label>
+                                `;
+                            }).join('')}
+                    </div>
+                    <div class="warning-box warning-box-danger">
+                        <div class="warning-title">⚠️ Warning</div>
+                        <div class="warning-text">
+                            This will reset ALL players' ratings to 1500 and clear ALL comparison history for selected positions. This action cannot be undone!
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    // ===== MODAL: Import =====
+    showImportModal() {
         if (this.importModal) {
-            console.log('Destroying existing modal');
             this.importModal.destroy();
         }
 
-        console.log('Creating new modal');
         this.importModal = new Modal({
             title: 'Import Players',
             content: this.renderImportModalContent(),
@@ -329,20 +539,14 @@ class SettingsPage extends BasePage {
             size: 'large',
             onConfirm: () => this.handleImportConfirm(),
             onClose: () => {
-                console.log('Modal closed');
                 this.importModal = null;
             }
         });
 
-        console.log('Mounting modal');
         this.importModal.mount();
-        
-        console.log('Opening modal');
         this.importModal.open();
 
-        // Attach modal event listeners
         setTimeout(() => {
-            console.log('Attaching import modal listeners');
             this.attachImportModalListeners();
         }, 100);
     }
@@ -350,21 +554,21 @@ class SettingsPage extends BasePage {
     renderImportModalContent() {
         return `
             <div class="import-modal-content">
-                <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                <p class="modal-description">
                     Import players from CSV or JSON format. You can paste data or upload a file.
                 </p>
 
-                <div style="margin-bottom: 1rem;">
+                <div class="format-example">
                     <strong>CSV Format:</strong>
-                    <pre style="background: var(--surface-1); padding: 0.5rem; border-radius: 4px; margin-top: 0.5rem; font-size: 0.85rem;">name,positions
+                    <pre class="code-block">name,positions
 "John Smith","OH,MB"
 "Alice Johnson","S"
 "Bob Williams","L"</pre>
                 </div>
 
-                <div style="margin-bottom: 1rem;">
+                <div class="format-example">
                     <strong>JSON Format:</strong>
-                    <pre style="background: var(--surface-1); padding: 0.5rem; border-radius: 4px; margin-top: 0.5rem; font-size: 0.85rem;">[
+                    <pre class="code-block">[
   {"name": "John Smith", "positions": ["OH", "MB"]},
   {"name": "Alice Johnson", "positions": ["S"]}
 ]</pre>
@@ -376,7 +580,7 @@ class SettingsPage extends BasePage {
                         type="file" 
                         id="importFileInput" 
                         accept=".csv,.json"
-                        style="width: 100%; padding: 0.5rem; background: var(--surface-2); border: 1px solid var(--border-color); border-radius: 8px;"
+                        class="file-input"
                     >
                 </div>
 
@@ -386,11 +590,11 @@ class SettingsPage extends BasePage {
                         id="importDataInput" 
                         rows="8"
                         placeholder="Paste CSV or JSON data here..."
-                        style="width: 100%; background: var(--surface-2); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.75rem; font-family: monospace; font-size: 0.9rem;"
+                        class="import-textarea"
                     ></textarea>
                 </div>
 
-                <div id="importPreview" style="margin-top: 1rem;"></div>
+                <div id="importPreview"></div>
             </div>
         `;
     }
@@ -441,20 +645,18 @@ class SettingsPage extends BasePage {
             }
 
             preview.innerHTML = `
-                <div style="background: var(--surface-2); border: 1px solid var(--accent-green); border-radius: 8px; padding: 1rem;">
-                    <strong style="color: var(--accent-green);">✓ Found ${players.length} player(s)</strong>
-                    <div style="margin-top: 0.5rem; max-height: 150px; overflow-y: auto;">
+                <div class="preview-success">
+                    <strong>✓ Found ${players.length} player(s)</strong>
+                    <div class="preview-list">
                         ${players.map(p => `
-                            <div style="padding: 0.25rem 0; font-size: 0.85rem;">
-                                • ${this.escape(p.name)} - ${p.positions.join(', ')}
-                            </div>
+                            <div class="preview-item">• ${this.escape(p.name)} - ${p.positions.join(', ')}</div>
                         `).join('')}
                     </div>
                 </div>
             `;
         } catch (error) {
             preview.innerHTML = `
-                <div style="background: rgba(231, 76, 60, 0.1); border: 1px solid var(--accent-red); border-radius: 8px; padding: 1rem; color: var(--accent-red);">
+                <div class="preview-error">
                     <strong>✗ Error:</strong> ${this.escape(error.message)}
                 </div>
             `;
@@ -462,19 +664,14 @@ class SettingsPage extends BasePage {
     }
 
     parseImportData(data) {
-        if (!data || !data.trim()) {
-            return [];
-        }
-
+        if (!data || !data.trim()) return [];
         data = data.trim();
 
-        // Try JSON first
+        // Try JSON
         if (data.startsWith('[') || data.startsWith('{')) {
             try {
                 let parsed = JSON.parse(data);
-                if (!Array.isArray(parsed)) {
-                    parsed = [parsed];
-                }
+                if (!Array.isArray(parsed)) parsed = [parsed];
                 return parsed.map(item => ({
                     name: item.name,
                     positions: Array.isArray(item.positions) ? item.positions : [item.positions]
@@ -486,24 +683,19 @@ class SettingsPage extends BasePage {
 
         // Try CSV
         const lines = data.split('\n').map(l => l.trim()).filter(l => l);
-        if (lines.length < 2) {
-            throw new Error('CSV must have at least header and one data row');
-        }
+        if (lines.length < 2) throw new Error('CSV must have header and data rows');
 
-        // Skip header
         const dataLines = lines.slice(1);
         const players = [];
 
         for (const line of dataLines) {
             const match = line.match(/^"?([^,"]+)"?\s*,\s*"?([^"]+)"?$/);
-            if (!match) {
-                throw new Error(`Invalid CSV line: ${line}`);
-            }
-
-            const name = match[1].trim();
-            const positions = match[2].split(',').map(p => p.trim());
-
-            players.push({ name, positions });
+            if (!match) throw new Error(`Invalid CSV line: ${line}`);
+            
+            players.push({
+                name: match[1].trim(),
+                positions: match[2].split(',').map(p => p.trim())
+            });
         }
 
         return players;
@@ -518,15 +710,12 @@ class SettingsPage extends BasePage {
 
         try {
             const players = this.parseImportData(dataInput.value);
-            
             if (players.length === 0) {
-                toast.error('No players found in data');
+                toast.error('No players found');
                 return false;
             }
 
-            let imported = 0;
-            let skipped = 0;
-
+            let imported = 0, skipped = 0;
             players.forEach(playerData => {
                 try {
                     playerService.add(playerData.name, playerData.positions);
@@ -538,12 +727,17 @@ class SettingsPage extends BasePage {
             });
 
             toast.success(`Imported ${imported} player(s)${skipped > 0 ? `, skipped ${skipped}` : ''}`);
-            return true; // Close modal
-
+            return true;
         } catch (error) {
             toast.error('Import failed: ' + error.message);
-            return false; // Keep modal open
+            return false;
         }
+    }
+
+    // ===== HELPERS =====
+    getSelectedModalPositions(inputName) {
+        const checkboxes = document.querySelectorAll(`input[name="${inputName}"]:checked`);
+        return Array.from(checkboxes).map(cb => cb.value);
     }
 
     handleExport() {
@@ -566,24 +760,8 @@ class SettingsPage extends BasePage {
         }
     }
 
-    handleResetAll() {
-        if (!confirm('Reset all player ratings? This cannot be undone!')) {
-            return;
-        }
-
-        const players = playerService.getAll();
-        players.forEach(player => {
-            playerService.reset(player.id);
-        });
-
-        toast.success('All ratings reset');
-    }
-
     handleClearAll() {
-        if (!confirm('Remove all players? This cannot be undone!')) {
-            return;
-        }
-
+        if (!confirm('Remove all players? This cannot be undone!')) return;
         stateManager.reset({ clearStorage: true });
         toast.success('All players removed');
     }
