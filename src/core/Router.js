@@ -84,9 +84,11 @@ class Router {
         if (this.isNavigating) return;
         
         this.isNavigating = true;
+        
+        // Normalize path (removes basePath if present)
         const normalizedPath = this.normalizePath(path);
         
-        // Build full URL
+        // Build full URL with basePath
         const fullPath = this.basePath + normalizedPath;
         
         // Update browser URL if needed
@@ -138,7 +140,7 @@ class Router {
             
             if (!link) return;
             
-            const href = link.getAttribute('href');
+            let href = link.getAttribute('href');
             
             // Skip external links, downloads, and targets
             if (
@@ -154,9 +156,19 @@ class Router {
                 return;
             }
             
-            // Skip if not our base path
-            if (this.basePath && !href.startsWith(this.basePath)) {
-                return;
+            // Handle absolute paths (starting with /)
+            // Check if href starts with basePath or root
+            if (href.startsWith('/')) {
+                // If we have a basePath and href starts with it, or href doesn't start with basePath
+                // Convert to relative to basePath
+                if (this.basePath) {
+                    // If href already includes basePath, remove it for navigation
+                    if (href.startsWith(this.basePath)) {
+                        href = href.substring(this.basePath.length);
+                    }
+                    // If href is just "/" or starts with "/" but not basePath
+                    // Keep it as is for navigation (will be normalized)
+                }
             }
             
             e.preventDefault();
@@ -188,6 +200,14 @@ class Router {
      */
     isActive(path) {
         return this.normalizePath(path) === this.currentRoute;
+    }
+
+    /**
+     * Build full URL with basePath
+     */
+    buildUrl(path) {
+        const normalized = this.normalizePath(path);
+        return this.basePath + normalized;
     }
 }
 
