@@ -1,3 +1,4 @@
+
 /**
  * Modal - Reusable modal dialog component
  */
@@ -8,7 +9,6 @@ class Modal extends Component {
         // Modal creates its own container
         const container = document.createElement('div');
         container.className = 'modal';
-        container.style.display = 'none';
         document.body.appendChild(container);
         
         super(container, props);
@@ -84,13 +84,15 @@ class Modal extends Component {
     }
 
     /**
-     * Open modal
+     * Open modal - uses CSS classes only
      */
     open() {
         if (this.isOpen) return;
         
-        this.container.style.display = 'flex';
-        document.body.style.overflow = 'hidden';
+        // Add classes instead of inline styles
+        this.container.classList.add('modal-visible');
+        document.body.classList.add('modal-open');
+        
         this.isOpen = true;
         
         // Focus first input if exists
@@ -103,13 +105,15 @@ class Modal extends Component {
     }
 
     /**
-     * Close modal
+     * Close modal - uses CSS classes only
      */
     close() {
         if (!this.isOpen) return;
         
-        this.container.style.display = 'none';
-        document.body.style.overflow = '';
+        // Remove classes instead of inline styles
+        this.container.classList.remove('modal-visible');
+        document.body.classList.remove('modal-open');
+        
         this.isOpen = false;
         
         if (this.onClose) {
@@ -158,7 +162,7 @@ class Modal extends Component {
      */
     onDestroy() {
         if (this.isOpen) {
-            document.body.style.overflow = '';
+            document.body.classList.remove('modal-open');
         }
         
         if (this.container && this.container.parentNode) {
