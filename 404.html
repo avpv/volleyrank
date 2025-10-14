@@ -2,18 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <script>
-        // GitHub Pages SPA redirect handler
-        // Redirects 404 to index.html with path preserved
-        sessionStorage.redirect = location.href;
-        location.replace(
-            location.pathname.split('/').slice(0, -1).join('/') + 
-            '/?redirect=' + 
-            encodeURIComponent(location.pathname + location.search)
-        );
-    </script>
+    <meta http-equiv="refresh" content="0;url=/volleyrank/">
 </head>
 <body>
-    Redirecting...
+    <script>
+        // Redirect all 404s to the index page
+        window.location.replace('/volleyrank/');
+    </script>
 </body>
 </html>
