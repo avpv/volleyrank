@@ -470,3 +470,30 @@
         width: 100%;
     }
 }
+
+/* Modal */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity var(--transition-normal);
+    pointer-events: none;
+}
+
+.modal-visible {
+    display: flex;
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Prevent body scroll when modal is open */
+.modal-open {
+    overflow: hidden;
+}
