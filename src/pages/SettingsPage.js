@@ -214,6 +214,8 @@ class SettingsPage extends BasePage {
     }
 
     attachEventListeners() {
+        console.log('SettingsPage: Attaching event listeners');
+        
         // Form submission
         const form = this.$('#playerForm');
         if (form) {
@@ -227,8 +229,14 @@ class SettingsPage extends BasePage {
         const importBtn = this.$('#importBtn');
         const exportBtn = this.$('#exportBtn');
         
+        console.log('Import button found:', !!importBtn);
+        console.log('Export button found:', !!exportBtn);
+        
         if (importBtn) {
-            importBtn.addEventListener('click', () => this.showImportModal());
+            importBtn.addEventListener('click', () => {
+                console.log('Import button clicked!');
+                this.showImportModal();
+            });
         }
         
         if (exportBtn) {
@@ -248,7 +256,7 @@ class SettingsPage extends BasePage {
         }
 
         // Player actions
-        this.$$('[data-action]').forEach(btn => {
+        this.$('[data-action]').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const action = btn.getAttribute('data-action');
                 const playerId = parseFloat(btn.getAttribute('data-player-id'));
@@ -303,10 +311,14 @@ class SettingsPage extends BasePage {
     }
 
     showImportModal() {
+        console.log('showImportModal called');
+        
         if (this.importModal) {
+            console.log('Destroying existing modal');
             this.importModal.destroy();
         }
 
+        console.log('Creating new modal');
         this.importModal = new Modal({
             title: 'Import Players',
             content: this.renderImportModalContent(),
@@ -317,15 +329,20 @@ class SettingsPage extends BasePage {
             size: 'large',
             onConfirm: () => this.handleImportConfirm(),
             onClose: () => {
+                console.log('Modal closed');
                 this.importModal = null;
             }
         });
 
+        console.log('Mounting modal');
         this.importModal.mount();
+        
+        console.log('Opening modal');
         this.importModal.open();
 
         // Attach modal event listeners
         setTimeout(() => {
+            console.log('Attaching import modal listeners');
             this.attachImportModalListeners();
         }, 100);
     }
