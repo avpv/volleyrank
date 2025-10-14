@@ -120,7 +120,7 @@ class PlayerService {
     }
 
     /**
-     * Update player positions
+     * Update player positions (NEW METHOD)
      */
     updatePositions(playerId, positions) {
         const validation = this.validate('temp', positions);
@@ -196,7 +196,7 @@ class PlayerService {
     }
 
     /**
-     * Reset player ratings
+     * Reset player ratings (all positions)
      */
     reset(playerId, positions = null) {
         const state = stateManager.getState();
@@ -239,6 +239,67 @@ class PlayerService {
         eventBus.emit('player:reset', { player: updatedPlayer, positions: positionsToReset });
         
         return updatedPlayer;
+    }
+
+    /**
+     * Reset specific positions for a player (NEW METHOD)
+     */
+    resetPositions(playerId, positions) {
+        if (!Array.isArray(positions) || positions.length === 0) {
+            throw new Error('At least one position is required');
+        }
+
+        return this.reset(playerId, positions);
+    }
+
+    /**
+     * Reset all players' ratings for specific positions (NEW METHOD)
+     */
+    resetAllPositions(positions) {
+        if (!Array.isArray(positions) || positions.length === 0) {
+            throw new Error('At least one position is required');
+        }
+
+        const state = stateManager.getState();
+        const updatedPlayers = state.players.map(player => {
+            const updated = { ...player };
+            
+            positions.forEach(pos => {
+                if (updated.ratings[pos]) {
+                    updated.ratings[pos] = this.DEFAULT_RATING;
+                    updated.comparisons[pos] = 0;
+                    updated.comparedWith[pos] = [];
+                }
+            });
+            
+            return updated;
+        });
+
+        // Recalculate total comparisons
+        let totalComparisons = 0;
+        const allPositions = ['S', 'OPP', 'OH', 'MB', 'L'];
+        const nonResetPositions = allPositions.filter(p => !positions.includes(p));
+        
+        updatedPlayers.forEach(player => {
+            nonResetPositions.forEach(pos => {
+                if (player.comparisons[pos]) {
+                    totalComparisons += player.comparisons[pos];
+                }
+            });
+        });
+        totalComparisons = Math.floor(totalComparisons / 2);
+
+        stateManager.setState({
+            players: updatedPlayers,
+            comparisons: totalComparisons
+        });
+
+        eventBus.emit('players:reset-all-positions', {
+            positions,
+            playersAffected: updatedPlayers.length
+        });
+
+        return updatedPlayers;
     }
 
     /**
