@@ -43,6 +43,11 @@ class Router {
     normalizePath(path) {
         if (!path || path === '/') return '/';
         
+        // Handle relative paths like ./ or ./compare/
+        if (path.startsWith('./')) {
+            path = path.substring(1); // Remove the dot, keep the slash
+        }
+        
         // Remove base path if present
         if (path.startsWith(this.basePath)) {
             path = path.substring(this.basePath.length);
