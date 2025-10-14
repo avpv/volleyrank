@@ -7,7 +7,7 @@ import eventBus from './core/EventBus.js';
 import stateManager from './core/StateManager.js';
 import toast from './components/base/Toast.js';
 
-// Import pages (we'll create these next)
+// Import pages
 import SettingsPage from './pages/SettingsPage.js';
 import ComparePage from './pages/ComparePage.js';
 import RankingsPage from './pages/RankingsPage.js';
@@ -69,10 +69,11 @@ class Application {
      * Handle GitHub Pages redirect
      */
     handleRedirect() {
-        const redirect = new URLSearchParams(window.location.search).get('redirect');
-        
-        if (redirect) {
-            window.history.replaceState(null, '', redirect);
+        // Simply clean any redirect parameters from URL
+        const url = new URL(window.location);
+        if (url.searchParams.has('redirect')) {
+            url.searchParams.delete('redirect');
+            window.history.replaceState(null, '', url.pathname);
         }
     }
 
