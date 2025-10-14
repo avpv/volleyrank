@@ -178,6 +178,16 @@ class Application {
             toast.success(`Player "${player.name}" updated`, 2000);
         });
 
+        eventBus.on('player:reset', (data) => {
+            const posNames = data.positions.map(p => this.getPositionName(p)).join(', ');
+            toast.success(`Reset ${posNames} for ${data.player.name}`, 2500);
+        });
+
+        eventBus.on('players:reset-all-positions', (data) => {
+            const posNames = data.positions.map(p => this.getPositionName(p)).join(', ');
+            toast.success(`Reset ${posNames} for ${data.playersAffected} players`, 3000);
+        });
+
         // Comparison events
         eventBus.on('comparison:completed', (data) => {
             const posName = this.getPositionName(data.position);
