@@ -31,9 +31,14 @@ class BasePage extends Component {
      * Destroy page and all child components
      */
     onDestroy() {
+        // todo
         this.components.forEach(component => {
             if (component && typeof component.destroy === 'function') {
-                component.destroy();
+                try {
+                    component.destroy();
+                } catch (error) {
+                    console.error('Error destroying component:', error);
+                }
             }
         });
         this.components = [];
