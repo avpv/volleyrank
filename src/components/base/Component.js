@@ -131,22 +131,39 @@ class Component {
     }
 
     /**
+     * Unmount component from DOM
+     */
+    unmount() {
+        if (!this.isMounted || this.isDestroyed) return;
+        
+        this.isMounted = false;
+        
+        if (this.container) {
+            this.container.innerHTML = '';
+        }
+    }
+
+    /**
      * Destroy component
      */
     destroy() {
         if (this.isDestroyed) return;
 
+        // todo
+        this.unmount();
+        
+        // todo
         this.onDestroy();
         
         // Unsubscribe from all events
         this.eventUnsubscribers.forEach(unsubscribe => unsubscribe());
         this.eventUnsubscribers = [];
         
+        // todo
         if (this.container) {
             this.container.innerHTML = '';
         }
         
-        this.isMounted = false;
         this.isDestroyed = true;
     }
 
