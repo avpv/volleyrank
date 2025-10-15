@@ -2,12 +2,132 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="refresh" content="0;url=/volleyrank/">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    
+    <!-- Page metadata -->
+    <title>Redirecting... - VolleyRank</title>
+    <meta name="description" content="Redirecting to VolleyRank application">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏐</text></svg>">
+    
+    <!-- Styles -->
+    <style>
+        /* ==========================================================================
+           Reset & Base Styles
+           ========================================================================== */
+        
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        /* ==========================================================================
+           Layout
+           ========================================================================== */
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 
+                         Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        /* ==========================================================================
+           Components
+           ========================================================================== */
+        
+        .redirect-container {
+            text-align: center;
+            padding: 2rem;
+            max-width: 500px;
+        }
+        
+        /* Loading Spinner */
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255, 255, 255, 0.2);
+            border-top-color: #ffffff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 2rem;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Typography */
+        .redirect-title {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            letter-spacing: -0.025em;
+        }
+        
+        .redirect-message {
+            font-size: 1.125rem;
+            opacity: 0.9;
+            font-weight: 400;
+        }
+        
+        /* ==========================================================================
+           Responsive Design
+           ========================================================================== */
+        
+        @media (max-width: 640px) {
+            .redirect-container {
+                padding: 1.5rem;
+            }
+            
+            .redirect-title {
+                font-size: 1.5rem;
+            }
+            
+            .redirect-message {
+                font-size: 1rem;
+            }
+        }
+        
+        /* ==========================================================================
+           Accessibility
+           ========================================================================== */
+        
+        @media (prefers-reduced-motion: reduce) {
+            .spinner {
+                animation-duration: 2s;
+            }
+        }
+    </style>
 </head>
 <body>
-    <script>
-        // Redirect all 404s to the index page
-        window.location.replace('/volleyrank/');
-    </script>
+    <!-- Main Content -->
+    <div class="redirect-container" role="main">
+        <!-- Loading Indicator -->
+        <div class="spinner" role="status" aria-label="Loading"></div>
+        
+        <!-- Title -->
+        <h1 class="redirect-title">🏐 Redirecting...</h1>
+        
+        <!-- Message -->
+        <p class="redirect-message">
+            Please wait while we redirect you to VolleyRank
+        </p>
+    </div>
+    
+    <!-- 404 Redirect Handler -->
+    <script src="src/404-redirect.js"></script>
 </body>
 </html>
