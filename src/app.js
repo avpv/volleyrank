@@ -16,7 +16,6 @@ import TeamsPage from './pages/TeamsPage.js';
 class Application {
     constructor() {
         this.currentPage = null;
-        this.pages = new Map();
     }
 
     /**
@@ -83,21 +82,25 @@ class Application {
     registerRoutes() {
         // Settings page (home)
         router.register('/', () => {
+            console.log('📍 Route: / (Settings)');
             this.renderPage('settings', SettingsPage);
         });
 
         // Compare page
         router.register('/compare/', () => {
+            console.log('📍 Route: /compare/');
             this.renderPage('compare', ComparePage);
         });
 
         // Rankings page
         router.register('/rankings/', () => {
+            console.log('📍 Route: /rankings/');
             this.renderPage('rankings', RankingsPage);
         });
 
         // Teams page
         router.register('/teams/', () => {
+            console.log('📍 Route: /teams/');
             this.renderPage('teams', TeamsPage);
         });
     }
@@ -106,29 +109,68 @@ class Application {
      * Render a page
      */
     renderPage(name, PageClass) {
-        // Destroy current page
+        console.log('📄 Rendering page:', name);
+        
+        // 1. Destroy current page
         if (this.currentPage) {
-            this.currentPage.destroy();
+            console.log('🗑️ Destroying previous page');
+            try {
+                this.currentPage.destroy();
+            } catch (error) {
+                console.error('❌ Error destroying page:', error);
+            }
             this.currentPage = null;
         }
 
-        // Get or create page instance
-        let page = this.pages.get(name);
+        // 2. Get container
+        const container = document.getElementById('appMain');
+        if (!container) {
+            console.error('❌ App container #appMain not found!');
+            return;
+        }
         
-        if (!page) {
-            const container = document.getElementById('appMain');
+        // 3. Clear container
+        container.innerHTML = '';
+        
+        // 4. Create new page instance (NO caching)
+        console.log('🆕 Creating new page instance:', PageClass.name);
+        let page;
+        
+        try {
             page = new PageClass(container);
-            this.pages.set(name, page);
+        } catch (error) {
+            console.error('❌ Error creating page:', error);
+            container.innerHTML = `
+                <div class="error-state">
+                    <div class="error-icon">⚠️</div>
+                    <p>Failed to create page: ${this.escape(error.message)}</p>
+                </div>
+            `;
+            return;
         }
 
-        // Mount page
-        page.mount();
-        this.currentPage = page;
+        // 5. Mount page
+        try {
+            console.log('⬆️ Mounting page...');
+            page.mount();
+            this.currentPage = page;
+            console.log('✅ Page mounted successfully');
+        } catch (error) {
+            console.error('❌ Error mounting page:', error);
+            container.innerHTML = `
+                <div class="error-state">
+                    <div class="error-icon">⚠️</div>
+                    <p>Failed to load page: ${this.escape(error.message)}</p>
+                    <button onclick="location.reload()" class="btn btn-primary">Reload Page</button>
+                </div>
+            `;
+            return;
+        }
 
-        // Update navigation
+        // 6. Update navigation
         this.updateNavigation();
 
-        // Scroll to top
+        // 7. Scroll to top
         window.scrollTo(0, 0);
     }
 
@@ -242,8 +284,8 @@ class Application {
                 <div class="error-container">
                     <h2>⚠️ Application Error</h2>
                     <p>Failed to load VolleyRank</p>
-                    <p class="error-message">${error.message}</p>
-                    <button onclick="location.reload()">Reload Page</button>
+                    <p class="error-message">${this.escape(error.message)}</p>
+                    <button onclick="location.reload()" class="btn btn-primary">Reload Page</button>
                 </div>
             `;
         }
@@ -264,6 +306,23 @@ class Application {
     }
 
     /**
+     * Safely escape HTML
+     */
+    escape(text) {
+        if (typeof text !== 'string') return '';
+        
+        const map = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        };
+        
+        return text.replace(/[&<>"']/g, m => map[m]);
+    }
+
+    /**
      * Get app info for debugging
      */
     getInfo() {
@@ -271,8 +330,7 @@ class Application {
             version: '4.0.0',
             currentRoute: router.currentRoute,
             currentPage: this.currentPage?.constructor.name,
-            stats: stateManager.getStats(),
-            registeredPages: Array.from(this.pages.keys())
+            stats: stateManager.getStats()
         };
     }
 }
