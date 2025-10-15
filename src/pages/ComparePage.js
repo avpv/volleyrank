@@ -187,14 +187,17 @@ class ComparePage extends BasePage {
             });
         }
 
-        // Comparison cards
-        this.$('.player-card.clickable').forEach(card => {
-            card.addEventListener('click', () => {
-                const winnerId = parseFloat(card.getAttribute('data-winner-id'));
-                const loserId = parseFloat(card.getAttribute('data-loser-id'));
-                this.handleComparison(winnerId, loserId);
+        // Comparison cards - ИСПРАВЛЕНИЕ: безопасная проверка
+        const cards = this.$$('.player-card.clickable');
+        if (cards && cards.length > 0) {
+            cards.forEach(card => {
+                card.addEventListener('click', () => {
+                    const winnerId = parseFloat(card.getAttribute('data-winner-id'));
+                    const loserId = parseFloat(card.getAttribute('data-loser-id'));
+                    this.handleComparison(winnerId, loserId);
+                });
             });
-        });
+        }
     }
 
     loadNextPair() {
