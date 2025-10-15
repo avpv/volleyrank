@@ -133,9 +133,14 @@ class Router {
      * Initialize router
      */
     init() {
+        console.log('🚦 Initializing router...');
+        console.log('📂 Base path:', this.basePath || '(root)');
+        
         // Handle browser back/forward
         window.addEventListener('popstate', (event) => {
+            console.log('⬅️ Popstate event');
             const path = event.state?.path || this.getCurrentPath();
+            console.log('   Target path:', path);
             this.navigate(path, false);
         });
 
@@ -177,11 +182,24 @@ class Router {
             }
             
             e.preventDefault();
+            console.log('🔗 Link clicked, navigating to:', href);
             this.navigate(href);
         });
 
-        // Navigate to current path
+        // todo
         const currentPath = this.getCurrentPath();
+        console.log('🎯 Initial current path:', currentPath);
+        
+        // todo
+        const fullPath = this.basePath + currentPath;
+        window.history.replaceState(
+            { path: currentPath }, 
+            '', 
+            fullPath
+        );
+        
+        // todo
+        console.log('🚀 Starting initial navigation...');
         this.navigate(currentPath, false);
     }
 
