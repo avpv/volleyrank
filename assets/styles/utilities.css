@@ -1,0 +1,539 @@
+/**
+ * Utility Classes
+ * 
+ * Atomic utility classes for rapid UI development.
+ * Following Tailwind-like patterns for consistency.
+ * 
+ * Categories:
+ * - Layout & Display
+ * - Spacing
+ * - Typography
+ * - Colors
+ * - Borders
+ * - Effects
+ * - Interactivity
+ * 
+ * @author VolleyRank Team
+ * @version 4.0.0
+ * @license MIT
+ */
+
+/* =============================================================================
+   Display & Layout
+   ============================================================================= */
+
+.block { display: block; }
+.inline-block { display: inline-block; }
+.inline { display: inline; }
+.flex { display: flex; }
+.inline-flex { display: inline-flex; }
+.grid { display: grid; }
+.inline-grid { display: inline-grid; }
+.hidden { display: none; }
+
+/* Flex Direction */
+.flex-row { flex-direction: row; }
+.flex-row-reverse { flex-direction: row-reverse; }
+.flex-col { flex-direction: column; }
+.flex-col-reverse { flex-direction: column-reverse; }
+
+/* Flex Wrap */
+.flex-wrap { flex-wrap: wrap; }
+.flex-wrap-reverse { flex-wrap: wrap-reverse; }
+.flex-nowrap { flex-wrap: nowrap; }
+
+/* Flex */
+.flex-1 { flex: 1 1 0%; }
+.flex-auto { flex: 1 1 auto; }
+.flex-initial { flex: 0 1 auto; }
+.flex-none { flex: none; }
+
+/* Justify Content */
+.justify-start { justify-content: flex-start; }
+.justify-end { justify-content: flex-end; }
+.justify-center { justify-content: center; }
+.justify-between { justify-content: space-between; }
+.justify-around { justify-content: space-around; }
+.justify-evenly { justify-content: space-evenly; }
+
+/* Align Items */
+.items-start { align-items: flex-start; }
+.items-end { align-items: flex-end; }
+.items-center { align-items: center; }
+.items-baseline { align-items: baseline; }
+.items-stretch { align-items: stretch; }
+
+/* Align Content */
+.content-start { align-content: flex-start; }
+.content-end { align-content: flex-end; }
+.content-center { align-content: center; }
+.content-between { align-content: space-between; }
+.content-around { align-content: space-around; }
+
+/* Align Self */
+.self-auto { align-self: auto; }
+.self-start { align-self: flex-start; }
+.self-end { align-self: flex-end; }
+.self-center { align-self: center; }
+.self-stretch { align-self: stretch; }
+
+/* Gap */
+.gap-0 { gap: var(--space-0); }
+.gap-1 { gap: var(--space-1); }
+.gap-2 { gap: var(--space-2); }
+.gap-3 { gap: var(--space-3); }
+.gap-4 { gap: var(--space-4); }
+.gap-6 { gap: var(--space-6); }
+.gap-8 { gap: var(--space-8); }
+
+/* =============================================================================
+   Spacing - Margin & Padding
+   ============================================================================= */
+
+/* Margin All */
+.m-0 { margin: var(--space-0); }
+.m-1 { margin: var(--space-1); }
+.m-2 { margin: var(--space-2); }
+.m-3 { margin: var(--space-3); }
+.m-4 { margin: var(--space-4); }
+.m-6 { margin: var(--space-6); }
+.m-8 { margin: var(--space-8); }
+.m-auto { margin: auto; }
+
+/* Margin X-axis */
+.mx-0 { margin-left: var(--space-0); margin-right: var(--space-0); }
+.mx-1 { margin-left: var(--space-1); margin-right: var(--space-1); }
+.mx-2 { margin-left: var(--space-2); margin-right: var(--space-2); }
+.mx-3 { margin-left: var(--space-3); margin-right: var(--space-3); }
+.mx-4 { margin-left: var(--space-4); margin-right: var(--space-4); }
+.mx-auto { margin-left: auto; margin-right: auto; }
+
+/* Margin Y-axis */
+.my-0 { margin-top: var(--space-0); margin-bottom: var(--space-0); }
+.my-1 { margin-top: var(--space-1); margin-bottom: var(--space-1); }
+.my-2 { margin-top: var(--space-2); margin-bottom: var(--space-2); }
+.my-3 { margin-top: var(--space-3); margin-bottom: var(--space-3); }
+.my-4 { margin-top: var(--space-4); margin-bottom: var(--space-4); }
+.my-6 { margin-top: var(--space-6); margin-bottom: var(--space-6); }
+.my-8 { margin-top: var(--space-8); margin-bottom: var(--space-8); }
+
+/* Margin Top */
+.mt-0 { margin-top: var(--space-0); }
+.mt-1 { margin-top: var(--space-1); }
+.mt-2 { margin-top: var(--space-2); }
+.mt-3 { margin-top: var(--space-3); }
+.mt-4 { margin-top: var(--space-4); }
+.mt-6 { margin-top: var(--space-6); }
+.mt-8 { margin-top: var(--space-8); }
+
+/* Margin Bottom */
+.mb-0 { margin-bottom: var(--space-0); }
+.mb-1 { margin-bottom: var(--space-1); }
+.mb-2 { margin-bottom: var(--space-2); }
+.mb-3 { margin-bottom: var(--space-3); }
+.mb-4 { margin-bottom: var(--space-4); }
+.mb-6 { margin-bottom: var(--space-6); }
+.mb-8 { margin-bottom: var(--space-8); }
+
+/* Padding All */
+.p-0 { padding: var(--space-0); }
+.p-1 { padding: var(--space-1); }
+.p-2 { padding: var(--space-2); }
+.p-3 { padding: var(--space-3); }
+.p-4 { padding: var(--space-4); }
+.p-6 { padding: var(--space-6); }
+.p-8 { padding: var(--space-8); }
+
+/* Padding X-axis */
+.px-0 { padding-left: var(--space-0); padding-right: var(--space-0); }
+.px-1 { padding-left: var(--space-1); padding-right: var(--space-1); }
+.px-2 { padding-left: var(--space-2); padding-right: var(--space-2); }
+.px-3 { padding-left: var(--space-3); padding-right: var(--space-3); }
+.px-4 { padding-left: var(--space-4); padding-right: var(--space-4); }
+.px-6 { padding-left: var(--space-6); padding-right: var(--space-6); }
+
+/* Padding Y-axis */
+.py-0 { padding-top: var(--space-0); padding-bottom: var(--space-0); }
+.py-1 { padding-top: var(--space-1); padding-bottom: var(--space-1); }
+.py-2 { padding-top: var(--space-2); padding-bottom: var(--space-2); }
+.py-3 { padding-top: var(--space-3); padding-bottom: var(--space-3); }
+.py-4 { padding-top: var(--space-4); padding-bottom: var(--space-4); }
+.py-6 { padding-top: var(--space-6); padding-bottom: var(--space-6); }
+
+/* =============================================================================
+   Typography
+   ============================================================================= */
+
+/* Font Size */
+.text-xs { font-size: var(--font-size-xs); }
+.text-sm { font-size: var(--font-size-sm); }
+.text-base { font-size: var(--font-size-base); }
+.text-lg { font-size: var(--font-size-lg); }
+.text-xl { font-size: var(--font-size-xl); }
+.text-2xl { font-size: var(--font-size-2xl); }
+.text-3xl { font-size: var(--font-size-3xl); }
+.text-4xl { font-size: var(--font-size-4xl); }
+
+/* Font Weight */
+.font-regular { font-weight: var(--font-weight-regular); }
+.font-medium { font-weight: var(--font-weight-medium); }
+.font-semibold { font-weight: var(--font-weight-semibold); }
+.font-bold { font-weight: var(--font-weight-bold); }
+
+/* Text Align */
+.text-left { text-align: left; }
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+.text-justify { text-align: justify; }
+
+/* Text Transform */
+.uppercase { text-transform: uppercase; }
+.lowercase { text-transform: lowercase; }
+.capitalize { text-transform: capitalize; }
+.normal-case { text-transform: none; }
+
+/* Line Height */
+.leading-tight { line-height: var(--line-height-tight); }
+.leading-normal { line-height: var(--line-height-normal); }
+.leading-relaxed { line-height: var(--line-height-relaxed); }
+
+/* Letter Spacing */
+.tracking-tight { letter-spacing: var(--letter-spacing-tight); }
+.tracking-normal { letter-spacing: var(--letter-spacing-normal); }
+.tracking-wide { letter-spacing: var(--letter-spacing-wide); }
+
+/* Text Decoration */
+.underline { text-decoration: underline; }
+.line-through { text-decoration: line-through; }
+.no-underline { text-decoration: none; }
+
+/* White Space */
+.whitespace-normal { white-space: normal; }
+.whitespace-nowrap { white-space: nowrap; }
+.whitespace-pre { white-space: pre; }
+.whitespace-pre-line { white-space: pre-line; }
+.whitespace-pre-wrap { white-space: pre-wrap; }
+
+/* Word Break */
+.break-normal { word-break: normal; overflow-wrap: normal; }
+.break-words { overflow-wrap: break-word; }
+.break-all { word-break: break-all; }
+
+/* Truncate */
+.truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* =============================================================================
+   Colors
+   ============================================================================= */
+
+/* Text Colors */
+.text-primary { color: var(--color-text-primary); }
+.text-secondary { color: var(--color-text-secondary); }
+.text-tertiary { color: var(--color-text-tertiary); }
+.text-disabled { color: var(--color-text-disabled); }
+.text-inverse { color: var(--color-text-inverse); }
+
+.text-brand { color: var(--color-brand-primary); }
+.text-success { color: var(--color-success); }
+.text-warning { color: var(--color-warning); }
+.text-error { color: var(--color-error); }
+.text-info { color: var(--color-info); }
+
+/* Background Colors */
+.bg-primary { background-color: var(--color-bg-primary); }
+.bg-secondary { background-color: var(--color-bg-secondary); }
+.bg-tertiary { background-color: var(--color-bg-tertiary); }
+
+.bg-surface-base { background-color: var(--color-surface-base); }
+.bg-surface-raised { background-color: var(--color-surface-raised); }
+.bg-surface-overlay { background-color: var(--color-surface-overlay); }
+
+.bg-brand { background-color: var(--color-brand-primary); }
+.bg-success { background-color: var(--color-success); }
+.bg-warning { background-color: var(--color-warning); }
+.bg-error { background-color: var(--color-error); }
+.bg-info { background-color: var(--color-info); }
+
+.bg-transparent { background-color: transparent; }
+
+/* =============================================================================
+   Borders
+   ============================================================================= */
+
+/* Border Width */
+.border-0 { border-width: 0; }
+.border { border-width: 1px; }
+.border-2 { border-width: 2px; }
+
+.border-t { border-top-width: 1px; }
+.border-r { border-right-width: 1px; }
+.border-b { border-bottom-width: 1px; }
+.border-l { border-left-width: 1px; }
+
+/* Border Style */
+.border-solid { border-style: solid; }
+.border-dashed { border-style: dashed; }
+.border-dotted { border-style: dotted; }
+.border-none { border-style: none; }
+
+/* Border Color */
+.border-default { border-color: var(--color-border-default); }
+.border-subtle { border-color: var(--color-border-subtle); }
+.border-strong { border-color: var(--color-border-strong); }
+.border-transparent { border-color: transparent; }
+
+.border-brand { border-color: var(--color-brand-primary); }
+.border-success { border-color: var(--color-success); }
+.border-warning { border-color: var(--color-warning); }
+.border-error { border-color: var(--color-error); }
+
+/* Border Radius */
+.rounded-none { border-radius: var(--radius-none); }
+.rounded-sm { border-radius: var(--radius-sm); }
+.rounded { border-radius: var(--radius-md); }
+.rounded-md { border-radius: var(--radius-md); }
+.rounded-lg { border-radius: var(--radius-lg); }
+.rounded-xl { border-radius: var(--radius-xl); }
+.rounded-2xl { border-radius: var(--radius-2xl); }
+.rounded-full { border-radius: var(--radius-full); }
+
+/* =============================================================================
+   Width & Height
+   ============================================================================= */
+
+/* Width */
+.w-auto { width: auto; }
+.w-full { width: 100%; }
+.w-screen { width: 100vw; }
+.w-min { width: min-content; }
+.w-max { width: max-content; }
+.w-fit { width: fit-content; }
+
+/* Height */
+.h-auto { height: auto; }
+.h-full { height: 100%; }
+.h-screen { height: 100vh; }
+.h-min { height: min-content; }
+.h-max { height: max-content; }
+.h-fit { height: fit-content; }
+
+/* Min/Max Width */
+.min-w-0 { min-width: 0; }
+.min-w-full { min-width: 100%; }
+.max-w-full { max-width: 100%; }
+.max-w-screen { max-width: 100vw; }
+
+/* Min/Max Height */
+.min-h-0 { min-height: 0; }
+.min-h-full { min-height: 100%; }
+.min-h-screen { min-height: 100vh; }
+.max-h-full { max-height: 100%; }
+.max-h-screen { max-height: 100vh; }
+
+/* =============================================================================
+   Position
+   ============================================================================= */
+
+.static { position: static; }
+.fixed { position: fixed; }
+.absolute { position: absolute; }
+.relative { position: relative; }
+.sticky { position: sticky; }
+
+/* Top/Right/Bottom/Left */
+.inset-0 { top: 0; right: 0; bottom: 0; left: 0; }
+.top-0 { top: 0; }
+.right-0 { right: 0; }
+.bottom-0 { bottom: 0; }
+.left-0 { left: 0; }
+
+/* =============================================================================
+   Overflow
+   ============================================================================= */
+
+.overflow-auto { overflow: auto; }
+.overflow-hidden { overflow: hidden; }
+.overflow-visible { overflow: visible; }
+.overflow-scroll { overflow: scroll; }
+
+.overflow-x-auto { overflow-x: auto; }
+.overflow-y-auto { overflow-y: auto; }
+.overflow-x-hidden { overflow-x: hidden; }
+.overflow-y-hidden { overflow-y: hidden; }
+
+/* =============================================================================
+   Z-Index
+   ============================================================================= */
+
+.z-0 { z-index: 0; }
+.z-10 { z-index: 10; }
+.z-20 { z-index: 20; }
+.z-30 { z-index: 30; }
+.z-40 { z-index: 40; }
+.z-50 { z-index: 50; }
+.z-auto { z-index: auto; }
+
+/* =============================================================================
+   Opacity
+   ============================================================================= */
+
+.opacity-0 { opacity: 0; }
+.opacity-25 { opacity: 0.25; }
+.opacity-50 { opacity: 0.5; }
+.opacity-75 { opacity: 0.75; }
+.opacity-100 { opacity: 1; }
+
+/* =============================================================================
+   Shadow
+   ============================================================================= */
+
+.shadow-none { box-shadow: none; }
+.shadow-xs { box-shadow: var(--shadow-xs); }
+.shadow-sm { box-shadow: var(--shadow-sm); }
+.shadow { box-shadow: var(--shadow-md); }
+.shadow-md { box-shadow: var(--shadow-md); }
+.shadow-lg { box-shadow: var(--shadow-lg); }
+.shadow-xl { box-shadow: var(--shadow-xl); }
+.shadow-2xl { box-shadow: var(--shadow-2xl); }
+
+/* =============================================================================
+   Transform
+   ============================================================================= */
+
+.scale-0 { transform: scale(0); }
+.scale-50 { transform: scale(0.5); }
+.scale-75 { transform: scale(0.75); }
+.scale-90 { transform: scale(0.9); }
+.scale-95 { transform: scale(0.95); }
+.scale-100 { transform: scale(1); }
+.scale-105 { transform: scale(1.05); }
+.scale-110 { transform: scale(1.1); }
+.scale-125 { transform: scale(1.25); }
+
+/* =============================================================================
+   Transition
+   ============================================================================= */
+
+.transition-none { transition-property: none; }
+.transition-all { transition-property: all; transition-duration: var(--duration-normal); }
+.transition-colors { transition-property: color, background-color, border-color; }
+.transition-opacity { transition-property: opacity; }
+.transition-shadow { transition-property: box-shadow; }
+.transition-transform { transition-property: transform; }
+
+.duration-fast { transition-duration: var(--duration-fast); }
+.duration-normal { transition-duration: var(--duration-normal); }
+.duration-slow { transition-duration: var(--duration-slow); }
+
+.ease-default { transition-timing-function: var(--ease-default); }
+.ease-in { transition-timing-function: var(--ease-in); }
+.ease-out { transition-timing-function: var(--ease-out); }
+.ease-in-out { transition-timing-function: var(--ease-in-out); }
+
+/* =============================================================================
+   Cursor
+   ============================================================================= */
+
+.cursor-auto { cursor: auto; }
+.cursor-default { cursor: default; }
+.cursor-pointer { cursor: pointer; }
+.cursor-wait { cursor: wait; }
+.cursor-text { cursor: text; }
+.cursor-move { cursor: move; }
+.cursor-not-allowed { cursor: not-allowed; }
+
+/* =============================================================================
+   User Select
+   ============================================================================= */
+
+.select-none { user-select: none; }
+.select-text { user-select: text; }
+.select-all { user-select: all; }
+.select-auto { user-select: auto; }
+
+/* =============================================================================
+   Pointer Events
+   ============================================================================= */
+
+.pointer-events-none { pointer-events: none; }
+.pointer-events-auto { pointer-events: auto; }
+
+/* =============================================================================
+   Accessibility
+   ============================================================================= */
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+.not-sr-only {
+    position: static;
+    width: auto;
+    height: auto;
+    padding: 0;
+    margin: 0;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
+}
+
+/* =============================================================================
+   Aspect Ratio
+   ============================================================================= */
+
+.aspect-square { aspect-ratio: 1 / 1; }
+.aspect-video { aspect-ratio: 16 / 9; }
+
+/* =============================================================================
+   Object Fit
+   ============================================================================= */
+
+.object-contain { object-fit: contain; }
+.object-cover { object-fit: cover; }
+.object-fill { object-fit: fill; }
+.object-none { object-fit: none; }
+.object-scale-down { object-fit: scale-down; }
+
+/* =============================================================================
+   Visibility
+   ============================================================================= */
+
+.visible { visibility: visible; }
+.invisible { visibility: hidden; }
+
+/* =============================================================================
+   Responsive Utilities
+   ============================================================================= */
+
+@media (min-width: 640px) {
+    .sm\:hidden { display: none; }
+    .sm\:block { display: block; }
+    .sm\:flex { display: flex; }
+    .sm\:grid { display: grid; }
+}
+
+@media (min-width: 768px) {
+    .md\:hidden { display: none; }
+    .md\:block { display: block; }
+    .md\:flex { display: flex; }
+    .md\:grid { display: grid; }
+}
+
+@media (min-width: 1024px) {
+    .lg\:hidden { display: none; }
+    .lg\:block { display: block; }
+    .lg\:flex { display: flex; }
+    .lg\:grid { display: grid; }
+}
