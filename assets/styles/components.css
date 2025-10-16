@@ -7,7 +7,7 @@
  * - Clean, functional aesthetics
  * - Professional developer experience
  * 
- * @version 5.0.0
+ * @version 5.1.0
  * @theme Volleyrank Dark
  */
 
@@ -160,9 +160,9 @@
 /* Inputs */
 .form-control {
     width: 100%;
-    padding: var(--spacing-2) var(--spacing-3);
+    padding: var(--spacing-3);
     font-family: inherit;
-    font-size: var(--font-size-sm);
+    font-size: var(--font-size-base);
     background-color: var(--color-bg-primary);
     border: 1px solid var(--color-border-default);
     border-radius: var(--radius-md);
@@ -193,6 +193,29 @@
     box-shadow: 0 0 0 3px rgba(248, 81, 73, 0.1);
 }
 
+/* Player Name Input */
+#playerNameInput {
+    width: 100%;
+    padding: var(--spacing-3);
+    font-family: inherit;
+    font-size: var(--font-size-base);
+    background-color: var(--color-bg-primary);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-md);
+    color: var(--color-text-primary);
+    transition: var(--transition-default);
+}
+
+#playerNameInput:hover {
+    border-color: var(--color-border-strong);
+}
+
+#playerNameInput:focus {
+    outline: none;
+    border-color: var(--color-brand-primary);
+    box-shadow: 0 0 0 3px rgba(47, 129, 247, 0.1);
+}
+
 /* Textarea */
 textarea.form-control {
     resize: vertical;
@@ -207,6 +230,64 @@ select.form-control {
     background-repeat: no-repeat;
     background-position: right var(--spacing-3) center;
     padding-right: var(--spacing-8);
+}
+
+/* Position Select */
+.position-select {
+    width: 100%;
+    max-width: 300px;
+    padding: var(--spacing-3);
+    font-family: inherit;
+    font-size: var(--font-size-base);
+    background-color: var(--color-bg-primary);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-md);
+    color: var(--color-text-primary);
+    cursor: pointer;
+    transition: var(--transition-default);
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16' fill='%237d8590'%3E%3Cpath d='M4.427 7.427l3.396 3.396a.25.25 0 00.354 0l3.396-3.396A.25.25 0 0011.396 7H4.604a.25.25 0 00-.177.427z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right var(--spacing-3) center;
+    padding-right: var(--spacing-10);
+}
+
+.position-select:hover {
+    border-color: var(--color-border-strong);
+}
+
+.position-select:focus {
+    outline: none;
+    border-color: var(--color-brand-primary);
+    box-shadow: 0 0 0 3px rgba(47, 129, 247, 0.1);
+}
+
+/* Team Builder Inputs */
+.team-count-input,
+.composition-input {
+    width: 80px;
+    padding: var(--spacing-2) var(--spacing-3);
+    font-family: inherit;
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    background-color: var(--color-bg-primary);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-md);
+    color: var(--color-text-primary);
+    text-align: center;
+    transition: var(--transition-default);
+}
+
+.team-count-input:hover,
+.composition-input:hover {
+    border-color: var(--color-border-strong);
+}
+
+.team-count-input:focus,
+.composition-input:focus {
+    outline: none;
+    border-color: var(--color-brand-primary);
+    box-shadow: 0 0 0 3px rgba(47, 129, 247, 0.1);
 }
 
 /* Checkboxes & Radio */
@@ -512,6 +593,7 @@ select.form-control {
     background-color: var(--color-border-default);
     border-radius: var(--radius-full);
     overflow: hidden;
+    position: relative;
 }
 
 .progress-bar {
@@ -520,6 +602,25 @@ select.form-control {
     border-radius: var(--radius-full);
     transition: width var(--duration-slow) var(--ease-out);
     position: relative;
+}
+
+.progress-bar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(255, 255, 255, 0.2) 50%, 
+        transparent 100%);
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
 }
 
 /* =============================================================================
@@ -752,75 +853,31 @@ select.form-control {
 
 /* Improved Modal Close Button */
 .modal-close {
-    width: 40px;
-    height: 40px;
+    width: 32px;
+    height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: none;
-    border: none;
-    color: var(--color-text-tertiary);
-    font-size: var(--font-size-2xl);
-    cursor: pointer;
+    background: var(--color-surface-overlay);
+    border: 1px solid var(--color-border-default);
     border-radius: var(--radius-full);
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
+    cursor: pointer;
     transition: var(--transition-default);
     position: relative;
-    font-weight: var(--font-weight-light);
 }
 
 .modal-close:hover {
+    background: var(--color-surface-raised);
+    border-color: var(--color-border-strong);
     color: var(--color-text-primary);
-    background-color: var(--color-surface-overlay);
     transform: scale(1.1);
 }
 
 .modal-close:active {
     transform: scale(0.95);
-}
-
-/* Alternative close button with SVG icon */
-.modal-close-icon {
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: none;
-    border: none;
-    cursor: pointer;
-    border-radius: var(--radius-full);
-    transition: var(--transition-default);
-    position: relative;
-}
-
-.modal-close-icon::before,
-.modal-close-icon::after {
-    content: '';
-    position: absolute;
-    width: 18px;
-    height: 2px;
-    background-color: var(--color-text-tertiary);
-    border-radius: 1px;
-    transition: var(--transition-default);
-}
-
-.modal-close-icon::before {
-    transform: rotate(45deg);
-}
-
-.modal-close-icon::after {
-    transform: rotate(-45deg);
-}
-
-.modal-close-icon:hover::before,
-.modal-close-icon:hover::after {
-    background-color: var(--color-text-primary);
-    transform: rotate(0deg);
-}
-
-.modal-close-icon:hover {
-    background-color: var(--color-surface-overlay);
-    transform: scale(1.1);
 }
 
 .modal-body {
@@ -967,33 +1024,86 @@ select.form-control {
    Ranking Badges
    ============================================================================= */
 
+.ranking-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-4);
+    padding: var(--spacing-4);
+    border-bottom: 1px solid var(--color-border-default);
+    transition: var(--transition-default);
+    margin-bottom: 0;
+}
+
+.ranking-item:last-child {
+    border-bottom: none;
+}
+
+.ranking-item:hover {
+    background-color: var(--color-surface-overlay);
+    border-bottom-color: var(--color-border-strong);
+}
+
 .rank-badge {
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    height: 36px;
     border-radius: var(--radius-md);
     background-color: var(--color-surface-raised);
     color: var(--color-text-primary);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: var(--font-weight-semibold);
+    font-weight: var(--font-weight-bold);
     font-size: var(--font-size-sm);
     flex-shrink: 0;
+    border: 2px solid var(--color-border-default);
+    box-shadow: var(--shadow-sm);
 }
 
 .rank-badge.gold {
     background: linear-gradient(135deg, #d4af37, #ffd700);
-    color: var(--color-text-inverse);
+    border-color: #ffd700;
+    color: #000;
+    box-shadow: 0 2px 8px rgba(212, 175, 55, 0.3);
 }
 
 .rank-badge.silver {
     background: linear-gradient(135deg, #c0c0c0, #e8e8e8);
-    color: var(--color-text-inverse);
+    border-color: #e8e8e8;
+    color: #000;
+    box-shadow: 0 2px 8px rgba(192, 192, 192, 0.3);
 }
 
 .rank-badge.bronze {
     background: linear-gradient(135deg, #cd7f32, #b08d57);
+    border-color: #b08d57;
     color: white;
+    box-shadow: 0 2px 8px rgba(205, 127, 50, 0.3);
+}
+
+/* Standard rank badges (positions 4+) */
+.rank-badge:not(.gold):not(.silver):not(.bronze) {
+    background: var(--color-surface-raised);
+    border: 2px solid var(--color-border-strong);
+    color: var(--color-text-primary);
+    font-weight: var(--font-weight-semibold);
+}
+
+.ranking-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.ranking-name {
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size-base);
+    color: var(--color-text-primary);
+    margin-bottom: var(--spacing-1);
+}
+
+.ranking-stats {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-tertiary);
+    font-family: var(--font-family-mono);
 }
 
 /* =============================================================================
@@ -1052,10 +1162,22 @@ select.form-control {
         height: 36px;
         font-size: var(--font-size-xl);
     }
-    
-    .modal-close-icon {
-        width: 36px;
-        height: 36px;
+
+    .rank-badge {
+        width: 32px;
+        height: 32px;
+        font-size: var(--font-size-xs);
+    }
+
+    .team-count-input,
+    .composition-input {
+        width: 70px;
+        padding: var(--spacing-2);
+    }
+
+    .ranking-item {
+        padding: var(--spacing-3);
+        gap: var(--spacing-3);
     }
 }
 
@@ -1069,5 +1191,35 @@ select.form-control {
     
     .stat-number {
         font-size: var(--font-size-3xl);
+    }
+}
+
+/* =============================================================================
+   Accessibility
+   ============================================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+    .progress-bar::after {
+        animation: none;
+    }
+    
+    .modal-close:hover {
+        transform: none;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .rank-badge:not(.gold):not(.silver):not(.bronze) {
+        border-width: 3px;
+        background: var(--color-bg-primary);
+    }
+    
+    .progress-bar {
+        background: var(--color-brand-primary);
+    }
+    
+    .ranking-item {
+        border-bottom-width: 2px;
     }
 }
