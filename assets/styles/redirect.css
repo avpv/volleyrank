@@ -1,18 +1,11 @@
 /**
- * Redirect Page Styles
+ * Redirect Page Styles - Volleyrank Theme
  * 
- * Styles for the 404 redirect page. Provides a clean, professional
- * loading experience while the redirect happens seamlessly.
+ * Clean, professional loading experience
+ * Consistent with Volleyrank's design language
  * 
- * Design Philosophy:
- * - Minimal, elegant design
- * - Smooth animations
- * - Accessible (WCAG 2.1 AA compliant)
- * - Responsive across all devices
- * - Performance optimized
- * 
- * @author VolleyRank Team
- * @version 4.0.0
+ * @version 5.0.0
+ * @theme Volleyrank Dark
  */
 
 /* =============================================================================
@@ -31,32 +24,23 @@
    Layout
    ============================================================================= */
 
-/**
- * Body Layout
- * Full viewport height with centered content
- */
 .redirect-body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 
-                 Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background-color: #0d1117;
     min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #ffffff;
-    line-height: 1.6;
+    color: #e6edf3;
+    line-height: 1.5;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
 
-/**
- * Main Container
- * Centers content with appropriate padding
- */
 .redirect-container {
     text-align: center;
     padding: 2rem;
-    max-width: 500px;
+    max-width: 400px;
     width: 100%;
     opacity: 0;
     animation: fadeIn 0.3s ease-in forwards;
@@ -66,95 +50,72 @@
    Components
    ============================================================================= */
 
-/**
- * Loading Spinner
- * Smooth rotating animation
- */
 .redirect-spinner {
-    width: 50px;
-    height: 50px;
-    border: 4px solid rgba(255, 255, 255, 0.2);
-    border-top-color: #ffffff;
+    width: 40px;
+    height: 40px;
+    border: 3px solid #30363d;
+    border-top-color: #2f81f7;
     border-radius: 50%;
     animation: spin 1s linear infinite;
-    margin: 0 auto 2rem;
+    margin: 0 auto 1.5rem;
 }
 
-/**
- * Title
- * Large, prominent heading
- */
 .redirect-title {
-    font-size: 2rem;
+    font-size: 1.5rem;
     font-weight: 600;
-    margin-bottom: 0.75rem;
-    letter-spacing: -0.025em;
-    line-height: 1.2;
+    margin-bottom: 0.5rem;
+    color: #e6edf3;
 }
 
-/**
- * Message
- * Descriptive text below title
- */
 .redirect-message {
-    font-size: 1.125rem;
-    opacity: 0.9;
+    font-size: 1rem;
+    color: #7d8590;
     font-weight: 400;
-    line-height: 1.5;
 }
 
-/**
- * No JavaScript Message
- * Fallback for users without JavaScript
- */
 .redirect-no-js {
     display: none;
     text-align: center;
     padding: 2rem;
-    color: #ffffff;
+    color: #e6edf3;
 }
 
 .redirect-no-js-title {
-    font-size: 1.75rem;
+    font-size: 1.25rem;
     font-weight: 600;
     margin-bottom: 1rem;
+    color: #e6edf3;
 }
 
 .redirect-no-js-text {
-    font-size: 1rem;
+    font-size: 0.875rem;
     margin-bottom: 0.75rem;
-    opacity: 0.9;
+    color: #7d8590;
 }
 
 .redirect-no-js-link {
     display: inline-block;
     margin-top: 1rem;
-    padding: 0.75rem 1.5rem;
-    background: rgba(255, 255, 255, 0.2);
-    color: #ffffff;
+    padding: 0.5rem 1rem;
+    background-color: #21262d;
+    color: #e6edf3;
     text-decoration: none;
-    border-radius: 0.5rem;
+    border: 1px solid #30363d;
+    border-radius: 0.375rem;
     font-weight: 500;
-    transition: background 0.2s ease;
+    transition: all 0.2s ease;
 }
 
 .redirect-no-js-link:hover {
-    background: rgba(255, 255, 255, 0.3);
-}
-
-.redirect-no-js-link:focus {
-    outline: 2px solid #ffffff;
-    outline-offset: 2px;
+    background-color: #30363d;
+    border-color: #7d8590;
+    text-decoration: none;
 }
 
 /* =============================================================================
    Animations
    ============================================================================= */
 
-/**
- * Fade In Animation
- * Smooth entrance for container
- */
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -166,10 +127,6 @@
     }
 }
 
-/**
- * Spin Animation
- * Continuous rotation for spinner
- */
 @keyframes spin {
     to {
         transform: rotate(360deg);
@@ -180,47 +137,22 @@
    Responsive Design
    ============================================================================= */
 
-/**
- * Mobile Devices (< 640px)
- */
 @media (max-width: 640px) {
     .redirect-container {
         padding: 1.5rem;
     }
     
     .redirect-title {
-        font-size: 1.5rem;
+        font-size: 1.25rem;
     }
     
     .redirect-message {
-        font-size: 1rem;
+        font-size: 0.875rem;
     }
     
     .redirect-spinner {
-        width: 40px;
-        height: 40px;
-    }
-}
-
-/**
- * Tablet Devices (641px - 1024px)
- */
-@media (min-width: 641px) and (max-width: 1024px) {
-    .redirect-container {
-        padding: 2rem;
-    }
-    
-    .redirect-title {
-        font-size: 1.75rem;
-    }
-}
-
-/**
- * Large Screens (> 1024px)
- */
-@media (min-width: 1025px) {
-    .redirect-container {
-        padding: 2.5rem;
+        width: 32px;
+        height: 32px;
     }
 }
 
@@ -228,10 +160,6 @@
    Accessibility
    ============================================================================= */
 
-/**
- * Reduced Motion
- * Respect user preferences for reduced motion
- */
 @media (prefers-reduced-motion: reduce) {
     .redirect-spinner {
         animation-duration: 2s;
@@ -243,82 +171,10 @@
     }
 }
 
-/**
- * High Contrast Mode
- * Ensure visibility in high contrast modes
- */
-@media (prefers-contrast: high) {
-    .redirect-body {
-        background: #000000;
-    }
-    
-    .redirect-spinner {
-        border-color: #ffffff;
-        border-top-color: #ffffff;
-    }
-}
-
-/**
- * Focus Visible
- * Ensure keyboard navigation is clear
- */
-:focus-visible {
-    outline: 2px solid #ffffff;
-    outline-offset: 2px;
-}
-
-/* =============================================================================
-   Print Styles
-   ============================================================================= */
-
-/**
- * Hide unnecessary elements when printing
- */
-@media print {
-    .redirect-spinner {
-        display: none;
-    }
-    
-    .redirect-body {
-        background: #ffffff;
-        color: #000000;
-    }
-    
-    .redirect-container {
-        opacity: 1;
-        animation: none;
-    }
-}
-
-/* =============================================================================
-   Dark Mode Support
-   ============================================================================= */
-
-/**
- * Dark mode is default, but provide explicit support
- */
-@media (prefers-color-scheme: dark) {
-    .redirect-body {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    }
-}
-
-/**
- * Light mode variant (if user prefers)
- */
-@media (prefers-color-scheme: light) {
-    .redirect-body {
-        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-    }
-}
-
 /* =============================================================================
    No JavaScript Fallback
    ============================================================================= */
 
-/**
- * Show no-js message when JavaScript is disabled
- */
 .no-js .redirect-container {
     display: none;
 }
