@@ -851,33 +851,38 @@ select.form-control {
     margin: 0;
 }
 
-/* Improved Modal Close Button */
+/* Modal Close Button */
 .modal-close {
     width: 32px;
     height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--color-surface-overlay);
-    border: 1px solid var(--color-border-default);
-    border-radius: var(--radius-full);
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-md);
     color: var(--color-text-secondary);
-    font-size: var(--font-size-lg);
-    font-weight: var(--font-weight-bold);
+    font-size: var(--font-size-xl);
+    line-height: 1;
     cursor: pointer;
     transition: var(--transition-default);
     position: relative;
+    padding: 0;
 }
 
 .modal-close:hover {
-    background: var(--color-surface-raised);
-    border-color: var(--color-border-strong);
+    background: var(--color-surface-overlay);
     color: var(--color-text-primary);
-    transform: scale(1.1);
 }
 
 .modal-close:active {
     transform: scale(0.95);
+}
+
+.modal-close::before {
+    content: '×';
+    display: block;
+    font-weight: var(--font-weight-light);
 }
 
 .modal-body {
