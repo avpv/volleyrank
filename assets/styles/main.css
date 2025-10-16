@@ -7,7 +7,7 @@
  * - Subtle animations and interactions
  * - Optimized for developer experience
  * 
- * @version 5.0.0
+ * @version 5.1.0
  * @theme Volleyrank Dark
  */
 
@@ -170,7 +170,7 @@
        Layout
        ========================================================================== */
     
-    --header-height: 4rem;
+    --header-height: 5rem;
     --nav-height: 3rem;
     --container-max-width: 1280px;
 }
@@ -236,7 +236,23 @@ h1 {
 }
 
 h2 {
-    font-size: var(--font-size-2xl);
+    font-size: var(--font-size-3xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text-primary);
+    margin-bottom: var(--spacing-6);
+    padding-bottom: var(--spacing-4);
+    border-bottom: 2px solid var(--color-brand-primary);
+    position: relative;
+}
+
+h2::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 60px;
+    height: 2px;
+    background: var(--gradient-brand);
 }
 
 h3 {
@@ -283,6 +299,8 @@ a:hover {
     border-bottom: 1px solid var(--color-border-default);
     height: var(--header-height);
     backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
 }
 
 .header-content {
@@ -302,6 +320,7 @@ a:hover {
     display: flex;
     align-items: center;
     gap: var(--spacing-3);
+    padding: var(--spacing-3) 0;
 }
 
 .app-subtitle {
@@ -391,7 +410,7 @@ a:hover {
 
 /* Footer */
 .app-footer {
-    background-color: var(--color-bg-secondary);
+    background-color: transparent;
     border-top: 1px solid var(--color-border-default);
     padding: var(--spacing-8) var(--spacing-6);
     margin-top: auto;
@@ -416,7 +435,7 @@ a:hover {
     text-decoration: none;
 }
 
-.Volleyrank-icon {
+.github-icon {
     width: 16px;
     height: 16px;
 }
@@ -520,7 +539,7 @@ a:hover {
 
 @media (max-width: 768px) {
     :root {
-        --header-height: 3.5rem;
+        --header-height: 4.5rem;
         --nav-height: 2.5rem;
     }
     
@@ -537,6 +556,7 @@ a:hover {
     
     .app-title {
         font-size: var(--font-size-xl);
+        padding: var(--spacing-2) 0;
     }
     
     .app-subtitle {
@@ -546,6 +566,11 @@ a:hover {
     .nav-link {
         padding: var(--spacing-2) var(--spacing-3);
         font-size: var(--font-size-xs);
+    }
+
+    h2 {
+        font-size: var(--font-size-2xl);
+        padding-bottom: var(--spacing-3);
     }
 }
 
@@ -557,6 +582,10 @@ a:hover {
     
     .nav-link {
         white-space: nowrap;
+    }
+
+    .app-header {
+        height: 4rem;
     }
 }
 
