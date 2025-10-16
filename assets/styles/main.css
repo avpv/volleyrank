@@ -338,8 +338,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 h1 {
-    font-size: var(--font-size-5xl);
-    font-weight: var(--font-weight-extrabold);
+    font-size: var(--font-size-3xl);
+    font-weight: var(--font-weight-bold);
     background: var(--gradient-brand);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -347,27 +347,27 @@ h1 {
 }
 
 h2 {
-    font-size: var(--font-size-4xl);
+    font-size: var(--font-size-2xl);
     font-weight: var(--font-weight-bold);
 }
 
 h3 {
-    font-size: var(--font-size-3xl);
+    font-size: var(--font-size-xl);
     font-weight: var(--font-weight-semibold);
 }
 
 h4 {
-    font-size: var(--font-size-2xl);
+    font-size: var(--font-size-lg);
     font-weight: var(--font-weight-semibold);
 }
 
 h5 {
-    font-size: var(--font-size-xl);
+    font-size: var(--font-size-base);
     font-weight: var(--font-weight-medium);
 }
 
 h6 {
-    font-size: var(--font-size-lg);
+    font-size: var(--font-size-sm);
     font-weight: var(--font-weight-medium);
 }
 
@@ -556,7 +556,7 @@ a:focus-visible {
 }
 
 .page-header h2 {
-    font-size: var(--font-size-4xl);
+    font-size: var(--font-size-2xl);
     font-weight: var(--font-weight-bold);
     background: linear-gradient(135deg, var(--color-text-primary) 0%, var(--color-text-secondary) 100%);
     -webkit-background-clip: text;
@@ -764,7 +764,7 @@ a:focus-visible {
     }
     
     .page-header h2 {
-        font-size: var(--font-size-3xl);
+        font-size: var(--font-size-xl);
     }
 }
 
