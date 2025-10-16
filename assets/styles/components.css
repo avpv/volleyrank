@@ -750,24 +750,77 @@ select.form-control {
     margin: 0;
 }
 
+/* Improved Modal Close Button */
 .modal-close {
-    width: 32px;
-    height: 32px;
+    width: 40px;
+    height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
     background: none;
     border: none;
     color: var(--color-text-tertiary);
-    font-size: var(--font-size-xl);
+    font-size: var(--font-size-2xl);
     cursor: pointer;
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-full);
     transition: var(--transition-default);
+    position: relative;
+    font-weight: var(--font-weight-light);
 }
 
 .modal-close:hover {
     color: var(--color-text-primary);
     background-color: var(--color-surface-overlay);
+    transform: scale(1.1);
+}
+
+.modal-close:active {
+    transform: scale(0.95);
+}
+
+/* Alternative close button with SVG icon */
+.modal-close-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+    border-radius: var(--radius-full);
+    transition: var(--transition-default);
+    position: relative;
+}
+
+.modal-close-icon::before,
+.modal-close-icon::after {
+    content: '';
+    position: absolute;
+    width: 18px;
+    height: 2px;
+    background-color: var(--color-text-tertiary);
+    border-radius: 1px;
+    transition: var(--transition-default);
+}
+
+.modal-close-icon::before {
+    transform: rotate(45deg);
+}
+
+.modal-close-icon::after {
+    transform: rotate(-45deg);
+}
+
+.modal-close-icon:hover::before,
+.modal-close-icon:hover::after {
+    background-color: var(--color-text-primary);
+    transform: rotate(0deg);
+}
+
+.modal-close-icon:hover {
+    background-color: var(--color-surface-overlay);
+    transform: scale(1.1);
 }
 
 .modal-body {
@@ -991,6 +1044,18 @@ select.form-control {
     
     .player-actions .btn {
         width: 100%;
+    }
+    
+    /* Mobile modal close button */
+    .modal-close {
+        width: 36px;
+        height: 36px;
+        font-size: var(--font-size-xl);
+    }
+    
+    .modal-close-icon {
+        width: 36px;
+        height: 36px;
     }
 }
 
