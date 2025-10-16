@@ -351,12 +351,19 @@ select.form-control {
     margin-bottom: var(--spacing-4);
 }
 
+/* Player Actions - Match form-actions button sizing */
 .player-actions {
     display: flex;
-    gap: var(--spacing-2);
+    gap: var(--spacing-3);
     padding-top: var(--spacing-4);
     border-top: 1px solid var(--color-border-default);
     flex-wrap: wrap;
+}
+
+/* Remove small button styling from player actions to match form-actions */
+.player-actions .btn {
+    padding: var(--spacing-2) var(--spacing-4);
+    font-size: var(--font-size-sm);
 }
 
 /* Player Avatar */
@@ -959,6 +966,14 @@ select.form-control {
         width: 48px;
         height: 48px;
         font-size: var(--font-size-lg);
+    }
+    
+    .player-actions {
+        flex-direction: column;
+    }
+    
+    .player-actions .btn {
+        width: 100%;
     }
 }
 
