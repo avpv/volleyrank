@@ -51,7 +51,7 @@ class TeamsPage extends BasePage {
             <div class="team-builder">
                 <div class="builder-settings">
                     <div class="form-group">
-                        <label>Number of Teams</label>
+                        <label class="section-label">Number of Teams</label>
                         <input 
                             type="number" 
                             id="teamCount" 
