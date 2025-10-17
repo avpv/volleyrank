@@ -100,7 +100,7 @@
 .progress-section h3 {
     margin-bottom: var(--spacing-6);
     font-size: var(--font-size-lg);
-    font-weight: var(--font-weight-medium);
+    font-weight: var(--font-weight-semibold);
     color: var(--color-text-primary);
 }
 
@@ -113,7 +113,7 @@
 .progress-item {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-3);
+    gap: var(--spacing-2);
     padding: var(--spacing-4);
     background-color: var(--color-surface-base);
     border: 1px solid var(--color-border-default);
@@ -145,6 +145,7 @@
     justify-content: space-between;
     align-items: center;
     font-size: var(--font-size-sm);
+    margin-bottom: var(--spacing-2);
 }
 
 .progress-header span:first-child {
@@ -350,7 +351,7 @@
     background-color: var(--color-surface-raised);
     border: 1px solid var(--color-border-default);
     border-radius: var(--radius-lg);
-    padding: var(--spacing-8);
+    padding: var(--spacing-6);
     margin-bottom: var(--spacing-8);
 }
 
@@ -360,7 +361,7 @@
 }
 
 .builder-settings h3 {
-    margin: var(--spacing-8) 0 var(--spacing-6) 0;
+    margin: var(--spacing-6) 0 var(--spacing-4) 0;
     font-size: var(--font-size-lg);
     font-weight: var(--font-weight-semibold);
     color: var(--color-text-primary);
@@ -377,6 +378,13 @@
     font-weight: var(--font-weight-medium);
     color: var(--color-text-primary);
     margin-bottom: var(--spacing-2);
+}
+
+/* Main section label styled as h3 */
+.builder-settings .form-group label.section-label {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    margin-bottom: var(--spacing-3);
 }
 
 .composition-grid {
@@ -442,15 +450,16 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: var(--spacing-8);
+    margin-bottom: var(--spacing-6);
     flex-wrap: wrap;
     gap: var(--spacing-4);
 }
 
 .result-header h3 {
-    font-size: var(--font-size-2xl);
-    font-weight: var(--font-weight-bold);
-    color: var(--color-brand-primary);
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+    margin: 0;
 }
 
 .result-controls {
@@ -561,7 +570,7 @@
    ============================================================================= */
 
 .import-modal-content {
-    padding: var(--spacing-2);
+    padding: 0;
 }
 
 .modal-description {
@@ -596,6 +605,7 @@
 }
 
 .file-input {
+    width: 100%;
     padding: var(--spacing-3);
     font-size: var(--font-size-sm);
     background-color: var(--color-bg-primary);
@@ -610,11 +620,16 @@
 }
 
 .import-textarea {
+    width: 100%;
     font-family: var(--font-family-mono);
     font-size: var(--font-size-sm);
     min-height: 200px;
     background-color: var(--color-bg-primary);
     color: var(--color-text-primary);
+    padding: var(--spacing-3);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-md);
+    resize: vertical;
 }
 
 .preview-success,
