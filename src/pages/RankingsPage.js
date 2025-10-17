@@ -39,7 +39,7 @@ class RankingsPage extends BasePage {
             return `
                 <div class="ranking-card">
                     <h3 class="ranking-title">${positionName}s</h3>
-                    ${this.renderEmpty('No players at this position', '📊')}
+                    ${this.renderEmpty('No players at this position')}
                 </div>
             `;
         }
