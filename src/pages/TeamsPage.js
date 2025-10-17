@@ -14,7 +14,9 @@ class TeamsPage extends BasePage {
         this.state = {
             teams: null,
             isOptimizing: false,
-            showEloRatings: true
+            showEloRatings: true,
+            teamCount: 2,
+            composition: { S: 1, OPP: 1, OH: 2, MB: 2, L: 0 }
         };
     }
 
@@ -55,7 +57,7 @@ class TeamsPage extends BasePage {
                         <input 
                             type="number" 
                             id="teamCount" 
-                            value="2" 
+                            value="${this.state.teamCount}" 
                             min="1" 
                             max="10"
                             class="team-count-input"
@@ -92,15 +94,13 @@ class TeamsPage extends BasePage {
             'L': 'Libero'
         };
 
-        const defaults = { S: 1, OPP: 1, OH: 2, MB: 2, L: 0 };
-
         return Object.entries(positions).map(([key, name]) => `
             <div class="composition-item">
                 <label>${name}</label>
                 <input 
                     type="number" 
                     id="comp_${key}" 
-                    value="${defaults[key]}" 
+                    value="${this.state.composition[key]}" 
                     min="0" 
                     max="6"
                     class="composition-input"
@@ -192,7 +192,12 @@ class TeamsPage extends BasePage {
     attachEventListeners() {
         // Update players per team
         const updatePlayersPerTeam = () => {
-            const teamCount = parseInt(this.$('#teamCount')?.value) || 2;
+            const teamCountInput = this.$('#teamCount');
+            const teamCount = parseInt(teamCountInput?.value) || 2;
+            
+            // Сохраняем teamCount в state
+            this.setState({ teamCount }, { silent: true });
+            
             const composition = this.getComposition();
             const total = Object.values(composition).reduce((sum, val) => sum + val, 0);
             const perTeam = this.$('#playersPerTeam');
@@ -206,8 +211,13 @@ class TeamsPage extends BasePage {
         }
 
         // Composition inputs
-        this.$$('.composition-input').forEach(input => {
-            input.addEventListener('input', updatePlayersPerTeam);
+        this.$('.composition-input').forEach(input => {
+            input.addEventListener('input', (e) => {
+                const pos = input.id.replace('comp_', '');
+                const value = parseInt(e.target.value) || 0;
+                this.state.composition[pos] = value;
+                updatePlayersPerTeam();
+            });
         });
 
         // Initial update
@@ -252,13 +262,14 @@ class TeamsPage extends BasePage {
         try {
             this.setState({ isOptimizing: true });
 
-            const teamCount = parseInt(this.$('#teamCount')?.value) || 2;
+            const teamCount = this.state.teamCount;
             const composition = this.getComposition();
             const players = playerService.getAll();
 
             // Validate
             if (Object.values(composition).every(v => v === 0)) {
                 toast.error('Please select at least one player per team');
+                this.setState({ isOptimizing: false });
                 return;
             }
 
