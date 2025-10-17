@@ -61,7 +61,7 @@ class SettingsPage extends BasePage {
     renderWelcomeGuide() {
         return `
             <div class="welcome-guide">
-                <h3>👋 Welcome to VolleyRank!</h3>
+                <h3>Welcome to VolleyRank!</h3>
                 <p>Get started in 3 easy steps:</p>
                 <ol>
                     <li><strong>Add players</strong> with their positions below</li>
@@ -151,7 +151,7 @@ class SettingsPage extends BasePage {
 
     renderPlayersList(players) {
         if (players.length === 0) {
-            return this.renderEmpty('No players yet. Add your first player above!', '👥');
+            return this.renderEmpty('No players yet. Add your first player above!');
         }
 
         const sorted = [...players].sort((a, b) => {
@@ -432,7 +432,7 @@ class SettingsPage extends BasePage {
                         }).join('')}
                     </div>
                     <div class="warning-box">
-                        <div class="warning-title">⚠️ Warning</div>
+                        <div class="warning-title">Warning</div>
                         <div class="warning-text">
                             This will reset ratings to 1500 and clear all comparison history for selected positions.
                         </div>
@@ -513,7 +513,7 @@ class SettingsPage extends BasePage {
                             }).join('')}
                     </div>
                     <div class="warning-box warning-box-danger">
-                        <div class="warning-title">⚠️ Warning</div>
+                        <div class="warning-title">Warning</div>
                         <div class="warning-text">
                             This will reset ALL players' ratings to 1500 and clear ALL comparison history for selected positions. This action cannot be undone!
                         </div>
@@ -646,7 +646,7 @@ class SettingsPage extends BasePage {
 
             preview.innerHTML = `
                 <div class="preview-success">
-                    <strong>✓ Found ${players.length} player(s)</strong>
+                    <strong>Found ${players.length} player(s)</strong>
                     <div class="preview-list">
                         ${players.map(p => `
                             <div class="preview-item">• ${this.escape(p.name)} - ${p.positions.join(', ')}</div>
@@ -657,7 +657,7 @@ class SettingsPage extends BasePage {
         } catch (error) {
             preview.innerHTML = `
                 <div class="preview-error">
-                    <strong>✗ Error:</strong> ${this.escape(error.message)}
+                    <strong>Error:</strong> ${this.escape(error.message)}
                 </div>
             `;
         }
