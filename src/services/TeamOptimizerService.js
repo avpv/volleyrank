@@ -112,7 +112,6 @@ class TeamBuilder {
                 .sort((a, b) => b.getRatingFor(position) - a.getRatingFor(position))
                 .slice(0, totalNeeded);
 
-            // Round-robin distribution
             eligiblePlayers.forEach((player, index) => {
                 const teamIndex = index % this.teamCount;
                 this.teams[teamIndex].push(player.toPlainObject(position));
@@ -133,7 +132,6 @@ class TeamBuilder {
                 .sort((a, b) => b.getRatingFor(position) - a.getRatingFor(position))
                 .slice(0, totalNeeded);
 
-            // Snake draft
             for (let round = 0; round < requiredCount; round++) {
                 for (let teamIndex = 0; teamIndex < this.teamCount; teamIndex++) {
                     const playerIndex = round * this.teamCount + teamIndex;
@@ -215,7 +213,12 @@ class SimpleOptimizer {
 
         for (let iter = 0; iter < this.maxIterations; iter++) {
             const neighbor = this.cloneTeams(current);
-            this.performSwap(neighbor, positions);
+            
+            if (Math.random() < 0.8) {
+                this.performSwap(neighbor, positions);
+            } else {
+                this.performPositionSwap(neighbor);
+            }
             
             const neighborScore = this.evaluateSolution(neighbor);
             const delta = neighborScore - currentScore;
@@ -285,6 +288,37 @@ class SimpleOptimizer {
         }
     }
 
+    performPositionSwap(teams) {
+        if (teams.length === 0) return;
+        
+        const teamIndex = Math.floor(Math.random() * teams.length);
+        const team = teams[teamIndex];
+        
+        if (team.length < 2) return;
+        
+        const idx1 = Math.floor(Math.random() * team.length);
+        let idx2;
+        do {
+            idx2 = Math.floor(Math.random() * team.length);
+        } while (idx1 === idx2);
+        
+        const p1 = team[idx1];
+        const p2 = team[idx2];
+        
+        if (p1.positions.includes(p2.assignedPosition) && 
+            p2.positions.includes(p1.assignedPosition)) {
+            
+            const tempPos = p1.assignedPosition;
+            const tempRating = p1.positionRating;
+            
+            p1.assignedPosition = p2.assignedPosition;
+            p1.positionRating = p1.ratings[p2.assignedPosition] || 1500;
+            
+            p2.assignedPosition = tempPos;
+            p2.positionRating = p2.ratings[tempPos] || 1500;
+        }
+    }
+
     cloneTeams(teams) {
         return teams.map(team => team.map(player => ({ ...player })));
     }
@@ -297,9 +331,6 @@ class TeamOptimizerService {
         this.isOptimizing = false;
     }
 
-    /**
-     * Main optimization method - maintains compatibility with existing API
-     */
     async optimize(composition, teamCount, players) {
         if (this.isOptimizing) {
             throw new Error('Optimization already in progress');
@@ -308,10 +339,8 @@ class TeamOptimizerService {
         this.isOptimizing = true;
 
         try {
-            // Validate input
             this.validate(composition, teamCount, players);
 
-            // Build initial solutions
             const builder = new TeamBuilder(composition, teamCount, players);
             
             const candidates = [
@@ -320,37 +349,30 @@ class TeamOptimizerService {
                 builder.createRandomSolution()
             ];
 
-            // Get active positions
             const positions = Object.keys(composition).filter(pos => composition[pos] > 0);
 
-            // Optimize each candidate
             const optimizedCandidates = await Promise.all(
                 candidates.map(candidate => this.optimizer.optimize(candidate, positions))
             );
 
-            // Select best solution
             const scores = optimizedCandidates.map(c => this.optimizer.evaluateSolution(c));
             const bestIdx = scores.indexOf(Math.min(...scores));
             const bestTeams = optimizedCandidates[bestIdx];
 
-            // Sort teams by strength
             bestTeams.sort((a, b) => {
                 const aStrength = a.reduce((sum, p) => sum + p.positionRating, 0);
                 const bStrength = b.reduce((sum, p) => sum + p.positionRating, 0);
                 return bStrength - aStrength;
             });
 
-            // Calculate balance using eloService
             const balance = eloService.evaluateBalance(bestTeams);
             
-            // Get unused players
             const usedIds = new Set();
             bestTeams.forEach(team => team.forEach(p => usedIds.add(p.id)));
             const unusedPlayers = players.filter(p => !usedIds.has(p.id));
 
             const algorithmNames = ['Balanced Distribution', 'Snake Draft', 'Random Distribution'];
 
-            // Return in expected format
             return {
                 teams: bestTeams,
                 balance: {
@@ -373,9 +395,6 @@ class TeamOptimizerService {
         }
     }
 
-    /**
-     * Validate team requirements
-     */
     validate(composition, teamCount, players) {
         const errors = [];
         
@@ -413,5 +432,4 @@ class TeamOptimizerService {
     }
 }
 
-// Export singleton instance (maintains existing API)
 export default new TeamOptimizerService();
