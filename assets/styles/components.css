@@ -396,6 +396,9 @@ select.form-control {
     padding: var(--spacing-5);
     transition: var(--transition-default);
     position: relative;
+    display: flex;
+    flex-direction: column;
+    min-height: 280px;
 }
 
 .player-card:hover {
@@ -455,6 +458,7 @@ select.form-control {
     border-bottom: 1px solid var(--color-border-default);
     padding-bottom: var(--spacing-4);
     transition: var(--transition-default);
+    flex: 1;
 }
 
 /* Ensure border remains visible when card is hovered */
@@ -468,6 +472,7 @@ select.form-control {
     gap: var(--spacing-3);
     padding-top: var(--spacing-4);
     flex-wrap: wrap;
+    margin-top: auto;
 }
 
 /* Remove small button styling from player actions to match form-actions */
