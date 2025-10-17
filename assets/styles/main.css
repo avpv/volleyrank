@@ -313,6 +313,26 @@ a:hover {
     margin: 0;
 }
 
+.app-title-link {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    align-items: center;
+    transition: var(--transition-default);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-2) var(--spacing-3);
+    margin: calc(var(--spacing-2) * -1) calc(var(--spacing-3) * -1);
+}
+
+.app-title-link:hover {
+    text-decoration: none;
+    opacity: 0.8;
+}
+
+.app-title-link:active {
+    transform: scale(0.98);
+}
+
 .app-subtitle {
     font-size: var(--font-size-sm);
     color: var(--color-text-tertiary);
