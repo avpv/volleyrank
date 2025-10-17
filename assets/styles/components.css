@@ -629,7 +629,7 @@ select.form-control {
 
 .stat-card {
     text-align: center;
-    padding: var(--spacing-6);
+    padding: var(--spacing-4);
     background-color: var(--color-surface-raised);
     border: 1px solid var(--color-border-default);
     border-radius: var(--radius-lg);
@@ -641,7 +641,7 @@ select.form-control {
 }
 
 .stat-number {
-    font-size: var(--font-size-4xl);
+    font-size: var(--font-size-3xl);
     font-weight: var(--font-weight-bold);
     color: var(--color-brand-primary);
     line-height: var(--line-height-tight);
@@ -649,7 +649,7 @@ select.form-control {
 }
 
 .stat-label {
-    font-size: var(--font-size-sm);
+    font-size: var(--font-size-xs);
     color: var(--color-text-tertiary);
     text-transform: uppercase;
     letter-spacing: var(--letter-spacing-wide);
@@ -859,19 +859,19 @@ select.form-control {
     align-items: center;
     justify-content: center;
     background: transparent;
-    border: none;
+    border: 1px solid transparent;
     border-radius: var(--radius-md);
     color: var(--color-text-secondary);
-    font-size: var(--font-size-xl);
+    font-size: var(--font-size-2xl);
     line-height: 1;
     cursor: pointer;
     transition: var(--transition-default);
-    position: relative;
     padding: 0;
 }
 
 .modal-close:hover {
     background: var(--color-surface-overlay);
+    border-color: var(--color-border-default);
     color: var(--color-text-primary);
 }
 
@@ -882,7 +882,7 @@ select.form-control {
 .modal-close::before {
     content: '×';
     display: block;
-    font-weight: var(--font-weight-light);
+    font-weight: var(--font-weight-regular);
 }
 
 .modal-body {
