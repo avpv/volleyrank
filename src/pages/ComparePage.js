@@ -108,7 +108,7 @@ class ComparePage extends BasePage {
 
     renderComparisonArea() {
         if (!this.selectedPosition) {
-            return this.renderEmpty('Select a position to start comparing players', '🏐');
+            return this.renderEmpty('Select a position to start comparing players');
         }
 
         const status = comparisonService.checkStatus(this.selectedPosition);
@@ -116,7 +116,7 @@ class ComparePage extends BasePage {
         if (!status.canCompare) {
             return `
                 <div class="comparison-area">
-                    ${this.renderEmpty(status.reason, '✓')}
+                    ${this.renderEmpty(status.reason)}
                 </div>
             `;
         }
@@ -187,7 +187,7 @@ class ComparePage extends BasePage {
             });
         }
 
-        // Comparison cards - ИСПРАВЛЕНИЕ: безопасная проверка
+        // Comparison cards
         const cards = this.$$('.player-card.clickable');
         if (cards && cards.length > 0) {
             cards.forEach(card => {
