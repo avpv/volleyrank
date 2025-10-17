@@ -1,1231 +1,905 @@
 /**
- * TeamOptimizerService - Advanced team balancing with hybrid algorithms
- * Uses Genetic Algorithm, Simulated Annealing, and Tabu Search with hyper-heuristic layer
+ * TeamOptimizerService - Team balancing with advanced algorithms
+ * Uses Genetic Algorithm, Simulated Annealing, and Tabu Search
  */
+
 import eloService from './EloService.js';
+import { EventEmitter } from 'events';
 
-// ========== CONSTANTS AND CONFIGURATION ==========
+// ========== CORE CONSTANTS ==========
 
-const ALGORITHM_NAMES = {
-    GENETIC: 'Genetic Algorithm',
-    TABU: 'Tabu Search', 
-    ANNEALING: 'Simulated Annealing',
-    LOCAL: 'Local Search'
+const OPTIMIZATION_STRATEGIES = {
+    BALANCED: 'balanced',
+    COMPETITIVE: 'competitive', 
+    DEVELOPMENTAL: 'developmental',
+    POSITION_FOCUSED: 'position_focused'
 };
 
-const POSITIONS = {
-    'S': 'Setter',
-    'OPP': 'Opposite', 
-    'OH': 'Outside Hitter',
-    'MB': 'Middle Blocker',
-    'L': 'Libero'
+const POSITION_GROUPS = {
+    'S': { name: 'Setter', weight: 1.3, priority: 1 },
+    'OPP': { name: 'Opposite', weight: 1.2, priority: 2 },
+    'OH': { name: 'Outside Hitter', weight: 1.1, priority: 3 },
+    'MB': { name: 'Middle Blocker', weight: 1.0, priority: 4 },
+    'L': { name: 'Libero', weight: 0.9, priority: 5 }
 };
 
-const DEFAULT_CONFIG = {
-    useGeneticAlgorithm: true,
-    useTabuSearch: true,
-    useSimulatedAnnealing: true,
-    adaptiveParameters: {
-        positionBalanceWeight: 0.3,
-        varianceWeight: 0.5
-    },
-    algorithms: {
-        geneticAlgorithm: {
-            populationSize: 20,
-            generationCount: 100,
-            mutationRate: 0.15,
-            crossoverRate: 0.7,
-            elitismCount: 2,
-            tournamentSize: 3,
-            maxStagnation: 20,
-            useHyperHeuristic: true
-        },
-        tabuSearch: {
-            tabuTenure: 50,
-            iterations: 5000,
-            neighborCount: 20,
-            aspirationCriteria: true,
-            diversification: { enabled: true, frequency: 1000 },
-            useHyperHeuristic: true
-        },
-        simulatedAnnealing: {
-            initialTemperature: 1000,
-            coolingRate: 0.995,
-            iterations: 50000,
-            reheatEnabled: true,
-            reheatTemperature: 500,
-            reheatIterations: 10000,
-            equilibriumIterations: 100,
-            useHyperHeuristic: true
-        },
-        localSearch: {
-            iterations: 1000,
-            searchStrategy: 'first-improvement', // 'first-improvement' or 'best-improvement'
-            neighborhoodSize: 10,
-            perturbationEnabled: true,
-            perturbationStrength: 0.1,
-            useHyperHeuristic: true
-        }
-    }
+const OPERATION_TYPES = {
+    SWAP_SAME_POSITION: 'swap_same_position',
+    SWAP_CROSS_POSITION: 'swap_cross_position',
+    POSITION_REASSIGNMENT: 'position_reassignment',
+    MULTI_SWAP: 'multi_swap'
 };
 
-// ========== UTILITY FUNCTIONS ==========
+// ========== DATA MODELS ==========
 
-/**
- * Deep merge utility with proper object checking
- */
-function deepMerge(target, source) {
-    for (const key in source) {
-        if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
-            if (!target[key] || typeof target[key] !== 'object') {
-                target[key] = {};
-            }
-            deepMerge(target[key], source[key]);
-        } else {
-            target[key] = source[key];
-        }
-    }
-    return target;
-}
-
-/**
- * Yield to event loop to prevent blocking
- */
-function yieldToEventLoop() {
-    return new Promise(resolve => setTimeout(resolve, 0));
-}
-
-// ========== HEURISTIC MANAGER ==========
-
-/**
- * Manages heuristic operator selection with adaptive scoring
- */
-class HeuristicManager {
-    constructor(operators, rewardMultiplier = 1.0) {
-        this.operators = operators;
-        this.scores = Object.fromEntries(operators.map(op => [op.name, 1.0]));
-        this.rewardMultiplier = rewardMultiplier;
-        this.decayRate = 0.98;
-        this.minScore = 0.1;
+class Player {
+    constructor(data) {
+        this.id = data.id;
+        this.name = data.name;
+        this.positions = data.positions || []; // Ordered by preference/competence
+        this.ratings = data.ratings || {};
+        this.assignedPosition = data.assignedPosition || null;
+        this.positionRating = data.positionRating || 0;
+        this.flexibilityScore = this.calculateFlexibilityScore();
+        
+        this.validate();
     }
 
-    selectOperator() {
-        const totalScore = Object.values(this.scores).reduce((sum, score) => sum + score, 0);
-        let randomPick = Math.random() * totalScore;
-        
-        for (const operator of this.operators) {
-            randomPick -= this.scores[operator.name];
-            if (randomPick <= 0) return operator;
+    validate() {
+        if (!this.id) throw new Error('Player ID required');
+        if (!this.name) throw new Error('Player name required');
+        if (!this.positions || this.positions.length === 0) {
+            throw new Error('Player must have at least one position');
         }
         
-        return this.operators[0];
+        // Ensure primary position has rating
+        const primary = this.positions[0];
+        if (!this.ratings[primary]) {
+            this.ratings[primary] = 1500;
+        }
     }
 
-    updateScore(operatorName, improvement) {
-        // Apply decay to all scores
-        for (const name in this.scores) {
-            this.scores[name] = Math.max(this.minScore, this.scores[name] * this.decayRate);
+    calculateFlexibilityScore() {
+        return this.positions.length / Object.keys(POSITION_GROUPS).length;
+    }
+
+    canPlay(position) {
+        return this.positions.includes(position);
+    }
+
+    getBestPosition() {
+        return this.positions.reduce((best, pos) => {
+            const currentRating = this.ratings[pos] || 0;
+            const bestRating = this.ratings[best] || 0;
+            return currentRating > bestRating ? pos : best;
+        }, this.positions[0]);
+    }
+
+    getRatingFor(position) {
+        return this.ratings[position] || this.ratings[this.positions[0]] || 1500;
+    }
+
+    assignPosition(position) {
+        if (!this.canPlay(position)) {
+            throw new Error(`Player ${this.id} cannot play position ${position}`);
         }
-        
-        // Reward operator that caused improvement
-        if (improvement > 0) {
-            this.scores[operatorName] += (1 + Math.log1p(improvement)) * this.rewardMultiplier;
-        }
+        this.assignedPosition = position;
+        this.positionRating = this.getRatingFor(position);
+        return this;
+    }
+
+    clone() {
+        return new Player({
+            ...this,
+            positions: [...this.positions],
+            ratings: { ...this.ratings }
+        });
     }
 }
 
-// ========== VALIDATION SERVICE ==========
-
-class ValidationService {
-    constructor(positions) {
-        this.positions = positions;
+class Team {
+    constructor(id) {
+        this.id = id;
+        this.players = [];
+        this.positionCounts = {};
+        this.composition = {};
     }
 
-    validateInput(composition, teamCount, players) {
-        const errors = [];
-
-        if (!composition || typeof composition !== 'object') {
-            errors.push('Invalid composition: must be an object');
-        }
-        if (!Number.isInteger(teamCount) || teamCount <= 0) {
-            errors.push('Invalid team count: must be positive integer');
-        }
-        if (!Array.isArray(players) || players.length === 0) {
-            errors.push('Invalid players: must be non-empty array');
-        }
-
-        if (errors.length > 0) {
-            throw new Error(`Validation failed: ${errors.join(', ')}`);
-        }
+    addPlayer(player, position) {
+        const assignedPlayer = player.clone().assignPosition(position);
+        this.players.push(assignedPlayer);
+        this.positionCounts[position] = (this.positionCounts[position] || 0) + 1;
+        return this;
     }
 
-    validateComposition(composition, teamCount, players) {
-        const playersByPosition = this.groupPlayersByPosition(players);
-        const errors = [];
-        const warnings = [];
-        let totalNeeded = 0;
+    removePlayer(playerId) {
+        const index = this.players.findIndex(p => p.id === playerId);
+        if (index !== -1) {
+            const player = this.players[index];
+            this.positionCounts[player.assignedPosition]--;
+            this.players.splice(index, 1);
+            return player;
+        }
+        return null;
+    }
 
-        Object.entries(composition).forEach(([position, count]) => {
-            const needed = count * teamCount;
-            const available = playersByPosition[position]?.length || 0;
-            totalNeeded += needed;
+    getPlayersByPosition(position) {
+        return this.players.filter(p => p.assignedPosition === position);
+    }
 
-            if (available < needed) {
-                errors.push({
-                    position,
-                    needed,
-                    available,
-                    shortage: needed - available,
-                    message: `Not enough ${this.positions[position]}s: need ${needed}, have ${available}`
-                });
-            } else if (available === needed) {
-                warnings.push({
-                    position,
-                    message: `Exact match for ${this.positions[position]}s - no substitutes available`
-                });
-            }
+    getPositionStrength(position) {
+        return this.getPlayersByPosition(position)
+            .reduce((sum, player) => sum + player.positionRating, 0);
+    }
+
+    getTotalStrength() {
+        return this.players.reduce((sum, player) => sum + player.positionRating, 0);
+    }
+
+    isValid(composition) {
+        return Object.keys(composition).every(position => 
+            this.positionCounts[position] === composition[position]
+        );
+    }
+
+    clone() {
+        const newTeam = new Team(this.id);
+        newTeam.players = this.players.map(p => p.clone());
+        newTeam.positionCounts = { ...this.positionCounts };
+        newTeam.composition = { ...this.composition };
+        return newTeam;
+    }
+}
+
+class Solution {
+    constructor(teams, composition) {
+        this.teams = teams.map(team => team.clone());
+        this.composition = { ...composition };
+        this.fitness = this.calculateFitness();
+    }
+
+    calculateFitness() {
+        const teamStrengths = this.teams.map(team => team.getTotalStrength());
+        const maxStrength = Math.max(...teamStrengths);
+        const minStrength = Math.min(...teamStrengths);
+        const balanceScore = maxStrength - minStrength;
+
+        let positionBalanceScore = 0;
+        Object.keys(this.composition).forEach(position => {
+            const positionStrengths = this.teams.map(team => team.getPositionStrength(position));
+            positionBalanceScore += Math.max(...positionStrengths) - Math.min(...positionStrengths);
         });
 
-        return {
-            isValid: errors.length === 0,
-            errors,
-            warnings,
-            totalNeeded,
-            totalAvailable: players.length,
-            unusedPlayers: players.length - totalNeeded,
-            playersPerTeam: totalNeeded / teamCount
-        };
-    }
-
-    groupPlayersByPosition(players) {
-        const grouped = Object.keys(this.positions).reduce((acc, pos) => {
-            acc[pos] = [];
-            return acc;
-        }, {});
-
-        players.forEach(player => {
-            player.positions?.forEach(position => {
-                if (grouped[position]) {
-                    grouped[position].push({
-                        ...player,
-                        assignedPosition: position,
-                        positionRating: player.ratings[position] || 1500,
-                        rating: player.ratings[position] || 1500
-                    });
-                }
+        let flexibilityPenalty = 0;
+        this.teams.forEach(team => {
+            team.players.forEach(player => {
+                const bestRating = player.ratings[player.getBestPosition()] || 0;
+                const currentRating = player.positionRating;
+                flexibilityPenalty += Math.max(0, bestRating - currentRating);
             });
         });
 
-        return grouped;
+        return balanceScore + positionBalanceScore * 0.3 + flexibilityPenalty * 0.1;
+    }
+
+    isValid() {
+        return this.teams.every(team => team.isValid(this.composition));
+    }
+
+    clone() {
+        return new Solution(this.teams, this.composition);
     }
 }
 
-// ========== SOLUTION GENERATOR ==========
+// ========== CORE OPTIMIZATION ENGINE ==========
 
-class SolutionGenerator {
-    constructor(validationService) {
-        this.validationService = validationService;
+class PositionAwareOptimizationEngine {
+    constructor() {
+        this.operationRegistry = new Map();
+        this.initializeOperations();
     }
 
-    generateInitialSolutions(composition, teamCount, playersByPosition) {
-        return [
-            this.createBalancedSolution(composition, teamCount, playersByPosition),
-            this.createSnakeDraftSolution(composition, teamCount, playersByPosition),
-            ...Array.from({ length: 3 }, () => 
-                this.createRandomSolution(composition, teamCount, playersByPosition)
-            ),
-            this.createPositionFocusedSolution(composition, teamCount, playersByPosition)
-        ];
-    }
-
-    createBalancedSolution(composition, teamCount, playersByPosition) {
-        const teams = Array.from({ length: teamCount }, () => []);
-        const usedIds = new Set();
-        
-        const positionOrder = this.getPositionOrderByScarcity(composition, teamCount, playersByPosition);
-        
-        positionOrder.forEach(([position, neededCount]) => {
-            const totalNeeded = neededCount * teamCount;
-            const players = this.getAvailablePlayers(playersByPosition[position], usedIds, totalNeeded);
-            
-            this.distributePlayersRoundRobin(teams, players, neededCount, usedIds);
-        });
-        
-        return teams;
-    }
-
-    createSnakeDraftSolution(composition, teamCount, playersByPosition) {
-        const teams = Array.from({ length: teamCount }, () => []);
-        const usedIds = new Set();
-
-        const positionOrder = this.getPositionOrderByScarcity(composition, teamCount, playersByPosition);
-
-        positionOrder.forEach(([position, neededCount]) => {
-            const totalNeeded = neededCount * teamCount;
-            const players = this.getAvailablePlayers(playersByPosition[position], usedIds, totalNeeded);
-
-            this.distributePlayersSnakeDraft(teams, players, neededCount, usedIds);
+    initializeOperations() {
+        this.operationRegistry.set(OPERATION_TYPES.SWAP_SAME_POSITION, {
+            execute: this.swapSamePosition.bind(this),
+            description: 'Swap players of same position between teams'
         });
 
-        return teams;
-    }
-
-    createRandomSolution(composition, teamCount, playersByPosition) {
-        const teams = Array.from({ length: teamCount }, () => []);
-        const usedIds = new Set();
-
-        const positionOrder = this.getPositionOrderByScarcity(composition, teamCount, playersByPosition);
-
-        positionOrder.forEach(([position, neededCount]) => {
-            const totalNeeded = neededCount * teamCount;
-            let players = this.getAvailablePlayers(playersByPosition[position], usedIds, totalNeeded);
-            
-            players = this.shuffleArray(players);
-
-            this.distributePlayersSequentially(teams, players, neededCount, usedIds);
+        this.operationRegistry.set(OPERATION_TYPES.SWAP_CROSS_POSITION, {
+            execute: this.swapCrossPosition.bind(this),
+            description: 'Swap players of different positions between teams with position reassignment'
         });
 
-        return teams;
-    }
-
-    createPositionFocusedSolution(composition, teamCount, playersByPosition) {
-        const teams = Array.from({ length: teamCount }, () => []);
-        const usedIds = new Set();
-        
-        const positionPriority = ['S', 'OPP', 'OH', 'MB', 'L'];
-        const positionOrder = Object.entries(composition)
-            .filter(([pos, count]) => count > 0)
-            .sort((a, b) => {
-                const aPriority = positionPriority.indexOf(a[0]);
-                const bPriority = positionPriority.indexOf(b[0]);
-                return aPriority - bPriority;
-            });
-        
-        positionOrder.forEach(([position, neededCount]) => {
-            const totalNeeded = neededCount * teamCount;
-            const players = this.getAvailablePlayers(playersByPosition[position], usedIds, totalNeeded);
-            
-            this.distributePlayersByRound(teams, players, neededCount, usedIds);
+        this.operationRegistry.set(OPERATION_TYPES.POSITION_REASSIGNMENT, {
+            execute: this.reassignPositions.bind(this),
+            description: 'Reassign positions within a team'
         });
-        
-        return teams;
+
+        this.operationRegistry.set(OPERATION_TYPES.MULTI_SWAP, {
+            execute: this.multiSwap.bind(this),
+            description: 'Multi-player swap between teams'
+        });
     }
 
-    // Helper methods for solution generation
-    getPositionOrderByScarcity(composition, teamCount, playersByPosition) {
-        return Object.entries(composition)
-            .filter(([pos, count]) => count > 0)
-            .sort((a, b) => {
-                const aAvail = (playersByPosition[a[0]] || []).length;
-                const bAvail = (playersByPosition[b[0]] || []).length;
-                const aRatio = aAvail / (a[1] * teamCount);
-                const bRatio = bAvail / (b[1] * teamCount);
-                return aRatio - bRatio;
-            });
-    }
+    /**
+     * Operation 1: Swap players of the same position between two teams
+     * This maintains composition as positions don't change
+     */
+    swapSamePosition(solution, team1Index, team2Index, position) {
+        const newSolution = solution.clone();
+        const team1 = newSolution.teams[team1Index];
+        const team2 = newSolution.teams[team2Index];
 
-    getAvailablePlayers(players, usedIds, totalNeeded) {
-        return (players || [])
-            .filter(p => !usedIds.has(p.id))
-            .sort((a, b) => b.positionRating - a.positionRating)
-            .slice(0, totalNeeded);
-    }
+        const team1Players = team1.getPlayersByPosition(position);
+        const team2Players = team2.getPlayersByPosition(position);
 
-    distributePlayersRoundRobin(teams, players, neededCount, usedIds) {
-        for (let teamIdx = 0; teamIdx < teams.length; teamIdx++) {
-            for (let i = 0; i < neededCount; i++) {
-                const playerIdx = teamIdx * neededCount + i;
-                if (playerIdx < players.length) {
-                    teams[teamIdx].push(players[playerIdx]);
-                    usedIds.add(players[playerIdx].id);
-                }
-            }
+        if (team1Players.length === 0 || team2Players.length === 0) {
+            return null; // Invalid operation
         }
+
+        const player1 = team1Players[Math.floor(Math.random() * team1Players.length)];
+        const player2 = team2Players[Math.floor(Math.random() * team2Players.length)];
+
+        // Remove and re-add with same positions
+        team1.removePlayer(player1.id);
+        team2.removePlayer(player2.id);
+
+        team1.addPlayer(player2, position);
+        team2.addPlayer(player1, position);
+
+        return newSolution.isValid() ? newSolution : null;
     }
 
-    distributePlayersSnakeDraft(teams, players, neededCount, usedIds) {
-        let playerIndex = 0;
-        for (let round = 0; round < neededCount; round++) {
-            const isEvenRound = round % 2 === 0;
+    /**
+     * Operation 2: Cross-position swap with position reassignment
+     * Players swap teams AND positions, maintaining composition
+     */
+    swapCrossPosition(solution, team1Index, team2Index, position1, position2) {
+        const newSolution = solution.clone();
+        const team1 = newSolution.teams[team1Index];
+        const team2 = newSolution.teams[team2Index];
+
+        const team1Players = team1.getPlayersByPosition(position1);
+        const team2Players = team2.getPlayersByPosition(position2);
+
+        if (team1Players.length === 0 || team2Players.length === 0) {
+            return null;
+        }
+
+        const player1 = team1Players[Math.floor(Math.random() * team1Players.length)];
+        const player2 = team2Players[Math.floor(Math.random() * team2Players.length)];
+
+        // Check if players can play the target positions
+        if (!player1.canPlay(position2) || !player2.canPlay(position1)) {
+            return null;
+        }
+
+        // Remove players
+        team1.removePlayer(player1.id);
+        team2.removePlayer(player2.id);
+
+        // Add with swapped positions
+        team1.addPlayer(player2, position1);
+        team2.addPlayer(player1, position2);
+
+        return newSolution.isValid() ? newSolution : null;
+    }
+
+    /**
+     * Operation 3: Position reassignment within a single team
+     * Swaps positions between two players in the same team
+     */
+    reassignPositions(solution, teamIndex, player1Index, player2Index) {
+        const newSolution = solution.clone();
+        const team = newSolution.teams[teamIndex];
+        const player1 = team.players[player1Index];
+        const player2 = team.players[player2Index];
+
+        // Check if players can swap positions
+        if (!player1.canPlay(player2.assignedPosition) || 
+            !player2.canPlay(player1.assignedPosition)) {
+            return null;
+        }
+
+        const tempPosition = player1.assignedPosition;
+        const tempRating = player1.positionRating;
+
+        // Update player1
+        player1.assignedPosition = player2.assignedPosition;
+        player1.positionRating = player1.getRatingFor(player2.assignedPosition);
+
+        // Update player2
+        player2.assignedPosition = tempPosition;
+        player2.positionRating = player2.getRatingFor(tempPosition);
+
+        // Update position counts
+        team.positionCounts[player1.assignedPosition] = team.getPlayersByPosition(player1.assignedPosition).length;
+        team.positionCounts[player2.assignedPosition] = team.getPlayersByPosition(player2.assignedPosition).length;
+
+        return newSolution.isValid() ? newSolution : null;
+    }
+
+    /**
+     * Operation 4: Multi-player swap between teams
+     * Complex operation that maintains composition through multiple swaps
+     */
+    multiSwap(solution, operations) {
+        const newSolution = solution.clone();
+
+        for (const op of operations) {
+            const { type, team1, team2, position1, position2, player1, player2 } = op;
             
-            for (let teamIdx = 0; teamIdx < teams.length; teamIdx++) {
-                if (playerIndex < players.length) {
-                    const actualTeamIdx = isEvenRound ? teamIdx : (teams.length - 1 - teamIdx);
-                    teams[actualTeamIdx].push(players[playerIndex]);
-                    usedIds.add(players[playerIndex].id);
-                    playerIndex++;
-                }
+            switch (type) {
+                case 'direct_swap':
+                    const result = this.swapCrossPosition(newSolution, team1, team2, position1, position2);
+                    if (!result) return null;
+                    break;
+                    
+                case 'reassignment':
+                    const reassignResult = this.reassignPositions(newSolution, team1, player1, player2);
+                    if (!reassignResult) return null;
+                    break;
+                    
+                default:
+                    return null;
             }
         }
+
+        return newSolution.isValid() ? newSolution : null;
     }
 
-    distributePlayersSequentially(teams, players, neededCount, usedIds) {
-        for (let teamIdx = 0; teamIdx < teams.length; teamIdx++) {
-            for (let i = 0; i < neededCount; i++) {
-                const playerIdx = teamIdx * neededCount + i;
-                if (playerIdx < players.length) {
-                    teams[teamIdx].push(players[playerIdx]);
-                    usedIds.add(players[playerIdx].id);
+    generateNeighbors(solution, count = 10) {
+        const neighbors = [];
+        const teams = solution.teams;
+        const positions = Object.keys(solution.composition);
+
+        while (neighbors.length < count) {
+            const operationType = this.getRandomOperationType();
+            const operation = this.operationRegistry.get(operationType);
+            
+            try {
+                let neighbor = null;
+
+                switch (operationType) {
+                    case OPERATION_TYPES.SWAP_SAME_POSITION:
+                        const position = positions[Math.floor(Math.random() * positions.length)];
+                        const [team1, team2] = this.getTwoDifferentRandomIndices(teams.length);
+                        neighbor = operation.execute(solution, team1, team2, position);
+                        break;
+
+                    case OPERATION_TYPES.SWAP_CROSS_POSITION:
+                        const [pos1, pos2] = this.getTwoDifferentRandomElements(positions);
+                        const [t1, t2] = this.getTwoDifferentRandomIndices(teams.length);
+                        neighbor = operation.execute(solution, t1, t2, pos1, pos2);
+                        break;
+
+                    case OPERATION_TYPES.POSITION_REASSIGNMENT:
+                        const teamIdx = Math.floor(Math.random() * teams.length);
+                        const team = teams[teamIdx];
+                        if (team.players.length >= 2) {
+                            const [p1, p2] = this.getTwoDifferentRandomIndices(team.players.length);
+                            neighbor = operation.execute(solution, teamIdx, p1, p2);
+                        }
+                        break;
                 }
+
+                if (neighbor && neighbor.isValid()) {
+                    neighbors.push(neighbor);
+                }
+            } catch (error) {
+                // Continue to next operation
+                continue;
             }
         }
+
+        return neighbors;
     }
 
-    distributePlayersByRound(teams, players, neededCount, usedIds) {
-        for (let i = 0; i < neededCount; i++) {
-            for (let teamIdx = 0; teamIdx < teams.length; teamIdx++) {
-                const playerIdx = teamIdx * neededCount + i;
-                if (playerIdx < players.length) {
-                    teams[teamIdx].push(players[playerIdx]);
-                    usedIds.add(players[playerIdx].id);
-                }
-            }
-        }
+    getRandomOperationType() {
+        const types = Object.values(OPERATION_TYPES);
+        return types[Math.floor(Math.random() * types.length)];
     }
 
-    shuffleArray(array) {
-        const shuffled = [...array];
-        for (let i = shuffled.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-        }
-        return shuffled;
+    getTwoDifferentRandomIndices(max) {
+        const first = Math.floor(Math.random() * max);
+        let second;
+        do {
+            second = Math.floor(Math.random() * max);
+        } while (second === first);
+        return [first, second];
+    }
+
+    getTwoDifferentRandomElements(array) {
+        if (array.length < 2) return [array[0], array[0]];
+        const firstIndex = Math.floor(Math.random() * array.length);
+        let secondIndex;
+        do {
+            secondIndex = Math.floor(Math.random() * array.length);
+        } while (secondIndex === firstIndex);
+        return [array[firstIndex], array[secondIndex]];
     }
 }
 
-// ========== SOLUTION EVALUATOR ==========
+// ==========  ALGORITHMS ==========
 
-class SolutionEvaluator {
+class HybridOptimizationAlgorithm {
     constructor(config) {
         this.config = config;
+        this.engine = new PositionAwareOptimizationEngine();
+        this.bestSolution = null;
+        this.iterations = 0;
     }
 
-    evaluateSolution(teams) {
-        if (!teams?.length) return Infinity;
-
-        const teamStrengths = teams.map(team => 
-            eloService.calculateTeamStrength(team).totalRating
-        );
-
-        const balanceScore = Math.max(...teamStrengths) - Math.min(...teamStrengths);
-        const varianceScore = this.calculateVariance(teamStrengths);
-        const positionImbalanceScore = this.calculatePositionImbalance(teams);
-
-        return balanceScore + 
-               Math.sqrt(varianceScore) * this.config.adaptiveParameters.varianceWeight + 
-               positionImbalanceScore * this.config.adaptiveParameters.positionBalanceWeight;
-    }
-
-    calculateVariance(teamStrengths) {
-        const avg = teamStrengths.reduce((a, b) => a + b, 0) / teamStrengths.length;
-        return teamStrengths.reduce((sum, strength) => 
-            sum + Math.pow(strength - avg, 2), 0) / teamStrengths.length;
-    }
-
-    calculatePositionImbalance(teams) {
-        return Object.keys(POSITIONS).reduce((totalImbalance, position) => {
-            const positionStrengths = teams.map(team =>
-                team.filter(player => player.assignedPosition === position)
-                    .reduce((sum, player) => sum + player.positionRating, 0)
-            );
-
-            const validStrengths = positionStrengths.filter(strength => strength > 0);
-            if (validStrengths.length === 0) return totalImbalance;
-
-            return totalImbalance + (Math.max(...validStrengths) - Math.min(...validStrengths));
-        }, 0);
-    }
-
-    sortTeamsByStrength(teams) {
-        return [...teams].sort((a, b) => 
-            eloService.calculateTeamStrength(b).totalRating - 
-            eloService.calculateTeamStrength(a).totalRating
-        );
-    }
-}
-
-// ========== HEURISTIC OPERATORS ==========
-
-class HeuristicOperators {
-    static performSwap(teams, positions) {
-        if (teams.length < 2) return false;
-
-        const [team1Index, team2Index] = HeuristicOperators.selectDistinctRandomTeams(teams.length);
-        const position = HeuristicOperators.selectRandomPosition(positions);
-
-        return HeuristicOperators.swapPlayersBetweenTeams(teams, team1Index, team2Index, position);
-    }
-
-    static performAdaptiveSwap(teams, positions) {
-        const teamStrengths = teams.map((team, idx) => ({ 
-            idx, 
-            strength: eloService.calculateTeamStrength(team).totalRating 
-        })).sort((a, b) => b.strength - a.strength);
+    async optimize(initialSolution, progressCallback = null) {
+        this.bestSolution = initialSolution;
+        const population = this.initializePopulation(initialSolution);
         
-        const strongestIdx = teamStrengths[0].idx;
-        const weakestIdx = teamStrengths[teamStrengths.length - 1].idx;
-        
-        if (strongestIdx !== weakestIdx && Math.random() < 0.7) {
-            const position = HeuristicOperators.selectRandomPosition(positions);
+        for (let generation = 0; generation < this.config.maxGenerations; generation++) {
+            // Genetic Algorithm Phase
+            const newPopulation = await this.evolvePopulation(population);
             
-            const strongPlayers = teams[strongestIdx].filter(p => p.assignedPosition === position);
-            const weakPlayers = teams[weakestIdx].filter(p => p.assignedPosition === position);
+            // Local Search Phase
+            const improvedPopulation = await this.applyLocalSearch(newPopulation);
             
-            if (strongPlayers.length > 0 && weakPlayers.length > 0) {
-                const weakestInStrong = strongPlayers.reduce((min, p) => 
-                    p.positionRating < min.positionRating ? p : min
-                );
-                const strongestInWeak = weakPlayers.reduce((max, p) => 
-                    p.positionRating > max.positionRating ? p : max
-                );
-                
-                return HeuristicOperators.swapSpecificPlayers(
-                    teams, strongestIdx, weakestInStrong, weakestIdx, strongestInWeak
-                );
-            }
-        }
-        return HeuristicOperators.performSwap(teams, positions);
-    }
-
-    static performDoubleSwap(teams, positions) {
-        if (teams.length < 2) return HeuristicOperators.performSwap(teams, positions);
-
-        const teamStrengths = teams.map((team, idx) => ({ 
-            idx, 
-            strength: eloService.calculateTeamStrength(team).totalRating 
-        })).sort((a, b) => b.strength - a.strength);
-        
-        const strongestIdx = teamStrengths[0].idx;
-        const weakestIdx = teamStrengths[teamStrengths.length - 1].idx;
-        
-        if (strongestIdx === weakestIdx) return HeuristicOperators.performSwap(teams, positions);
-
-        const [position1, position2] = HeuristicOperators.selectDistinctPositions(positions);
-        let swapped = false;
-
-        if (HeuristicOperators.swapPlayersBetweenTeams(teams, strongestIdx, weakestIdx, position1)) {
-            swapped = true;
-        }
-        if (HeuristicOperators.swapPlayersBetweenTeams(teams, strongestIdx, weakestIdx, position2)) {
-            swapped = true;
-        }
-
-        return swapped;
-    }
-
-    static smartMutate(teams, positions) {
-        const positionImbalances = positions.map(pos => {
-            const posStrengths = teams.map(team => 
-                team.filter(p => p.assignedPosition === pos)
-                    .reduce((sum, p) => sum + p.positionRating, 0)
-            );
-            return { 
-                pos, 
-                imbalance: Math.max(...posStrengths) - Math.min(...posStrengths) 
-            };
-        }).sort((a, b) => b.imbalance - a.imbalance);
-        
-        const swapCount = Math.floor(Math.random() * 3) + 1;
-        
-        for (let i = 0; i < swapCount; i++) {
-            const useProblematic = Math.random() < 0.6;
-            const position = useProblematic && positionImbalances.length > 0 
-                ? positionImbalances[0].pos 
-                : HeuristicOperators.selectRandomPosition(positions);
-            
-            HeuristicOperators.performAdaptiveSwap(teams, [position]);
-        }
-    }
-
-    static disruptiveMutate(teams, positions) { 
-        HeuristicOperators.performDoubleSwap(teams, positions); 
-    }
-
-    // Helper methods
-    static selectDistinctRandomTeams(teamCount) {
-        const t1 = Math.floor(Math.random() * teamCount);
-        let t2;
-        do { 
-            t2 = Math.floor(Math.random() * teamCount); 
-        } while (t1 === t2);
-        return [t1, t2];
-    }
-
-    static selectRandomPosition(positions) {
-        return positions[Math.floor(Math.random() * positions.length)];
-    }
-
-    static selectDistinctPositions(positions) {
-        const pos1 = positions[Math.floor(Math.random() * positions.length)];
-        let pos2;
-        do { 
-            pos2 = positions[Math.floor(Math.random() * positions.length)]; 
-        } while (positions.length > 1 && pos1 === pos2);
-        return [pos1, pos2];
-    }
-
-    static swapPlayersBetweenTeams(teams, team1Index, team2Index, position) {
-        const team1Players = teams[team1Index].filter(p => p.assignedPosition === position);
-        const team2Players = teams[team2Index].filter(p => p.assignedPosition === position);
-        
-        if (team1Players.length > 0 && team2Players.length > 0) {
-            const player1 = team1Players[Math.floor(Math.random() * team1Players.length)];
-            const player2 = team2Players[Math.floor(Math.random() * team2Players.length)];
-            
-            return HeuristicOperators.swapSpecificPlayers(teams, team1Index, player1, team2Index, player2);
-        }
-        return false;
-    }
-
-    static swapSpecificPlayers(teams, team1Index, player1, team2Index, player2) {
-        const idx1 = teams[team1Index].findIndex(p => p.id === player1.id);
-        const idx2 = teams[team2Index].findIndex(p => p.id === player2.id);
-        
-        if (idx1 !== -1 && idx2 !== -1) {
-            [teams[team1Index][idx1], teams[team2Index][idx2]] = 
-            [teams[team2Index][idx2], teams[team1Index][idx1]];
-            return true;
-        }
-        return false;
-    }
-}
-
-// ========== MAIN TEAM OPTIMIZER SERVICE ==========
-
-class TeamOptimizerService {
-    constructor(userConfig = {}) {
-        this.config = deepMerge(DEFAULT_CONFIG, userConfig);
-        this.positions = POSITIONS;
-        
-        // Initialize services
-        this.validationService = new ValidationService(this.positions);
-        this.solutionGenerator = new SolutionGenerator(this.validationService);
-        this.solutionEvaluator = new SolutionEvaluator(this.config);
-        this.heuristicOperators = HeuristicOperators;
-    }
-
-    async optimize(composition, teamCount, players) {
-        // Input validation
-        this.validationService.validateInput(composition, teamCount, players);
-        const validation = this.validationService.validateComposition(composition, teamCount, players);
-        if (!validation.isValid) {
-            throw new Error(validation.errors.map(e => e.message).join(', '));
-        }
-
-        // Adaptive parameter tuning
-        this.adaptParameters(teamCount, players.length);
-        
-        // Create optimization context
-        const context = this.createOptimizationContext(composition, teamCount, players);
-        
-        // Execute optimization algorithms
-        const results = await this.executeAlgorithms(context);
-        
-        // Format and return final result
-        return this.formatFinalResult(results, context);
-    }
-
-    createOptimizationContext(composition, teamCount, players) {
-        const playersByPosition = this.validationService.groupPlayersByPosition(players);
-        const positions = Object.keys(composition).filter(pos => composition[pos] > 0);
-        const initialSolutions = this.solutionGenerator.generateInitialSolutions(
-            composition, teamCount, playersByPosition
-        );
-
-        return {
-            composition,
-            teamCount,
-            players,
-            playersByPosition,
-            positions,
-            initialSolutions,
-            stats: this.createEmptyStats(),
-            config: this.config,
-            heuristicManagers: this.createHeuristicManagers()
-        };
-    }
-
-    createHeuristicManagers() {
-        const neighborhoodOperators = [
-            { name: 'simpleSwap', execute: this.heuristicOperators.performSwap },
-            { name: 'adaptiveSwap', execute: this.heuristicOperators.performAdaptiveSwap },
-            { name: 'doubleSwap', execute: this.heuristicOperators.performDoubleSwap }
-        ];
-
-        const mutationOperators = [
-            { name: 'smartMutate', execute: this.heuristicOperators.smartMutate },
-            { name: 'disruptiveMutate', execute: this.heuristicOperators.disruptiveMutate }
-        ];
-
-        return {
-            neighborhood: new HeuristicManager(neighborhoodOperators, 2.0),
-            mutation: new HeuristicManager(mutationOperators, 1.5)
-        };
-    }
-
-    // ========== ALGORITHM EXECUTION ==========
-
-    async executeAlgorithms(context) {
-        const algorithmPromises = [];
-        const algorithmNames = [];
-
-        if (this.config.useGeneticAlgorithm) {
-            algorithmPromises.push(this.runGeneticAlgorithm(context));
-            algorithmNames.push(ALGORITHM_NAMES.GENETIC);
-        }
-        if (this.config.useTabuSearch) {
-            algorithmPromises.push(this.runTabuSearch(context));
-            algorithmNames.push(ALGORITHM_NAMES.TABU);
-        }
-        if (this.config.useSimulatedAnnealing) {
-            algorithmPromises.push(this.runSimulatedAnnealing(context));
-            algorithmNames.push(ALGORITHM_NAMES.ANNEALING);
-        }
-
-        // Ensure at least one algorithm runs
-        if (algorithmPromises.length === 0) {
-            algorithmPromises.push(this.runGeneticAlgorithm(context));
-            algorithmNames.push(ALGORITHM_NAMES.GENETIC);
-        }
-
-        const results = await Promise.all(algorithmPromises);
-        return this.selectBestResult(results, algorithmNames, context);
-    }
-
-    selectBestResult(results, algorithmNames, context) {
-        const scoredResults = results.map((solution, index) => ({
-            solution,
-            score: this.solutionEvaluator.evaluateSolution(solution),
-            algorithm: algorithmNames[index]
-        }));
-
-        const bestResult = scoredResults.reduce((best, current) => 
-            current.score < best.score ? current : best
-        );
-
-        return {
-            ...bestResult,
-            context
-        };
-    }
-
-    async formatFinalResult(bestResult, context) {
-        const refinedTeams = await this.runLocalSearch(bestResult.solution, context);
-        const sortedTeams = this.solutionEvaluator.sortTeamsByStrength(refinedTeams);
-
-        return {
-            teams: sortedTeams,
-            balance: eloService.evaluateBalance(sortedTeams),
-            unusedPlayers: this.getUnusedPlayers(sortedTeams, context.players),
-            validation: this.validationService.validateComposition(
-                context.composition, context.teamCount, context.players
-            ),
-            algorithm: bestResult.algorithm,
-            statistics: this.collectStatistics(context.stats)
-        };
-    }
-
-    // ========== ALGORITHM IMPLEMENTATIONS ==========
-
-    async runGeneticAlgorithm(context) {
-        const config = context.config.algorithms.geneticAlgorithm;
-        const { heuristicManagers, composition, teamCount, playersByPosition, positions } = context;
-        
-        let population = this.initializeGeneticPopulation(context);
-        let bestScore = Infinity;
-        let stagnationCount = 0;
-
-        for (let generation = 0; generation < config.generationCount; generation++) {
-            context.stats.geneticAlgorithm.generations = generation + 1;
-            
-            const scoredPopulation = this.scorePopulation(population);
-            const generationBestScore = scoredPopulation[0].score;
-
-            if (generationBestScore < bestScore) {
-                bestScore = generationBestScore;
-                stagnationCount = 0;
-                context.stats.geneticAlgorithm.improvements++;
-            } else {
-                stagnationCount++;
+            // Update best solution
+            const generationBest = this.findBestSolution(improvedPopulation);
+            if (generationBest.fitness < this.bestSolution.fitness) {
+                this.bestSolution = generationBest;
             }
 
-            population = this.createNewGeneration(scoredPopulation, config, composition, heuristicManagers.mutation);
-            
-            if (stagnationCount >= config.maxStagnation) {
-                this.diversifyPopulation(population, composition, teamCount, playersByPosition);
-                stagnationCount = 0;
+            // Progress reporting
+            if (progressCallback && generation % 10 === 0) {
+                progressCallback({
+                    generation,
+                    fitness: this.bestSolution.fitness,
+                    progress: (generation / this.config.maxGenerations) * 100
+                });
             }
 
-            if (generation % 10 === 0) await yieldToEventLoop();
+            // Yield to prevent blocking
+            if (generation % 5 === 0) {
+                await new Promise(resolve => setTimeout(resolve, 0));
+            }
+
+            this.iterations++;
         }
 
-        return this.selectBestSolution(population);
+        return this.bestSolution;
     }
 
-    async runSimulatedAnnealing(context) {
-        const config = context.config.algorithms.simulatedAnnealing;
-        const { heuristicManagers, positions } = context;
+    initializePopulation(initialSolution) {
+        const population = [initialSolution];
         
-        let currentSolution = this.cloneTeams(context.initialSolutions[0]);
-        let bestSolution = this.cloneTeams(currentSolution);
-        let currentScore = this.solutionEvaluator.evaluateSolution(currentSolution);
-        let bestScore = currentScore;
-        
-        let temperature = config.initialTemperature;
-        let iterationsWithoutImprovement = 0;
-        let acceptedInEquilibrium = 0;
-
-        for (let iteration = 0; iteration < config.iterations; iteration++) {
-            context.stats.simulatedAnnealing.iterations = iteration + 1;
-            context.stats.simulatedAnnealing.temperature = temperature;
-
-            const neighbor = this.generateNeighbor(currentSolution, positions, heuristicManagers.neighborhood);
-            const neighborScore = this.solutionEvaluator.evaluateSolution(neighbor);
-            const scoreDelta = neighborScore - currentScore;
-
-            if (this.shouldAcceptSolution(scoreDelta, temperature)) {
-                currentSolution = neighbor;
-                currentScore = neighborScore;
-                acceptedInEquilibrium++;
-
-                if (neighborScore < bestScore) {
-                    bestSolution = this.cloneTeams(neighbor);
-                    bestScore = neighborScore;
-                    iterationsWithoutImprovement = 0;
-                    context.stats.simulatedAnnealing.improvements++;
-                } else {
-                    iterationsWithoutImprovement++;
-                }
-            }
-
-            temperature = this.updateTemperature(temperature, config, iteration, acceptedInEquilibrium);
-            
-            if (this.shouldReheat(config, iterationsWithoutImprovement, temperature)) {
-                temperature = config.reheatTemperature;
-                iterationsWithoutImprovement = 0;
-            }
-
-            if (iteration % 5000 === 0) await yieldToEventLoop();
-        }
-
-        return bestSolution;
-    }
-
-    async runTabuSearch(context) {
-        const config = context.config.algorithms.tabuSearch;
-        const { heuristicManagers, positions, composition, teamCount, playersByPosition } = context;
-        
-        let currentSolution = this.cloneTeams(context.initialSolutions[0]);
-        let bestSolution = this.cloneTeams(currentSolution);
-        let currentScore = this.solutionEvaluator.evaluateSolution(currentSolution);
-        let bestScore = currentScore;
-        
-        const tabuList = [];
-        let iterationsWithoutImprovement = 0;
-
-        for (let iteration = 0; iteration < config.iterations; iteration++) {
-            context.stats.tabuSearch.iterations = iteration + 1;
-
-            const neighbors = this.generateNeighborhood(
-                currentSolution, positions, config.neighborCount, heuristicManagers.neighborhood
-            );
-
-            const bestNeighbor = this.findBestNonTabuNeighbor(neighbors, tabuList, bestScore, config.aspirationCriteria);
-            
-            if (bestNeighbor) {
-                currentSolution = bestNeighbor.solution;
-                currentScore = bestNeighbor.score;
-
-                tabuList.push(this.hashSolution(currentSolution));
-                this.manageTabuListSize(tabuList, config.tabuTenure);
-
-                if (currentScore < bestScore) {
-                    bestSolution = this.cloneTeams(currentSolution);
-                    bestScore = currentScore;
-                    iterationsWithoutImprovement = 0;
-                    context.stats.tabuSearch.improvements++;
-                } else {
-                    iterationsWithoutImprovement++;
-                }
-            }
-
-            if (this.shouldDiversify(config, iterationsWithoutImprovement)) {
-                currentSolution = this.solutionGenerator.createRandomSolution(composition, teamCount, playersByPosition);
-                currentScore = this.solutionEvaluator.evaluateSolution(currentSolution);
-                iterationsWithoutImprovement = 0;
-            }
-
-            if (iteration % 500 === 0) await yieldToEventLoop();
-        }
-
-        return bestSolution;
-    }
-
-    async runLocalSearch(initialSolution, context, maxIterations = null) {
-        const config = context.config.algorithms.localSearch;
-        const { heuristicManagers, positions } = context;
-        
-        const iterations = maxIterations || config.iterations;
-        let currentSolution = this.cloneTeams(initialSolution);
-        let improved = true;
-        let iteration = 0;
-
-        while (improved && iteration < iterations) {
-            iteration++;
-            context.stats.localSearch.iterations = iteration;
-
-            const neighbors = this.generateNeighborhood(
-                currentSolution, positions, config.neighborhoodSize, heuristicManagers.neighborhood
-            );
-
-            const currentScore = this.solutionEvaluator.evaluateSolution(currentSolution);
-            const bestNeighbor = this.findBestNeighbor(neighbors);
-
-            if (bestNeighbor && bestNeighbor.score < currentScore) {
-                currentSolution = bestNeighbor.solution;
-                context.stats.localSearch.improvements++;
-                
-                if (config.searchStrategy === 'first-improvement') {
-                    // Continue with next iteration
-                    continue;
-                }
-            } else {
-                improved = false;
-            }
-
-            if (config.perturbationEnabled && !improved) {
-                this.perturbSolution(currentSolution, positions, config.perturbationStrength);
-                improved = true;
-            }
-
-            if (iteration % 100 === 0) await yieldToEventLoop();
-        }
-
-        return currentSolution;
-    }
-
-    // ========== ALGORITHM HELPER METHODS ==========
-
-    initializeGeneticPopulation(context) {
-        const { initialSolutions, config } = context;
-        const population = [...initialSolutions];
-        
-        while (population.length < config.algorithms.geneticAlgorithm.populationSize) {
-            population.push(this.solutionGenerator.createRandomSolution(
-                context.composition, context.teamCount, context.playersByPosition
-            ));
+        for (let i = 1; i < this.config.populationSize; i++) {
+            const randomSolution = this.generateRandomSolution(initialSolution);
+            population.push(randomSolution);
         }
         
         return population;
     }
 
-    scorePopulation(population) {
-        return population.map(teams => ({
-            teams,
-            score: this.solutionEvaluator.evaluateSolution(teams)
-        })).sort((a, b) => a.score - b.score);
+    generateRandomSolution(baseSolution) {
+        // Create a randomized version of the base solution
+        const teams = baseSolution.teams.map(team => {
+            const newTeam = new Team(team.id);
+            const shuffledPlayers = [...team.players].sort(() => Math.random() - 0.5);
+            
+            // Reassign players to positions randomly while maintaining composition
+            const positionAssignments = this.assignPlayersToPositions(shuffledPlayers, baseSolution.composition);
+            positionAssignments.forEach(({ player, position }) => {
+                newTeam.addPlayer(player, position);
+            });
+            
+            return newTeam;
+        });
+
+        return new Solution(teams, baseSolution.composition);
     }
 
-    createNewGeneration(scoredPopulation, config, composition, mutationManager) {
-        const newPopulation = scoredPopulation
-            .slice(0, config.elitismCount)
-            .map(s => this.cloneTeams(s.teams));
+    assignPlayersToPositions(players, composition) {
+        const assignments = [];
+        const positionRequirements = { ...composition };
+        const unassignedPlayers = [...players];
+        
+        // First pass: assign players to their preferred positions
+        unassignedPlayers.forEach(player => {
+            const preferredPosition = player.positions[0];
+            if (positionRequirements[preferredPosition] > 0) {
+                assignments.push({ player, position: preferredPosition });
+                positionRequirements[preferredPosition]--;
+            }
+        });
 
-        while (newPopulation.length < config.populationSize) {
-            const parent1 = this.tournamentSelection(scoredPopulation, config.tournamentSize);
-            const parent2 = this.tournamentSelection(scoredPopulation, config.tournamentSize);
-            
-            const child = Math.random() < config.crossoverRate
-                ? this.enhancedCrossover(parent1, parent2, composition)
-                : this.cloneTeams(parent1);
-            
-            newPopulation.push(child);
-        }
+        // Second pass: assign remaining players to available positions they can play
+        unassignedPlayers.forEach(player => {
+            if (!assignments.find(a => a.player.id === player.id)) {
+                const availablePosition = player.positions.find(pos => positionRequirements[pos] > 0);
+                if (availablePosition) {
+                    assignments.push({ player, position: availablePosition });
+                    positionRequirements[availablePosition]--;
+                }
+            }
+        });
 
-        // Apply mutation
-        for (let i = config.elitismCount; i < newPopulation.length; i++) {
-            if (Math.random() < config.mutationRate) {
-                this.applyMutation(newPopulation[i], context.positions, mutationManager, config.useHyperHeuristic);
+        return assignments;
+    }
+
+    async evolvePopulation(population) {
+        const newPopulation = [];
+        
+        // Elitism: keep best solutions
+        const sortedPopulation = [...population].sort((a, b) => a.fitness - b.fitness);
+        const eliteCount = Math.floor(population.length * this.config.elitismRate);
+        newPopulation.push(...sortedPopulation.slice(0, eliteCount));
+
+        // Create offspring through crossover and mutation
+        while (newPopulation.length < population.length) {
+            const parent1 = this.tournamentSelection(population);
+            const parent2 = this.tournamentSelection(population);
+            
+            const child = await this.crossover(parent1, parent2);
+            const mutatedChild = await this.mutate(child);
+            
+            if (mutatedChild.isValid()) {
+                newPopulation.push(mutatedChild);
             }
         }
 
         return newPopulation;
     }
 
-    applyMutation(teams, positions, mutationManager, useHyperHeuristic) {
-        if (useHyperHeuristic && mutationManager) {
-            const oldScore = this.solutionEvaluator.evaluateSolution(teams);
-            const operator = mutationManager.selectOperator();
-            operator.execute(teams, positions);
-            const newScore = this.solutionEvaluator.evaluateSolution(teams);
-            mutationManager.updateScore(operator.name, oldScore - newScore);
-        } else {
-            this.heuristicOperators.smartMutate(teams, positions);
-        }
-    }
-
-    tournamentSelection(scoredPopulation, tournamentSize) {
+    tournamentSelection(population) {
+        const tournamentSize = 3;
         let best = null;
+        
         for (let i = 0; i < tournamentSize; i++) {
-            const candidate = scoredPopulation[Math.floor(Math.random() * scoredPopulation.length)];
-            if (!best || candidate.score < best.score) {
+            const candidate = population[Math.floor(Math.random() * population.length)];
+            if (!best || candidate.fitness < best.fitness) {
                 best = candidate;
             }
         }
-        return best.teams;
+        
+        return best;
     }
 
-    diversifyPopulation(population, composition, teamCount, playersByPosition) {
-        const keepCount = Math.floor(population.length * 0.3);
-        for (let i = keepCount; i < population.length; i++) {
-            if (Math.random() < 0.7) {
-                population[i] = this.solutionGenerator.createRandomSolution(composition, teamCount, playersByPosition);
-            } else {
-                population[i] = this.solutionGenerator.createPositionFocusedSolution(composition, teamCount, playersByPosition);
-            }
+    async crossover(parent1, parent2) {
+        // Uniform crossover: randomly select teams from parents
+        const childTeams = [];
+        
+        for (let i = 0; i < parent1.teams.length; i++) {
+            const useParent1 = Math.random() < 0.5;
+            const sourceTeam = useParent1 ? parent1.teams[i] : parent2.teams[i];
+            childTeams.push(sourceTeam.clone());
         }
+
+        return new Solution(childTeams, parent1.composition);
     }
 
-    selectBestSolution(population) {
-        const scored = this.scorePopulation(population);
-        return scored[0].teams;
+    async mutate(solution) {
+        // Apply random operations from the optimization engine
+        const neighbors = this.engine.generateNeighbors(solution, 1);
+        return neighbors.length > 0 ? neighbors[0] : solution;
     }
 
-    // Simulated Annealing helpers
-    shouldAcceptSolution(delta, temperature) {
-        return delta < 0 || Math.random() < Math.exp(-delta / temperature);
-    }
-
-    updateTemperature(temperature, config, iteration, acceptedInEquilibrium) {
-        if (iteration > 0 && iteration % config.equilibriumIterations === 0) {
-            return temperature * config.coolingRate;
-        }
-        return temperature;
-    }
-
-    shouldReheat(config, iterationsWithoutImprovement, temperature) {
-        return config.reheatEnabled && 
-               iterationsWithoutImprovement > config.reheatIterations && 
-               temperature < config.reheatTemperature;
-    }
-
-    // Tabu Search helpers
-    generateNeighborhood(solution, positions, size, heuristicManager) {
-        const neighborhood = [];
-        for (let i = 0; i < size; i++) {
-            const neighbor = this.cloneTeams(solution);
-            let operatorName = 'default';
+    async applyLocalSearch(population) {
+        const improvedPopulation = [];
+        
+        for (const solution of population) {
+            let currentSolution = solution;
+            let improved = true;
+            let localIterations = 0;
             
-            if (heuristicManager) {
-                const operator = heuristicManager.selectOperator();
-                operator.execute(neighbor, positions);
-                operatorName = operator.name;
-            } else {
-                this.heuristicOperators.performAdaptiveSwap(neighbor, positions);
-            }
-            
-            neighborhood.push({
-                solution: neighbor,
-                score: this.solutionEvaluator.evaluateSolution(neighbor),
-                operatorName
-            });
-        }
-        return neighborhood;
-    }
-
-    findBestNonTabuNeighbor(neighbors, tabuList, bestScore, aspirationCriteria) {
-        let bestNeighbor = null;
-        
-        for (const neighbor of neighbors) {
-            const isTabu = tabuList.includes(this.hashSolution(neighbor.solution));
-            const satisfiesAspiration = aspirationCriteria && neighbor.score < bestScore;
-            
-            if ((!isTabu || satisfiesAspiration) && 
-                (!bestNeighbor || neighbor.score < bestNeighbor.score)) {
-                bestNeighbor = neighbor;
-            }
-        }
-        
-        return bestNeighbor;
-    }
-
-    findBestNeighbor(neighbors) {
-        return neighbors.reduce((best, current) => 
-            !best || current.score < best.score ? current : best, null
-        );
-    }
-
-    manageTabuListSize(tabuList, maxSize) {
-        while (tabuList.length > maxSize) {
-            tabuList.shift();
-        }
-    }
-
-    shouldDiversify(config, iterationsWithoutImprovement) {
-        return config.diversification.enabled && 
-               iterationsWithoutImprovement > config.diversification.frequency;
-    }
-
-    // Local Search helpers
-    perturbSolution(teams, positions, strength) {
-        const perturbationCount = Math.max(1, Math.floor(teams.length * positions.length * strength));
-        
-        for (let i = 0; i < perturbationCount; i++) {
-            this.heuristicOperators.performSwap(teams, positions);
-        }
-    }
-
-    // ========== CORE OPERATIONS ==========
-
-    enhancedCrossover(parent1, parent2, composition) {
-        const child = Array.from({ length: parent1.length }, () => []);
-        const usedIds = new Set();
-        
-        const splitPoint = Math.floor(parent1.length / 2);
-        
-        // Copy first half from parent1
-        for (let i = 0; i < splitPoint; i++) {
-            parent1[i].forEach(player => {
-                child[i].push({...player});
-                usedIds.add(player.id);
-            });
-        }
-        
-        // Copy second half from parent2, avoiding duplicates
-        for (let i = splitPoint; i < parent2.length; i++) {
-            parent2[i].forEach(player => {
-                if (!usedIds.has(player.id)) {
-                    child[i].push({...player});
-                    usedIds.add(player.id);
-                }
-            });
-        }
-        
-        // Add any missing players from parent2
-        this.addMissingPlayers(child, parent2, usedIds, composition);
-        
-        return child;
-    }
-
-    addMissingPlayers(child, parent, usedIds, composition) {
-        parent.flat().forEach(player => {
-            if (!usedIds.has(player.id)) {
-                let placed = false;
+            while (improved && localIterations < this.config.localSearchIterations) {
+                improved = false;
+                const neighbors = this.engine.generateNeighbors(currentSolution, 5);
                 
-                // Try to place in a team that needs this position
-                for (let i = 0; i < child.length; i++) {
-                    const positionCount = child[i].filter(p => 
-                        p.assignedPosition === player.assignedPosition
-                    ).length;
-                    const targetCount = composition[player.assignedPosition] || 0;
-                    
-                    if (positionCount < targetCount) {
-                        child[i].push({...player});
-                        usedIds.add(player.id);
-                        placed = true;
+                for (const neighbor of neighbors) {
+                    if (neighbor.fitness < currentSolution.fitness) {
+                        currentSolution = neighbor;
+                        improved = true;
                         break;
                     }
                 }
                 
-                // If couldn't place by position, place in smallest team
-                if (!placed) {
-                    const teamSizes = child.map(team => team.length);
-                    const minSize = Math.min(...teamSizes);
-                    const targetTeam = teamSizes.indexOf(minSize);
-                    child[targetTeam].push({...player});
-                    usedIds.add(player.id);
-                }
+                localIterations++;
             }
-        });
-    }
-
-    generateNeighbor(solution, positions, heuristicManager) {
-        const neighbor = this.cloneTeams(solution);
-        
-        if (heuristicManager) {
-            const operator = heuristicManager.selectOperator();
-            operator.execute(neighbor, positions);
-        } else {
-            this.heuristicOperators.performAdaptiveSwap(neighbor, positions);
+            
+            improvedPopulation.push(currentSolution);
         }
         
-        return neighbor;
+        return improvedPopulation;
     }
 
-    // ========== UTILITY METHODS ==========
-
-    cloneTeams(teams) {
-        return teams.map(team => team.map(player => ({ ...player })));
-    }
-
-    hashSolution(teams) {
-        return teams.map(team => 
-            team.map(p => p.id).sort().join(',')
-        ).join('|');
-    }
-
-    getUnusedPlayers(teams, allPlayers) {
-        const usedIds = new Set();
-        teams.forEach(team => {
-            team.forEach(player => {
-                usedIds.add(player.id);
-            });
-        });
-
-        return allPlayers.filter(p => !usedIds.has(p.id));
-    }
-
-    adaptParameters(teamCount, totalPlayers) {
-        const complexity = teamCount * totalPlayers;
-        const algorithms = this.config.algorithms;
-
-        if (complexity < 50) {
-            algorithms.geneticAlgorithm.generationCount = 50;
-            algorithms.tabuSearch.iterations = 2000;
-            algorithms.simulatedAnnealing.iterations = 10000;
-            algorithms.localSearch.iterations = 500;
-        } else if (complexity < 200) {
-            algorithms.geneticAlgorithm.generationCount = 100;
-            algorithms.tabuSearch.iterations = 5000;
-            algorithms.simulatedAnnealing.iterations = 30000;
-            algorithms.localSearch.iterations = 1000;
-        } else {
-            algorithms.geneticAlgorithm.generationCount = 150;
-            algorithms.tabuSearch.iterations = 8000;
-            algorithms.simulatedAnnealing.iterations = 50000;
-            algorithms.localSearch.iterations = 1500;
-        }
-    }
-
-    createEmptyStats() {
-        return {
-            geneticAlgorithm: { generations: 0, improvements: 0 },
-            tabuSearch: { iterations: 0, improvements: 0 },
-            simulatedAnnealing: { iterations: 0, improvements: 0, temperature: 0 },
-            localSearch: { iterations: 0, improvements: 0 }
-        };
-    }
-
-    collectStatistics(stats) {
-        return {
-            geneticAlgorithm: { 
-                ...stats.geneticAlgorithm, 
-                config: this.config.algorithms.geneticAlgorithm 
-            },
-            tabuSearch: { 
-                ...stats.tabuSearch, 
-                config: this.config.algorithms.tabuSearch 
-            },
-            simulatedAnnealing: { 
-                ...stats.simulatedAnnealing, 
-                config: this.config.algorithms.simulatedAnnealing 
-            },
-            localSearch: { 
-                ...stats.localSearch, 
-                config: this.config.algorithms.localSearch 
-            }
-        };
+    findBestSolution(population) {
+        return population.reduce((best, current) => 
+            current.fitness < best.fitness ? current : best
+        );
     }
 }
 
-export default TeamOptimizerService;
+// ==========  SOLUTION GENERATOR ==========
+
+class SolutionGenerator {
+    constructor() {
+        this.engine = new PositionAwareOptimizationEngine();
+    }
+
+    generateInitialSolutions(composition, teamCount, players, count = 5) {
+        const solutions = [];
+        
+        // Strategy 1: Balanced distribution
+        solutions.push(this.createBalancedSolution(composition, teamCount, players));
+        
+        // Strategy 2: Position-focused distribution
+        solutions.push(this.createPositionFocusedSolution(composition, teamCount, players));
+        
+        // Strategy 3: Random distributions
+        for (let i = 0; i < count - 2; i++) {
+            solutions.push(this.createRandomSolution(composition, teamCount, players));
+        }
+
+        return solutions.filter(s => s.isValid());
+    }
+
+    createBalancedSolution(composition, teamCount, players) {
+        const teams = Array.from({ length: teamCount }, (_, i) => new Team(`team-${i}`));
+        const playerPool = players.map(p => new Player(p));
+        
+        // Sort positions by scarcity
+        const positions = this.getPositionsByScarcity(composition, teamCount, playerPool);
+        
+        positions.forEach(([position, requiredCount]) => {
+            const totalNeeded = requiredCount * teamCount;
+            const eligiblePlayers = playerPool
+                .filter(p => p.canPlay(position))
+                .sort((a, b) => b.getRatingFor(position) - a.getRatingFor(position))
+                .slice(0, totalNeeded);
+
+            // Distribute players round-robin
+            eligiblePlayers.forEach((player, index) => {
+                const teamIndex = index % teamCount;
+                teams[teamIndex].addPlayer(player, position);
+            });
+        });
+
+        return new Solution(teams, composition);
+    }
+
+    createPositionFocusedSolution(composition, teamCount, players) {
+        const teams = Array.from({ length: teamCount }, (_, i) => new Team(`team-${i}`));
+        const playerPool = players.map(p => new Player(p));
+        
+        const positions = Object.entries(composition).sort((a, b) => {
+            const aPriority = POSITION_GROUPS[a[0]].priority;
+            const bPriority = POSITION_GROUPS[b[0]].priority;
+            return aPriority - bPriority;
+        });
+
+        positions.forEach(([position, requiredCount]) => {
+            const totalNeeded = requiredCount * teamCount;
+            const eligiblePlayers = playerPool
+                .filter(p => !teams.some(t => t.players.find(tp => tp.id === p.id)))
+                .filter(p => p.canPlay(position))
+                .sort((a, b) => b.getRatingFor(position) - a.getRatingFor(position))
+                .slice(0, totalNeeded);
+
+            // Snake draft distribution
+            for (let round = 0; round < requiredCount; round++) {
+                for (let teamIndex = 0; teamIndex < teamCount; teamIndex++) {
+                    const playerIndex = round * teamCount + teamIndex;
+                    if (playerIndex < eligiblePlayers.length) {
+                        const actualTeamIndex = round % 2 === 0 ? teamIndex : teamCount - 1 - teamIndex;
+                        teams[actualTeamIndex].addPlayer(eligiblePlayers[playerIndex], position);
+                    }
+                }
+            }
+        });
+
+        return new Solution(teams, composition);
+    }
+
+    createRandomSolution(composition, teamCount, players) {
+        const teams = Array.from({ length: teamCount }, (_, i) => new Team(`team-${i}`));
+        const shuffledPlayers = [...players]
+            .map(p => new Player(p))
+            .sort(() => Math.random() - 0.5);
+
+        let playerIndex = 0;
+        Object.entries(composition).forEach(([position, requiredCount]) => {
+            for (let teamIndex = 0; teamIndex < teamCount; teamIndex++) {
+                for (let i = 0; i < requiredCount; i++) {
+                    if (playerIndex < shuffledPlayers.length) {
+                        const player = shuffledPlayers[playerIndex];
+                        if (player.canPlay(position)) {
+                            teams[teamIndex].addPlayer(player, position);
+                            playerIndex++;
+                        }
+                    }
+                }
+            }
+        });
+
+        return new Solution(teams, composition);
+    }
+
+    getPositionsByScarcity(composition, teamCount, players) {
+        return Object.entries(composition).sort((a, b) => {
+            const [posA, countA] = a;
+            const [posB, countB] = b;
+            
+            const playersA = players.filter(p => p.canPlay(posA)).length;
+            const playersB = players.filter(p => p.canPlay(posB)).length;
+            
+            const ratioA = playersA / (countA * teamCount);
+            const ratioB = playersB / (countB * teamCount);
+            
+            return ratioA - ratioB;
+        });
+    }
+}
+
+// ========== MAIN  SERVICE ==========
+
+class TeamOptimizer extends EventEmitter {
+    constructor(config = {}) {
+        super();
+        
+        this.config = {
+            maxGenerations: 100,
+            populationSize: 20,
+            elitismRate: 0.1,
+            localSearchIterations: 10,
+            timeout: 30000,
+            ...config
+        };
+        
+        this.solutionGenerator = new SolutionGenerator();
+        this.algorithm = new HybridOptimizationAlgorithm(this.config);
+        this.isOptimizing = false;
+    }
+
+    async optimizeTeams(composition, teamCount, players, strategy = OPTIMIZATION_STRATEGIES.BALANCED) {
+        if (this.isOptimizing) {
+            throw new Error('Optimization already in progress');
+        }
+
+        this.isOptimizing = true;
+        const startTime = Date.now();
+
+        try {
+            this.emit('optimizationStarted', { composition, teamCount, playerCount: players.length });
+
+            // Validate input
+            this.validateInput(composition, teamCount, players);
+
+            // Generate initial solutions
+            const initialSolutions = this.solutionGenerator.generateInitialSolutions(
+                composition, teamCount, players
+            );
+
+            if (initialSolutions.length === 0) {
+                throw new Error('Could not generate valid initial solutions');
+            }
+
+            const bestInitial = initialSolutions.reduce((best, current) => 
+                current.fitness < best.fitness ? current : best
+            );
+
+            // Run optimization
+            const bestSolution = await this.algorithm.optimize(
+                bestInitial,
+                (progress) => this.emit('optimizationProgress', progress)
+            );
+
+            const result = this.formatResult(bestSolution, players, Date.now() - startTime);
+
+            this.emit('optimizationCompleted', result);
+            return result;
+
+        } catch (error) {
+            this.emit('optimizationFailed', { error: error.message });
+            throw error;
+        } finally {
+            this.isOptimizing = false;
+        }
+    }
+
+    validateInput(composition, teamCount, players) {
+        if (teamCount < 2) {
+            throw new Error('Must have at least 2 teams');
+        }
+
+        const totalPlayersNeeded = Object.values(composition).reduce((sum, count) => sum + count, 0) * teamCount;
+        if (players.length < totalPlayersNeeded) {
+            throw new Error(`Not enough players: need ${totalPlayersNeeded}, have ${players.length}`);
+        }
+
+        // Check position requirements
+        Object.entries(composition).forEach(([position, count]) => {
+            const totalNeeded = count * teamCount;
+            const availablePlayers = players.filter(p => p.positions.includes(position)).length;
+            
+            if (availablePlayers < totalNeeded) {
+                throw new Error(`Not enough players for position ${position}: need ${totalNeeded}, have ${availablePlayers}`);
+            }
+        });
+    }
+
+    formatResult(solution, allPlayers, executionTime) {
+        const teams = solution.teams.map(team => ({
+            id: team.id,
+            players: team.players.map(player => ({
+                id: player.id,
+                name: player.name,
+                assignedPosition: player.assignedPosition,
+                positionRating: player.positionRating,
+                possiblePositions: player.positions
+            })),
+            totalStrength: team.getTotalStrength(),
+            positionStrengths: Object.keys(solution.composition).reduce((acc, position) => {
+                acc[position] = team.getPositionStrength(position);
+                return acc;
+            }, {})
+        }));
+
+        const usedPlayerIds = new Set();
+        solution.teams.forEach(team => {
+            team.players.forEach(player => usedPlayerIds.add(player.id));
+        });
+
+        const unusedPlayers = allPlayers.filter(player => !usedPlayerIds.has(player.id));
+
+        return {
+            teams: teams.sort((a, b) => b.totalStrength - a.totalStrength),
+            metrics: {
+                fitness: solution.fitness,
+                balance: this.calculateBalanceMetric(solution),
+                positionBalance: this.calculatePositionBalanceMetric(solution),
+                executionTime
+            },
+            unusedPlayers,
+            composition: solution.composition
+        };
+    }
+
+    calculateBalanceMetric(solution) {
+        const teamStrengths = solution.teams.map(team => team.getTotalStrength());
+        return Math.max(...teamStrengths) - Math.min(...teamStrengths);
+    }
+
+    calculatePositionBalanceMetric(solution) {
+        let totalImbalance = 0;
+        Object.keys(solution.composition).forEach(position => {
+            const strengths = solution.teams.map(team => team.getPositionStrength(position));
+            totalImbalance += Math.max(...strengths) - Math.min(...strengths);
+        });
+        return totalImbalance;
+    }
+
+    // Utility method for quick optimization
+    async quickOptimize(composition, teamCount, players) {
+        const quickConfig = {
+            maxGenerations: 50,
+            populationSize: 10,
+            localSearchIterations: 5,
+            timeout: 10000
+        };
+
+        const quickOptimizer = new TeamOptimizer(quickConfig);
+        return quickOptimizer.optimizeTeams(composition, teamCount, players);
+    }
+}
+
+// ========== EXPORTS ==========
+
+export {
+    TeamOptimizer,
+    Player,
+    Team,
+    Solution,
+    PositionAwareOptimizationEngine,
+    OPERATION_TYPES,
+    OPTIMIZATION_STRATEGIES
+};
+
+export default TeamOptimizer;
