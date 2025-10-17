@@ -70,14 +70,6 @@ class PlayerAdapter {
         return this.ratings[position] || 1500;
     }
 
-    getBestPosition() {
-        return this.positions.reduce((best, pos) => {
-            const currentRating = this.getRatingFor(pos);
-            const bestRating = this.getRatingFor(best);
-            return currentRating > bestRating ? pos : best;
-        }, this.positions[0]);
-    }
-
     toPlainObject(assignedPosition) {
         return {
             id: this.id,
