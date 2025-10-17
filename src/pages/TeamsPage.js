@@ -195,8 +195,8 @@ class TeamsPage extends BasePage {
             const teamCountInput = this.$('#teamCount');
             const teamCount = parseInt(teamCountInput?.value) || 2;
             
-            // Save teamCount to state
-            this.setState({ teamCount }, { silent: true });
+            // Update state directly without triggering re-render
+            this.state.teamCount = teamCount;
             
             const composition = this.getComposition();
             const total = Object.values(composition).reduce((sum, val) => sum + val, 0);
@@ -207,15 +207,22 @@ class TeamsPage extends BasePage {
         // Team count change
         const teamCountInput = this.$('#teamCount');
         if (teamCountInput) {
-            teamCountInput.addEventListener('input', updatePlayersPerTeam);
+            // Remove old listener to prevent duplicates
+            const newInput = teamCountInput.cloneNode(true);
+            teamCountInput.parentNode.replaceChild(newInput, teamCountInput);
+            newInput.addEventListener('input', updatePlayersPerTeam);
         }
 
         // Composition inputs - Use querySelectorAll directly on container
         const compositionInputs = this.container.querySelectorAll('.composition-input');
         if (compositionInputs && compositionInputs.length > 0) {
             compositionInputs.forEach(input => {
-                input.addEventListener('input', (e) => {
-                    const pos = input.id.replace('comp_', '');
+                // Clone to remove old event listeners
+                const newInput = input.cloneNode(true);
+                input.parentNode.replaceChild(newInput, input);
+                
+                newInput.addEventListener('input', (e) => {
+                    const pos = newInput.id.replace('comp_', '');
                     const value = parseInt(e.target.value) || 0;
                     this.state.composition[pos] = value;
                     updatePlayersPerTeam();
