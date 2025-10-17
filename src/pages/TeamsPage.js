@@ -207,12 +207,12 @@ class TeamsPage extends BasePage {
         // Team count change
         const teamCountInput = this.$('#teamCount');
         if (teamCountInput) {
-            this.addEventListener(teamCountInput, 'input', updatePlayersPerTeam);
+            teamCountInput.addEventListener('input', updatePlayersPerTeam);
         }
 
-        // Composition inputs - ИСПРАВЛЕНИЕ: используем this.$$ вместо this.$
-        this.$$('.composition-input').forEach(input => {
-            this.addEventListener(input, 'input', (e) => {
+        // Composition inputs
+        this.$('.composition-input').forEach(input => {
+            input.addEventListener('input', (e) => {
                 const pos = input.id.replace('comp_', '');
                 const value = parseInt(e.target.value) || 0;
                 this.state.composition[pos] = value;
@@ -226,13 +226,13 @@ class TeamsPage extends BasePage {
         // Optimize button
         const optimizeBtn = this.$('#optimizeBtn');
         if (optimizeBtn) {
-            this.addEventListener(optimizeBtn, 'click', () => this.handleOptimize());
+            optimizeBtn.addEventListener('click', () => this.handleOptimize());
         }
 
         // Show ELO toggle
         const showEloToggle = this.$('#showEloToggle');
         if (showEloToggle) {
-            this.addEventListener(showEloToggle, 'change', (e) => {
+            showEloToggle.addEventListener('change', (e) => {
                 this.setState({ showEloRatings: e.target.checked });
             });
         }
@@ -240,7 +240,7 @@ class TeamsPage extends BasePage {
         // Export button
         const exportBtn = this.$('#exportTeamsBtn');
         if (exportBtn) {
-            this.addEventListener(exportBtn, 'click', () => this.handleExport());
+            exportBtn.addEventListener('click', () => this.handleExport());
         }
     }
 
