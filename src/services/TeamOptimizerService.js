@@ -70,6 +70,14 @@ class PlayerAdapter {
         return this.ratings[position] || 1500;
     }
 
+    getBestPosition() {
+        return this.positions.reduce((best, pos) => {
+            const currentRating = this.getRatingFor(pos);
+            const bestRating = this.getRatingFor(best);
+            return currentRating > bestRating ? pos : best;
+        }, this.positions[0]);
+    }
+
     toPlainObject(assignedPosition) {
         return {
             id: this.id,
@@ -206,10 +214,13 @@ class SimpleOptimizer {
         for (let iter = 0; iter < this.maxIterations; iter++) {
             const neighbor = this.cloneTeams(current);
             
-            if (Math.random() < 0.8) {
+            const rand = Math.random();
+            if (rand < 0.5) {
                 this.performSwap(neighbor, positions);
-            } else {
+            } else if (rand < 0.8) {
                 this.performPositionSwap(neighbor);
+            } else {
+                this.performCrossTeamPositionSwap(neighbor);
             }
             
             const neighborScore = this.evaluateSolution(neighbor);
@@ -236,6 +247,8 @@ class SimpleOptimizer {
     }
 
     evaluateSolution(teams) {
+        if (teams.length === 0) return 0;
+        
         const teamStrengths = teams.map(team => 
             team.reduce((sum, player) => sum + player.positionRating, 0)
         );
@@ -301,13 +314,50 @@ class SimpleOptimizer {
             p2.positions.includes(p1.assignedPosition)) {
             
             const tempPos = p1.assignedPosition;
-            const tempRating = p1.positionRating;
             
             p1.assignedPosition = p2.assignedPosition;
             p1.positionRating = p1.ratings[p2.assignedPosition] || 1500;
             
             p2.assignedPosition = tempPos;
             p2.positionRating = p2.ratings[tempPos] || 1500;
+        }
+    }
+
+    performCrossTeamPositionSwap(teams) {
+        if (teams.length < 2) return;
+
+        const t1_idx = Math.floor(Math.random() * teams.length);
+        let t2_idx;
+        do {
+            t2_idx = Math.floor(Math.random() * teams.length);
+        } while (t1_idx === t2_idx);
+
+        const team1 = teams[t1_idx];
+        const team2 = teams[t2_idx];
+
+        if (team1.length === 0 || team2.length === 0) return;
+
+        const p1_idx = Math.floor(Math.random() * team1.length);
+        const p2_idx = Math.floor(Math.random() * team2.length);
+
+        const p1 = team1[p1_idx];
+        const p2 = team2[p2_idx];
+
+        if (p1.assignedPosition === p2.assignedPosition) return;
+        
+        if (p1.positions.includes(p2.assignedPosition) && 
+            p2.positions.includes(p1.assignedPosition)) {
+
+            const p1_new_pos = p2.assignedPosition;
+            const p2_new_pos = p1.assignedPosition;
+
+            [teams[t1_idx][p1_idx], teams[t2_idx][p2_idx]] = [p2, p1];
+            
+            p1.assignedPosition = p1_new_pos;
+            p1.positionRating = p1.ratings[p1_new_pos] || 1500;
+            
+            p2.assignedPosition = p2_new_pos;
+            p2.positionRating = p2.ratings[p2_new_pos] || 1500;
         }
     }
 
