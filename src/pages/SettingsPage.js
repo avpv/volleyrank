@@ -1,4 +1,3 @@
-
 /**
  * SettingsPage - Player management page with full modal support
  */
@@ -24,6 +23,7 @@ class SettingsPage extends BasePage {
         this.on('player:reset', () => this.update());
         this.on('players:reset-all-positions', () => this.update());
         this.on('state:changed', () => this.update());
+        this.on('state:reset', () => this.update());
     }
 
     onMount() {
@@ -762,8 +762,16 @@ class SettingsPage extends BasePage {
 
     handleClearAll() {
         if (!confirm('Remove all players? This cannot be undone!')) return;
-        stateManager.reset({ clearStorage: true });
-        toast.success('All players removed');
+        
+        try {
+            stateManager.reset({ clearStorage: true });
+            toast.success('All players removed');
+            // Принудительно обновляем UI после удаления всех игроков
+            this.update();
+        } catch (error) {
+            toast.error('Failed to remove players');
+            console.error('Clear all error:', error);
+        }
     }
 }
 
