@@ -329,6 +329,10 @@ a:hover {
     opacity: 0.8;
 }
 
+.app-title-link:hover .app-title {
+    text-decoration: none;
+}
+
 .app-title-link:active {
     transform: scale(0.98);
 }
