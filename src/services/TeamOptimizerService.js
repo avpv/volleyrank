@@ -1,357 +1,244 @@
 /**
- * TeamOptimizerService - Adapter for new TeamOptimizer
- * Maintains compatibility with existing application architecture
+ * Ultimate Team Optimizer Workflow
  */
 import eloService from './EloService.js';
 
-// Simple EventEmitter implementation for browser
-class SimpleEventEmitter {
+class TeamOptimizerService {
     constructor() {
-        this.events = new Map();
-    }
-
-    on(event, callback) {
-        if (!this.events.has(event)) {
-            this.events.set(event, []);
-        }
-        this.events.get(event).push(callback);
-    }
-
-    emit(event, data) {
-        if (this.events.has(event)) {
-            this.events.get(event).forEach(callback => callback(data));
-        }
-    }
-
-    off(event, callback) {
-        if (this.events.has(event)) {
-            const callbacks = this.events.get(event);
-            const index = callbacks.indexOf(callback);
-            if (index > -1) {
-                callbacks.splice(index, 1);
+        this.positions = {
+            'S': 'Setter',
+            'OPP': 'Opposite',
+            'OH': 'Outside Hitter',
+            'MB': 'Middle Blocker',
+            'L': 'Libero'
+        };
+        
+        // --- GLOBAL CONFIGURATION ---
+        this.config = {
+            useGeneticAlgorithm: true,
+            useTabuSearch: true,
+            useSimulatedAnnealing: true,
+            adaptiveSwapEnabled: true,
+            adaptiveParameters: {
+                strongWeakSwapProbability: 0.6,
+                positionBalanceWeight: 0.3, // Weight for position-specific imbalance in the evaluation function
+                varianceWeight: 0.5       // Weight for team strength variance
             }
+        };
+        
+        // --- PER-ALGORITHM CONFIGURATION ---
+        this.algorithmConfigs = {
+            geneticAlgorithm: {
+                populationSize: 20,
+                generationCount: 100,
+                mutationRate: 0.2, // Increased mutation rate to leverage powerful swaps
+                crossoverRate: 0.7,
+                elitismCount: 2,
+                tournamentSize: 3,
+                maxStagnation: 20
+            },
+            tabuSearch: {
+                tabuTenure: 50,
+                iterations: 5000,
+                neighborCount: 20,
+                diversificationFrequency: 1000
+            },
+            simulatedAnnealing: {
+                initialTemperature: 1000,
+                coolingRate: 0.995,
+                iterations: 50000,
+                reheatEnabled: true,
+                reheatTemperature: 500,
+                reheatIterations: 10000
+            },
+            localSearch: {
+                iterations: 1500,
+                neighborhoodSize: 10
+            }
+        };
+        
+        this.tabuList = [];
+        this.algorithmStats = {};
+    }
+
+    /**
+     * Main optimization entry point.
+     */
+    async optimize(composition, teamCount, players) {
+        const validation = this.enhancedValidate(composition, teamCount, players);
+        if (!validation.isValid) {
+            throw new Error(validation.errors.map(e => e.message).join(', '));
         }
-    }
-}
 
-// Optimization strategies
-const OPTIMIZATION_STRATEGIES = {
-    BALANCED: 'balanced',
-    COMPETITIVE: 'competitive',
-    DEVELOPMENTAL: 'developmental',
-    POSITION_FOCUSED: 'position_focused'
-};
+        this.adaptParameters(teamCount, players.length);
+        const playersByPosition = this.groupByPosition(players);
+        const positions = Object.keys(composition).filter(pos => composition[pos] > 0);
+        
+        const candidates = this.generateInitialSolutions(composition, teamCount, playersByPosition);
+        this.resetAlgorithmStats();
 
-const POSITION_GROUPS = {
-    'S': { name: 'Setter', weight: 1.3, priority: 1 },
-    'OPP': { name: 'Opposite', weight: 1.2, priority: 2 },
-    'OH': { name: 'Outside Hitter', weight: 1.1, priority: 3 },
-    'MB': { name: 'Middle Blocker', weight: 1.0, priority: 4 },
-    'L': { name: 'Libero', weight: 0.9, priority: 5 }
-};
+        const algorithmPromises = [];
+        const algorithmNames = [];
+        
+        if (this.config.useGeneticAlgorithm) {
+            algorithmPromises.push(this.runGeneticAlgorithm(candidates, composition, teamCount, playersByPosition, positions));
+            algorithmNames.push('Genetic Algorithm');
+        }
+        if (this.config.useTabuSearch) {
+            algorithmPromises.push(this.runTabuSearch(candidates[0], positions));
+            algorithmNames.push('Tabu Search');
+        }
+        if (this.config.useSimulatedAnnealing) {
+            algorithmPromises.push(this.runSimulatedAnnealing(candidates[0], positions));
+            algorithmNames.push('Simulated Annealing');
+        }
+        
+        if (algorithmPromises.length === 0) {
+            this.config.useGeneticAlgorithm = true;
+            this.config.useTabuSearch = true;
+            return this.optimize(composition, teamCount, players);
+        }
 
-// ========== PLAYER ADAPTER ==========
-class PlayerAdapter {
-    constructor(data) {
-        this.id = data.id;
-        this.name = data.name;
-        this.positions = data.positions || [];
-        this.ratings = data.ratings || {};
-        this.comparisons = data.comparisons || {};
-        this.comparedWith = data.comparedWith || {};
-        this.createdAt = data.createdAt;
-    }
+        const results = await Promise.all(algorithmPromises);
+        const scores = results.map(r => this.evaluateSolution(r));
+        const bestIdx = scores.indexOf(Math.min(...scores));
+        
+        console.log(`Best initial result from: ${algorithmNames[bestIdx]}`);
+        const bestTeams = await this.runLocalSearch(results[bestIdx], positions);
 
-    canPlay(position) {
-        return this.positions.includes(position);
-    }
+        bestTeams.sort((a, b) => {
+            const aStrength = eloService.calculateTeamStrength(a).totalRating;
+            const bStrength = eloService.calculateTeamStrength(b).totalRating;
+            return bStrength - aStrength;
+        });
 
-    getRatingFor(position) {
-        return this.ratings[position] || 1500;
-    }
+        const balance = eloService.evaluateBalance(bestTeams);
+        const unused = this.getUnusedPlayers(bestTeams, players);
 
-    getBestPosition() {
-        return this.positions.reduce((best, pos) => {
-            const currentRating = this.getRatingFor(pos);
-            const bestRating = this.getRatingFor(best);
-            return currentRating > bestRating ? pos : best;
-        }, this.positions[0]);
-    }
-
-    toPlainObject(assignedPosition) {
         return {
-            id: this.id,
-            name: this.name,
-            positions: this.positions,
-            ratings: this.ratings,
-            comparisons: this.comparisons,
-            comparedWith: this.comparedWith,
-            createdAt: this.createdAt,
-            assignedPosition: assignedPosition,
-            positionRating: this.getRatingFor(assignedPosition)
+            teams: bestTeams,
+            balance,
+            unusedPlayers: unused,
+            validation,
+            algorithm: `${algorithmNames[bestIdx]} + Local Search Refinement`,
+            statistics: this.getAlgorithmStatistics()
         };
     }
-}
 
-// ========== TEAM BUILDER ==========
-class TeamBuilder {
-    constructor(composition, teamCount, players) {
-        this.composition = composition;
-        this.teamCount = teamCount;
-        this.players = players.map(p => new PlayerAdapter(p));
-        this.teams = Array.from({ length: teamCount }, () => []);
-    }
+    // =======================================================================
+    // == UNIVERSAL MUTATION OPERATORS (CORE OF THE MERGED LOGIC)           ==
+    // =======================================================================
+    
+    /**
+     * A unified operator that selects one of the available swap/mutation types
+     * based on a probability distribution. This is the heart of the optimizer's
+     * search strategy.
+     * @param {Array} teams - The current team structure.
+     * @param {Array} positions - The list of positions in the composition.
+     */
+    performUniversalSwap(teams, positions) {
+        const rand = Math.random();
 
-    createBalancedSolution() {
-        const positions = this.getPositionsByScarcity();
-        
-        positions.forEach(([position, requiredCount]) => {
-            const totalNeeded = requiredCount * this.teamCount;
-            const eligiblePlayers = this.players
-                .filter(p => p.canPlay(position) && !this.isPlayerAssigned(p.id))
-                .sort((a, b) => b.getRatingFor(position) - a.getRatingFor(position))
-                .slice(0, totalNeeded);
-
-            eligiblePlayers.forEach((player, index) => {
-                const teamIndex = index % this.teamCount;
-                this.teams[teamIndex].push(player.toPlainObject(position));
-            });
-        });
-
-        return this.teams;
-    }
-
-    createSnakeDraftSolution() {
-        const teams = Array.from({ length: this.teamCount }, () => []);
-        const positions = this.getPositionsByScarcity();
-        
-        positions.forEach(([position, requiredCount]) => {
-            const totalNeeded = requiredCount * this.teamCount;
-            const eligiblePlayers = this.players
-                .filter(p => p.canPlay(position) && !this.isPlayerAssignedInTeams(p.id, teams))
-                .sort((a, b) => b.getRatingFor(position) - a.getRatingFor(position))
-                .slice(0, totalNeeded);
-
-            for (let round = 0; round < requiredCount; round++) {
-                for (let teamIndex = 0; teamIndex < this.teamCount; teamIndex++) {
-                    const playerIndex = round * this.teamCount + teamIndex;
-                    if (playerIndex < eligiblePlayers.length) {
-                        const actualTeamIndex = round % 2 === 0 ? teamIndex : this.teamCount - 1 - teamIndex;
-                        teams[actualTeamIndex].push(eligiblePlayers[playerIndex].toPlainObject(position));
-                    }
-                }
-            }
-        });
-
-        return teams;
-    }
-
-    createRandomSolution() {
-        const teams = Array.from({ length: this.teamCount }, () => []);
-        const shuffledPlayers = [...this.players].sort(() => Math.random() - 0.5);
-        let playerIndex = 0;
-
-        Object.entries(this.composition).forEach(([position, requiredCount]) => {
-            for (let teamIdx = 0; teamIdx < this.teamCount; teamIdx++) {
-                for (let i = 0; i < requiredCount; i++) {
-                    while (playerIndex < shuffledPlayers.length) {
-                        const player = shuffledPlayers[playerIndex];
-                        playerIndex++;
-                        
-                        if (player.canPlay(position) && !this.isPlayerAssignedInTeams(player.id, teams)) {
-                            teams[teamIdx].push(player.toPlainObject(position));
-                            break;
-                        }
-                    }
-                }
-            }
-        });
-
-        return teams;
-    }
-
-    getPositionsByScarcity() {
-        return Object.entries(this.composition)
-            .filter(([_, count]) => count > 0)
-            .sort((a, b) => {
-                const [posA, countA] = a;
-                const [posB, countB] = b;
-                
-                const playersA = this.players.filter(p => p.canPlay(posA)).length;
-                const playersB = this.players.filter(p => p.canPlay(posB)).length;
-                
-                const ratioA = playersA / (countA * this.teamCount);
-                const ratioB = playersB / (countB * this.teamCount);
-                
-                return ratioA - ratioB;
-            });
-    }
-
-    isPlayerAssigned(playerId) {
-        return this.teams.some(team => team.some(p => p.id === playerId));
-    }
-
-    isPlayerAssignedInTeams(playerId, teams) {
-        return teams.some(team => team.some(p => p.id === playerId));
-    }
-}
-
-// ========== OPTIMIZER ==========
-class SimpleOptimizer {
-    constructor() {
-        this.maxIterations = 5000;
-        this.coolingRate = 0.995;
-        this.initialTemperature = 1000;
-    }
-
-    async optimize(teams, positions) {
-        let current = this.cloneTeams(teams);
-        let best = this.cloneTeams(teams);
-        let currentScore = this.evaluateSolution(current);
-        let bestScore = currentScore;
-        let temperature = this.initialTemperature;
-
-        for (let iter = 0; iter < this.maxIterations; iter++) {
-            const neighbor = this.cloneTeams(current);
-            
-            const rand = Math.random();
-            if (rand < 0.5) {
-                this.performSwap(neighbor, positions);
-            } else if (rand < 0.8) {
-                this.performPositionSwap(neighbor);
+        // 50% - Adaptive/Simple Swap (frequent, fine-tuning)
+        if (rand < 0.5) {
+            if (this.config.adaptiveSwapEnabled) {
+                this.performAdaptiveSwap(teams, positions);
             } else {
-                this.performCrossTeamPositionSwap(neighbor);
+                this.performSwap(teams, positions);
             }
+        } 
+        // 25% - Cross-Team Position Swap (powerful, global changes)
+        else if (rand < 0.75) {
+            this.performCrossTeamPositionSwap(teams);
+        } 
+        // 25% - Intra-Team Position Swap (local role optimization)
+        else {
+            this.performPositionSwap(teams);
+        }
+    }
+
+    /**
+     * Swaps two players between the strongest and weakest teams to improve balance.
+     * Falls back to a random swap if conditions aren't met.
+     */
+    performAdaptiveSwap(teams, positions) {
+        const teamStrengths = teams.map((team, idx) => ({
+            idx,
+            strength: eloService.calculateTeamStrength(team).totalRating
+        })).sort((a, b) => b.strength - a.strength);
+        
+        if (teamStrengths.length < 2) {
+            return this.performSwap(teams, positions);
+        }
+        
+        const strongestIdx = teamStrengths[0].idx;
+        const weakestIdx = teamStrengths[teamStrengths.length - 1].idx;
+        
+        if (Math.random() < this.config.adaptiveParameters.strongWeakSwapProbability && strongestIdx !== weakestIdx) {
+            const position = positions[Math.floor(Math.random() * positions.length)];
+            const strongPlayers = teams[strongestIdx].filter(p => p.assignedPosition === position);
+            const weakPlayers = teams[weakestIdx].filter(p => p.assignedPosition === position);
             
-            const neighborScore = this.evaluateSolution(neighbor);
-            const delta = neighborScore - currentScore;
-            
-            if (delta < 0 || Math.random() < Math.exp(-delta / temperature)) {
-                current = neighbor;
-                currentScore = neighborScore;
+            if (strongPlayers.length > 0 && weakPlayers.length > 0) {
+                const weakestInStrong = strongPlayers.reduce((min, p) => p.positionRating < min.positionRating ? p : min);
+                const strongestInWeak = weakPlayers.reduce((max, p) => p.positionRating > max.positionRating ? p : max);
+                const idx1 = teams[strongestIdx].findIndex(p => p.id === weakestInStrong.id);
+                const idx2 = teams[weakestIdx].findIndex(p => p.id === strongestInWeak.id);
                 
-                if (neighborScore < bestScore) {
-                    best = this.cloneTeams(neighbor);
-                    bestScore = neighborScore;
+                if (idx1 !== -1 && idx2 !== -1 && weakestInStrong.positionRating < strongestInWeak.positionRating) {
+                     [teams[strongestIdx][idx1], teams[weakestIdx][idx2]] = [teams[weakestIdx][idx2], teams[strongestIdx][idx1]];
+                     return;
                 }
-            }
-            
-            temperature *= this.coolingRate;
-            
-            if (iter % 500 === 0) {
-                await new Promise(resolve => setTimeout(resolve, 1));
             }
         }
-
-        return best;
+        // Fallback to a standard random swap
+        this.performSwap(teams, positions);
     }
-
-    evaluateSolution(teams) {
-        if (teams.length === 0) return 0;
-        
-        const teamStrengths = teams.map(team => 
-            team.reduce((sum, player) => sum + player.positionRating, 0)
-        );
-
-        const balance = Math.max(...teamStrengths) - Math.min(...teamStrengths);
-        
-        const avg = teamStrengths.reduce((a, b) => a + b, 0) / teamStrengths.length;
-        const variance = teamStrengths.reduce((sum, strength) => 
-            sum + Math.pow(strength - avg, 2), 0) / teamStrengths.length;
-
-        return balance * 1.0 + Math.sqrt(variance) * 0.5;
-    }
-
+    
+    /**
+     * Simple random swap of two players on the same position between two random teams.
+     */
     performSwap(teams, positions) {
-        if (teams.length < 2) return;
-    
-        const t1 = Math.floor(Math.random() * teams.length);
-        let t2;
-        do {
-            t2 = Math.floor(Math.random() * teams.length);
-        } while (t1 === t2);
-    
-        const pos = positions[Math.floor(Math.random() * positions.length)];
+        if (teams.length < 2 || positions.length === 0) return;
+        const t1_idx = Math.floor(Math.random() * teams.length);
+        let t2_idx;
+        do { t2_idx = Math.floor(Math.random() * teams.length); } while (t1_idx === t2_idx);
         
-        const t1Players = teams[t1].filter(p => p.assignedPosition === pos);
-        const t2Players = teams[t2].filter(p => p.assignedPosition === pos);
+        const pos = positions[Math.floor(Math.random() * positions.length)];
+        const t1Players = teams[t1_idx].filter(p => p.assignedPosition === pos);
+        const t2Players = teams[t2_idx].filter(p => p.assignedPosition === pos);
         
         if (t1Players.length > 0 && t2Players.length > 0) {
             const p1 = t1Players[Math.floor(Math.random() * t1Players.length)];
             const p2 = t2Players[Math.floor(Math.random() * t2Players.length)];
-            
-            if (!p1.positions.includes(pos) || !p2.positions.includes(pos)) {
-                return;
-            }
-            
-            const idx1 = teams[t1].findIndex(p => p.id === p1.id);
-            const idx2 = teams[t2].findIndex(p => p.id === p2.id);
-            
+            const idx1 = teams[t1_idx].findIndex(p => p.id === p1.id);
+            const idx2 = teams[t2_idx].findIndex(p => p.id === p2.id);
             if (idx1 !== -1 && idx2 !== -1) {
-                [teams[t1][idx1], teams[t2][idx2]] = [teams[t2][idx2], teams[t1][idx1]];
+                [teams[t1_idx][idx1], teams[t2_idx][idx2]] = [teams[t2_idx][idx2], teams[t1_idx][idx1]];
             }
         }
     }
 
+    /**
+     * Swaps the assigned positions of two players WITHIN the same team.
+     * Crucial for optimizing roles for multi-position players.
+     */
     performPositionSwap(teams) {
         if (teams.length === 0) return;
-        
         const teamIndex = Math.floor(Math.random() * teams.length);
         const team = teams[teamIndex];
-        
         if (team.length < 2) return;
         
         const idx1 = Math.floor(Math.random() * team.length);
         let idx2;
-        do {
-            idx2 = Math.floor(Math.random() * team.length);
-        } while (idx1 === idx2);
+        do { idx2 = Math.floor(Math.random() * team.length); } while (idx1 === idx2);
         
         const p1 = team[idx1];
         const p2 = team[idx2];
         
-        if (p1.positions.includes(p2.assignedPosition) && 
-            p2.positions.includes(p1.assignedPosition)) {
-            
-            const tempPos = p1.assignedPosition;
-            
-            p1.assignedPosition = p2.assignedPosition;
-            p1.positionRating = p1.ratings[p2.assignedPosition] || 1500;
-            
-            p2.assignedPosition = tempPos;
-            p2.positionRating = p2.ratings[tempPos] || 1500;
-        }
-    }
-
-    performCrossTeamPositionSwap(teams) {
-        if (teams.length < 2) return;
-
-        const t1_idx = Math.floor(Math.random() * teams.length);
-        let t2_idx;
-        do {
-            t2_idx = Math.floor(Math.random() * teams.length);
-        } while (t1_idx === t2_idx);
-
-        const team1 = teams[t1_idx];
-        const team2 = teams[t2_idx];
-
-        if (team1.length === 0 || team2.length === 0) return;
-
-        const p1_idx = Math.floor(Math.random() * team1.length);
-        const p2_idx = Math.floor(Math.random() * team2.length);
-
-        const p1 = team1[p1_idx];
-        const p2 = team2[p2_idx];
-
-        if (p1.assignedPosition === p2.assignedPosition) return;
-        
-        if (p1.positions.includes(p2.assignedPosition) && 
-            p2.positions.includes(p1.assignedPosition)) {
-
+        if (p1.positions.includes(p2.assignedPosition) && p2.positions.includes(p1.assignedPosition)) {
             const p1_new_pos = p2.assignedPosition;
             const p2_new_pos = p1.assignedPosition;
-
-            [teams[t1_idx][p1_idx], teams[t2_idx][p2_idx]] = [p2, p1];
             
             p1.assignedPosition = p1_new_pos;
             p1.positionRating = p1.ratings[p1_new_pos] || 1500;
@@ -361,116 +248,450 @@ class SimpleOptimizer {
         }
     }
 
-    cloneTeams(teams) {
-        return teams.map(team => team.map(player => ({ ...player })));
-    }
-}
+    /**
+     * Swaps two players BETWEEN different teams AND assigns them each other's original positions.
+     * The most powerful operator for breaking out of local optima.
+     */
+    performCrossTeamPositionSwap(teams) {
+        if (teams.length < 2) return;
+        const t1_idx = Math.floor(Math.random() * teams.length);
+        let t2_idx;
+        do { t2_idx = Math.floor(Math.random() * teams.length); } while (t1_idx === t2_idx);
 
-// ========== MAIN SERVICE (SINGLETON) ==========
-class TeamOptimizerService {
-    constructor() {
-        this.optimizer = new SimpleOptimizer();
-        this.isOptimizing = false;
-    }
+        const team1 = teams[t1_idx];
+        const team2 = teams[t2_idx];
+        if (team1.length === 0 || team2.length === 0) return;
 
-    async optimize(composition, teamCount, players) {
-        if (this.isOptimizing) {
-            throw new Error('Optimization already in progress');
-        }
+        const p1_idx = Math.floor(Math.random() * team1.length);
+        const p2_idx = Math.floor(Math.random() * team2.length);
+        const p1 = team1[p1_idx];
+        const p2 = team2[p2_idx];
 
-        this.isOptimizing = true;
-
-        try {
-            this.validate(composition, teamCount, players);
-
-            const builder = new TeamBuilder(composition, teamCount, players);
-            
-            const candidates = [
-                builder.createBalancedSolution(),
-                builder.createSnakeDraftSolution(),
-                builder.createRandomSolution()
-            ];
-
-            const positions = Object.keys(composition).filter(pos => composition[pos] > 0);
-
-            const optimizedCandidates = await Promise.all(
-                candidates.map(candidate => this.optimizer.optimize(candidate, positions))
-            );
-
-            const scores = optimizedCandidates.map(c => this.optimizer.evaluateSolution(c));
-            const bestIdx = scores.indexOf(Math.min(...scores));
-            const bestTeams = optimizedCandidates[bestIdx];
-
-            bestTeams.sort((a, b) => {
-                const aStrength = a.reduce((sum, p) => sum + p.positionRating, 0);
-                const bStrength = b.reduce((sum, p) => sum + p.positionRating, 0);
-                return bStrength - aStrength;
-            });
-
-            const balance = eloService.evaluateBalance(bestTeams);
-            
-            const usedIds = new Set();
-            bestTeams.forEach(team => team.forEach(p => usedIds.add(p.id)));
-            const unusedPlayers = players.filter(p => !usedIds.has(p.id));
-
-            const algorithmNames = ['Balanced Distribution', 'Snake Draft', 'Random Distribution'];
-
-            return {
-                teams: bestTeams,
-                balance: {
-                    isBalanced: balance.isBalanced,
-                    maxDifference: balance.maxDifference
-                },
-                unusedPlayers,
-                validation: {
-                    isValid: true,
-                    errors: [],
-                    warnings: []
-                },
-                algorithm: algorithmNames[bestIdx] + ' + Simulated Annealing'
-            };
-
-        } catch (error) {
-            throw error;
-        } finally {
-            this.isOptimizing = false;
-        }
-    }
-
-    validate(composition, teamCount, players) {
-        const errors = [];
+        if (p1.assignedPosition === p2.assignedPosition) return;
         
-        if (teamCount < 1) {
-            errors.push({ message: 'Must have at least 1 team' });
+        if (p1.positions.includes(p2.assignedPosition) && p2.positions.includes(p1.assignedPosition)) {
+            const p1_new_pos = p2.assignedPosition;
+            const p2_new_pos = p1.assignedPosition;
+
+            [teams[t1_idx][p1_idx], teams[t2_idx][p2_idx]] = [p2, p1];
+            
+            // p1 is now in team2
+            p1.assignedPosition = p1_new_pos;
+            p1.positionRating = p1.ratings[p1_new_pos] || 1500;
+            
+            // p2 is now in team1
+            p2.assignedPosition = p2_new_pos;
+            p2.positionRating = p2.ratings[p2_new_pos] || 1500;
+        }
+    }
+
+    // =======================================================================
+    // == CORE ALGORITHM IMPLEMENTATIONS (ADAPTED FOR UNIVERSAL SWAP)       ==
+    // =======================================================================
+
+    async runGeneticAlgorithm(initialPop, composition, teamCount, playersByPosition, positions) {
+        const config = this.algorithmConfigs.geneticAlgorithm;
+        let population = [...initialPop];
+        
+        while (population.length < config.populationSize) {
+            population.push(this.createRandomSolution(composition, teamCount, playersByPosition));
         }
 
-        let totalNeeded = 0;
-        Object.entries(composition).forEach(([position, count]) => {
-            const needed = count * teamCount;
-            totalNeeded += needed;
-            const available = players.filter(p => p.positions && p.positions.includes(position)).length;
+        let bestScore = Infinity;
+        let stagnationCount = 0;
+
+        for (let gen = 0; gen < config.generationCount; gen++) {
+            this.algorithmStats.geneticAlgorithm.generations = gen + 1;
+            const scored = population.map(individual => ({
+                teams: individual,
+                score: this.evaluateSolution(individual)
+            })).sort((a, b) => a.score - b.score);
+
+            if (scored[0].score < bestScore) {
+                bestScore = scored[0].score;
+                stagnationCount = 0;
+                this.algorithmStats.geneticAlgorithm.improvements++;
+            } else {
+                stagnationCount++;
+            }
+
+            const newPopulation = scored.slice(0, config.elitismCount).map(s => s.teams);
+
+            while (newPopulation.length < config.populationSize) {
+                const parent1 = this.tournamentSelection(scored, config.tournamentSize);
+                if (Math.random() < config.crossoverRate) {
+                    const parent2 = this.tournamentSelection(scored, config.tournamentSize);
+                    newPopulation.push(this.enhancedCrossover(parent1, parent2, composition));
+                } else {
+                    newPopulation.push(JSON.parse(JSON.stringify(parent1)));
+                }
+            }
+
+            for (let i = config.elitismCount; i < newPopulation.length; i++) {
+                if (Math.random() < config.mutationRate) {
+                    this.performUniversalSwap(newPopulation[i], positions);
+                }
+            }
+
+            if (stagnationCount >= config.maxStagnation) {
+                for (let i = Math.ceil(population.length / 2); i < population.length; i++) {
+                     population[i] = this.createRandomSolution(composition, teamCount, playersByPosition);
+                }
+                stagnationCount = 0;
+            }
             
-            if (available < needed) {
-                errors.push({
-                    position,
-                    needed,
-                    available,
-                    message: `Not enough ${position}s: need ${needed}, have ${available}`
-                });
+            population = newPopulation;
+            if (gen % 10 === 0) await new Promise(resolve => setTimeout(resolve, 1));
+        }
+
+        return population.map(ind => ({ teams: ind, score: this.evaluateSolution(ind) }))
+            .sort((a, b) => a.score - b.score)[0].teams;
+    }
+    
+    async runTabuSearch(initialTeams, positions) {
+        const config = this.algorithmConfigs.tabuSearch;
+        let current = JSON.parse(JSON.stringify(initialTeams));
+        let best = JSON.parse(JSON.stringify(current));
+        let bestScore = this.evaluateSolution(best);
+        this.tabuList = [];
+        let iterationSinceImprovement = 0;
+
+        for (let iter = 0; iter < config.iterations; iter++) {
+            this.algorithmStats.tabuSearch.iterations = iter + 1;
+            const neighbors = this.generateNeighborhood(current, positions, config.neighborCount);
+            
+            let bestNeighbor = null;
+            let bestNeighborScore = Infinity;
+            
+            for (const neighbor of neighbors) {
+                const hash = this.hashSolution(neighbor);
+                const score = this.evaluateSolution(neighbor);
+                if ((!this.tabuList.includes(hash) || score < bestScore) && score < bestNeighborScore) {
+                    bestNeighbor = neighbor;
+                    bestNeighborScore = score;
+                }
+            }
+            
+            if (bestNeighbor) {
+                current = bestNeighbor;
+                const currentScore = bestNeighborScore;
+                this.tabuList.push(this.hashSolution(current));
+                if (this.tabuList.length > config.tabuTenure) this.tabuList.shift();
+                
+                if (currentScore < bestScore) {
+                    best = JSON.parse(JSON.stringify(current));
+                    bestScore = currentScore;
+                    iterationSinceImprovement = 0;
+                    this.algorithmStats.tabuSearch.improvements++;
+                } else {
+                    iterationSinceImprovement++;
+                }
+            }
+            if (iterationSinceImprovement > config.diversificationFrequency) {
+                current = this.generateNeighborhood(best, positions, 1)[0];
+                iterationSinceImprovement = 0;
+                this.tabuList = [];
+            }
+            if (iter % 500 === 0) await new Promise(resolve => setTimeout(resolve, 1));
+        }
+        return best;
+    }
+
+    async runSimulatedAnnealing(initialTeams, positions) {
+        const config = this.algorithmConfigs.simulatedAnnealing;
+        let current = JSON.parse(JSON.stringify(initialTeams));
+        let best = JSON.parse(JSON.stringify(current));
+        let currentScore = this.evaluateSolution(current);
+        let bestScore = currentScore;
+        let temp = config.initialTemperature;
+        let iterationSinceImprovement = 0;
+
+        for (let iter = 0; iter < config.iterations; iter++) {
+            this.algorithmStats.simulatedAnnealing.iterations = iter + 1;
+            this.algorithmStats.simulatedAnnealing.temperature = temp;
+            
+            const neighbor = JSON.parse(JSON.stringify(current));
+            this.performUniversalSwap(neighbor, positions);
+            const neighborScore = this.evaluateSolution(neighbor);
+            const delta = neighborScore - currentScore;
+            
+            if (delta < 0 || Math.random() < Math.exp(-delta / temp)) {
+                current = neighbor;
+                currentScore = neighborScore;
+                if (neighborScore < bestScore) {
+                    best = JSON.parse(JSON.stringify(neighbor));
+                    bestScore = neighborScore;
+                    iterationSinceImprovement = 0;
+                    this.algorithmStats.simulatedAnnealing.improvements++;
+                } else {
+                    iterationSinceImprovement++;
+                }
+            }
+            temp *= config.coolingRate;
+            if (config.reheatEnabled && iterationSinceImprovement > config.reheatIterations) {
+                temp = config.reheatTemperature;
+                iterationSinceImprovement = 0;
+            }
+            if (iter % 5000 === 0) await new Promise(resolve => setTimeout(resolve, 1));
+        }
+        return best;
+    }
+
+    async runLocalSearch(teams, positions) {
+        const config = this.algorithmConfigs.localSearch;
+        let current = JSON.parse(JSON.stringify(teams));
+        let currentScore = this.evaluateSolution(current);
+        
+        for (let iter = 0; iter < config.iterations; iter++) {
+            this.algorithmStats.localSearch.iterations = iter + 1;
+            const neighbor = JSON.parse(JSON.stringify(current));
+            this.performUniversalSwap(neighbor, positions);
+            const neighborScore = this.evaluateSolution(neighbor);
+            if (neighborScore < currentScore) {
+                current = neighbor;
+                currentScore = neighborScore;
+                this.algorithmStats.localSearch.improvements++;
+            }
+            if (iter % 100 === 0) await new Promise(resolve => setTimeout(resolve, 1));
+        }
+        return current;
+    }
+    
+    // =======================================================================
+    // == HELPER AND UTILITY METHODS (MOSTLY FROM THE ADVANCED SCRIPT)      ==
+    // =======================================================================
+    
+    generateNeighborhood(teams, positions, size) {
+        return Array.from({ length: size }, () => {
+            const neighbor = JSON.parse(JSON.stringify(teams));
+            this.performUniversalSwap(neighbor, positions);
+            return neighbor;
+        });
+    }
+
+    evaluateSolution(teams) {
+        if (!teams || teams.length === 0) return Infinity;
+        const teamStrengths = teams.map(team => eloService.calculateTeamStrength(team).totalRating);
+        if (teamStrengths.some(isNaN)) return Infinity;
+
+        const balance = Math.max(...teamStrengths) - Math.min(...teamStrengths);
+        const avg = teamStrengths.reduce((a, b) => a + b, 0) / teamStrengths.length;
+        const variance = teamStrengths.reduce((sum, s) => sum + Math.pow(s - avg, 2), 0) / teamStrengths.length;
+
+        let positionImbalance = 0;
+        Object.keys(this.positions).forEach(pos => {
+            const posStrengths = teams.map(team =>
+                team.filter(p => p.assignedPosition === pos).reduce((sum, p) => sum + p.positionRating, 0)
+            );
+            if (posStrengths.length > 1 && posStrengths.some(s => s > 0)) {
+                positionImbalance += (Math.max(...posStrengths) - Math.min(...posStrengths));
             }
         });
 
-        if (errors.length > 0) {
-            throw new Error(errors.map(e => e.message).join(', '));
+        return balance + Math.sqrt(variance) * this.config.adaptiveParameters.varianceWeight + 
+               positionImbalance * this.config.adaptiveParameters.positionBalanceWeight;
+    }
+
+    enhancedValidate(composition, teamCount, players) {
+        const errors = [];
+        const warnings = [];
+        const playersByPosition = this.groupByPosition(players);
+        let totalNeeded = 0;
+        
+        Object.entries(composition).forEach(([position, count]) => {
+            if (count > 0) {
+                const needed = count * teamCount;
+                const available = players.filter(p => p.positions.includes(position)).length;
+                totalNeeded += needed;
+                if (available < needed) {
+                    errors.push({ position, needed, available, message: `Not enough ${this.positions[position]}s: need ${needed}, have ${available}` });
+                }
+            }
+        });
+        if(players.length < totalNeeded) {
+            errors.push({message: `Not enough total players: need ${totalNeeded}, have ${players.length}`});
         }
 
-        return {
-            isValid: errors.length === 0,
-            errors,
-            warnings: [],
-            totalNeeded,
-            totalAvailable: players.length
+        return { isValid: errors.length === 0, errors, warnings };
+    }
+
+    groupByPosition(players) {
+        const grouped = {};
+        players.forEach(player => {
+            if (player.positions && Array.isArray(player.positions)) {
+                player.positions.forEach(position => {
+                    if (!grouped[position]) grouped[position] = [];
+                    grouped[position].push({ ...player, assignedPosition: position, positionRating: player.ratings[position] || 1500 });
+                });
+            }
+        });
+        return grouped;
+    }
+
+    generateInitialSolutions(composition, teamCount, playersByPosition) {
+        const solutions = new Set();
+        solutions.add(this.createBalancedSolution(composition, teamCount, playersByPosition));
+        solutions.add(this.createSnakeDraftSolution(composition, teamCount, playersByPosition));
+        for(let i=0; i<3; i++) {
+           solutions.add(this.createRandomSolution(composition, teamCount, playersByPosition));
+        }
+        return Array.from(solutions).map(s => JSON.parse(s));
+    }
+    
+    createBalancedSolution(composition, teamCount, playersByPosition) {
+        const teams = Array.from({ length: teamCount }, () => []);
+        const usedIds = new Set();
+        const positionOrder = Object.entries(composition).filter(([, count]) => count > 0);
+
+        positionOrder.forEach(([position, neededCount]) => {
+            const players = (playersByPosition[position] || [])
+                .filter(p => !usedIds.has(p.id))
+                .sort((a, b) => b.positionRating - a.positionRating);
+
+            let playerIdx = 0;
+            for (let i = 0; i < neededCount; i++) {
+                for (let teamIdx = 0; teamIdx < teamCount; teamIdx++) {
+                     if(playerIdx < players.length) {
+                        teams[teamIdx].push(players[playerIdx]);
+                        usedIds.add(players[playerIdx].id);
+                        playerIdx++;
+                    }
+                }
+            }
+        });
+        return JSON.stringify(teams);
+    }
+    
+    createSnakeDraftSolution(composition, teamCount, playersByPosition) {
+        const teams = Array.from({ length: teamCount }, () => []);
+        const usedIds = new Set();
+        const positionOrder = Object.entries(composition).filter(([, count]) => count > 0);
+
+        positionOrder.forEach(([position, neededCount]) => {
+            const players = (playersByPosition[position] || [])
+                .filter(p => !usedIds.has(p.id))
+                .sort((a, b) => b.positionRating - a.positionRating);
+            
+            let playerIdx = 0;
+            for (let round = 0; round < neededCount; round++) {
+                for (let i = 0; i < teamCount; i++) {
+                    if(playerIdx < players.length){
+                        const teamIdx = round % 2 === 0 ? i : teamCount - 1 - i;
+                        teams[teamIdx].push(players[playerIdx]);
+                        usedIds.add(players[playerIdx].id);
+                        playerIdx++;
+                    }
+                }
+            }
+        });
+        return JSON.stringify(teams);
+    }
+
+    createRandomSolution(composition, teamCount, playersByPosition) {
+        const teams = Array.from({ length: teamCount }, () => []);
+        let allAvailablePlayers = [];
+        Object.entries(composition).forEach(([position, neededCount]) => {
+            const players = (playersByPosition[position] || []);
+            for(let i=0; i<neededCount * teamCount; i++){
+                if(i < players.length) {
+                    allAvailablePlayers.push(players[i]);
+                }
+            }
+        });
+        
+        // Shuffle and remove duplicates
+        allAvailablePlayers = [...new Map(allAvailablePlayers.map(p => [p.id, p])).values()];
+        for (let i = allAvailablePlayers.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [allAvailablePlayers[i], allAvailablePlayers[j]] = [allAvailablePlayers[j], allAvailablePlayers[i]];
+        }
+
+        const teamPlayerCounts = Array(teamCount).fill(0);
+        const totalPlayersPerTeam = Object.values(composition).reduce((a,b)=>a+b, 0);
+
+        allAvailablePlayers.forEach(player => {
+            // Find a team that needs this player
+            let placed = false;
+            const shuffledTeamIndices = [...Array(teamCount).keys()].sort(() => Math.random() - 0.5);
+            for(const teamIdx of shuffledTeamIndices){
+                if(teamPlayerCounts[teamIdx] < totalPlayersPerTeam){
+                    const posCount = teams[teamIdx].filter(p => p.assignedPosition === player.assignedPosition).length;
+                    if(posCount < composition[player.assignedPosition]){
+                         teams[teamIdx].push(player);
+                         teamPlayerCounts[teamIdx]++;
+                         placed = true;
+                         break;
+                    }
+                }
+            }
+        });
+        return JSON.stringify(teams);
+    }
+
+    enhancedCrossover(parent1, parent2, composition) {
+        const child = Array.from({ length: parent1.length }, () => []);
+        const usedIds = new Set();
+        // Take a slice from parent1
+        const slicePoint = Math.floor(Math.random() * parent1.length);
+        for (let i = 0; i < slicePoint; i++) {
+            child[i] = JSON.parse(JSON.stringify(parent1[i]));
+            parent1[i].forEach(p => usedIds.add(p.id));
+        }
+        // Take remaining players from parent2
+        const remainingPlayers = parent2.flat().filter(p => !usedIds.has(p.id));
+        remainingPlayers.forEach(player => {
+            let placed = false;
+            for (let i = 0; i < child.length; i++) {
+                const needsPos = (child[i].filter(p => p.assignedPosition === player.assignedPosition).length) < (composition[player.assignedPosition] || 0);
+                if (needsPos) {
+                    child[i].push(JSON.parse(JSON.stringify(player)));
+                    placed = true;
+                    break;
+                }
+            }
+            if (!placed) { // if no team strictly needs the position, add to smallest team
+                const smallestTeam = child.reduce((smallest, current) => current.length < smallest.length ? current : smallest, child[0]);
+                smallestTeam.push(JSON.parse(JSON.stringify(player)));
+            }
+        });
+        return child;
+    }
+    
+    getUnusedPlayers(teams, allPlayers) {
+        const usedIds = new Set(teams.flat().map(p => p.id));
+        return allPlayers.filter(p => !usedIds.has(p.id));
+    }
+
+    hashSolution(teams) {
+        return teams.map(team => team.map(p => p.id).sort().join(',')).sort().join('|');
+    }
+
+    tournamentSelection(scoredPopulation, size) {
+        let best = null;
+        for (let i = 0; i < size; i++) {
+            const idx = Math.floor(Math.random() * scoredPopulation.length);
+            if (!best || scoredPopulation[idx].score < best.score) {
+                best = scoredPopulation[idx];
+            }
+        }
+        return best.teams;
+    }
+
+    adaptParameters(teamCount, totalPlayers) {
+        // This is a placeholder for more complex logic
+    }
+    
+    resetAlgorithmStats() {
+        this.algorithmStats = {
+            geneticAlgorithm: { generations: 0, improvements: 0 },
+            tabuSearch: { iterations: 0, improvements: 0 },
+            simulatedAnnealing: { iterations: 0, improvements: 0, temperature: 0 },
+            localSearch: { iterations: 0, improvements: 0 }
         };
+    }
+
+    getAlgorithmStatistics() {
+        return this.algorithmStats;
     }
 }
 
