@@ -210,16 +210,18 @@ class TeamsPage extends BasePage {
             teamCountInput.addEventListener('input', updatePlayersPerTeam);
         }
 
-        // Composition inputs - FIX: Use querySelectorAll to get NodeList
+        // Composition inputs - Use querySelectorAll directly on container
         const compositionInputs = this.container.querySelectorAll('.composition-input');
-        compositionInputs.forEach(input => {
-            input.addEventListener('input', (e) => {
-                const pos = input.id.replace('comp_', '');
-                const value = parseInt(e.target.value) || 0;
-                this.state.composition[pos] = value;
-                updatePlayersPerTeam();
+        if (compositionInputs && compositionInputs.length > 0) {
+            compositionInputs.forEach(input => {
+                input.addEventListener('input', (e) => {
+                    const pos = input.id.replace('comp_', '');
+                    const value = parseInt(e.target.value) || 0;
+                    this.state.composition[pos] = value;
+                    updatePlayersPerTeam();
+                });
             });
-        });
+        }
 
         // Initial update
         updatePlayersPerTeam();
