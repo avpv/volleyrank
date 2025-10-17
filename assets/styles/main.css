@@ -170,7 +170,7 @@
        Layout
        ========================================================================== */
     
-    --header-height: 5rem;
+    --header-height: 4rem;
     --nav-height: 3rem;
     --container-max-width: 1280px;
 }
@@ -231,36 +231,25 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 h1 {
-    font-size: var(--font-size-3xl);
-    font-weight: var(--font-weight-bold);
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-semibold);
 }
 
 h2 {
-    font-size: var(--font-size-3xl);
-    font-weight: var(--font-weight-bold);
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-semibold);
     color: var(--color-text-primary);
     margin-bottom: var(--spacing-6);
-    padding-bottom: var(--spacing-4);
-    border-bottom: 2px solid var(--color-brand-primary);
-    position: relative;
-}
-
-h2::after {
-    content: '';
-    position: absolute;
-    bottom: -2px;
-    left: 0;
-    width: 60px;
-    height: 2px;
-    background: var(--gradient-brand);
 }
 
 h3 {
-    font-size: var(--font-size-xl);
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
 }
 
 h4 {
-    font-size: var(--font-size-lg);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-medium);
 }
 
 p {
@@ -401,12 +390,11 @@ a:hover {
 
 .page-header {
     margin-bottom: var(--spacing-8);
-    border-bottom: 1px solid var(--color-border-default);
-    padding-bottom: var(--spacing-6);
+    padding-bottom: var(--spacing-4);
 }
 
 .page-header h2 {
-    margin-bottom: var(--spacing-2);
+    margin-bottom: 0;
 }
 
 /* Footer */
