@@ -926,13 +926,14 @@ select.form-control {
 .welcome-guide h3 {
     color: var(--color-brand-primary);
     margin-bottom: var(--spacing-4);
-    font-size: var(--font-size-lg);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
 }
 
 .welcome-guide p {
     color: var(--color-text-secondary);
     margin-bottom: var(--spacing-4);
-    font-size: var(--font-size-base);
+    font-size: var(--font-size-sm);
 }
 
 .welcome-guide ol {
@@ -944,7 +945,7 @@ select.form-control {
     margin-bottom: var(--spacing-3);
     color: var(--color-text-primary);
     line-height: var(--line-height-relaxed);
-    font-size: var(--font-size-base);
+    font-size: var(--font-size-sm);
 }
 
 .welcome-guide ol li strong {
@@ -1201,12 +1202,12 @@ select.form-control {
     }
     
     .welcome-guide h3 {
-        font-size: var(--font-size-base);
+        font-size: var(--font-size-sm);
     }
     
     .welcome-guide p,
     .welcome-guide ol li {
-        font-size: var(--font-size-sm);
+        font-size: var(--font-size-xs);
     }
 }
 
