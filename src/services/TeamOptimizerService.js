@@ -138,20 +138,16 @@ class TeamOptimizerService {
      */
     performUniversalSwap(teams, positions) {
         const rand = Math.random();
-
-        // 50% - Adaptive/Simple Swap (frequent, fine-tuning)
-        if (rand < 0.5) {
-            if (this.config.adaptiveSwapEnabled) {
-                this.performAdaptiveSwap(teams, positions);
-            } else {
-                this.performSwap(teams, positions);
-            }
+        
+        if (rand < 0.25) {
+            this.performSwap(teams, positions);
         } 
-        // 25% - Cross-Team Position Swap (powerful, global changes)
+        else if (rand < 0.5) {
+            this.performAdaptiveSwap(teams, positions);
+        } 
         else if (rand < 0.75) {
             this.performCrossTeamPositionSwap(teams);
         } 
-        // 25% - Intra-Team Position Swap (local role optimization)
         else {
             this.performPositionSwap(teams);
         }
