@@ -4,7 +4,6 @@
  */
 
 import eloService from './EloService.js';
-import { EventEmitter } from 'events';
 
 // ========== CORE CONSTANTS ==========
 
