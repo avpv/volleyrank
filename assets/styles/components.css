@@ -20,7 +20,7 @@
     align-items: center;
     justify-content: center;
     gap: var(--spacing-2);
-    padding: var(--spacing-2) var(--spacing-4);
+    padding: var(--spacing-3) var(--spacing-4);
     font-family: inherit;
     font-size: var(--font-size-sm);
     font-weight: var(--font-weight-medium);
@@ -35,6 +35,7 @@
     transition: var(--transition-default);
     position: relative;
     overflow: hidden;
+    min-height: 40px;
 }
 
 /* Button Variants */
@@ -102,13 +103,15 @@
 
 /* Button Sizes */
 .btn-sm {
-    padding: var(--spacing-1) var(--spacing-3);
+    padding: var(--spacing-2) var(--spacing-3);
     font-size: var(--font-size-xs);
+    min-height: 32px;
 }
 
 .btn-lg {
-    padding: var(--spacing-3) var(--spacing-5);
+    padding: var(--spacing-4) var(--spacing-6);
     font-size: var(--font-size-base);
+    min-height: 48px;
 }
 
 /* Button States */
@@ -469,8 +472,9 @@ select.form-control {
 
 /* Remove small button styling from player actions to match form-actions */
 .player-actions .btn {
-    padding: var(--spacing-2) var(--spacing-4);
+    padding: var(--spacing-3) var(--spacing-4);
     font-size: var(--font-size-sm);
+    min-height: 40px;
 }
 
 /* Player Avatar */
@@ -919,11 +923,13 @@ select.form-control {
 .welcome-guide h3 {
     color: var(--color-brand-primary);
     margin-bottom: var(--spacing-4);
+    font-size: var(--font-size-lg);
 }
 
 .welcome-guide p {
     color: var(--color-text-secondary);
     margin-bottom: var(--spacing-4);
+    font-size: var(--font-size-base);
 }
 
 .welcome-guide ol {
@@ -935,10 +941,12 @@ select.form-control {
     margin-bottom: var(--spacing-3);
     color: var(--color-text-primary);
     line-height: var(--line-height-relaxed);
+    font-size: var(--font-size-base);
 }
 
 .welcome-guide ol li strong {
     color: var(--color-brand-primary);
+    font-weight: var(--font-weight-semibold);
 }
 
 /* =============================================================================
@@ -1165,7 +1173,7 @@ select.form-control {
     .modal-close {
         width: 36px;
         height: 36px;
-        font-size: var(--font-size-xl);
+        font-size: var(--font-size-2xl);
     }
 
     .rank-badge {
@@ -1183,6 +1191,19 @@ select.form-control {
     .ranking-item {
         padding: var(--spacing-3);
         gap: var(--spacing-3);
+    }
+    
+    .welcome-guide {
+        padding: var(--spacing-6);
+    }
+    
+    .welcome-guide h3 {
+        font-size: var(--font-size-base);
+    }
+    
+    .welcome-guide p,
+    .welcome-guide ol li {
+        font-size: var(--font-size-sm);
     }
 }
 
