@@ -195,7 +195,7 @@ class TeamsPage extends BasePage {
             const teamCountInput = this.$('#teamCount');
             const teamCount = parseInt(teamCountInput?.value) || 2;
             
-            // Сохраняем teamCount в state
+            // Save teamCount to state
             this.setState({ teamCount }, { silent: true });
             
             const composition = this.getComposition();
@@ -210,8 +210,9 @@ class TeamsPage extends BasePage {
             teamCountInput.addEventListener('input', updatePlayersPerTeam);
         }
 
-        // Composition inputs
-        this.$('.composition-input').forEach(input => {
+        // Composition inputs - FIX: Use querySelectorAll to get NodeList
+        const compositionInputs = this.container.querySelectorAll('.composition-input');
+        compositionInputs.forEach(input => {
             input.addEventListener('input', (e) => {
                 const pos = input.id.replace('comp_', '');
                 const value = parseInt(e.target.value) || 0;
