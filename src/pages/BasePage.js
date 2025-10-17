@@ -31,7 +31,6 @@ class BasePage extends Component {
      * Destroy page and all child components
      */
     onDestroy() {
-        // todo
         this.components.forEach(component => {
             if (component && typeof component.destroy === 'function') {
                 try {
@@ -70,10 +69,10 @@ class BasePage extends Component {
     /**
      * Render empty state
      */
-    renderEmpty(message, icon = '📋') {
+    renderEmpty(message, icon = '') {
         return `
             <div class="empty-state">
-                <div class="empty-icon">${icon}</div>
+                ${icon ? `<div class="empty-icon">${icon}</div>` : ''}
                 <p>${message}</p>
             </div>
         `;
@@ -85,7 +84,7 @@ class BasePage extends Component {
     renderError(message) {
         return `
             <div class="error-state">
-                <div class="error-icon">⚠️</div>
+                <div class="error-icon">!</div>
                 <p>${this.escape(message)}</p>
             </div>
         `;
