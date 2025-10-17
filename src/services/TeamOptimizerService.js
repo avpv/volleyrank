@@ -2,7 +2,6 @@
  * TeamOptimizerService - Team balancing with advanced algorithms
  * Uses Genetic Algorithm, Simulated Annealing, and Tabu Search
  */
-
 import eloService from './EloService.js';
 
 // ========== CORE CONSTANTS ==========
