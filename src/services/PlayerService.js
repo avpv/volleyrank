@@ -52,10 +52,6 @@ class PlayerService {
             if (new Set(positions).size !== positions.length) {
                 errors.push('Duplicate positions not allowed');
             }
-
-            if (positions.length > 3) {
-                errors.push('Maximum 3 positions allowed');
-            }
         }
 
         return {
