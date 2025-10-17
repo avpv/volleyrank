@@ -862,8 +862,8 @@ select.form-control {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: transparent;
-    border: 1px solid transparent;
+    background: var(--color-surface-raised);
+    border: 1px solid var(--color-border-default);
     border-radius: var(--radius-md);
     color: var(--color-text-secondary);
     font-size: var(--font-size-2xl);
@@ -871,16 +871,19 @@ select.form-control {
     cursor: pointer;
     transition: var(--transition-default);
     padding: 0;
+    flex-shrink: 0;
 }
 
 .modal-close:hover {
     background: var(--color-surface-overlay);
-    border-color: var(--color-border-default);
+    border-color: var(--color-border-strong);
     color: var(--color-text-primary);
+    transform: scale(1.05);
 }
 
 .modal-close:active {
     transform: scale(0.95);
+    background: var(--color-bg-tertiary);
 }
 
 .modal-close::before {
