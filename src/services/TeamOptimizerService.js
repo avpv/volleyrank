@@ -256,13 +256,13 @@ class SimpleOptimizer {
 
     performSwap(teams, positions) {
         if (teams.length < 2) return;
-
+    
         const t1 = Math.floor(Math.random() * teams.length);
         let t2;
         do {
             t2 = Math.floor(Math.random() * teams.length);
         } while (t1 === t2);
-
+    
         const pos = positions[Math.floor(Math.random() * positions.length)];
         
         const t1Players = teams[t1].filter(p => p.assignedPosition === pos);
@@ -272,10 +272,16 @@ class SimpleOptimizer {
             const p1 = t1Players[Math.floor(Math.random() * t1Players.length)];
             const p2 = t2Players[Math.floor(Math.random() * t2Players.length)];
             
+            if (!p1.positions.includes(pos) || !p2.positions.includes(pos)) {
+                return;
+            }
+            
             const idx1 = teams[t1].findIndex(p => p.id === p1.id);
             const idx2 = teams[t2].findIndex(p => p.id === p2.id);
             
-            [teams[t1][idx1], teams[t2][idx2]] = [teams[t2][idx2], teams[t1][idx1]];
+            if (idx1 !== -1 && idx2 !== -1) {
+                [teams[t1][idx1], teams[t2][idx2]] = [teams[t2][idx2], teams[t1][idx1]];
+            }
         }
     }
 
