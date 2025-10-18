@@ -13,7 +13,6 @@ class TeamOptimizerService {
             'L': 'Libero'
         };
         
-        // --- GLOBAL CONFIGURATION ---
         this.config = {
             useGeneticAlgorithm: true,
             useTabuSearch: true,
@@ -21,17 +20,16 @@ class TeamOptimizerService {
             adaptiveSwapEnabled: true,
             adaptiveParameters: {
                 strongWeakSwapProbability: 0.6,
-                positionBalanceWeight: 0.3, // Weight for position-specific imbalance in the evaluation function
-                varianceWeight: 0.5       // Weight for team strength variance
+                positionBalanceWeight: 0.3,
+                varianceWeight: 0.5
             }
         };
         
-        // --- PER-ALGORITHM CONFIGURATION ---
         this.algorithmConfigs = {
             geneticAlgorithm: {
                 populationSize: 20,
                 generationCount: 100,
-                mutationRate: 0.2, // Increased mutation rate to leverage powerful swaps
+                mutationRate: 0.2,
                 crossoverRate: 0.7,
                 elitismCount: 2,
                 tournamentSize: 3,
@@ -61,9 +59,6 @@ class TeamOptimizerService {
         this.algorithmStats = {};
     }
 
-    /**
-     * Main optimization entry point.
-     */
     async optimize(composition, teamCount, players) {
         const validation = this.enhancedValidate(composition, teamCount, players);
         if (!validation.isValid) {
@@ -125,17 +120,6 @@ class TeamOptimizerService {
         };
     }
 
-    // =======================================================================
-    // == UNIVERSAL MUTATION OPERATORS (CORE OF THE MERGED LOGIC)           ==
-    // =======================================================================
-    
-    /**
-     * A unified operator that selects one of the available swap/mutation types
-     * based on a probability distribution. This is the heart of the optimizer's
-     * search strategy.
-     * @param {Array} teams - The current team structure.
-     * @param {Array} positions - The list of positions in the composition.
-     */
     performUniversalSwap(teams, positions) {
         const rand = Math.random();
         
@@ -153,10 +137,6 @@ class TeamOptimizerService {
         }
     }
 
-    /**
-     * Swaps two players between the strongest and weakest teams to improve balance.
-     * Falls back to a random swap if conditions aren't met.
-     */
     performAdaptiveSwap(teams, positions) {
         const teamStrengths = teams.map((team, idx) => ({
             idx,
@@ -187,13 +167,9 @@ class TeamOptimizerService {
                 }
             }
         }
-        // Fallback to a standard random swap
         this.performSwap(teams, positions);
     }
     
-    /**
-     * Simple random swap of two players on the same position between two random teams.
-     */
     performSwap(teams, positions) {
         if (teams.length < 2 || positions.length === 0) return;
         const t1_idx = Math.floor(Math.random() * teams.length);
@@ -215,10 +191,6 @@ class TeamOptimizerService {
         }
     }
 
-    /**
-     * Swaps the assigned positions of two players WITHIN the same team.
-     * Crucial for optimizing roles for multi-position players.
-     */
     performPositionSwap(teams) {
         if (teams.length === 0) return;
         const teamIndex = Math.floor(Math.random() * teams.length);
@@ -244,10 +216,6 @@ class TeamOptimizerService {
         }
     }
 
-    /**
-     * Swaps two players BETWEEN different teams AND assigns them each other's original positions.
-     * The most powerful operator for breaking out of local optima.
-     */
     performCrossTeamPositionSwap(teams) {
         if (teams.length < 2) return;
         const t1_idx = Math.floor(Math.random() * teams.length);
@@ -271,19 +239,27 @@ class TeamOptimizerService {
 
             [teams[t1_idx][p1_idx], teams[t2_idx][p2_idx]] = [p2, p1];
             
-            // p1 is now in team2
             p1.assignedPosition = p1_new_pos;
             p1.positionRating = p1.ratings[p1_new_pos] || 1500;
             
-            // p2 is now in team1
             p2.assignedPosition = p2_new_pos;
             p2.positionRating = p2.ratings[p2_new_pos] || 1500;
         }
     }
 
-    // =======================================================================
-    // == CORE ALGORITHM IMPLEMENTATIONS (ADAPTED FOR UNIVERSAL SWAP)       ==
-    // =======================================================================
+    cloneTeams(teams) {
+        if (!Array.isArray(teams)) {
+            console.error('cloneTeams: teams is not an array', teams);
+            return [];
+        }
+        return teams.map(team => {
+            if (!Array.isArray(team)) {
+                console.error('cloneTeams: team is not an array', team);
+                return [];
+            }
+            return team.map(player => ({ ...player }));
+        });
+    }
 
     async runGeneticAlgorithm(initialPop, composition, teamCount, playersByPosition, positions) {
         const config = this.algorithmConfigs.geneticAlgorithm;
@@ -319,7 +295,7 @@ class TeamOptimizerService {
                     const parent2 = this.tournamentSelection(scored, config.tournamentSize);
                     newPopulation.push(this.enhancedCrossover(parent1, parent2, composition));
                 } else {
-                    newPopulation.push(JSON.parse(JSON.stringify(parent1)));
+                    newPopulation.push(this.cloneTeams(parent1));
                 }
             }
 
@@ -346,8 +322,8 @@ class TeamOptimizerService {
     
     async runTabuSearch(initialTeams, positions) {
         const config = this.algorithmConfigs.tabuSearch;
-        let current = JSON.parse(JSON.stringify(initialTeams));
-        let best = JSON.parse(JSON.stringify(current));
+        let current = this.cloneTeams(initialTeams);
+        let best = this.cloneTeams(current);
         let bestScore = this.evaluateSolution(best);
         this.tabuList = [];
         let iterationSinceImprovement = 0;
@@ -375,7 +351,7 @@ class TeamOptimizerService {
                 if (this.tabuList.length > config.tabuTenure) this.tabuList.shift();
                 
                 if (currentScore < bestScore) {
-                    best = JSON.parse(JSON.stringify(current));
+                    best = this.cloneTeams(current);
                     bestScore = currentScore;
                     iterationSinceImprovement = 0;
                     this.algorithmStats.tabuSearch.improvements++;
@@ -395,8 +371,8 @@ class TeamOptimizerService {
 
     async runSimulatedAnnealing(initialTeams, positions) {
         const config = this.algorithmConfigs.simulatedAnnealing;
-        let current = JSON.parse(JSON.stringify(initialTeams));
-        let best = JSON.parse(JSON.stringify(current));
+        let current = this.cloneTeams(initialTeams);
+        let best = this.cloneTeams(current);
         let currentScore = this.evaluateSolution(current);
         let bestScore = currentScore;
         let temp = config.initialTemperature;
@@ -406,7 +382,7 @@ class TeamOptimizerService {
             this.algorithmStats.simulatedAnnealing.iterations = iter + 1;
             this.algorithmStats.simulatedAnnealing.temperature = temp;
             
-            const neighbor = JSON.parse(JSON.stringify(current));
+            const neighbor = this.cloneTeams(current);
             this.performUniversalSwap(neighbor, positions);
             const neighborScore = this.evaluateSolution(neighbor);
             const delta = neighborScore - currentScore;
@@ -415,7 +391,7 @@ class TeamOptimizerService {
                 current = neighbor;
                 currentScore = neighborScore;
                 if (neighborScore < bestScore) {
-                    best = JSON.parse(JSON.stringify(neighbor));
+                    best = this.cloneTeams(neighbor);
                     bestScore = neighborScore;
                     iterationSinceImprovement = 0;
                     this.algorithmStats.simulatedAnnealing.improvements++;
@@ -435,12 +411,12 @@ class TeamOptimizerService {
 
     async runLocalSearch(teams, positions) {
         const config = this.algorithmConfigs.localSearch;
-        let current = JSON.parse(JSON.stringify(teams));
+        let current = this.cloneTeams(teams);
         let currentScore = this.evaluateSolution(current);
         
         for (let iter = 0; iter < config.iterations; iter++) {
             this.algorithmStats.localSearch.iterations = iter + 1;
-            const neighbor = JSON.parse(JSON.stringify(current));
+            const neighbor = this.cloneTeams(current);
             this.performUniversalSwap(neighbor, positions);
             const neighborScore = this.evaluateSolution(neighbor);
             if (neighborScore < currentScore) {
@@ -453,21 +429,22 @@ class TeamOptimizerService {
         return current;
     }
     
-    // =======================================================================
-    // == HELPER AND UTILITY METHODS (MOSTLY FROM THE ADVANCED SCRIPT)      ==
-    // =======================================================================
-    
     generateNeighborhood(teams, positions, size) {
         return Array.from({ length: size }, () => {
-            const neighbor = JSON.parse(JSON.stringify(teams));
+            const neighbor = this.cloneTeams(teams);
             this.performUniversalSwap(neighbor, positions);
             return neighbor;
         });
     }
 
     evaluateSolution(teams) {
-        if (!teams || teams.length === 0) return Infinity;
-        const teamStrengths = teams.map(team => eloService.calculateTeamStrength(team).totalRating);
+        if (!teams || !Array.isArray(teams) || teams.length === 0) return Infinity;
+        
+        const teamStrengths = teams.map(team => {
+            if (!Array.isArray(team)) return 0;
+            return eloService.calculateTeamStrength(team).totalRating;
+        });
+        
         if (teamStrengths.some(isNaN)) return Infinity;
 
         const balance = Math.max(...teamStrengths) - Math.min(...teamStrengths);
@@ -491,7 +468,6 @@ class TeamOptimizerService {
     enhancedValidate(composition, teamCount, players) {
         const errors = [];
         const warnings = [];
-        const playersByPosition = this.groupByPosition(players);
         let totalNeeded = 0;
         
         Object.entries(composition).forEach(([position, count]) => {
@@ -525,13 +501,13 @@ class TeamOptimizerService {
     }
 
     generateInitialSolutions(composition, teamCount, playersByPosition) {
-        const solutions = new Set();
-        solutions.add(this.createBalancedSolution(composition, teamCount, playersByPosition));
-        solutions.add(this.createSnakeDraftSolution(composition, teamCount, playersByPosition));
+        const solutions = [];
+        solutions.push(this.createBalancedSolution(composition, teamCount, playersByPosition));
+        solutions.push(this.createSnakeDraftSolution(composition, teamCount, playersByPosition));
         for(let i=0; i<3; i++) {
-           solutions.add(this.createRandomSolution(composition, teamCount, playersByPosition));
+           solutions.push(this.createRandomSolution(composition, teamCount, playersByPosition));
         }
-        return Array.from(solutions).map(s => JSON.parse(s));
+        return solutions;
     }
     
     createBalancedSolution(composition, teamCount, playersByPosition) {
@@ -555,7 +531,7 @@ class TeamOptimizerService {
                 }
             }
         });
-        return JSON.stringify(teams);
+        return teams;
     }
     
     createSnakeDraftSolution(composition, teamCount, playersByPosition) {
@@ -580,7 +556,7 @@ class TeamOptimizerService {
                 }
             }
         });
-        return JSON.stringify(teams);
+        return teams;
     }
 
     createRandomSolution(composition, teamCount, playersByPosition) {
@@ -595,7 +571,6 @@ class TeamOptimizerService {
             }
         });
         
-        // Shuffle and remove duplicates
         allAvailablePlayers = [...new Map(allAvailablePlayers.map(p => [p.id, p])).values()];
         for (let i = allAvailablePlayers.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -606,7 +581,6 @@ class TeamOptimizerService {
         const totalPlayersPerTeam = Object.values(composition).reduce((a,b)=>a+b, 0);
 
         allAvailablePlayers.forEach(player => {
-            // Find a team that needs this player
             let placed = false;
             const shuffledTeamIndices = [...Array(teamCount).keys()].sort(() => Math.random() - 0.5);
             for(const teamIdx of shuffledTeamIndices){
@@ -621,33 +595,33 @@ class TeamOptimizerService {
                 }
             }
         });
-        return JSON.stringify(teams);
+        return teams;
     }
 
     enhancedCrossover(parent1, parent2, composition) {
         const child = Array.from({ length: parent1.length }, () => []);
         const usedIds = new Set();
-        // Take a slice from parent1
         const slicePoint = Math.floor(Math.random() * parent1.length);
+        
         for (let i = 0; i < slicePoint; i++) {
-            child[i] = JSON.parse(JSON.stringify(parent1[i]));
+            child[i] = parent1[i].map(p => ({ ...p }));
             parent1[i].forEach(p => usedIds.add(p.id));
         }
-        // Take remaining players from parent2
+        
         const remainingPlayers = parent2.flat().filter(p => !usedIds.has(p.id));
         remainingPlayers.forEach(player => {
             let placed = false;
             for (let i = 0; i < child.length; i++) {
                 const needsPos = (child[i].filter(p => p.assignedPosition === player.assignedPosition).length) < (composition[player.assignedPosition] || 0);
                 if (needsPos) {
-                    child[i].push(JSON.parse(JSON.stringify(player)));
+                    child[i].push({ ...player });
                     placed = true;
                     break;
                 }
             }
-            if (!placed) { // if no team strictly needs the position, add to smallest team
+            if (!placed) {
                 const smallestTeam = child.reduce((smallest, current) => current.length < smallest.length ? current : smallest, child[0]);
-                smallestTeam.push(JSON.parse(JSON.stringify(player)));
+                smallestTeam.push({ ...player });
             }
         });
         return child;
@@ -674,7 +648,6 @@ class TeamOptimizerService {
     }
 
     adaptParameters(teamCount, totalPlayers) {
-        // This is a placeholder for more complex logic
     }
     
     resetAlgorithmStats() {
