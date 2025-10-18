@@ -514,16 +514,18 @@ class TeamOptimizerService {
         const teams = Array.from({ length: teamCount }, () => []);
         const usedIds = new Set();
         const positionOrder = Object.entries(composition).filter(([, count]) => count > 0);
-
+    
         positionOrder.forEach(([position, neededCount]) => {
             const players = (playersByPosition[position] || [])
                 .filter(p => !usedIds.has(p.id))
                 .sort((a, b) => b.positionRating - a.positionRating);
-
+    
             let playerIdx = 0;
-            for (let i = 0; i < neededCount; i++) {
+            
+            for (let slot = 0; slot < neededCount; slot++) {
+                
                 for (let teamIdx = 0; teamIdx < teamCount; teamIdx++) {
-                     if(playerIdx < players.length) {
+                    if (playerIdx < players.length) {
                         teams[teamIdx].push(players[playerIdx]);
                         usedIds.add(players[playerIdx].id);
                         playerIdx++;
@@ -538,17 +540,19 @@ class TeamOptimizerService {
         const teams = Array.from({ length: teamCount }, () => []);
         const usedIds = new Set();
         const positionOrder = Object.entries(composition).filter(([, count]) => count > 0);
-
+    
         positionOrder.forEach(([position, neededCount]) => {
             const players = (playersByPosition[position] || [])
                 .filter(p => !usedIds.has(p.id))
                 .sort((a, b) => b.positionRating - a.positionRating);
             
             let playerIdx = 0;
-            for (let round = 0; round < neededCount; round++) {
+            
+            for (let slot = 0; slot < neededCount; slot++) {
+                
                 for (let i = 0; i < teamCount; i++) {
-                    if(playerIdx < players.length){
-                        const teamIdx = round % 2 === 0 ? i : teamCount - 1 - i;
+                    if (playerIdx < players.length) {
+                        const teamIdx = slot % 2 === 0 ? i : teamCount - 1 - i;
                         teams[teamIdx].push(players[playerIdx]);
                         usedIds.add(players[playerIdx].id);
                         playerIdx++;
@@ -561,40 +565,32 @@ class TeamOptimizerService {
 
     createRandomSolution(composition, teamCount, playersByPosition) {
         const teams = Array.from({ length: teamCount }, () => []);
-        let allAvailablePlayers = [];
+        const usedIds = new Set();
+        const totalPlayersPerTeam = Object.values(composition).reduce((a, b) => a + b, 0);
+    
         Object.entries(composition).forEach(([position, neededCount]) => {
-            const players = (playersByPosition[position] || []);
-            for(let i=0; i<neededCount * teamCount; i++){
-                if(i < players.length) {
-                    allAvailablePlayers.push(players[i]);
-                }
+            if (neededCount === 0) return;
+            
+            const players = (playersByPosition[position] || [])
+                .filter(p => !usedIds.has(p.id));
+            
+            for (let i = players.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [players[i], players[j]] = [players[j], players[i]];
             }
-        });
-        
-        allAvailablePlayers = [...new Map(allAvailablePlayers.map(p => [p.id, p])).values()];
-        for (let i = allAvailablePlayers.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [allAvailablePlayers[i], allAvailablePlayers[j]] = [allAvailablePlayers[j], allAvailablePlayers[i]];
-        }
-
-        const teamPlayerCounts = Array(teamCount).fill(0);
-        const totalPlayersPerTeam = Object.values(composition).reduce((a,b)=>a+b, 0);
-
-        allAvailablePlayers.forEach(player => {
-            let placed = false;
-            const shuffledTeamIndices = [...Array(teamCount).keys()].sort(() => Math.random() - 0.5);
-            for(const teamIdx of shuffledTeamIndices){
-                if(teamPlayerCounts[teamIdx] < totalPlayersPerTeam){
-                    const posCount = teams[teamIdx].filter(p => p.assignedPosition === player.assignedPosition).length;
-                    if(posCount < composition[player.assignedPosition]){
-                         teams[teamIdx].push(player);
-                         teamPlayerCounts[teamIdx]++;
-                         placed = true;
-                         break;
+    
+            let playerIdx = 0;
+            for (let slot = 0; slot < neededCount; slot++) {
+                for (let teamIdx = 0; teamIdx < teamCount; teamIdx++) {
+                    if (playerIdx < players.length) {
+                        teams[teamIdx].push(players[playerIdx]);
+                        usedIds.add(players[playerIdx].id);
+                        playerIdx++;
                     }
                 }
             }
         });
+    
         return teams;
     }
 
