@@ -585,11 +585,17 @@ select.form-control {
 }
 
 .badge-stats {
-    display: none; /* Hidden in compact mode */
+    font-size: var(--font-size-xs);
+    color: var(--color-text-tertiary);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-1);
 }
 
 .badge-rating {
-    display: none; /* Hidden in compact mode */
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text-primary);
+    font-size: var(--font-size-sm);
 }
 
 /* =============================================================================
