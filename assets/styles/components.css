@@ -474,11 +474,14 @@ select.form-control {
     border-top-color: var(--color-border-strong);
 }
 
-/* Remove small button styling from player actions to match form-actions */
+/* Player Actions buttons - consistent sizing */
 .player-actions .btn {
-    padding: var(--spacing-3) var(--spacing-4);
+    padding: var(--spacing-3) var(--spacing-5);
     font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
     min-height: 40px;
+    min-width: 100px;
+    flex: 1;
 }
 
 /* Player Avatar */
