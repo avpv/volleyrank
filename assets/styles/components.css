@@ -861,13 +861,14 @@ select.form-control {
 }
 
 /* Modal Close Button */
-.modal-close {
+.modal-close,
+.modal-close-btn {
     width: 32px;
     height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--color-surface-raised);
+    background: transparent;
     border: 1px solid var(--color-border-default);
     border-radius: var(--radius-md);
     color: var(--color-text-secondary);
@@ -879,22 +880,18 @@ select.form-control {
     flex-shrink: 0;
 }
 
-.modal-close:hover {
+.modal-close:hover,
+.modal-close-btn:hover {
     background: var(--color-surface-overlay);
     border-color: var(--color-border-strong);
     color: var(--color-text-primary);
     transform: scale(1.05);
 }
 
-.modal-close:active {
+.modal-close:active,
+.modal-close-btn:active {
     transform: scale(0.95);
     background: var(--color-bg-tertiary);
-}
-
-.modal-close::before {
-    content: '×';
-    display: block;
-    font-weight: var(--font-weight-regular);
 }
 
 .modal-body {
