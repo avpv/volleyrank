@@ -455,14 +455,7 @@ select.form-control {
     align-items: stretch;
     gap: var(--spacing-3);
     margin-bottom: var(--spacing-4);
-    padding-bottom: var(--spacing-4);
-    border-bottom: 1px solid var(--color-border-default);
     transition: var(--transition-default);
-}
-
-/* Ensure border remains visible when card is hovered */
-.player-card:hover .player-positions {
-    border-bottom-color: var(--color-border-strong);
 }
 
 /* Player Actions - Match form-actions button sizing */
@@ -470,8 +463,15 @@ select.form-control {
     display: flex;
     gap: var(--spacing-3);
     padding-top: var(--spacing-4);
+    border-top: 1px solid var(--color-border-default);
     flex-wrap: wrap;
     margin-top: auto;
+    transition: var(--transition-default);
+}
+
+/* Ensure border remains visible when card is hovered */
+.player-card:hover .player-actions {
+    border-top-color: var(--color-border-strong);
 }
 
 /* Remove small button styling from player actions to match form-actions */
