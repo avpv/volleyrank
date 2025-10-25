@@ -394,26 +394,14 @@ select.form-control {
     border: 1px solid var(--color-border-default);
     border-radius: var(--radius-lg);
     padding: var(--spacing-5);
-    transition: var(--transition-default);
     position: relative;
     display: flex;
     flex-direction: column;
     min-height: 280px;
 }
 
-.player-card:hover {
-    border-color: var(--color-border-strong);
-    background-color: var(--color-surface-overlay);
-}
-
 .player-card.clickable {
     cursor: pointer;
-}
-
-.player-card.clickable:hover {
-    border-color: var(--color-brand-primary);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-lg);
 }
 
 .player-header {
@@ -431,7 +419,7 @@ select.form-control {
     line-height: var(--line-height-tight);
 }
 
-/* Multi-badge - fixed to maintain contrast on hover */
+/* Multi-badge */
 .multi-badge {
     background-color: var(--color-surface-overlay);
     color: var(--color-text-secondary);
@@ -439,14 +427,6 @@ select.form-control {
     padding: var(--spacing-1) var(--spacing-2);
     border-radius: var(--radius-sm);
     font-weight: var(--font-weight-medium);
-    transition: var(--transition-default);
-}
-
-/* Ensure multi-badge maintains contrast when card is hovered */
-.player-card:hover .multi-badge {
-    background-color: var(--color-bg-secondary);
-    color: var(--color-text-primary);
-    border: 1px solid var(--color-border-default);
 }
 
 .player-positions {
@@ -466,12 +446,6 @@ select.form-control {
     border-top: 1px solid var(--color-border-default);
     flex-wrap: wrap;
     margin-top: auto;
-    transition: var(--transition-default);
-}
-
-/* Ensure border remains visible when card is hovered */
-.player-card:hover .player-actions {
-    border-top-color: var(--color-border-strong);
 }
 
 /* Player Actions buttons - consistent sizing */
