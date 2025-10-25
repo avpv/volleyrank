@@ -72,7 +72,7 @@ class ComparePage extends BasePage {
 
         return `
             <div class="progress-section">
-                <h3>Position Progress</h3>
+                <h3>Comparison Progress</h3>
                 <div class="progress-bars">
                     ${Object.entries(positions).map(([key, name]) => {
                         const prog = progress[key];
@@ -82,18 +82,23 @@ class ComparePage extends BasePage {
                             return `
                                 <div class="progress-item disabled">
                                     <div class="progress-header">
-                                        <span>${name}</span>
-                                        <span class="progress-status">Need 2+ players</span>
+                                        <span>${name} (${key})</span>
+                                        <span class="progress-status">${players.length} player${players.length !== 1 ? 's' : ''}</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 0%"></div>
                                     </div>
                                 </div>
                             `;
                         }
                         
+                        const isComplete = prog.percentage === 100;
+                        
                         return `
                             <div class="progress-item">
                                 <div class="progress-header">
-                                    <span>${name}</span>
-                                    <span>${prog.completed}/${prog.total} (${prog.percentage}%)</span>
+                                    <span>${name} (${key})</span>
+                                    <span>${isComplete ? '✓ Complete' : `${prog.completed}/${prog.total}`}</span>
                                 </div>
                                 <div class="progress-bar">
                                     <div class="progress-fill" style="width: ${prog.percentage}%"></div>
