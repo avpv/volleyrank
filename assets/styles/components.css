@@ -623,15 +623,16 @@ select.form-control {
     background-color: var(--color-surface-raised);
     border: 1px solid var(--color-border-default);
     border-radius: var(--radius-lg);
-    padding: var(--spacing-5);
+    padding: var(--spacing-6);
     margin-bottom: var(--spacing-6);
 }
 
 .progress-section h3 {
-    font-size: var(--font-size-lg);
+    font-size: var(--font-size-xl);
     font-weight: var(--font-weight-semibold);
     color: var(--color-text-primary);
-    margin-bottom: var(--spacing-4);
+    margin-bottom: var(--spacing-5);
+    letter-spacing: -0.01em;
 }
 
 .progress-bars {
@@ -649,10 +650,7 @@ select.form-control {
 }
 
 .progress-item:hover {
-    border-color: var(--color-brand-primary);
-    background-color: var(--color-surface-base);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(47, 129, 247, 0.15);
+    border-color: var(--color-border-strong);
 }
 
 .progress-item.disabled {
@@ -662,9 +660,6 @@ select.form-control {
 
 .progress-item.disabled:hover {
     border-color: var(--color-border-default);
-    background-color: var(--color-bg-primary);
-    transform: none;
-    box-shadow: none;
 }
 
 .progress-header {
@@ -672,13 +667,14 @@ select.form-control {
     justify-content: space-between;
     align-items: center;
     margin-bottom: var(--spacing-3);
-    font-size: var(--font-size-sm);
+    gap: var(--spacing-3);
 }
 
 .progress-header span:first-child {
     font-weight: var(--font-weight-semibold);
     color: var(--color-text-primary);
     font-size: var(--font-size-base);
+    line-height: var(--line-height-tight);
 }
 
 .progress-header span:last-child {
@@ -687,33 +683,36 @@ select.form-control {
     font-family: var(--font-family-mono);
     font-weight: var(--font-weight-semibold);
     background-color: var(--color-surface-raised);
-    padding: var(--spacing-1) var(--spacing-2);
+    padding: var(--spacing-1) var(--spacing-3);
     border-radius: var(--radius-sm);
+    white-space: nowrap;
 }
 
 .progress-status {
     color: var(--color-text-tertiary) !important;
     font-style: italic;
-    font-weight: var(--font-weight-medium) !important;
+    font-weight: var(--font-weight-normal) !important;
     background-color: transparent !important;
+    padding: 0 !important;
 }
 
 .progress-bar {
     width: 100%;
-    height: 10px;
-    background-color: var(--color-border-default);
+    height: 8px;
+    background-color: var(--color-surface-overlay);
     border-radius: var(--radius-full);
     overflow: hidden;
     position: relative;
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--color-border-default);
 }
 
 .progress-fill {
     height: 100%;
     background: var(--gradient-brand);
     border-radius: var(--radius-full);
-    transition: width 0.5s ease-out;
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
+    box-shadow: 0 0 8px rgba(47, 129, 247, 0.4);
 }
 
 .progress-fill::after {
