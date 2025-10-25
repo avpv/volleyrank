@@ -567,15 +567,7 @@ select.form-control {
     padding: var(--spacing-3) var(--spacing-5);
     width: 140px;
     min-height: 80px;
-    transition: var(--transition-default);
     flex-shrink: 0;
-}
-
-.position-badge:hover {
-    background-color: var(--color-surface-overlay);
-    border-color: var(--color-brand-primary);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(47, 129, 247, 0.2);
 }
 
 .badge-position {
