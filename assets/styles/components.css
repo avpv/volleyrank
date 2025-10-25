@@ -398,6 +398,11 @@ select.form-control {
     display: flex;
     flex-direction: column;
     min-height: 280px;
+    transition: var(--transition-default);
+}
+
+.player-card:hover {
+    border-color: var(--color-border-strong);
 }
 
 .player-card.clickable {
