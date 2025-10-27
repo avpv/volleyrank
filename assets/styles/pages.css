@@ -98,7 +98,7 @@
 }
 
 .progress-section h3 {
-    margin-bottom: var(--spacing-6);
+    margin-bottom: var(--spacing-5);
     font-size: var(--font-size-lg);
     font-weight: var(--font-weight-semibold);
     color: var(--color-text-primary);
@@ -107,32 +107,41 @@
 .progress-bars {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-4);
+    gap: var(--spacing-3);
 }
 
 .progress-item {
     display: flex;
     flex-direction: column;
     gap: var(--spacing-2);
-    padding: var(--spacing-4);
+    padding: var(--spacing-3) var(--spacing-4);
     background-color: var(--color-surface-base);
     border: 1px solid var(--color-border-default);
     border-radius: var(--radius-md);
-    transition: var(--transition-default);
+    transition: all 0.2s ease;
+    cursor: default;
 }
 
 .progress-item:hover {
     background-color: var(--color-surface-overlay);
     border-color: var(--color-border-strong);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .progress-item.disabled {
-    opacity: 0.6;
+    opacity: 0.5;
     background-color: var(--color-bg-secondary);
+    cursor: not-allowed;
+}
+
+.progress-item.disabled:hover {
+    transform: none;
+    box-shadow: none;
 }
 
 .progress-item.current-position {
-    border-left: 4px solid var(--color-brand-primary);
+    border-left: 3px solid var(--color-brand-primary);
     background-color: var(--color-surface-interactive);
 }
 
@@ -145,7 +154,7 @@
     justify-content: space-between;
     align-items: center;
     font-size: var(--font-size-sm);
-    margin-bottom: var(--spacing-2);
+    gap: var(--spacing-3);
 }
 
 .progress-header span:first-child {
@@ -154,37 +163,59 @@
     display: flex;
     align-items: center;
     gap: var(--spacing-2);
+    flex: 1;
+    min-width: 0;
 }
 
-.progress-header span:last-child {
-    color: var(--color-text-tertiary);
+.progress-stats {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
     font-family: var(--font-family-mono);
     font-size: var(--font-size-xs);
+    flex-shrink: 0;
+}
+
+.progress-count {
+    color: var(--color-text-secondary);
     font-weight: var(--font-weight-medium);
+}
+
+.progress-percentage {
+    color: var(--color-brand-primary);
+    font-weight: var(--font-weight-semibold);
+    min-width: 40px;
+    text-align: right;
+}
+
+.progress-percentage.complete {
+    color: var(--color-success);
 }
 
 .progress-status {
     color: var(--color-warning);
-    font-style: italic;
     font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-medium);
 }
 
 /* Progress Bar */
 .progress-bar {
     width: 100%;
-    height: 8px;
-    background-color: var(--color-border-default);
+    height: 6px;
+    background-color: rgba(48, 54, 61, 0.5);
     border-radius: var(--radius-full);
     overflow: hidden;
     position: relative;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .progress-fill {
     height: 100%;
-    background: var(--gradient-brand);
+    background: linear-gradient(90deg, #2f81f7, #58a6ff);
     border-radius: var(--radius-full);
-    transition: width var(--duration-slow) var(--ease-out);
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
+    box-shadow: 0 0 8px rgba(47, 129, 247, 0.4);
 }
 
 .progress-fill::after {
@@ -196,9 +227,14 @@
     bottom: 0;
     background: linear-gradient(90deg, 
         transparent 0%, 
-        rgba(255, 255, 255, 0.2) 50%, 
+        rgba(255, 255, 255, 0.3) 50%, 
         transparent 100%);
     animation: shimmer 2s infinite;
+}
+
+.progress-fill.complete {
+    background: linear-gradient(90deg, #3fb950, #56d364);
+    box-shadow: 0 0 8px rgba(63, 185, 80, 0.4);
 }
 
 /* Comparison Area */
@@ -726,10 +762,21 @@
         padding: var(--spacing-4);
     }
 
+    .progress-item {
+        padding: var(--spacing-3);
+    }
+
     .progress-header {
-        flex-direction: column;
-        align-items: flex-start;
+        font-size: var(--font-size-xs);
+    }
+
+    .progress-stats {
         gap: var(--spacing-2);
+    }
+
+    .progress-count,
+    .progress-percentage {
+        font-size: 0.7rem;
     }
 }
 
