@@ -85,24 +85,27 @@ class ComparePage extends BasePage {
                                         <span>${name} (${key})</span>
                                         <span class="progress-status">${players.length} player${players.length !== 1 ? 's' : ''}</span>
                                     </div>
-                                    <div class="progress-bar">
-                                        <div class="progress-fill" style="width: 0%"></div>
-                                    </div>
                                 </div>
                             `;
                         }
                         
                         const isComplete = prog.percentage === 100;
+                        const hasComparisons = prog.completed > 0;
                         
                         return `
-                            <div class="progress-item">
+                            <div class="progress-item ${this.selectedPosition === key ? 'current-position' : ''}">
                                 <div class="progress-header">
                                     <span>${name} (${key})</span>
-                                    <span>${isComplete ? '✓ Complete' : `${prog.completed}/${prog.total}`}</span>
+                                    <div class="progress-stats">
+                                        <span class="progress-count">${prog.completed}/${prog.total}</span>
+                                        <span class="progress-percentage ${isComplete ? 'complete' : ''}">${Math.round(prog.percentage)}%</span>
+                                    </div>
                                 </div>
-                                <div class="progress-bar">
-                                    <div class="progress-fill" style="width: ${prog.percentage}%"></div>
-                                </div>
+                                ${hasComparisons ? `
+                                    <div class="progress-bar">
+                                        <div class="progress-fill ${isComplete ? 'complete' : ''}" style="width: ${prog.percentage}%"></div>
+                                    </div>
+                                ` : ''}
                             </div>
                         `;
                     }).join('')}
