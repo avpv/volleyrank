@@ -201,40 +201,23 @@
 /* Progress Bar */
 .progress-bar {
     width: 100%;
-    height: 6px;
-    background-color: rgba(48, 54, 61, 0.5);
-    border-radius: var(--radius-full);
+    height: 4px;
+    background-color: rgba(48, 54, 61, 0.3);
+    border-radius: var(--radius-sm);
     overflow: hidden;
     position: relative;
-    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .progress-fill {
     height: 100%;
-    background: linear-gradient(90deg, #2f81f7, #58a6ff);
-    border-radius: var(--radius-full);
-    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    background: var(--color-brand-primary);
+    border-radius: var(--radius-sm);
+    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
-    box-shadow: 0 0 8px rgba(47, 129, 247, 0.4);
-}
-
-.progress-fill::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(90deg, 
-        transparent 0%, 
-        rgba(255, 255, 255, 0.3) 50%, 
-        transparent 100%);
-    animation: shimmer 2s infinite;
 }
 
 .progress-fill.complete {
-    background: linear-gradient(90deg, #3fb950, #56d364);
-    box-shadow: 0 0 8px rgba(63, 185, 80, 0.4);
+    background: var(--color-success);
 }
 
 /* Comparison Area */
