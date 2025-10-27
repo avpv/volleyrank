@@ -579,41 +579,8 @@ select.form-control {
    Progress Bars
    ============================================================================= */
 
-.progress {
-    width: 100%;
-    height: 8px;
-    background-color: var(--color-border-default);
-    border-radius: var(--radius-full);
-    overflow: hidden;
-    position: relative;
-}
-
-.progress-bar {
-    height: 100%;
-    background: var(--gradient-brand);
-    border-radius: var(--radius-full);
-    transition: width var(--duration-slow) var(--ease-out);
-    position: relative;
-}
-
-.progress-bar::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(90deg, 
-        transparent 0%, 
-        rgba(255, 255, 255, 0.2) 50%, 
-        transparent 100%);
-    animation: shimmer 2s infinite;
-}
-
-@keyframes shimmer {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
-}
+/* Generic progress component removed - not used in the application.
+   All progress bar styles are now in pages.css for specific pages. */
 
 /* =============================================================================
    Compare Page Progress Bars
