@@ -13,6 +13,9 @@ class TeamOptimizerService {
             'L': 'Libero'
         };
         
+        // Position order for sorting players in teams
+        this.positionOrder = ['S', 'OPP', 'OH', 'MB', 'L'];
+        
         this.config = {
             useGeneticAlgorithm: true,
             useTabuSearch: true,
@@ -101,11 +104,15 @@ class TeamOptimizerService {
         console.log(`Best initial result from: ${algorithmNames[bestIdx]}`);
         const bestTeams = await this.runLocalSearch(results[bestIdx], positions);
 
+        // Sort teams by strength (strongest first)
         bestTeams.sort((a, b) => {
             const aStrength = eloService.calculateTeamStrength(a).totalRating;
             const bStrength = eloService.calculateTeamStrength(b).totalRating;
             return bStrength - aStrength;
         });
+
+        // Sort players within each team by position order
+        bestTeams.forEach(team => this.sortTeamByPosition(team));
 
         const balance = eloService.evaluateBalance(bestTeams);
         const unused = this.getUnusedPlayers(bestTeams, players);
@@ -621,6 +628,26 @@ class TeamOptimizerService {
             }
         });
         return child;
+    }
+    
+    
+    /**
+     * Sort players in a team by position order
+     */
+    sortTeamByPosition(team) {
+        return team.sort((a, b) => {
+            const posA = a.assignedPosition || a.positions?.[0];
+            const posB = b.assignedPosition || b.positions?.[0];
+            
+            const indexA = this.positionOrder.indexOf(posA);
+            const indexB = this.positionOrder.indexOf(posB);
+            
+            // If position not found, put at the end
+            const orderA = indexA === -1 ? 999 : indexA;
+            const orderB = indexB === -1 ? 999 : indexB;
+            
+            return orderA - orderB;
+        });
     }
     
     getUnusedPlayers(teams, allPlayers) {
