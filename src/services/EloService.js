@@ -30,10 +30,23 @@ class EloService {
      * Calculate rating changes for a position
      */
     calculateRatingChange(winner, loser, position) {
+        // Validate that winner and loser are different players
+        if (winner.id === loser.id) {
+            throw new Error('Cannot calculate rating change for same player');
+        }
+
         const winnerRating = winner.ratings?.[position] || this.DEFAULT_RATING;
         const loserRating = loser.ratings?.[position] || this.DEFAULT_RATING;
         const winnerComparisons = winner.comparisons?.[position] || 0;
         const loserComparisons = loser.comparisons?.[position] || 0;
+
+        // Validate rating values
+        if (winnerRating < 0 || loserRating < 0) {
+            throw new Error('Invalid rating value: ratings cannot be negative');
+        }
+        if (!isFinite(winnerRating) || !isFinite(loserRating)) {
+            throw new Error('Invalid rating value: ratings must be finite numbers');
+        }
 
         const winnerExpected = this.calculateExpectedScore(winnerRating, loserRating);
         const loserExpected = this.calculateExpectedScore(loserRating, winnerRating);
