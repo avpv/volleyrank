@@ -595,7 +595,7 @@ select.form-control {
 
 .stat-card {
     text-align: center;
-    padding: var(--spacing-4);
+    padding: var(--spacing-3);
     background-color: var(--color-surface-raised);
     border: 1px solid var(--color-border-default);
     border-radius: var(--radius-lg);
