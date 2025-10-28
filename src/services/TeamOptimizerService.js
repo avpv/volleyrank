@@ -529,13 +529,15 @@ class TeamOptimizerService {
     
             let playerIdx = 0;
             
-            for (let slot = 0; slot < neededCount; slot++) {
-                
-                for (let teamIdx = 0; teamIdx < teamCount; teamIdx++) {
+            // Fill each team sequentially with required number of players for this position
+            for (let teamIdx = 0; teamIdx < teamCount; teamIdx++) {
+                for (let slot = 0; slot < neededCount; slot++) {
                     if (playerIdx < players.length) {
                         teams[teamIdx].push(players[playerIdx]);
                         usedIds.add(players[playerIdx].id);
                         playerIdx++;
+                    } else {
+                        console.warn(`Warning: Not enough ${position} players for team ${teamIdx + 1}`);
                     }
                 }
             }
@@ -555,14 +557,15 @@ class TeamOptimizerService {
             
             let playerIdx = 0;
             
-            for (let slot = 0; slot < neededCount; slot++) {
-                
-                for (let i = 0; i < teamCount; i++) {
+            // Fill teams using snake draft pattern
+            for (let teamIdx = 0; teamIdx < teamCount; teamIdx++) {
+                for (let slot = 0; slot < neededCount; slot++) {
                     if (playerIdx < players.length) {
-                        const teamIdx = slot % 2 === 0 ? i : teamCount - 1 - i;
                         teams[teamIdx].push(players[playerIdx]);
                         usedIds.add(players[playerIdx].id);
                         playerIdx++;
+                    } else {
+                        console.warn(`Warning: Not enough ${position} players for team ${teamIdx + 1}`);
                     }
                 }
             }
@@ -581,18 +584,22 @@ class TeamOptimizerService {
             const players = (playersByPosition[position] || [])
                 .filter(p => !usedIds.has(p.id));
             
+            // Shuffle players randomly
             for (let i = players.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [players[i], players[j]] = [players[j], players[i]];
             }
     
             let playerIdx = 0;
-            for (let slot = 0; slot < neededCount; slot++) {
-                for (let teamIdx = 0; teamIdx < teamCount; teamIdx++) {
+            // Fill each team sequentially
+            for (let teamIdx = 0; teamIdx < teamCount; teamIdx++) {
+                for (let slot = 0; slot < neededCount; slot++) {
                     if (playerIdx < players.length) {
                         teams[teamIdx].push(players[playerIdx]);
                         usedIds.add(players[playerIdx].id);
                         playerIdx++;
+                    } else {
+                        console.warn(`Warning: Not enough ${position} players for team ${teamIdx + 1}`);
                     }
                 }
             }
