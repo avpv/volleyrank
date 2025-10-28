@@ -104,6 +104,11 @@ class ComparisonService {
      * Process a comparison
      */
     processComparison(winnerId, loserId, position) {
+        // Validate that winner and loser are different
+        if (winnerId === loserId) {
+            throw new Error('Cannot compare a player with themselves');
+        }
+
         const state = stateManager.getState();
         const winner = state.players.find(p => p.id === winnerId);
         const loser = state.players.find(p => p.id === loserId);
@@ -114,6 +119,12 @@ class ComparisonService {
 
         if (!winner.ratings[position] || !loser.ratings[position]) {
             throw new Error(`Players don't have ratings for ${position}`);
+        }
+
+        // Check if players have already been compared at this position
+        const winnerCompared = winner.comparedWith[position] || [];
+        if (winnerCompared.includes(loser.name)) {
+            throw new Error('These players have already been compared at this position');
         }
 
         // Calculate rating changes
@@ -199,6 +210,8 @@ class ComparisonService {
         const totalPairs = (players.length * (players.length - 1)) / 2;
         const comparedPairs = new Set();
         
+        // Each comparison is stored in both players' comparedWith lists,
+        // but the Set with sorted names ensures each pair is counted only once
         players.forEach(player => {
             const compared = player.comparedWith[position] || [];
             compared.forEach(opponentName => {
