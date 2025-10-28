@@ -420,7 +420,7 @@ a:hover {
 
 .page-header h2 {
     margin-bottom: 0;
-    font-size: var(--font-size-xl);
+    font-size: var(--font-size-lg);
 }
 
 /* Footer */
