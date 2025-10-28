@@ -1,5 +1,5 @@
 /**
- * SettingsPage - Player management page with full modal support
+ * SettingsPage - Player management
  */
 import BasePage from './BasePage.js';
 import playerService from '../services/PlayerService.js';
@@ -182,7 +182,7 @@ class SettingsPage extends BasePage {
                 <div class="position-badge">
                     <div class="badge-position">${name}</div>
                     <div class="badge-stats">
-                        <span class="badge-rating">${rating}</span>
+                        <span class="badge-rating">${rating} ELO</span>
                         <span class="badge-comparisons">${comparisons} comp.</span>
                     </div>
                 </div>
