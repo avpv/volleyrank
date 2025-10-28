@@ -94,7 +94,7 @@ class PlayerService {
         });
 
         const player = {
-            id: Date.now() + Math.random(),
+            id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
             name: cleanName,
             positions: cleanPositions,
             ratings,
@@ -218,18 +218,9 @@ class PlayerService {
         const updatedPlayers = [...state.players];
         updatedPlayers[playerIndex] = updatedPlayer;
         
-        // Remove from other players' lists
-        updatedPlayers.forEach((p, idx) => {
-            if (idx !== playerIndex) {
-                positionsToReset.forEach(pos => {
-                    if (p.comparedWith[pos]) {
-                        p.comparedWith[pos] = p.comparedWith[pos].filter(
-                            name => name !== player.name
-                        );
-                    }
-                });
-            }
-        });
+        // Note: We don't remove this player from other players' comparedWith lists
+        // because that would create inconsistency in their comparison counts.
+        // The reset only affects this player's data.
 
         stateManager.setState({ players: updatedPlayers });
         eventBus.emit('player:reset', { player: updatedPlayer, positions: positionsToReset });
