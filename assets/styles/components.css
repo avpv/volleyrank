@@ -402,7 +402,7 @@ select.form-control {
 }
 
 .player-card:hover {
-    border-color: var(--color-border-strong);
+    border-color: var(--color-brand-primary);
 }
 
 .player-card.clickable {
