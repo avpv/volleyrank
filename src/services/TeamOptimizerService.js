@@ -41,7 +41,7 @@ class TeamOptimizerService {
                 maxStagnation: 20
             },
             tabuSearch: {
-                tabuTenure: 50,
+                tabuTenure: 100,  // Increased from 50: with 20 neighbors/iteration, 50 fills in 2.5 iterations
                 iterations: 5000,
                 neighborCount: 20,
                 diversificationFrequency: 1000
@@ -102,7 +102,7 @@ class TeamOptimizerService {
             algorithmNames.push('Genetic Algorithm');
         }
         if (this.config.useTabuSearch) {
-            algorithmPromises.push(this.runTabuSearch(candidates[0], positions));
+            algorithmPromises.push(this.runMultiStartTabuSearch(candidates, positions));
             algorithmNames.push('Tabu Search');
         }
         if (this.config.useSimulatedAnnealing) {
@@ -359,7 +359,8 @@ class TeamOptimizerService {
         let current = this.cloneTeams(initialTeams);
         let best = this.cloneTeams(current);
         let bestScore = this.evaluateSolution(best);
-        this.tabuList = [];
+        const tabuSet = new Set(); // Use Set instead of Array for O(1) lookup
+        const tabuQueue = []; // Keep queue for FIFO removal
         let iterationSinceImprovement = 0;
 
         for (let iter = 0; iter < config.iterations; iter++) {
@@ -368,21 +369,49 @@ class TeamOptimizerService {
             
             let bestNeighbor = null;
             let bestNeighborScore = Infinity;
+            let bestNonTabuNeighbor = null;
+            let bestNonTabuScore = Infinity;
             
+            // Find best neighbor (considering tabu list and aspiration criterion)
             for (const neighbor of neighbors) {
                 const hash = this.hashSolution(neighbor);
                 const score = this.evaluateSolution(neighbor);
-                if ((!this.tabuList.includes(hash) || score < bestScore) && score < bestNeighborScore) {
+                const isTabu = tabuSet.has(hash);
+                
+                // Track best non-tabu neighbor as fallback
+                if (!isTabu && score < bestNonTabuScore) {
+                    bestNonTabuNeighbor = neighbor;
+                    bestNonTabuScore = score;
+                }
+                
+                // Aspiration criterion: accept tabu if better than global best
+                if ((!isTabu || score < bestScore) && score < bestNeighborScore) {
                     bestNeighbor = neighbor;
                     bestNeighborScore = score;
                 }
             }
             
+            // CRITICAL FIX: If all neighbors are tabu and worse than bestScore,
+            // accept the best non-tabu neighbor to prevent getting stuck
+            if (bestNeighbor === null && bestNonTabuNeighbor !== null) {
+                bestNeighbor = bestNonTabuNeighbor;
+                bestNeighborScore = bestNonTabuScore;
+            }
+            
             if (bestNeighbor) {
                 current = bestNeighbor;
                 const currentScore = bestNeighborScore;
-                this.tabuList.push(this.hashSolution(current));
-                if (this.tabuList.length > config.tabuTenure) this.tabuList.shift();
+                const currentHash = this.hashSolution(current);
+                
+                // Add to tabu set and queue
+                tabuSet.add(currentHash);
+                tabuQueue.push(currentHash);
+                
+                // Remove oldest if exceeds tenure
+                if (tabuQueue.length > config.tabuTenure) {
+                    const oldHash = tabuQueue.shift();
+                    tabuSet.delete(oldHash);
+                }
                 
                 if (currentScore < bestScore) {
                     best = this.cloneTeams(current);
@@ -392,15 +421,59 @@ class TeamOptimizerService {
                 } else {
                     iterationSinceImprovement++;
                 }
+            } else {
+                // CRITICAL FIX: Force diversification if stuck
+                iterationSinceImprovement++;
             }
-            if (iterationSinceImprovement > config.diversificationFrequency) {
-                current = this.generateNeighborhood(best, positions, 1)[0];
+            
+            // Periodic diversification to escape local minima
+            if (iter > 0 && iter % config.diversificationFrequency === 0) {
+                current = this.cloneTeams(best);
+                // Perform multiple random swaps for strong diversification
+                const swapCount = Math.max(3, Math.floor(current[0].length / 2));
+                for (let i = 0; i < swapCount; i++) {
+                    this.performUniversalSwap(current, positions);
+                }
+                // Partially clear tabu structures (keep 50%)
+                const keepCount = Math.floor(config.tabuTenure / 2);
+                while (tabuQueue.length > keepCount) {
+                    const oldHash = tabuQueue.shift();
+                    tabuSet.delete(oldHash);
+                }
                 iterationSinceImprovement = 0;
-                this.tabuList = [];
+            }
+            
+            // Restart on long stagnation
+            if (iterationSinceImprovement > 500) {
+                current = this.cloneTeams(best);
+                for (let i = 0; i < 5; i++) {
+                    this.performUniversalSwap(current, positions);
+                }
+                iterationSinceImprovement = 0;
             }
             if (iter % 500 === 0) await new Promise(resolve => setTimeout(resolve, 1));
         }
         return best;
+    }
+
+    /**
+     * Multi-Start Tabu Search
+     * Runs Tabu Search from multiple initial solutions and returns the best result
+     */
+    async runMultiStartTabuSearch(candidates, positions) {
+        // Use up to 3 different initial solutions
+        const startCount = Math.min(3, candidates.length);
+        const results = [];
+        
+        for (let i = 0; i < startCount; i++) {
+            const result = await this.runTabuSearch(candidates[i], positions);
+            results.push(result);
+        }
+        
+        // Return the best solution found
+        const scores = results.map(r => this.evaluateSolution(r));
+        const bestIdx = scores.indexOf(Math.min(...scores));
+        return results[bestIdx];
     }
 
     async runSimulatedAnnealing(initialTeams, positions) {
@@ -1060,16 +1133,34 @@ class TeamOptimizerService {
             
             let playerIdx = 0;
             
-            // Fill teams using snake draft pattern
-            for (let teamIdx = 0; teamIdx < teamCount; teamIdx++) {
-                for (let slot = 0; slot < neededCount; slot++) {
-                    if (playerIdx < players.length) {
+            // TRUE SNAKE DRAFT: 1→2→3→3→2→1→1→2→3...
+            // Round 1: Team 1, Team 2, Team 3
+            // Round 2: Team 3, Team 2, Team 1 (reverse)
+            // Round 3: Team 1, Team 2, Team 3
+            // etc.
+            
+            let round = 0;
+            while (playerIdx < players.length) {
+                const isReverseRound = round % 2 === 1;
+                
+                for (let slotInRound = 0; slotInRound < teamCount; slotInRound++) {
+                    // In reverse rounds, go from last team to first
+                    const teamIdx = isReverseRound ? (teamCount - 1 - slotInRound) : slotInRound;
+                    
+                    // Check if this team still needs players for this position
+                    const currentCount = teams[teamIdx].filter(p => p.assignedPosition === position).length;
+                    if (currentCount < neededCount && playerIdx < players.length) {
                         teams[teamIdx].push(players[playerIdx]);
                         usedIds.add(players[playerIdx].id);
                         playerIdx++;
-                    } else {
-                        console.warn(`Warning: Not enough ${position} players for team ${teamIdx + 1}`);
                     }
+                }
+                round++;
+                
+                // Safety check to prevent infinite loop
+                if (round > 100) {
+                    console.warn(`Warning: Snake draft exceeded 100 rounds for ${position}`);
+                    break;
                 }
             }
         });
