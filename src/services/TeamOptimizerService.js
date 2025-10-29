@@ -20,6 +20,8 @@ class TeamOptimizerService {
             useGeneticAlgorithm: true,
             useTabuSearch: true,
             useSimulatedAnnealing: true,
+            useAntColony: true,
+            useConstraintProgramming: true,
             adaptiveSwapEnabled: true,
             adaptiveParameters: {
                 strongWeakSwapProbability: 0.6,
@@ -51,6 +53,23 @@ class TeamOptimizerService {
                 reheatEnabled: true,
                 reheatTemperature: 500,
                 reheatIterations: 10000
+            },
+            antColony: {
+                antCount: 20,
+                iterations: 100,
+                alpha: 1.0,          // Pheromone importance
+                beta: 2.0,           // Heuristic importance
+                evaporationRate: 0.1,
+                pheromoneDeposit: 100,
+                elitistWeight: 2.0   // Best solution pheromone multiplier
+            },
+            constraintProgramming: {
+                maxBacktracks: 1000,
+                variableOrderingHeuristic: 'most-constrained',
+                valueOrderingHeuristic: 'least-constraining',
+                propagationLevel: 'full',
+                restartStrategy: 'luby',
+                conflictAnalysis: true
             },
             localSearch: {
                 iterations: 1500,
@@ -89,6 +108,14 @@ class TeamOptimizerService {
         if (this.config.useSimulatedAnnealing) {
             algorithmPromises.push(this.runSimulatedAnnealing(candidates[0], positions));
             algorithmNames.push('Simulated Annealing');
+        }
+        if (this.config.useAntColony) {
+            algorithmPromises.push(this.runAntColonyOptimization(composition, teamCount, playersByPosition, positions));
+            algorithmNames.push('Ant Colony Optimization');
+        }
+        if (this.config.useConstraintProgramming) {
+            algorithmPromises.push(this.runConstraintProgramming(composition, teamCount, playersByPosition, positions));
+            algorithmNames.push('Constraint Programming');
         }
         
         if (algorithmPromises.length === 0) {
@@ -416,6 +443,455 @@ class TeamOptimizerService {
         return best;
     }
 
+    /**
+     * Ant Colony Optimization (ACO)
+     * Inspired by foraging behavior of ants using pheromone trails
+     */
+    async runAntColonyOptimization(composition, teamCount, playersByPosition, positions) {
+        const config = this.algorithmConfigs.antColony;
+        
+        // Initialize pheromone matrix: [playerId][teamIndex] = pheromone level
+        const allPlayers = Object.values(playersByPosition).flat();
+        const pheromones = new Map();
+        allPlayers.forEach(player => {
+            const teamPheromones = Array(teamCount).fill(1.0);
+            pheromones.set(player.id, teamPheromones);
+        });
+        
+        let globalBest = null;
+        let globalBestScore = Infinity;
+        
+        this.algorithmStats.antColony = { iterations: 0, improvements: 0 };
+        
+        for (let iter = 0; iter < config.iterations; iter++) {
+            this.algorithmStats.antColony.iterations = iter + 1;
+            const iterationSolutions = [];
+            
+            // Each ant constructs a solution
+            for (let ant = 0; ant < config.antCount; ant++) {
+                const solution = this.constructAntSolution(
+                    composition, 
+                    teamCount, 
+                    playersByPosition, 
+                    pheromones, 
+                    config
+                );
+                
+                const score = this.evaluateSolution(solution);
+                iterationSolutions.push({ solution, score });
+                
+                if (score < globalBestScore) {
+                    globalBest = this.cloneTeams(solution);
+                    globalBestScore = score;
+                    this.algorithmStats.antColony.improvements++;
+                }
+            }
+            
+            // Evaporate pheromones
+            pheromones.forEach((teamPheromones, playerId) => {
+                for (let t = 0; t < teamCount; t++) {
+                    teamPheromones[t] *= (1 - config.evaporationRate);
+                }
+            });
+            
+            // Deposit pheromones
+            iterationSolutions.forEach(({ solution, score }) => {
+                const deposit = config.pheromoneDeposit / (1 + score);
+                solution.forEach((team, teamIndex) => {
+                    team.forEach(player => {
+                        const teamPheromones = pheromones.get(player.id);
+                        if (teamPheromones) {
+                            teamPheromones[teamIndex] += deposit;
+                        }
+                    });
+                });
+            });
+            
+            // Elitist strategy: extra pheromones for best solution
+            if (globalBest) {
+                const elitistDeposit = config.pheromoneDeposit * config.elitistWeight / (1 + globalBestScore);
+                globalBest.forEach((team, teamIndex) => {
+                    team.forEach(player => {
+                        const teamPheromones = pheromones.get(player.id);
+                        if (teamPheromones) {
+                            teamPheromones[teamIndex] += elitistDeposit;
+                        }
+                    });
+                });
+            }
+            
+            if (iter % 10 === 0) await new Promise(resolve => setTimeout(resolve, 1));
+        }
+        
+        return globalBest || this.generateInitialSolutions(composition, teamCount, playersByPosition)[0];
+    }
+    
+    /**
+     * Construct a solution using ant colony principles
+     */
+    constructAntSolution(composition, teamCount, playersByPosition, pheromones, config) {
+        const teams = Array.from({ length: teamCount }, () => []);
+        const usedIds = new Set();
+        
+        // Smart position ordering: fill scarce positions first
+        const positionPriority = ['MB', 'S', 'L', 'OPP', 'OH'];
+        const positionOrder = positionPriority
+            .map(pos => [pos, composition[pos]])
+            .filter(([, count]) => count && count > 0);
+        
+        positionOrder.forEach(([position, neededCount]) => {
+            const availablePlayers = (playersByPosition[position] || [])
+                .filter(p => !usedIds.has(p.id));
+            
+            for (let teamIdx = 0; teamIdx < teamCount; teamIdx++) {
+                for (let slot = 0; slot < neededCount; slot++) {
+                    if (availablePlayers.length === 0) break;
+                    
+                    // Calculate probabilities based on pheromones and heuristic
+                    const probabilities = this.calculateAntProbabilities(
+                        availablePlayers,
+                        teamIdx,
+                        position,
+                        pheromones,
+                        config
+                    );
+                    
+                    // Select player based on probabilities
+                    const selectedPlayer = this.rouletteWheelSelection(availablePlayers, probabilities);
+                    
+                    teams[teamIdx].push(selectedPlayer);
+                    usedIds.add(selectedPlayer.id);
+                    
+                    // Remove from available
+                    const idx = availablePlayers.indexOf(selectedPlayer);
+                    if (idx > -1) availablePlayers.splice(idx, 1);
+                }
+            }
+        });
+        
+        return teams;
+    }
+    
+    /**
+     * Calculate selection probabilities for ant colony
+     */
+    calculateAntProbabilities(players, teamIndex, position, pheromones, config) {
+        const probabilities = [];
+        let totalProbability = 0;
+        
+        players.forEach(player => {
+            const teamPheromones = pheromones.get(player.id) || Array(10).fill(1.0);
+            const pheromone = teamPheromones[teamIndex] || 1.0;
+            
+            // Heuristic: rating strength
+            const rating = player.ratings?.[position] || 1500;
+            const heuristic = rating / 1500; // Normalize around 1.0
+            
+            // Probability = pheromone^alpha * heuristic^beta
+            const probability = Math.pow(pheromone, config.alpha) * Math.pow(heuristic, config.beta);
+            probabilities.push(probability);
+            totalProbability += probability;
+        });
+        
+        // Normalize probabilities
+        return probabilities.map(p => totalProbability > 0 ? p / totalProbability : 1 / players.length);
+    }
+    
+    /**
+     * Roulette wheel selection
+     */
+    rouletteWheelSelection(players, probabilities) {
+        const random = Math.random();
+        let cumulative = 0;
+        
+        for (let i = 0; i < players.length; i++) {
+            cumulative += probabilities[i];
+            if (random <= cumulative) {
+                return players[i];
+            }
+        }
+        
+        return players[players.length - 1]; // Fallback
+    }
+
+    /**
+     * Constraint Programming (CP)
+     * Uses backtracking with constraint propagation and intelligent heuristics
+     */
+    async runConstraintProgramming(composition, teamCount, playersByPosition, positions) {
+        const config = this.algorithmConfigs.constraintProgramming;
+        
+        this.algorithmStats.constraintProgramming = { 
+            iterations: 0, 
+            improvements: 0, 
+            backtracks: 0,
+            conflicts: 0
+        };
+        
+        // Build constraint model
+        const variables = this.buildCPVariables(composition, teamCount, playersByPosition);
+        const constraints = this.buildCPConstraints(composition, teamCount, variables);
+        
+        // Try to find solution using backtracking with constraint propagation
+        const solution = await this.cpBacktrackingSearch(
+            variables,
+            constraints,
+            composition,
+            teamCount,
+            playersByPosition,
+            config
+        );
+        
+        if (!solution) {
+            console.warn('CP: No solution found, using greedy construction');
+            return this.generateInitialSolutions(composition, teamCount, playersByPosition)[0];
+        }
+        
+        return this.convertCPSolutionToTeams(solution, variables, composition, teamCount, playersByPosition);
+    }
+    
+    /**
+     * Build CP variables: each player needs to be assigned to a team and position
+     */
+    buildCPVariables(composition, teamCount, playersByPosition) {
+        const variables = [];
+        
+        // For each team and position slot, we need to assign a player
+        for (let teamIdx = 0; teamIdx < teamCount; teamIdx++) {
+            Object.entries(composition).forEach(([position, count]) => {
+                for (let slot = 0; slot < count; slot++) {
+                    const eligiblePlayers = playersByPosition[position] || [];
+                    variables.push({
+                        id: `team${teamIdx}_${position}_${slot}`,
+                        teamIndex: teamIdx,
+                        position: position,
+                        slotIndex: slot,
+                        domain: eligiblePlayers.map(p => p.id),
+                        assignment: null,
+                        constraints: []
+                    });
+                }
+            });
+        }
+        
+        return variables;
+    }
+    
+    /**
+     * Build CP constraints
+     */
+    buildCPConstraints(composition, teamCount, variables) {
+        const constraints = [];
+        
+        // Constraint 1: Each player can only be assigned once (AllDifferent)
+        constraints.push({
+            type: 'all-different',
+            variables: variables,
+            check: (assignments) => {
+                const assigned = assignments.filter(a => a !== null);
+                return assigned.length === new Set(assigned).size;
+            }
+        });
+        
+        // Constraint 2: Team balance (soft constraint)
+        for (let teamIdx = 0; teamIdx < teamCount; teamIdx++) {
+            const teamVars = variables.filter(v => v.teamIndex === teamIdx);
+            constraints.push({
+                type: 'team-balance',
+                variables: teamVars,
+                teamIndex: teamIdx,
+                check: (assignments, playersByPosition) => {
+                    // This is a soft constraint - always true, but affects score
+                    return true;
+                }
+            });
+        }
+        
+        return constraints;
+    }
+    
+    /**
+     * Backtracking search with constraint propagation
+     */
+    async cpBacktrackingSearch(variables, constraints, composition, teamCount, playersByPosition, config, depth = 0) {
+        this.algorithmStats.constraintProgramming.iterations++;
+        
+        // Check if solution is complete
+        if (variables.every(v => v.assignment !== null)) {
+            return variables.map(v => v.assignment);
+        }
+        
+        // Check backtrack limit
+        if (this.algorithmStats.constraintProgramming.backtracks >= config.maxBacktracks) {
+            return null;
+        }
+        
+        // Select next variable using heuristic
+        const nextVar = this.selectCPVariable(variables, config);
+        if (!nextVar) return null;
+        
+        // Order values using heuristic
+        const orderedValues = this.orderCPValues(nextVar, variables, playersByPosition, config);
+        
+        // Try each value
+        for (const playerId of orderedValues) {
+            // Assign value
+            nextVar.assignment = playerId;
+            
+            // Check constraints
+            if (this.checkCPConstraints(variables, constraints, playersByPosition)) {
+                // Propagate constraints
+                const propagatedDomains = this.propagateCPConstraints(variables, constraints);
+                
+                // Recursively search
+                const result = await this.cpBacktrackingSearch(
+                    variables, 
+                    constraints, 
+                    composition, 
+                    teamCount, 
+                    playersByPosition, 
+                    config,
+                    depth + 1
+                );
+                
+                if (result) return result;
+                
+                // Restore domains after failed branch
+                this.restoreCPDomains(variables, propagatedDomains);
+            } else {
+                this.algorithmStats.constraintProgramming.conflicts++;
+            }
+            
+            // Unassign and backtrack
+            nextVar.assignment = null;
+            this.algorithmStats.constraintProgramming.backtracks++;
+        }
+        
+        if (depth % 50 === 0) await new Promise(resolve => setTimeout(resolve, 1));
+        
+        return null;
+    }
+    
+    /**
+     * Select next variable to assign (most constrained first)
+     */
+    selectCPVariable(variables, config) {
+        const unassigned = variables.filter(v => v.assignment === null);
+        if (unassigned.length === 0) return null;
+        
+        if (config.variableOrderingHeuristic === 'most-constrained') {
+            // Choose variable with smallest domain (MRV - Minimum Remaining Values)
+            return unassigned.reduce((min, v) => 
+                v.domain.length < min.domain.length ? v : min
+            );
+        }
+        
+        return unassigned[0];
+    }
+    
+    /**
+     * Order values for a variable (least constraining first)
+     */
+    orderCPValues(variable, allVariables, playersByPosition, config) {
+        if (config.valueOrderingHeuristic === 'least-constraining') {
+            // Try to order by how many options it leaves for other variables
+            return [...variable.domain].sort((a, b) => {
+                const aConstrains = this.countConstrainedByAssignment(a, variable, allVariables);
+                const bConstrains = this.countConstrainedByAssignment(b, variable, allVariables);
+                return aConstrains - bConstrains;
+            });
+        }
+        
+        return variable.domain;
+    }
+    
+    /**
+     * Count how many variables would be constrained by this assignment
+     */
+    countConstrainedByAssignment(playerId, variable, allVariables) {
+        let count = 0;
+        allVariables.forEach(v => {
+            if (v !== variable && v.assignment === null && v.domain.includes(playerId)) {
+                count++;
+            }
+        });
+        return count;
+    }
+    
+    /**
+     * Check if current partial assignment satisfies constraints
+     */
+    checkCPConstraints(variables, constraints, playersByPosition) {
+        const assignments = variables.map(v => v.assignment);
+        
+        for (const constraint of constraints) {
+            if (constraint.type === 'all-different') {
+                const assigned = assignments.filter(a => a !== null);
+                if (assigned.length !== new Set(assigned).size) {
+                    return false;
+                }
+            }
+        }
+        
+        return true;
+    }
+    
+    /**
+     * Propagate constraints to reduce domains
+     */
+    propagateCPConstraints(variables, constraints) {
+        const oldDomains = new Map();
+        
+        // Save current domains
+        variables.forEach(v => {
+            oldDomains.set(v.id, [...v.domain]);
+        });
+        
+        // Remove assigned values from other variables' domains
+        const assignedValues = new Set(
+            variables.filter(v => v.assignment !== null).map(v => v.assignment)
+        );
+        
+        variables.forEach(v => {
+            if (v.assignment === null) {
+                v.domain = v.domain.filter(playerId => !assignedValues.has(playerId));
+            }
+        });
+        
+        return oldDomains;
+    }
+    
+    /**
+     * Restore domains after backtracking
+     */
+    restoreCPDomains(variables, oldDomains) {
+        variables.forEach(v => {
+            const oldDomain = oldDomains.get(v.id);
+            if (oldDomain) {
+                v.domain = [...oldDomain];
+            }
+        });
+    }
+    
+    /**
+     * Convert CP solution to team structure
+     */
+    convertCPSolutionToTeams(solution, variables, composition, teamCount, playersByPosition) {
+        const teams = Array.from({ length: teamCount }, () => []);
+        const allPlayers = Object.values(playersByPosition).flat();
+        const playerMap = new Map(allPlayers.map(p => [p.id, p]));
+        
+        variables.forEach((variable, idx) => {
+            const playerId = solution[idx];
+            const player = playerMap.get(playerId);
+            if (player) {
+                teams[variable.teamIndex].push(player);
+            }
+        });
+        
+        return teams;
+    }
+
     async runLocalSearch(teams, positions) {
         const config = this.algorithmConfigs.localSearch;
         let current = this.cloneTeams(teams);
@@ -520,12 +996,26 @@ class TeamOptimizerService {
     createBalancedSolution(composition, teamCount, playersByPosition) {
         const teams = Array.from({ length: teamCount }, () => []);
         const usedIds = new Set();
-        const positionOrder = Object.entries(composition).filter(([, count]) => count > 0);
+        
+        // Smart position ordering: fill scarce positions first
+        // Priority: MB > S > L > OPP > OH (typically MB and S are most scarce)
+        const positionPriority = ['MB', 'S', 'L', 'OPP', 'OH'];
+        const positionOrder = positionPriority
+            .map(pos => [pos, composition[pos]])
+            .filter(([, count]) => count && count > 0);
     
         positionOrder.forEach(([position, neededCount]) => {
             const players = (playersByPosition[position] || [])
                 .filter(p => !usedIds.has(p.id))
-                .sort((a, b) => b.positionRating - a.positionRating);
+                .sort((a, b) => {
+                    // Prioritize players who can only play this position
+                    const aSpecialist = a.positions.length === 1 ? 1 : 0;
+                    const bSpecialist = b.positions.length === 1 ? 1 : 0;
+                    if (aSpecialist !== bSpecialist) return bSpecialist - aSpecialist;
+                    
+                    // Then sort by rating
+                    return b.positionRating - a.positionRating;
+                });
     
             let playerIdx = 0;
             
@@ -548,12 +1038,25 @@ class TeamOptimizerService {
     createSnakeDraftSolution(composition, teamCount, playersByPosition) {
         const teams = Array.from({ length: teamCount }, () => []);
         const usedIds = new Set();
-        const positionOrder = Object.entries(composition).filter(([, count]) => count > 0);
+        
+        // Smart position ordering: fill scarce positions first
+        const positionPriority = ['MB', 'S', 'L', 'OPP', 'OH'];
+        const positionOrder = positionPriority
+            .map(pos => [pos, composition[pos]])
+            .filter(([, count]) => count && count > 0);
     
         positionOrder.forEach(([position, neededCount]) => {
             const players = (playersByPosition[position] || [])
                 .filter(p => !usedIds.has(p.id))
-                .sort((a, b) => b.positionRating - a.positionRating);
+                .sort((a, b) => {
+                    // Prioritize players who can only play this position
+                    const aSpecialist = a.positions.length === 1 ? 1 : 0;
+                    const bSpecialist = b.positions.length === 1 ? 1 : 0;
+                    if (aSpecialist !== bSpecialist) return bSpecialist - aSpecialist;
+                    
+                    // Then sort by rating
+                    return b.positionRating - a.positionRating;
+                });
             
             let playerIdx = 0;
             
@@ -578,7 +1081,13 @@ class TeamOptimizerService {
         const usedIds = new Set();
         const totalPlayersPerTeam = Object.values(composition).reduce((a, b) => a + b, 0);
     
-        Object.entries(composition).forEach(([position, neededCount]) => {
+        // Smart position ordering: fill scarce positions first
+        const positionPriority = ['MB', 'S', 'L', 'OPP', 'OH'];
+        const positionOrder = positionPriority
+            .map(pos => [pos, composition[pos]])
+            .filter(([, count]) => count && count > 0);
+    
+        positionOrder.forEach(([position, neededCount]) => {
             if (neededCount === 0) return;
             
             const players = (playersByPosition[position] || [])
@@ -685,6 +1194,8 @@ class TeamOptimizerService {
             geneticAlgorithm: { generations: 0, improvements: 0 },
             tabuSearch: { iterations: 0, improvements: 0 },
             simulatedAnnealing: { iterations: 0, improvements: 0, temperature: 0 },
+            antColony: { iterations: 0, improvements: 0 },
+            constraintProgramming: { iterations: 0, improvements: 0, backtracks: 0, conflicts: 0 },
             localSearch: { iterations: 0, improvements: 0 }
         };
     }
