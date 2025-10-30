@@ -59,7 +59,7 @@ export function performAdaptiveSwap(teams, positions, adaptiveParams) {
         
         if (strongPlayers.length > 0 && weakPlayers.length > 0) {
             const weakestInStrong = strongPlayers.reduce((min, p) => p.positionRating < min.positionRating ? p : min);
-            const strongestInWeak = weakPlayers.reduce((max, p => p.positionRating > max.positionRating ? p : max);
+            const strongestInWeak = weakPlayers.reduce((max, p) => p.positionRating > max.positionRating ? p : max);
             const idx1 = teams[strongestIdx].findIndex(p => p.id === weakestInStrong.id);
             const idx2 = teams[weakestIdx].findIndex(p => p.id === strongestInWeak.id);
             
