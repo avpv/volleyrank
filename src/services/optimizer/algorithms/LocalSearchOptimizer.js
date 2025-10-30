@@ -1,8 +1,8 @@
-// src/services/optimizer/LocalSearchOptimizer.js
+// src/services/optimizer/algorithms/LocalSearchOptimizer.js
 
-import IOptimizer from './IOptimizer.js';
-import { cloneTeams } from './utils/solutionUtils.js';
-import { performUniversalSwap } from './utils/swapOperations.js';
+import IOptimizer from '../IOptimizer.js';
+import { cloneTeams } from '../utils/solutionUtils.js';
+import { performUniversalSwap } from '../utils/swapOperations.js';
 
 /**
  * Local Search Optimizer
