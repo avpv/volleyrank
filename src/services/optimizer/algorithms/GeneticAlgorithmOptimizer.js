@@ -1,9 +1,9 @@
-// src/services/optimizer/GeneticAlgorithmOptimizer.js
+// src/services/optimizer/algorithms/GeneticAlgorithmOptimizer.js
 
-import IOptimizer from './IOptimizer.js';
-import { cloneTeams } from './utils/solutionUtils.js';
-import { performUniversalSwap } from './utils/swapOperations.js';
-import { createRandomSolution } from './utils/solutionGenerators.js';
+import IOptimizer from '../IOptimizer.js';
+import { cloneTeams } from '../utils/solutionUtils.js';
+import { performUniversalSwap } from '../utils/swapOperations.js';
+import { createRandomSolution } from '../utils/solutionGenerators.js';
 
 /**
  * Genetic Algorithm Optimizer
