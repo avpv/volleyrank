@@ -8,12 +8,12 @@
 import eloService from './EloService.js';
 
 // Import optimizers
-import GeneticAlgorithmOptimizer from './optimizer/GeneticAlgorithmOptimizer.js';
-import TabuSearchOptimizer from './optimizer/TabuSearchOptimizer.js';
-import SimulatedAnnealingOptimizer from './optimizer/SimulatedAnnealingOptimizer.js';
-import AntColonyOptimizer from './optimizer/AntColonyOptimizer.js';
-import ConstraintProgrammingOptimizer from './optimizer/ConstraintProgrammingOptimizer.js';
-import LocalSearchOptimizer from './optimizer/LocalSearchOptimizer.js';
+import GeneticAlgorithmOptimizer from './optimizer/algorithms/GeneticAlgorithmOptimizer.js';
+import TabuSearchOptimizer from './optimizer/algorithms/TabuSearchOptimizer.js';
+import SimulatedAnnealingOptimizer from './optimizer/algorithms/SimulatedAnnealingOptimizer.js';
+import AntColonyOptimizer from './optimizer/algorithms/AntColonyOptimizer.js';
+import ConstraintProgrammingOptimizer from './optimizer/algorithms/ConstraintProgrammingOptimizer.js';
+import LocalSearchOptimizer from './optimizer/algorithms/LocalSearchOptimizer.js';
 
 // Import utilities
 import { sortTeamByPosition, getUnusedPlayers } from './optimizer/utils/solutionUtils.js';
