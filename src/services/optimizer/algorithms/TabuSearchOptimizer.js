@@ -1,8 +1,8 @@
-// src/services/optimizer/TabuSearchOptimizer.js
+// src/services/optimizer/algorithms/TabuSearchOptimizer.js
 
-import IOptimizer from './IOptimizer.js';
-import { cloneTeams, hashSolution } from './utils/solutionUtils.js';
-import { performUniversalSwap } from './utils/swapOperations.js';
+import IOptimizer from '../IOptimizer.js';
+import { cloneTeams, hashSolution } from '../utils/solutionUtils.js';
+import { performUniversalSwap } from '../utils/swapOperations.js';
 
 /**
  * Tabu Search Optimizer
