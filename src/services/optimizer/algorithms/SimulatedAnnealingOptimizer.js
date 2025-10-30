@@ -1,8 +1,8 @@
-// src/services/optimizer/SimulatedAnnealingOptimizer.js
+// src/services/optimizer/algorithms/SimulatedAnnealingOptimizer.js
 
-import IOptimizer from './IOptimizer.js';
-import { cloneTeams } from './utils/solutionUtils.js';
-import { performUniversalSwap } from './utils/swapOperations.js';
+import IOptimizer from '../IOptimizer.js';
+import { cloneTeams } from '../utils/solutionUtils.js';
+import { performUniversalSwap } from '../utils/swapOperations.js';
 
 /**
  * Simulated Annealing Optimizer
