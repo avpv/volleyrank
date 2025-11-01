@@ -106,7 +106,7 @@ class SettingsPage extends BasePage {
                     </div>
 
                     <div class="form-section">
-                        <label class="form-section-title">Data Management</label>
+                        <label class="form-section-title">Local Storage</label>
                         <div class="form-section-actions">
                             <button type="button" class="btn btn-info" id="exportStorageBtn">
                                 Export Local Storage
