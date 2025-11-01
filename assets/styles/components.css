@@ -101,6 +101,17 @@
     color: var(--color-text-primary);
 }
 
+.btn-info {
+    background-color: var(--color-info);
+    border-color: var(--color-info);
+    color: white;
+}
+
+.btn-info:hover:not(:disabled) {
+    background-color: var(--color-info-hover);
+    border-color: var(--color-info-hover);
+}
+
 /* Button Sizes */
 .btn-sm {
     padding: var(--spacing-2) var(--spacing-3);
@@ -366,6 +377,13 @@ select.form-control {
 }
 
 .form-actions-secondary {
+    display: flex;
+    gap: var(--spacing-3);
+    margin-top: var(--spacing-4);
+    flex-wrap: wrap;
+}
+
+.form-actions-tertiary {
     display: flex;
     gap: var(--spacing-3);
     margin-top: var(--spacing-4);
@@ -1131,7 +1149,8 @@ select.form-control {
     }
     
     .form-actions,
-    .form-actions-secondary {
+    .form-actions-secondary,
+    .form-actions-tertiary {
         flex-direction: column;
     }
     
