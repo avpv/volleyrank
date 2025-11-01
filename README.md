@@ -72,39 +72,46 @@ Visit **[https://avpv.github.io/volleyrank/](https://avpv.github.io/volleyrank/)
 - **CSV Format**: `name,positions` (e.g., `"John Smith","OH,MB"`)
 - **Template**: Download a sample CSV template to get started
 
-## 🔧 Technical Stack
-
-VolleyRank is built with modern web technologies:
-
-- **Frontend**: Vanilla JavaScript (ES6+ Modules) - no framework dependencies
-- **Architecture**: Single Page Application (SPA) with custom routing
-- **State Management**: Event-driven architecture with centralized state management
-- **Storage**: Browser LocalStorage for data persistence
-- **Styling**: Custom CSS with GitHub-inspired design
-- **Build**: Zero build step - runs directly in the browser
-- **Deployment**: GitHub Pages
-
-### Key Technologies & Algorithms
-
-- **ELO Rating System**: Industry-standard player rating algorithm
-- **Optimization Algorithms**:
-  - Genetic Algorithm (GA) - Population-based evolutionary optimization
-  - Simulated Annealing (SA) - Probabilistic optimization with cooling schedule
-  - Ant Colony Optimization (ACO) - Nature-inspired swarm intelligence
-  - Tabu Search - Memory-based local search with forbidden moves
-  - Local Search - Hill-climbing with strategic improvements
-  - Constraint Programming - Logical constraint satisfaction
-- **Smart Comparison Selection**: Prioritizes high-impact comparisons for faster convergence
-
 ## ⚙️ How It Works
 
-### Rating System
-- Each player starts with the **same rating** (1500) for each of their positions
-- When comparing players at a position, **only that position's rating changes**
-- Example: If "John" (OH/MB) beats "Alice" (OH) at Outside Hitter:
-  - John's OH rating goes up
-  - Alice's OH rating goes down
-  - John's MB rating stays the same
+### ELO Rating System
+
+VolleyRank uses the **ELO rating system**, the same method used in chess rankings and many competitive sports. Here's how it works in simple terms:
+
+- Every player starts with the same rating (**1500 points**) for each position they can play
+- When you compare two players, you're essentially saying "Player A is better than Player B at this position"
+- The winner gains points, the loser loses points
+- **The amount of points exchanged depends on the ratings difference:**
+  - If a lower-rated player wins, they gain more points (upset victory!)
+  - If a higher-rated player wins, they gain fewer points (expected result)
+- Each position has its own separate rating, so a player who excels as Setter might have different rating as Outside Hitter
+
+**Example:** If "John" (OH/MB) beats "Alice" (OH) in an Outside Hitter comparison:
+- John's OH rating goes up
+- Alice's OH rating goes down
+- John's MB rating stays the same (we only compared OH skills)
+
+This system quickly learns who the best players are and creates accurate rankings with surprisingly few comparisons!
+
+### Team Optimization Algorithms
+
+When you create teams, VolleyRank uses several smart algorithms working together to find the most balanced team combinations. Think of it as trying thousands of different team arrangements in seconds to find the fairest split:
+
+**The algorithms include:**
+
+- **Genetic Algorithm** - Mimics natural evolution: creates "generations" of team combinations, keeps the best ones, and combines them to make even better solutions
+
+- **Simulated Annealing** - Inspired by metalworking: starts with random changes and gradually becomes more selective, like metal cooling into its strongest form
+
+- **Ant Colony Optimization** - Based on how ants find food: many "virtual ants" explore different solutions and leave "trails" to guide others toward better team combinations
+
+- **Tabu Search** - Has a "memory" of recent attempts and avoids repeating bad combinations, helping it explore new possibilities
+
+- **Local Search** - Makes small improvements step by step, swapping players between teams until balance improves
+
+- **Constraint Programming** - Uses logical rules to eliminate impossible combinations early, focusing only on valid team formations
+
+All these algorithms run in parallel, and VolleyRank automatically picks the most balanced result. This ensemble approach means you get fair teams even with complex requirements (like "I need 2 Setters per team" or "Create 5 teams of 6 players each").
 
 ### Team Formation
 
@@ -145,108 +152,48 @@ name,positions
 ]
 ```
 
-## 🎯 Advanced Features
+## 🎯 Why VolleyRank Works So Well
 
-### Multi-Algorithm Team Optimization
+### Multiple Algorithms Working Together
 
-VolleyRank employs a sophisticated ensemble of optimization algorithms to find the best team combinations:
+Instead of using just one method, VolleyRank runs several different algorithms at the same time and picks the best result. It's like asking multiple experts for advice and choosing the best solution:
 
-- **Parallel Algorithm Execution**: Runs multiple algorithms simultaneously
-- **Best Solution Selection**: Automatically chooses the most balanced result
-- **Thousands of Evaluations**: Tests extensive team arrangements in seconds
-- **Complex Constraint Handling**: Works with any team composition
-- **Performance Optimized**: Smart caching and efficient data structures
+- **Fast Results**: Tests thousands of team combinations in just seconds
+- **Handles Complexity**: Works with any team size and position requirements
+- **Always Improving**: Each algorithm approaches the problem differently, increasing chances of finding the perfect balance
 
-### Intelligent Player Comparison
+### Intelligent Comparisons
 
-The comparison system is designed to minimize the number of comparisons needed:
-- Prioritizes pairs with uncertain outcomes
-- Focuses on players with fewer comparisons
-- Position-specific comparison tracking
-- Statistical confidence indicators
-
-## 💻 Development
-
-### Project Structure
-
-```
-volleyrank/
-├── index.html              # Main HTML entry point
-├── src/
-│   ├── app.js             # Application bootstrap
-│   ├── core/              # Core framework (Router, EventBus, StateManager)
-│   ├── pages/             # Page components (Settings, Compare, Rankings, Teams)
-│   ├── components/        # Reusable UI components
-│   └── services/          # Business logic services
-│       ├── EloService.js
-│       ├── PlayerService.js
-│       ├── ComparisonService.js
-│       ├── TeamOptimizerService.js
-│       └── optimizer/     # Optimization algorithms
-│           └── algorithms/
-├── assets/
-│   └── styles/           # CSS stylesheets
-└── demo-players.csv      # Sample data
-```
-
-### Running Locally
-
-Since VolleyRank is a static site with no build process:
-
-```bash
-# Clone the repository
-git clone https://github.com/avpv/volleyrank.git
-cd volleyrank
-
-# Serve with any static file server
-python -m http.server 8000
-# or
-npx serve
-# or
-php -S localhost:8000
-```
-
-Then open `http://localhost:8000` in your browser.
-
-### Development Guidelines
-
-- **No Build Step**: Pure ES6 modules - edit and refresh
-- **ES6+ Features**: Use modern JavaScript features
-- **Modular Architecture**: Keep components small and focused
-- **Event-Driven**: Use EventBus for cross-component communication
-- **State Management**: Centralized state through StateManager
-- **Performance**: Optimize for large player lists (100+ players)
+VolleyRank doesn't waste your time with random comparisons. It shows you the matchups that matter most:
+- Focuses on players who need more data
+- Chooses comparisons that will reveal the most about player rankings
+- Separates ratings by position for accurate assessment
+- Builds reliable rankings quickly
 
 ## 🌐 Browser Compatibility
 
-- ✅ Chrome/Edge 90+
-- ✅ Firefox 88+
-- ✅ Safari 14+
-- ✅ All modern browsers with ES6 module support
-- 💾 All data saved in browser LocalStorage
-- 📱 Responsive design for mobile and tablet
+Works in all modern browsers:
+- ✅ Chrome/Edge (2021 or newer)
+- ✅ Firefox (2021 or newer)
+- ✅ Safari (2021 or newer)
+- 💾 All your data stays in your browser - completely private
+- 📱 Works on desktop, tablet, and mobile devices
 
 ## 🤝 Contributing
 
-Contributions are welcome! Here's how you can help:
+Contributions are welcome! Feel free to:
+- Report bugs or suggest features via [GitHub Issues](https://github.com/avpv/volleyrank/issues)
+- Submit improvements via Pull Requests
+- Share your feedback and ideas
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Make your changes
-4. Test thoroughly in multiple browsers
-5. Commit your changes (`git commit -m 'Add amazing feature'`)
-6. Push to the branch (`git push origin feature/amazing-feature`)
-7. Open a Pull Request
+### Ideas for Improvements
 
-### Ideas for Contributions
-
-- Additional optimization algorithms
-- Performance improvements
-- UI/UX enhancements
-- New export formats
-- Internationalization (i18n)
-- Accessibility improvements
-- Mobile app wrapper
+- Additional optimization methods
+- Performance enhancements for large teams
+- UI/UX improvements
+- Support for more export formats
+- Translations to other languages
+- Better mobile experience
 
 ## 📄 License
 
@@ -254,12 +201,12 @@ MIT License - feel free to use and modify for your volleyball team!
 
 ## 🙏 Acknowledgments
 
-- ELO rating system pioneered by Arpad Elo
-- Optimization algorithms from operations research literature
-- Inspired by the need for fair team formation in recreational volleyball
+- **ELO rating system** - Created by Arpad Elo for chess, now used worldwide in competitive games and sports
+- **Optimization algorithms** - Inspired by nature and mathematics to solve complex problems
+- Built with passion for fair and fun volleyball games
 
 ---
 
-**Version 4.0.0** - Enterprise-grade optimization with multi-algorithm support
+**Version 4.0** - Multi-algorithm team optimization with ELO ratings
 
-**[View Live Demo](https://avpv.github.io/volleyrank/)** | **[Report Bug](https://github.com/avpv/volleyrank/issues)** | **[Request Feature](https://github.com/avpv/volleyrank/issues)**
+**[🏐 Try it Now](https://avpv.github.io/volleyrank/)** | **[🐛 Report Bug](https://github.com/avpv/volleyrank/issues)** | **[💡 Request Feature](https://github.com/avpv/volleyrank/issues)**
