@@ -229,6 +229,39 @@ volleyrank/
 - Data persists between sessions
 - No server required - runs entirely in browser
 
+## Technical Details
+
+### Core Technologies
+- **Frontend**: Vanilla JavaScript (ES6+ modules)
+- **UI**: HTML5, CSS3 (GitHub-inspired design)
+- **Architecture**: Single Page Application (SPA)
+- **Routing**: History API with client-side router
+- **Storage**: LocalStorage API for data persistence
+- **Deployment**: Static site on GitHub Pages
+
+### Architecture Patterns
+- **Event-driven**: EventBus for component communication
+- **State Management**: Centralized StateManager with localStorage sync
+- **Component-based**: Modular page and component structure
+- **Service Layer**: Separated business logic (ELO, Comparison, Optimization)
+- **MVC-inspired**: Clear separation of concerns
+
+### Project Structure
+```
+src/
+├── core/           # Core framework (Router, EventBus, State)
+├── services/       # Business logic (ELO, Teams, Comparisons)
+├── components/     # Reusable UI components
+├── pages/          # Page controllers
+└── utils/          # Helper functions and constants
+```
+
+### No Dependencies
+- Zero external libraries or frameworks
+- Pure vanilla JavaScript
+- No build step required
+- Works directly in browser
+
 ## Development
 
 ### Key Classes
