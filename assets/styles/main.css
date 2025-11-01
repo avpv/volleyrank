@@ -243,7 +243,7 @@ h2 {
 }
 
 h3 {
-    font-size: var(--font-size-sm);
+    font-size: var(--font-size-xs);
     font-weight: var(--font-weight-semibold);
 }
 
