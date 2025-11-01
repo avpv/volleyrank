@@ -766,7 +766,7 @@ class SettingsPage extends BasePage {
         try {
             stateManager.reset({ clearStorage: true });
             toast.success('All players removed');
-            // Принудительно обновляем UI после удаления всех игроков
+            // Force update UI after deleting all players
             this.update();
         } catch (error) {
             toast.error('Failed to remove players');
