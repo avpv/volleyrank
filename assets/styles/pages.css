@@ -427,23 +427,6 @@
     margin: 0;
 }
 
-.builder-info {
-    text-align: left;
-    font-size: var(--font-size-base);
-    color: var(--color-text-secondary);
-    margin-bottom: var(--spacing-8);
-    padding: var(--spacing-4);
-    background-color: var(--color-surface-base);
-    border: 1px solid var(--color-border-default);
-    border-radius: var(--radius-md);
-}
-
-.builder-info span {
-    font-weight: var(--font-weight-bold);
-    color: var(--color-brand-primary);
-    font-size: var(--font-size-lg);
-}
-
 /* Teams Result */
 .teams-result {
     margin-top: var(--spacing-8);
