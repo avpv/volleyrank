@@ -373,7 +373,6 @@
 
 .builder-settings {
     max-width: 800px;
-    margin: 0 auto;
 }
 
 .builder-settings h3 {
@@ -435,7 +434,7 @@
 }
 
 .builder-info {
-    text-align: center;
+    text-align: left;
     font-size: var(--font-size-base);
     color: var(--color-text-secondary);
     margin-bottom: var(--spacing-8);
