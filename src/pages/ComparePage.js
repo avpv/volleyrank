@@ -72,7 +72,7 @@ class ComparePage extends BasePage {
 
         return `
             <div class="progress-section">
-                <h3>Comparison Progress</h3>
+                <label>Comparison Progress</label>
                 <div class="progress-bars">
                     ${Object.entries(positions).map(([key, name]) => {
                         const prog = progress[key];
