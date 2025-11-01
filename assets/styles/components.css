@@ -388,7 +388,7 @@ select.form-control {
     border-color: var(--color-border-strong);
 }
 
-/* Player Cards */
+/* Player Cards - Compare Page (blue hover) */
 .player-card {
     background-color: var(--color-surface-raised);
     border: 1px solid var(--color-border-default);
@@ -407,6 +407,23 @@ select.form-control {
 
 .player-card.clickable {
     cursor: pointer;
+}
+
+/* Settings Player Cards (stat-card style hover) */
+.settings-player-card {
+    background-color: var(--color-surface-raised);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-5);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-height: 280px;
+    transition: var(--transition-default);
+}
+
+.settings-player-card:hover {
+    border-color: var(--color-border-strong);
 }
 
 .player-header {
@@ -1127,11 +1144,16 @@ select.form-control {
         height: 48px;
         font-size: var(--font-size-lg);
     }
-    
+
+    .player-card,
+    .settings-player-card {
+        min-height: auto;
+    }
+
     .player-actions {
         flex-direction: column;
     }
-    
+
     .player-actions .btn {
         width: 100%;
     }
