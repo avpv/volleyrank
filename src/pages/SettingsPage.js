@@ -118,7 +118,7 @@ class SettingsPage extends BasePage {
                     </div>
 
                     <div class="form-section danger-zone">
-                        <label class="form-section-title">Danger Zone</label>
+                        <label class="form-section-title">Reset & Delete</label>
                         <div class="form-section-actions">
                             <button type="button" class="btn btn-warning" id="resetAllBtn">
                                 Reset All Ratings
