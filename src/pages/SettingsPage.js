@@ -190,10 +190,10 @@ class SettingsPage extends BasePage {
         }).join('');
 
         return `
-            <div class="player-card" data-player-id="${player.id}">
+            <div class="settings-player-card" data-player-id="${player.id}">
                 <div class="player-header">
                     <h4 class="player-name">${this.escape(player.name)}</h4>
-                    ${player.positions.length > 1 ? 
+                    ${player.positions.length > 1 ?
                         '<span class="multi-badge">Multi-pos</span>' : ''
                     }
                 </div>
