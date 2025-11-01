@@ -4,6 +4,7 @@
 import BasePage from './BasePage.js';
 import playerService from '../services/PlayerService.js';
 import stateManager from '../core/StateManager.js';
+import storage from '../core/StorageAdapter.js';
 import toast from '../components/base/Toast.js';
 import Modal from '../components/base/Modal.js';
 
@@ -104,6 +105,15 @@ class SettingsPage extends BasePage {
                         </button>
                         <button type="button" class="btn btn-secondary" id="exportBtn">
                             Export Players
+                        </button>
+                    </div>
+
+                    <div class="form-actions-tertiary">
+                        <button type="button" class="btn btn-info" id="exportStorageBtn">
+                            Export Local Storage
+                        </button>
+                        <button type="button" class="btn btn-info" id="importStorageBtn">
+                            Import Local Storage
                         </button>
                     </div>
 
@@ -230,13 +240,25 @@ class SettingsPage extends BasePage {
         // Import/Export buttons
         const importBtn = this.$('#importBtn');
         const exportBtn = this.$('#exportBtn');
-        
+
         if (importBtn) {
             importBtn.addEventListener('click', () => this.showImportModal());
         }
-        
+
         if (exportBtn) {
             exportBtn.addEventListener('click', () => this.handleExport());
+        }
+
+        // Import/Export LocalStorage buttons
+        const exportStorageBtn = this.$('#exportStorageBtn');
+        const importStorageBtn = this.$('#importStorageBtn');
+
+        if (exportStorageBtn) {
+            exportStorageBtn.addEventListener('click', () => this.handleExportStorage());
+        }
+
+        if (importStorageBtn) {
+            importStorageBtn.addEventListener('click', () => this.showImportStorageModal());
         }
 
         // Reset/Clear buttons
@@ -762,7 +784,7 @@ class SettingsPage extends BasePage {
 
     handleClearAll() {
         if (!confirm('Remove all players? This cannot be undone!')) return;
-        
+
         try {
             stateManager.reset({ clearStorage: true });
             toast.success('All players removed');
@@ -771,6 +793,209 @@ class SettingsPage extends BasePage {
         } catch (error) {
             toast.error('Failed to remove players');
             console.error('Clear all error:', error);
+        }
+    }
+
+    // ===== LOCAL STORAGE IMPORT/EXPORT =====
+    handleExportStorage() {
+        try {
+            const data = storage.exportAll();
+            const blob = new Blob([data], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `volleyrank-storage-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+
+            toast.success('Local storage exported successfully!');
+        } catch (error) {
+            toast.error('Export failed: ' + error.message);
+            console.error('Export storage error:', error);
+        }
+    }
+
+    showImportStorageModal() {
+        const modal = new Modal({
+            title: 'Import Local Storage',
+            content: this.renderImportStorageContent(),
+            showCancel: true,
+            showConfirm: true,
+            confirmText: 'Import',
+            cancelText: 'Cancel',
+            size: 'large',
+            onConfirm: () => this.handleImportStorageConfirm(),
+            onClose: () => {
+                this.storageImportModal = null;
+            }
+        });
+
+        this.storageImportModal = modal;
+        this.addComponent(modal);
+        modal.mount();
+        modal.open();
+
+        setTimeout(() => {
+            this.attachImportStorageModalListeners();
+        }, 100);
+    }
+
+    renderImportStorageContent() {
+        return `
+            <div class="import-modal-content">
+                <p class="modal-description">
+                    Import all application data from a previously exported local storage file.
+                </p>
+
+                <div class="warning-box">
+                    <div class="warning-title">Warning</div>
+                    <div class="warning-text">
+                        This will replace all current data in your browser. Make sure to export your current data first if you want to keep it!
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Upload Storage Export File (JSON)</label>
+                    <input
+                        type="file"
+                        id="importStorageFileInput"
+                        accept=".json"
+                        class="file-input"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label>Or Paste JSON Data</label>
+                    <textarea
+                        id="importStorageDataInput"
+                        rows="8"
+                        placeholder="Paste exported JSON data here..."
+                        class="import-textarea"
+                    ></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="mergeDataCheckbox">
+                        <span>Merge with existing data (don't replace)</span>
+                    </label>
+                </div>
+
+                <div id="importStoragePreview"></div>
+            </div>
+        `;
+    }
+
+    attachImportStorageModalListeners() {
+        const fileInput = document.getElementById('importStorageFileInput');
+        const dataInput = document.getElementById('importStorageDataInput');
+
+        if (fileInput) {
+            fileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    this.handleStorageFileUpload(file);
+                }
+            });
+        }
+
+        if (dataInput) {
+            dataInput.addEventListener('input', (e) => {
+                this.previewImportStorageData(e.target.value);
+            });
+        }
+    }
+
+    async handleStorageFileUpload(file) {
+        try {
+            const text = await file.text();
+            const dataInput = document.getElementById('importStorageDataInput');
+            if (dataInput) {
+                dataInput.value = text;
+                this.previewImportStorageData(text);
+            }
+        } catch (error) {
+            toast.error('Failed to read file: ' + error.message);
+        }
+    }
+
+    previewImportStorageData(data) {
+        const preview = document.getElementById('importStoragePreview');
+        if (!preview) return;
+
+        try {
+            if (!data || !data.trim()) {
+                preview.innerHTML = '';
+                return;
+            }
+
+            const parsed = JSON.parse(data);
+
+            if (!parsed.data) {
+                throw new Error('Invalid format: missing data property');
+            }
+
+            const keys = Object.keys(parsed.data);
+            const exportDate = parsed.exportedAt ?
+                new Date(parsed.exportedAt).toLocaleString() : 'Unknown';
+
+            preview.innerHTML = `
+                <div class="preview-success">
+                    <strong>Valid storage export file</strong>
+                    <div class="preview-details">
+                        <div>Exported: ${exportDate}</div>
+                        <div>Keys found: ${keys.length}</div>
+                        <div class="preview-list">
+                            ${keys.map(k => `<div class="preview-item">• ${this.escape(k)}</div>`).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+        } catch (error) {
+            preview.innerHTML = `
+                <div class="preview-error">
+                    <strong>Error:</strong> ${this.escape(error.message)}
+                </div>
+            `;
+        }
+    }
+
+    handleImportStorageConfirm() {
+        const dataInput = document.getElementById('importStorageDataInput');
+        const mergeCheckbox = document.getElementById('mergeDataCheckbox');
+
+        if (!dataInput || !dataInput.value.trim()) {
+            toast.error('Please provide data to import');
+            return false;
+        }
+
+        const merge = mergeCheckbox ? mergeCheckbox.checked : false;
+
+        try {
+            const result = storage.importAll(dataInput.value, { merge });
+
+            if (result.success) {
+                const msg = `Imported ${result.imported} key(s)` +
+                    (result.failed > 0 ? `, ${result.failed} failed` : '');
+                toast.success(msg);
+
+                // Reload the page to refresh all data
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
+
+                return true;
+            } else {
+                toast.error('Import failed');
+                return false;
+            }
+        } catch (error) {
+            toast.error('Import failed: ' + error.message);
+            console.error('Import storage error:', error);
+            return false;
         }
     }
 }
