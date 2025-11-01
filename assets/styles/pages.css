@@ -376,7 +376,7 @@
     margin: 0;
 }
 
-.builder-settings h3 {
+.team-builder > h3 {
     margin: var(--spacing-6) 0 var(--spacing-4) 0;
     font-size: var(--font-size-lg);
     font-weight: var(--font-weight-semibold);
@@ -394,13 +394,6 @@
     font-weight: var(--font-weight-medium);
     color: var(--color-text-primary);
     margin-bottom: var(--spacing-2);
-}
-
-/* Main section label styled as h3 */
-.builder-settings .form-group label.section-label {
-    font-size: var(--font-size-lg);
-    font-weight: var(--font-weight-semibold);
-    margin-bottom: var(--spacing-3);
 }
 
 .composition-grid {
