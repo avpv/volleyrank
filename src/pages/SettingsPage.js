@@ -103,12 +103,9 @@ class SettingsPage extends BasePage {
                         <button type="button" class="btn btn-secondary" id="importBtn">
                             Import Players
                         </button>
-                        <button type="button" class="btn btn-secondary" id="exportBtn">
-                            Export Players
-                        </button>
                     </div>
 
-                    <div class="form-actions-tertiary">
+                    <div class="form-group">
                         <button type="button" class="btn btn-info" id="exportStorageBtn">
                             Export Local Storage
                         </button>
@@ -237,16 +234,11 @@ class SettingsPage extends BasePage {
             });
         }
 
-        // Import/Export buttons
+        // Import button
         const importBtn = this.$('#importBtn');
-        const exportBtn = this.$('#exportBtn');
 
         if (importBtn) {
             importBtn.addEventListener('click', () => this.showImportModal());
-        }
-
-        if (exportBtn) {
-            exportBtn.addEventListener('click', () => this.handleExport());
         }
 
         // Import/Export LocalStorage buttons
@@ -760,26 +752,6 @@ class SettingsPage extends BasePage {
     getSelectedModalPositions(inputName) {
         const checkboxes = document.querySelectorAll(`input[name="${inputName}"]:checked`);
         return Array.from(checkboxes).map(cb => cb.value);
-    }
-
-    handleExport() {
-        try {
-            const data = stateManager.export();
-            const blob = new Blob([data], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `volleyrank-${new Date().toISOString().split('T')[0]}.json`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
-            
-            toast.success('Data exported!');
-        } catch (error) {
-            toast.error('Export failed');
-        }
     }
 
     handleClearAll() {
