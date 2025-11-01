@@ -223,27 +223,17 @@ class ComparePage extends BasePage {
         if (cards && cards.length > 0) {
             cards.forEach(card => {
                 card.addEventListener('click', () => {
-                    const winnerIdStr = card.getAttribute('data-winner-id');
-                    const loserIdStr = card.getAttribute('data-loser-id');
-                    
+                    const winnerId = card.getAttribute('data-winner-id');
+                    const loserId = card.getAttribute('data-loser-id');
+
                     // Validate attributes exist and are not 'undefined' string
-                    if (!winnerIdStr || winnerIdStr === 'undefined' || 
-                        !loserIdStr || loserIdStr === 'undefined') {
-                        console.error('Invalid player IDs in card:', { winnerIdStr, loserIdStr });
+                    if (!winnerId || winnerId === 'undefined' ||
+                        !loserId || loserId === 'undefined') {
+                        console.error('Invalid player IDs in card:', { winnerId, loserId });
                         toast.error('Error: Invalid player data');
                         return;
                     }
-                    
-                    const winnerId = Number(winnerIdStr);
-                    const loserId = Number(loserIdStr);
-                    
-                    // Validate numbers
-                    if (isNaN(winnerId) || isNaN(loserId)) {
-                        console.error('Failed to parse player IDs:', { winnerIdStr, loserIdStr, winnerId, loserId });
-                        toast.error('Error: Invalid player IDs');
-                        return;
-                    }
-                    
+
                     this.handleComparison(winnerId, loserId);
                 });
             });
