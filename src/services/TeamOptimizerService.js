@@ -179,6 +179,7 @@ class TeamOptimizerService {
 
     /**
      * Run all enabled optimization algorithms in parallel
+     * Each algorithm now starts from a randomly selected initial solution for diversity
      * @param {Array} initialSolutions - Initial candidate solutions
      * @param {Object} problemContext - Problem context
      * @returns {Promise<Object>} Results and algorithm names
@@ -187,7 +188,12 @@ class TeamOptimizerService {
         const algorithmPromises = [];
         const algorithmNames = [];
 
-        // Genetic Algorithm
+        // Helper to get a random initial solution
+        const getRandomInitialSolution = () => {
+            return initialSolutions[Math.floor(Math.random() * initialSolutions.length)];
+        };
+
+        // Genetic Algorithm - uses entire population
         if (this.config.useGeneticAlgorithm) {
             const optimizer = new GeneticAlgorithmOptimizer(
                 this.algorithmConfigs.geneticAlgorithm,
@@ -203,20 +209,21 @@ class TeamOptimizerService {
             algorithmNames.push('Genetic Algorithm');
         }
 
-        // Tabu Search (Multi-Start)
+        // Tabu Search (Multi-Start with random starting points)
         if (this.config.useTabuSearch) {
             const startCount = Math.min(3, initialSolutions.length);
             const tabuResults = [];
-            
+
             for (let i = 0; i < startCount; i++) {
                 const optimizer = new TabuSearchOptimizer(
                     this.algorithmConfigs.tabuSearch,
                     this.config.adaptiveParameters
                 );
-                const context = { ...problemContext, initialSolution: initialSolutions[i] };
+                // Each run starts from a different random solution
+                const context = { ...problemContext, initialSolution: getRandomInitialSolution() };
                 tabuResults.push(optimizer.solve(context));
             }
-            
+
             algorithmPromises.push(
                 Promise.all(tabuResults).then(results => {
                     const scores = results.map(r => this.evaluateSolution(r));
@@ -228,13 +235,14 @@ class TeamOptimizerService {
             algorithmNames.push('Tabu Search');
         }
 
-        // Simulated Annealing
+        // Simulated Annealing - now uses random initial solution
         if (this.config.useSimulatedAnnealing) {
             const optimizer = new SimulatedAnnealingOptimizer(
                 this.algorithmConfigs.simulatedAnnealing,
                 this.config.adaptiveParameters
             );
-            const context = { ...problemContext, initialSolution: initialSolutions[0] };
+            // Use random starting point for diversity
+            const context = { ...problemContext, initialSolution: getRandomInitialSolution() };
             algorithmPromises.push(
                 optimizer.solve(context).then(result => {
                     this.algorithmStats.simulatedAnnealing = optimizer.getStatistics();
@@ -244,7 +252,7 @@ class TeamOptimizerService {
             algorithmNames.push('Simulated Annealing');
         }
 
-        // Ant Colony Optimization
+        // Ant Colony Optimization - constructs solutions from scratch (inherently diverse)
         if (this.config.useAntColony) {
             const optimizer = new AntColonyOptimizer(this.algorithmConfigs.antColony);
             algorithmPromises.push(
@@ -256,7 +264,7 @@ class TeamOptimizerService {
             algorithmNames.push('Ant Colony Optimization');
         }
 
-        // Constraint Programming
+        // Constraint Programming - constructs solutions from scratch (inherently diverse)
         if (this.config.useConstraintProgramming) {
             const optimizer = new ConstraintProgrammingOptimizer(this.algorithmConfigs.constraintProgramming);
             algorithmPromises.push(
