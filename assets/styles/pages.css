@@ -549,8 +549,7 @@
 }
 
 .team-player:hover {
-    background-color: var(--color-surface-overlay);
-    border-color: var(--color-border-default);
+    border-color: var(--color-border-strong);
 }
 
 .player-info {
