@@ -373,6 +373,7 @@
 
 .builder-settings {
     max-width: 800px;
+    margin: 0;
 }
 
 .builder-settings h3 {
@@ -548,8 +549,7 @@
 }
 
 .team-player:hover {
-    background-color: var(--color-surface-overlay);
-    border-color: var(--color-border-default);
+    border-color: var(--color-border-strong);
 }
 
 .player-info {
@@ -688,30 +688,31 @@
     .comparison-area {
         padding: var(--spacing-6);
     }
-    
+
     .players-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .player-actions {
         flex-direction: column;
     }
-    
+
     .player-actions .btn {
         width: 100%;
     }
-    
+
     .comparison-cards {
         flex-direction: column;
         gap: var(--spacing-6);
     }
-    
+
     .vs-divider {
         transform: rotate(90deg);
         margin: var(--spacing-4) 0;
     }
-    
-    .player-card.clickable {
+
+    .player-card.clickable,
+    .settings-player-card {
         max-width: 100%;
     }
     
@@ -766,26 +767,27 @@
         padding: var(--spacing-4);
         border-radius: var(--radius-md);
     }
-    
+
     .comparison-area {
         min-height: 350px;
         padding: var(--spacing-6);
     }
-    
+
     .player-avatar {
         width: 56px;
         height: 56px;
         font-size: var(--font-size-xl);
     }
-    
+
     .composition-grid {
         grid-template-columns: 1fr;
     }
-    
-    .player-card.clickable {
+
+    .player-card.clickable,
+    .settings-player-card {
         min-width: 100%;
     }
-    
+
     .player-rating {
         font-size: var(--font-size-xl);
     }
@@ -806,15 +808,16 @@
     .team-builder {
         display: none;
     }
-    
+
     .players-grid,
     .rankings-grid,
     .teams-grid {
         grid-template-columns: 1fr;
         gap: var(--spacing-4);
     }
-    
+
     .player-card,
+    .settings-player-card,
     .ranking-card,
     .team-card {
         break-inside: avoid;
@@ -822,7 +825,7 @@
         border: 1px solid #000;
         background: white;
     }
-    
+
     .player-name,
     .ranking-name,
     .team-header h4 {
