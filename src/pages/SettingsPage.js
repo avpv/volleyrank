@@ -105,22 +105,28 @@ class SettingsPage extends BasePage {
                         </button>
                     </div>
 
-                    <div class="form-actions">
-                        <button type="button" class="btn btn-info" id="exportStorageBtn">
-                            Export Local Storage
-                        </button>
-                        <button type="button" class="btn btn-info" id="importStorageBtn">
-                            Import Local Storage
-                        </button>
+                    <div class="form-section">
+                        <label class="form-section-title">Data Management</label>
+                        <div class="form-section-actions">
+                            <button type="button" class="btn btn-info" id="exportStorageBtn">
+                                Export Local Storage
+                            </button>
+                            <button type="button" class="btn btn-info" id="importStorageBtn">
+                                Import Local Storage
+                            </button>
+                        </div>
                     </div>
 
-                    <div class="form-actions-secondary">
-                        <button type="button" class="btn btn-warning" id="resetAllBtn">
-                            Reset All Ratings
-                        </button>
-                        <button type="button" class="btn btn-danger" id="clearAllBtn">
-                            Remove All Players
-                        </button>
+                    <div class="form-section danger-zone">
+                        <label class="form-section-title">Danger Zone</label>
+                        <div class="form-section-actions">
+                            <button type="button" class="btn btn-warning" id="resetAllBtn">
+                                Reset All Ratings
+                            </button>
+                            <button type="button" class="btn btn-danger" id="clearAllBtn">
+                                Remove All Players
+                            </button>
+                        </div>
                     </div>
                 </form>
             </div>

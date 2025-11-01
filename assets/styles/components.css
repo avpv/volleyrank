@@ -390,6 +390,41 @@ select.form-control {
     flex-wrap: wrap;
 }
 
+/* Form Sections */
+.form-section {
+    margin-top: var(--spacing-6);
+    padding: var(--spacing-4);
+    background-color: var(--color-surface-default);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--border-radius-lg);
+}
+
+.form-section-title {
+    display: block;
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-secondary);
+    margin-bottom: var(--spacing-3);
+}
+
+.form-section-actions {
+    display: flex;
+    gap: var(--spacing-3);
+    flex-wrap: wrap;
+}
+
+/* Danger Zone Styling */
+.form-section.danger-zone {
+    border-color: var(--color-danger);
+    background-color: rgba(220, 38, 38, 0.02);
+}
+
+.form-section.danger-zone .form-section-title {
+    color: var(--color-danger);
+}
+
 /* =============================================================================
    Cards
    ============================================================================= */
@@ -1150,7 +1185,8 @@ select.form-control {
     
     .form-actions,
     .form-actions-secondary,
-    .form-actions-tertiary {
+    .form-actions-tertiary,
+    .form-section-actions {
         flex-direction: column;
     }
     
