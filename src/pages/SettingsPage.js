@@ -105,7 +105,7 @@ class SettingsPage extends BasePage {
                         </button>
                     </div>
 
-                    <div class="form-group">
+                    <div class="form-actions">
                         <button type="button" class="btn btn-info" id="exportStorageBtn">
                             Export Local Storage
                         </button>
