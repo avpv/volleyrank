@@ -129,7 +129,30 @@ class ComparePage extends BasePage {
             `;
         }
 
-        const [player1, player2] = this.currentPair || status.nextPair;
+        const pair = this.currentPair || status.nextPair;
+        
+        // Validate pair exists and has both players
+        if (!pair || !pair[0] || !pair[1]) {
+            console.error('Invalid pair:', pair);
+            return `
+                <div class="comparison-area">
+                    ${this.renderEmpty('Error loading comparison pair')}
+                </div>
+            `;
+        }
+        
+        const [player1, player2] = pair;
+        
+        // Validate player IDs exist
+        if (player1.id === undefined || player2.id === undefined) {
+            console.error('Player missing ID:', { player1, player2 });
+            return `
+                <div class="comparison-area">
+                    ${this.renderEmpty('Error: Player missing ID')}
+                </div>
+            `;
+        }
+        
         const posName = playerService.positions[this.selectedPosition];
 
         return `
@@ -200,8 +223,27 @@ class ComparePage extends BasePage {
         if (cards && cards.length > 0) {
             cards.forEach(card => {
                 card.addEventListener('click', () => {
-                    const winnerId = Number(card.getAttribute('data-winner-id'));
-                    const loserId = Number(card.getAttribute('data-loser-id'));
+                    const winnerIdStr = card.getAttribute('data-winner-id');
+                    const loserIdStr = card.getAttribute('data-loser-id');
+                    
+                    // Validate attributes exist and are not 'undefined' string
+                    if (!winnerIdStr || winnerIdStr === 'undefined' || 
+                        !loserIdStr || loserIdStr === 'undefined') {
+                        console.error('Invalid player IDs in card:', { winnerIdStr, loserIdStr });
+                        toast.error('Error: Invalid player data');
+                        return;
+                    }
+                    
+                    const winnerId = Number(winnerIdStr);
+                    const loserId = Number(loserIdStr);
+                    
+                    // Validate numbers
+                    if (isNaN(winnerId) || isNaN(loserId)) {
+                        console.error('Failed to parse player IDs:', { winnerIdStr, loserIdStr, winnerId, loserId });
+                        toast.error('Error: Invalid player IDs');
+                        return;
+                    }
+                    
                     this.handleComparison(winnerId, loserId);
                 });
             });
@@ -219,14 +261,9 @@ class ComparePage extends BasePage {
     }
 
     handleComparison(winnerId, loserId) {
-        console.log('🎯 handleComparison called:', { winnerId, loserId, position: this.selectedPosition });
-        console.log('   Winner ID type:', typeof winnerId, 'value:', winnerId);
-        console.log('   Loser ID type:', typeof loserId, 'value:', loserId);
-        
         try {
             comparisonService.processComparison(winnerId, loserId, this.selectedPosition);
         } catch (error) {
-            console.error('❌ Comparison error:', error);
             toast.error(error.message);
         }
     }
