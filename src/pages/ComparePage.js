@@ -200,8 +200,8 @@ class ComparePage extends BasePage {
         if (cards && cards.length > 0) {
             cards.forEach(card => {
                 card.addEventListener('click', () => {
-                    const winnerId = parseFloat(card.getAttribute('data-winner-id'));
-                    const loserId = parseFloat(card.getAttribute('data-loser-id'));
+                    const winnerId = Number(card.getAttribute('data-winner-id'));
+                    const loserId = Number(card.getAttribute('data-loser-id'));
                     this.handleComparison(winnerId, loserId);
                 });
             });
@@ -219,9 +219,14 @@ class ComparePage extends BasePage {
     }
 
     handleComparison(winnerId, loserId) {
+        console.log('🎯 handleComparison called:', { winnerId, loserId, position: this.selectedPosition });
+        console.log('   Winner ID type:', typeof winnerId, 'value:', winnerId);
+        console.log('   Loser ID type:', typeof loserId, 'value:', loserId);
+        
         try {
             comparisonService.processComparison(winnerId, loserId, this.selectedPosition);
         } catch (error) {
+            console.error('❌ Comparison error:', error);
             toast.error(error.message);
         }
     }
