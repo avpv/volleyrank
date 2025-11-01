@@ -415,15 +415,7 @@ select.form-control {
     flex-wrap: wrap;
 }
 
-/* Danger Zone Styling */
-.form-section.danger-zone {
-    border-color: var(--color-danger);
-    background-color: rgba(220, 38, 38, 0.02);
-}
-
-.form-section.danger-zone .form-section-title {
-    color: var(--color-danger);
-}
+/* Danger Zone Styling - Removed, using default form-section styles */
 
 /* =============================================================================
    Cards
