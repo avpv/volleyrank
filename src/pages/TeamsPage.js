@@ -67,9 +67,9 @@ class TeamsPage extends BasePage {
 
                 <div class="form-group">
                     <label>Team Composition</label>
-                </div>
-                <div class="composition-grid">
-                    ${this.renderCompositionInputs()}
+                    <div class="composition-grid">
+                        ${this.renderCompositionInputs()}
+                    </div>
                 </div>
 
                 <div class="builder-settings">
