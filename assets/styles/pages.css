@@ -97,11 +97,13 @@
     margin-bottom: var(--spacing-8);
 }
 
-.progress-section h3 {
+.progress-section h3,
+.progress-section label {
     margin-bottom: var(--spacing-5);
     font-size: var(--font-size-lg);
     font-weight: var(--font-weight-semibold);
     color: var(--color-text-primary);
+    display: block;
 }
 
 .progress-bars {
