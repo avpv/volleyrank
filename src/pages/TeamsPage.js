@@ -53,28 +53,30 @@ class TeamsPage extends BasePage {
             <div class="team-builder">
                 <div class="builder-settings">
                     <div class="form-group">
-                        <label class="section-label">Number of Teams</label>
-                        <input 
-                            type="number" 
-                            id="teamCount" 
-                            value="${this.state.teamCount}" 
-                            min="1" 
+                        <label>Number of Teams</label>
+                        <input
+                            type="number"
+                            id="teamCount"
+                            value="${this.state.teamCount}"
+                            min="1"
                             max="10"
                             class="team-count-input"
                         >
                     </div>
+                </div>
 
-                    <h3>Team Composition</h3>
-                    <div class="composition-grid">
-                        ${this.renderCompositionInputs()}
-                    </div>
+                <h3>Team Composition</h3>
+                <div class="composition-grid">
+                    ${this.renderCompositionInputs()}
+                </div>
 
-                    <div class="builder-info">
-                        Players per team: <span id="playersPerTeam">6</span>
-                    </div>
+                <div class="builder-info">
+                    Players per team: <span id="playersPerTeam">6</span>
+                </div>
 
-                    <button 
-                        class="btn btn-primary btn-large" 
+                <div class="builder-settings">
+                    <button
+                        class="btn btn-primary btn-large"
                         id="optimizeBtn"
                         ${players.length < 2 ? 'disabled' : ''}
                     >
