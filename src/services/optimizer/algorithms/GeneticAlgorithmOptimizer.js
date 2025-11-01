@@ -80,14 +80,14 @@ class GeneticAlgorithmOptimizer extends IOptimizer {
                 }
             }
 
-            // Handle stagnation
+            // Handle stagnation - replace half of new population with random solutions
             if (stagnationCount >= this.config.maxStagnation) {
-                for (let i = Math.ceil(population.length / 2); i < population.length; i++) {
-                    population[i] = createRandomSolution(composition, teamCount, playersByPosition);
+                for (let i = Math.ceil(newPopulation.length / 2); i < newPopulation.length; i++) {
+                    newPopulation[i] = createRandomSolution(composition, teamCount, playersByPosition);
                 }
                 stagnationCount = 0;
             }
-            
+
             population = newPopulation;
             
             // Yield control periodically
