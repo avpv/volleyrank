@@ -70,10 +70,6 @@ class TeamsPage extends BasePage {
                     ${this.renderCompositionInputs()}
                 </div>
 
-                <div class="builder-info">
-                    Players per team: <span id="playersPerTeam">6</span>
-                </div>
-
                 <div class="builder-settings">
                     <button
                         class="btn btn-primary btn-large"
@@ -201,9 +197,6 @@ class TeamsPage extends BasePage {
             this.state.teamCount = teamCount;
             
             const composition = this.getComposition();
-            const total = Object.values(composition).reduce((sum, val) => sum + val, 0);
-            const perTeam = this.$('#playersPerTeam');
-            if (perTeam) perTeam.textContent = total;
         };
 
         // Team count change
