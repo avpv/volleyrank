@@ -275,7 +275,7 @@ class SettingsPage extends BasePage {
         this.$$('[data-action]').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const action = btn.getAttribute('data-action');
-                const playerId = parseFloat(btn.getAttribute('data-player-id'));
+                const playerId = btn.getAttribute('data-player-id');
                 this.handlePlayerAction(action, playerId);
             });
         });
