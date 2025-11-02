@@ -157,12 +157,12 @@ class TeamsPage extends BasePage {
             <div class="team-card">
                 <div class="team-header">
                     <h4>Team ${index + 1}</h4>
-                    ${showElo ? `
-                        <div class="team-rating">
-                            ${strength.weightedRating} weighted ELO (${strength.totalRating} raw, avg ${strength.averageRating})
-                        </div>
-                    ` : ''}
                 </div>
+                ${showElo ? `
+                    <div class="team-rating">
+                        ${strength.weightedRating} weighted ELO (${strength.totalRating} raw, avg ${strength.averageRating})
+                    </div>
+                ` : ''}
 
                 <div class="team-players">
                     ${team.map(player => this.renderTeamPlayer(player, showElo)).join('')}
