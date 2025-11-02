@@ -127,8 +127,11 @@ class ComparisonService {
             throw new Error('These players have already been compared at this position');
         }
 
-        // Calculate rating changes
-        const changes = eloService.calculateRatingChange(winner, loser, position);
+        // Get pool size for fair K-factor adjustment
+        const poolSize = playerService.getByPosition(position).length;
+
+        // Calculate rating changes with pool-adjusted K-factor
+        const changes = eloService.calculateRatingChange(winner, loser, position, poolSize);
 
         // Update players
         const updatedPlayers = state.players.map(p => {
