@@ -82,7 +82,7 @@ class TeamOptimizerService {
                 elitistWeight: 2.0
             },
             constraintProgramming: {
-                maxBacktracks: 1000,
+                maxBacktracks: 10000,
                 variableOrderingHeuristic: 'most-constrained',
                 valueOrderingHeuristic: 'least-constraining',
                 propagationLevel: 'full',
@@ -139,9 +139,15 @@ class TeamOptimizerService {
         // Select best result
         const scores = results.map(r => this.evaluateSolution(r));
         const bestIdx = scores.indexOf(Math.min(...scores));
-        
-        console.log(`Best initial result from: ${algorithmNames[bestIdx]}`);
-        
+
+        // Log algorithm performance for debugging
+        console.log('=== Algorithm Performance ===');
+        algorithmNames.forEach((name, idx) => {
+            console.log(`${name}: score ${scores[idx].toFixed(2)}`);
+        });
+        console.log(`Best result from: ${algorithmNames[bestIdx]} (score: ${scores[bestIdx].toFixed(2)})`);
+        console.log('============================');
+
         // Refine with local search
         const localSearchContext = {
             ...problemContext,
@@ -283,8 +289,31 @@ class TeamOptimizerService {
             return this.runOptimizationAlgorithms(initialSolutions, problemContext);
         }
 
-        const results = await Promise.all(algorithmPromises);
-        return { results, algorithmNames };
+        // Use Promise.allSettled to handle individual algorithm failures gracefully
+        const settledResults = await Promise.allSettled(algorithmPromises);
+
+        // Filter out rejected promises and log failures
+        const results = [];
+        const successfulAlgorithmNames = [];
+        settledResults.forEach((result, idx) => {
+            if (result.status === 'fulfilled') {
+                results.push(result.value);
+                successfulAlgorithmNames.push(algorithmNames[idx]);
+            } else {
+                console.error(`Algorithm ${algorithmNames[idx]} failed:`, result.reason);
+            }
+        });
+
+        // Ensure we have at least one result
+        if (results.length === 0) {
+            console.warn('All algorithms failed, using first initial solution');
+            return {
+                results: [initialSolutions[0]],
+                algorithmNames: ['Fallback (Initial Solution)']
+            };
+        }
+
+        return { results, algorithmNames: successfulAlgorithmNames };
     }
 
     /**

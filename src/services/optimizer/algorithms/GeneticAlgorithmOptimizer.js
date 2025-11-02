@@ -34,7 +34,8 @@ class GeneticAlgorithmOptimizer extends IOptimizer {
             evaluateFn
         } = problemContext;
 
-        let population = Array.isArray(initialSolution[0]) ? [...initialSolution] : [initialSolution];
+        try {
+            let population = Array.isArray(initialSolution[0]) ? [...initialSolution] : [initialSolution];
 
         // Fill population to required size with diverse solutions
         while (population.length < this.config.populationSize) {
@@ -113,6 +114,10 @@ class GeneticAlgorithmOptimizer extends IOptimizer {
 
         return population.map(ind => ({ teams: ind, score: evaluateFn(ind) }))
             .sort((a, b) => a.score - b.score)[0].teams;
+        } catch (error) {
+            console.error('GA: Error during optimization:', error);
+            throw error; // Re-throw to be caught by Promise.allSettled
+        }
     }
 
     /**

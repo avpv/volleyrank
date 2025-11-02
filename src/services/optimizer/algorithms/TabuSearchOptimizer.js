@@ -30,7 +30,8 @@ class TabuSearchOptimizer extends IOptimizer {
             evaluateFn
         } = problemContext;
 
-        let current = cloneTeams(initialSolution);
+        try {
+            let current = cloneTeams(initialSolution);
         let best = cloneTeams(current);
         let bestScore = evaluateFn(best);
         const tabuSet = new Set(); // Use Set for O(1) lookup
@@ -130,6 +131,10 @@ class TabuSearchOptimizer extends IOptimizer {
             if (iter % 500 === 0) await new Promise(resolve => setTimeout(resolve, 1));
         }
         return best;
+        } catch (error) {
+            console.error('Tabu Search: Error during optimization:', error);
+            throw error; // Re-throw to be caught by Promise.allSettled
+        }
     }
 
     /**
