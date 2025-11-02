@@ -30,8 +30,9 @@ class AntColonyOptimizer extends IOptimizer {
             evaluateFn
         } = problemContext;
 
-        // Initialize pheromone matrix: [playerId][teamIndex] = pheromone level
-        const allPlayers = Object.values(playersByPosition).flat();
+        try {
+            // Initialize pheromone matrix: [playerId][teamIndex] = pheromone level
+            const allPlayers = Object.values(playersByPosition).flat();
         const pheromones = new Map();
         allPlayers.forEach(player => {
             const teamPheromones = Array(teamCount).fill(1.0);
@@ -100,8 +101,12 @@ class AntColonyOptimizer extends IOptimizer {
             // Yield control periodically
             if (iter % 10 === 0) await new Promise(resolve => setTimeout(resolve, 1));
         }
-        
+
         return globalBest || generateInitialSolutions(composition, teamCount, playersByPosition)[0];
+        } catch (error) {
+            console.error('Ant Colony: Error during optimization:', error);
+            throw error; // Re-throw to be caught by Promise.allSettled
+        }
     }
 
     /**

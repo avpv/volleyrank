@@ -30,25 +30,30 @@ class ConstraintProgrammingOptimizer extends IOptimizer {
             playersByPosition
         } = problemContext;
 
-        // Build constraint model
-        const variables = this.buildCPVariables(composition, teamCount, playersByPosition);
-        const constraints = this.buildCPConstraints(composition, teamCount, variables);
-        
-        // Try to find solution using backtracking with constraint propagation
-        const solution = await this.cpBacktrackingSearch(
-            variables,
-            constraints,
-            composition,
-            teamCount,
-            playersByPosition
-        );
-        
-        if (!solution) {
-            console.warn('CP: No solution found, using greedy construction');
+        try {
+            // Build constraint model
+            const variables = this.buildCPVariables(composition, teamCount, playersByPosition);
+            const constraints = this.buildCPConstraints(composition, teamCount, variables);
+
+            // Try to find solution using backtracking with constraint propagation
+            const solution = await this.cpBacktrackingSearch(
+                variables,
+                constraints,
+                composition,
+                teamCount,
+                playersByPosition
+            );
+
+            if (!solution) {
+                console.warn(`CP: No solution found after ${this.stats.backtracks} backtracks, using greedy construction`);
+                return generateInitialSolutions(composition, teamCount, playersByPosition)[0];
+            }
+
+            return this.convertCPSolutionToTeams(solution, variables, composition, teamCount, playersByPosition);
+        } catch (error) {
+            console.error('CP: Error during optimization:', error);
             return generateInitialSolutions(composition, teamCount, playersByPosition)[0];
         }
-        
-        return this.convertCPSolutionToTeams(solution, variables, composition, teamCount, playersByPosition);
     }
 
     /**

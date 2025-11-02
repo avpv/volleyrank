@@ -31,7 +31,8 @@ class SimulatedAnnealingOptimizer extends IOptimizer {
             evaluateFn
         } = problemContext;
 
-        let current = cloneTeams(initialSolution);
+        try {
+            let current = cloneTeams(initialSolution);
         let best = cloneTeams(current);
         let currentScore = evaluateFn(current);
         let bestScore = currentScore;
@@ -74,8 +75,12 @@ class SimulatedAnnealingOptimizer extends IOptimizer {
             // Yield control periodically
             if (iter % 5000 === 0) await new Promise(resolve => setTimeout(resolve, 1));
         }
-        
+
         return best;
+        } catch (error) {
+            console.error('Simulated Annealing: Error during optimization:', error);
+            throw error; // Re-throw to be caught by Promise.allSettled
+        }
     }
 
     getStatistics() {
