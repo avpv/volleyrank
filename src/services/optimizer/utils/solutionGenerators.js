@@ -26,6 +26,156 @@ const warningTracker = {
 };
 
 /**
+ * Calculate position scarcity - how tight each position's player supply is
+ * @param {Object} composition - Position requirements
+ * @param {number} teamCount - Number of teams
+ * @param {Object} playersByPosition - Available players by position
+ * @param {Set} usedIds - Already allocated player IDs
+ * @returns {Object} Position scarcity scores (lower = more scarce)
+ */
+function calculatePositionScarcity(composition, teamCount, playersByPosition, usedIds) {
+    const scarcity = {};
+
+    Object.entries(composition).forEach(([position, neededPerTeam]) => {
+        if (!neededPerTeam || neededPerTeam === 0) {
+            scarcity[position] = Infinity; // Not needed
+            return;
+        }
+
+        const totalNeeded = neededPerTeam * teamCount;
+        const availablePlayers = (playersByPosition[position] || [])
+            .filter(p => !usedIds.has(p.id));
+        const availableCount = availablePlayers.length;
+
+        // Scarcity score: ratio of available to needed (lower = more scarce)
+        scarcity[position] = availableCount / totalNeeded;
+    });
+
+    return scarcity;
+}
+
+/**
+ * Create a smart solution that prioritizes specialists and handles scarcity
+ * This should eliminate most allocation warnings by making intelligent choices
+ * @param {boolean} randomize - Add randomization to avoid identical solutions
+ */
+function createSmartSolution(composition, teamCount, playersByPosition, randomize = false) {
+    const teams = Array.from({ length: teamCount }, () => []);
+    const usedIds = new Set();
+
+    // Get all positions we need to fill
+    const positionsNeeded = Object.entries(composition)
+        .filter(([, count]) => count && count > 0)
+        .map(([pos, count]) => ({ position: pos, count }));
+
+    // Phase 1: Allocate specialist players (those who can only play one position)
+    positionsNeeded.forEach(({ position, count: neededCount }) => {
+        const specialists = (playersByPosition[position] || [])
+            .filter(p => !usedIds.has(p.id) && p.positions.length === 1)
+            .sort((a, b) => {
+                const aRating = randomize ? a.positionRating + (Math.random() - 0.5) * 30 : a.positionRating;
+                const bRating = randomize ? b.positionRating + (Math.random() - 0.5) * 30 : b.positionRating;
+                return bRating - aRating;
+            });
+
+        let playerIdx = 0;
+        for (let teamIdx = 0; teamIdx < teamCount && playerIdx < specialists.length; teamIdx++) {
+            for (let slot = 0; slot < neededCount && playerIdx < specialists.length; slot++) {
+                const currentCount = teams[teamIdx].filter(p => p.assignedPosition === position).length;
+                if (currentCount < neededCount) {
+                    teams[teamIdx].push(specialists[playerIdx]);
+                    usedIds.add(specialists[playerIdx].id);
+                    playerIdx++;
+                }
+            }
+        }
+    });
+
+    // Phase 2: Allocate multi-position players based on position scarcity
+    // Keep filling until all positions are satisfied
+    let maxIterations = 100;
+    let iteration = 0;
+
+    while (iteration < maxIterations) {
+        iteration++;
+        let madeProgress = false;
+
+        // Calculate current scarcity for remaining positions
+        const scarcity = calculatePositionScarcity(composition, teamCount, playersByPosition, usedIds);
+
+        // Sort positions by scarcity (most scarce first)
+        const positionsByScarcity = positionsNeeded
+            .map(({ position }) => ({ position, scarcity: scarcity[position] }))
+            .filter(({ scarcity }) => scarcity < Infinity)
+            .sort((a, b) => a.scarcity - b.scarcity);
+
+        // Try to fill the most scarce position
+        for (const { position } of positionsByScarcity) {
+            const neededCount = composition[position];
+
+            // Check if any team still needs this position
+            let needsMore = false;
+            for (let teamIdx = 0; teamIdx < teamCount; teamIdx++) {
+                const currentCount = teams[teamIdx].filter(p => p.assignedPosition === position).length;
+                if (currentCount < neededCount) {
+                    needsMore = true;
+                    break;
+                }
+            }
+
+            if (!needsMore) continue;
+
+            // Get available players for this position (including multi-position)
+            const availablePlayers = (playersByPosition[position] || [])
+                .filter(p => !usedIds.has(p.id))
+                .sort((a, b) => {
+                    // Prefer players with fewer position options (more specialized)
+                    if (a.positions.length !== b.positions.length) {
+                        return a.positions.length - b.positions.length;
+                    }
+
+                    // Then by rating (with optional randomization)
+                    const aRating = randomize ? a.positionRating + (Math.random() - 0.5) * 30 : a.positionRating;
+                    const bRating = randomize ? b.positionRating + (Math.random() - 0.5) * 30 : b.positionRating;
+                    return bRating - aRating;
+                });
+
+            if (availablePlayers.length === 0) continue;
+
+            // Allocate players to teams that need this position
+            for (let teamIdx = 0; teamIdx < teamCount && availablePlayers.length > 0; teamIdx++) {
+                const currentCount = teams[teamIdx].filter(p => p.assignedPosition === position).length;
+
+                if (currentCount < neededCount) {
+                    const player = availablePlayers.shift();
+                    teams[teamIdx].push(player);
+                    usedIds.add(player.id);
+                    madeProgress = true;
+                }
+            }
+        }
+
+        // If we didn't make any progress, we're done (either complete or stuck)
+        if (!madeProgress) break;
+    }
+
+    // Check if we successfully filled all positions and log warnings if not
+    positionsNeeded.forEach(({ position, count: neededCount }) => {
+        for (let teamIdx = 0; teamIdx < teamCount; teamIdx++) {
+            const currentCount = teams[teamIdx].filter(p => p.assignedPosition === position).length;
+            if (currentCount < neededCount) {
+                const warningKey = `smart-${position}`;
+                if (warningTracker.shouldWarn(warningKey)) {
+                    console.warn(`Warning: Not enough ${position} players for team ${teamIdx + 1} (smart allocation - this indicates insufficient players)`);
+                }
+            }
+        }
+    });
+
+    return teams;
+}
+
+/**
  * Generate multiple initial solutions using different strategies
  * All strategies now include randomization to ensure diversity
  * @param {Object} composition - Position composition requirements
@@ -35,12 +185,12 @@ const warningTracker = {
  */
 export function generateInitialSolutions(composition, teamCount, playersByPosition) {
     const strategies = [
+        () => createSmartSolution(composition, teamCount, playersByPosition, false),  // NEW: Smart allocation
+        () => createSmartSolution(composition, teamCount, playersByPosition, true),   // NEW: Smart with randomization
         () => createGreedySolution(composition, teamCount, playersByPosition, true),  // with randomization
         () => createBalancedSolution(composition, teamCount, playersByPosition, true), // with randomization
         () => createSnakeDraftSolution(composition, teamCount, playersByPosition, true), // with randomization
-        () => createRandomSolution(composition, teamCount, playersByPosition),
-        () => createRandomSolution(composition, teamCount, playersByPosition), // add more random solutions
-        () => createGreedySolution(composition, teamCount, playersByPosition, true)  // another randomized greedy
+        () => createRandomSolution(composition, teamCount, playersByPosition)
     ];
 
     return strategies.map(strategy => strategy());
