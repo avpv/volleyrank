@@ -35,6 +35,7 @@ export function performSwap(teams, positions) {
 
 /**
  * Perform an adaptive swap between strongest and weakest teams
+ * Uses position-weighted ratings for more accurate team strength evaluation
  * @param {Array} teams - Array of teams
  * @param {Array} positions - Available positions
  * @param {Object} adaptiveParams - Adaptive parameters configuration
@@ -42,7 +43,7 @@ export function performSwap(teams, positions) {
 export function performAdaptiveSwap(teams, positions, adaptiveParams) {
     const teamStrengths = teams.map((team, idx) => ({
         idx,
-        strength: eloService.calculateTeamStrength(team).totalRating
+        strength: eloService.calculateTeamStrength(team, true).weightedRating
     })).sort((a, b) => b.strength - a.strength);
     
     if (teamStrengths.length < 2) {

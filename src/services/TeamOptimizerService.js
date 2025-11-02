@@ -160,10 +160,10 @@ class TeamOptimizerService {
         const bestTeams = await localSearchOptimizer.solve(localSearchContext);
         this.algorithmStats.localSearch = localSearchOptimizer.getStatistics();
 
-        // Sort teams by strength (strongest first)
+        // Sort teams by strength (strongest first) using weighted ratings
         bestTeams.sort((a, b) => {
-            const aStrength = eloService.calculateTeamStrength(a).totalRating;
-            const bStrength = eloService.calculateTeamStrength(b).totalRating;
+            const aStrength = eloService.calculateTeamStrength(a, true).weightedRating;
+            const bStrength = eloService.calculateTeamStrength(b, true).weightedRating;
             return bStrength - aStrength;
         });
 
@@ -318,35 +318,39 @@ class TeamOptimizerService {
 
     /**
      * Evaluate solution quality (lower is better)
+     * Uses position-weighted ratings for more accurate team balance
      * @param {Array} teams - Solution to evaluate
      * @returns {number} Quality score
      */
     evaluateSolution(teams) {
         if (!teams || !Array.isArray(teams) || teams.length === 0) return Infinity;
-        
+
+        // Use weighted ratings for team strength calculation
         const teamStrengths = teams.map(team => {
             if (!Array.isArray(team)) return 0;
-            return eloService.calculateTeamStrength(team).totalRating;
+            return eloService.calculateTeamStrength(team, true).weightedRating;
         });
-        
+
         if (teamStrengths.some(isNaN)) return Infinity;
 
         const balance = Math.max(...teamStrengths) - Math.min(...teamStrengths);
         const avg = teamStrengths.reduce((a, b) => a + b, 0) / teamStrengths.length;
         const variance = teamStrengths.reduce((sum, s) => sum + Math.pow(s - avg, 2), 0) / teamStrengths.length;
 
-        // Position-level balance
+        // Position-level balance with position weights applied
         let positionImbalance = 0;
         Object.keys(this.positions).forEach(pos => {
+            const positionWeight = eloService.POSITION_WEIGHTS[pos] || 1.0;
             const posStrengths = teams.map(team =>
-                team.filter(p => p.assignedPosition === pos).reduce((sum, p) => sum + p.positionRating, 0)
+                team.filter(p => p.assignedPosition === pos)
+                    .reduce((sum, p) => sum + (p.positionRating * positionWeight), 0)
             );
             if (posStrengths.length > 1 && posStrengths.some(s => s > 0)) {
                 positionImbalance += (Math.max(...posStrengths) - Math.min(...posStrengths));
             }
         });
 
-        return balance + Math.sqrt(variance) * this.config.adaptiveParameters.varianceWeight + 
+        return balance + Math.sqrt(variance) * this.config.adaptiveParameters.varianceWeight +
                positionImbalance * this.config.adaptiveParameters.positionBalanceWeight;
     }
 

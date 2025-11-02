@@ -150,7 +150,7 @@ class TeamsPage extends BasePage {
     }
 
     renderTeam(team, index) {
-        const strength = eloService.calculateTeamStrength(team);
+        const strength = eloService.calculateTeamStrength(team, true);
         const showElo = this.state.showEloRatings;
 
         return `
@@ -159,7 +159,7 @@ class TeamsPage extends BasePage {
                     <h4>Team ${index + 1}</h4>
                     ${showElo ? `
                         <div class="team-rating">
-                            ${strength.totalRating} ELO (avg ${strength.averageRating})
+                            ${strength.weightedRating} weighted ELO (${strength.totalRating} raw, avg ${strength.averageRating})
                         </div>
                     ` : ''}
                 </div>

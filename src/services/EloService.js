@@ -6,6 +6,16 @@ class EloService {
     constructor() {
         this.DEFAULT_RATING = 1500;
         this.BASE_K_FACTOR = 30;
+
+        // Position weights for team optimization
+        // Reflects the impact each position has on team balance
+        this.POSITION_WEIGHTS = {
+            'S': 1.3,    // Setter - highest impact, "brain of the team"
+            'OPP': 1.2,  // Opposite - high impact, "main attacking power"
+            'OH': 1.1,   // Outside Hitter - medium impact, "universal soldier"
+            'MB': 1.0,   // Middle Blocker - baseline impact, reference unit
+            'L': 0.9     // Libero - lowest impact, defensive specialist
+        };
     }
 
     /**
@@ -151,29 +161,43 @@ class EloService {
 
     /**
      * Calculate team strength
+     * @param {Array} players - Team players
+     * @param {boolean} usePositionWeights - Whether to apply position weights
+     * @returns {Object} Team strength statistics
      */
-    calculateTeamStrength(players) {
+    calculateTeamStrength(players, usePositionWeights = true) {
         if (!players || players.length === 0) {
             return {
                 totalRating: 0,
+                weightedRating: 0,
                 averageRating: 0,
                 playerCount: 0
             };
         }
 
         let totalRating = 0;
+        let weightedRating = 0;
 
         players.forEach(player => {
             const position = player.assignedPosition || player.positions?.[0];
-            const rating = position && player.ratings?.[position] 
-                ? player.ratings[position] 
+            const rating = position && player.ratings?.[position]
+                ? player.ratings[position]
                 : this.DEFAULT_RATING;
-            
+
             totalRating += rating;
+
+            // Apply position weight if enabled
+            if (usePositionWeights && position) {
+                const weight = this.POSITION_WEIGHTS[position] || 1.0;
+                weightedRating += rating * weight;
+            } else {
+                weightedRating += rating;
+            }
         });
 
         return {
             totalRating: Math.round(totalRating),
+            weightedRating: Math.round(weightedRating),
             averageRating: Math.round(totalRating / players.length),
             playerCount: players.length
         };
@@ -181,32 +205,43 @@ class EloService {
 
     /**
      * Evaluate balance between teams
+     * @param {Array} teams - Array of teams to evaluate
+     * @param {boolean} usePositionWeights - Whether to use weighted ratings for balance
+     * @returns {Object} Balance evaluation
      */
-    evaluateBalance(teams) {
+    evaluateBalance(teams, usePositionWeights = true) {
         if (!teams || teams.length < 2) {
             return {
                 isBalanced: true,
                 maxDifference: 0,
+                maxWeightedDifference: 0,
                 teams: []
             };
         }
 
-        const teamStats = teams.map(team => this.calculateTeamStrength(team));
+        const teamStats = teams.map(team => this.calculateTeamStrength(team, usePositionWeights));
         const ratings = teamStats.map(stats => stats.totalRating);
-        
+        const weightedRatings = teamStats.map(stats => stats.weightedRating);
+
         const maxRating = Math.max(...ratings);
         const minRating = Math.min(...ratings);
         const maxDifference = maxRating - minRating;
-        
-        const isBalanced = maxDifference < 300;
+
+        const maxWeightedRating = Math.max(...weightedRatings);
+        const minWeightedRating = Math.min(...weightedRatings);
+        const maxWeightedDifference = maxWeightedRating - minWeightedRating;
+
+        // Use weighted difference for balance check
+        const isBalanced = maxWeightedDifference < 350;
 
         return {
             isBalanced,
             maxDifference: Math.round(maxDifference),
+            maxWeightedDifference: Math.round(maxWeightedDifference),
             teams: teamStats.map((stats, index) => ({
                 index,
                 ...stats,
-                strengthRank: ratings.filter(r => r > stats.totalRating).length + 1
+                strengthRank: weightedRatings.filter(r => r > stats.weightedRating).length + 1
             }))
         };
     }
