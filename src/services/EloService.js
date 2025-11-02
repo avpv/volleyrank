@@ -27,9 +27,39 @@ class EloService {
     }
 
     /**
-     * Calculate rating changes for a position
+     * Pool-size adjusted K-factor for fair ELO distribution
+     * Smaller pools get higher K-factors to compensate for fewer battles
+     *
+     * @param {number} baseK - Base K-factor from calculateKFactor
+     * @param {number} poolSize - Number of players in the position pool
+     * @param {number} referenceSize - Reference pool size (default: 15)
+     * @returns {number} Adjusted K-factor
      */
-    calculateRatingChange(winner, loser, position) {
+    calculatePoolAdjustedKFactor(baseK, poolSize, referenceSize = 15) {
+        // Validate inputs
+        if (poolSize <= 0) return baseK;
+        if (poolSize === 1) return baseK; // Single player, no adjustment needed
+
+        // Calculate adjustment factor: sqrt(referenceSize / poolSize)
+        // This gives more volatility to smaller pools
+        const adjustmentFactor = Math.sqrt(referenceSize / poolSize);
+
+        // Apply adjustment with reasonable bounds [0.5x to 2.0x]
+        const boundedFactor = Math.max(0.5, Math.min(2.0, adjustmentFactor));
+
+        return Math.round(baseK * boundedFactor);
+    }
+
+    /**
+     * Calculate rating changes for a position
+     *
+     * @param {Object} winner - Winner player object
+     * @param {Object} loser - Loser player object
+     * @param {string} position - Position being compared
+     * @param {number} poolSize - Optional: Number of players in position pool (for fair K-factor adjustment)
+     * @returns {Object} Rating change details
+     */
+    calculateRatingChange(winner, loser, position, poolSize = null) {
         // Validate that winner and loser are different players
         if (winner.id === loser.id) {
             throw new Error('Cannot calculate rating change for same player');
@@ -51,8 +81,18 @@ class EloService {
         const winnerExpected = this.calculateExpectedScore(winnerRating, loserRating);
         const loserExpected = this.calculateExpectedScore(loserRating, winnerRating);
 
-        const winnerK = this.calculateKFactor(winnerComparisons, winnerRating);
-        const loserK = this.calculateKFactor(loserComparisons, loserRating);
+        // Calculate base K-factors
+        const winnerBaseK = this.calculateKFactor(winnerComparisons, winnerRating);
+        const loserBaseK = this.calculateKFactor(loserComparisons, loserRating);
+
+        // Apply pool-size adjustment if poolSize is provided
+        let winnerK = winnerBaseK;
+        let loserK = loserBaseK;
+
+        if (poolSize && poolSize > 1) {
+            winnerK = this.calculatePoolAdjustedKFactor(winnerBaseK, poolSize);
+            loserK = this.calculatePoolAdjustedKFactor(loserBaseK, poolSize);
+        }
 
         const winnerChange = winnerK * (1 - winnerExpected);
         const loserChange = loserK * (0 - loserExpected);
@@ -63,6 +103,7 @@ class EloService {
                 newRating: winnerRating + winnerChange,
                 change: winnerChange,
                 kFactor: winnerK,
+                baseKFactor: winnerBaseK,
                 expected: winnerExpected
             },
             loser: {
@@ -70,8 +111,11 @@ class EloService {
                 newRating: loserRating + loserChange,
                 change: loserChange,
                 kFactor: loserK,
+                baseKFactor: loserBaseK,
                 expected: loserExpected
-            }
+            },
+            poolSize: poolSize || null,
+            poolAdjusted: poolSize && poolSize > 1
         };
     }
 
@@ -207,6 +251,128 @@ class EloService {
             comparisons: player.comparisons?.[pos] || 0,
             comparedWith: (player.comparedWith?.[pos] || []).length
         })).sort((a, b) => b.rating - a.rating);
+    }
+
+    /**
+     * Calculate percentile rank for a player within their position pool
+     *
+     * @param {Object} player - The player to calculate percentile for
+     * @param {string} position - The position to calculate for
+     * @param {Array} allPlayersInPosition - All players who can play this position
+     * @returns {Object} Percentile information
+     */
+    calculatePercentile(player, position, allPlayersInPosition) {
+        if (!allPlayersInPosition || allPlayersInPosition.length === 0) {
+            return { percentile: 0, rank: 0, total: 0 };
+        }
+
+        // Sort players by rating (descending)
+        const sortedPlayers = [...allPlayersInPosition]
+            .filter(p => p.ratings && p.ratings[position] !== undefined)
+            .sort((a, b) => (b.ratings[position] || this.DEFAULT_RATING) - (a.ratings[position] || this.DEFAULT_RATING));
+
+        // Find player's rank (1-based)
+        const rank = sortedPlayers.findIndex(p => p.id === player.id) + 1;
+
+        if (rank === 0) {
+            return { percentile: 0, rank: 0, total: sortedPlayers.length };
+        }
+
+        // Calculate percentile (higher is better)
+        // Top player = 100th percentile, bottom = 0th percentile
+        const percentile = sortedPlayers.length === 1
+            ? 100
+            : Math.round(((sortedPlayers.length - rank) / (sortedPlayers.length - 1)) * 100);
+
+        return {
+            percentile,
+            rank,
+            total: sortedPlayers.length
+        };
+    }
+
+    /**
+     * Calculate confidence score for a player's rating at a position
+     * Based on how many comparisons they've completed vs. total possible
+     *
+     * @param {Object} player - The player
+     * @param {string} position - The position
+     * @param {number} totalPlayersInPosition - Total players who can play this position
+     * @returns {Object} Confidence information
+     */
+    calculateConfidence(player, position, totalPlayersInPosition) {
+        const comparisons = player.comparisons?.[position] || 0;
+
+        // Maximum possible comparisons for this player at this position
+        const maxPossible = totalPlayersInPosition - 1;
+
+        if (maxPossible === 0) {
+            return {
+                confidence: 0,
+                comparisons,
+                maxPossible: 0,
+                level: 'none'
+            };
+        }
+
+        // Calculate confidence as percentage of completed comparisons
+        const confidence = Math.min(100, Math.round((comparisons / maxPossible) * 100));
+
+        // Determine confidence level
+        let level;
+        if (confidence < 20) level = 'very-low';
+        else if (confidence < 40) level = 'low';
+        else if (confidence < 60) level = 'medium';
+        else if (confidence < 80) level = 'high';
+        else level = 'very-high';
+
+        return {
+            confidence,
+            comparisons,
+            maxPossible,
+            level
+        };
+    }
+
+    /**
+     * Get enhanced player statistics for a position
+     * Includes percentile, confidence, and pool-adjusted metrics
+     *
+     * @param {Object} player - The player
+     * @param {string} position - The position
+     * @param {Array} allPlayersInPosition - All players in this position
+     * @returns {Object} Enhanced statistics
+     */
+    getEnhancedPlayerStats(player, position, allPlayersInPosition) {
+        const rating = player.ratings?.[position] || this.DEFAULT_RATING;
+        const comparisons = player.comparisons?.[position] || 0;
+        const poolSize = allPlayersInPosition.length;
+
+        // Calculate base K-factor
+        const baseK = this.calculateKFactor(comparisons, rating);
+
+        // Calculate pool-adjusted K-factor
+        const adjustedK = this.calculatePoolAdjustedKFactor(baseK, poolSize);
+
+        // Calculate percentile
+        const percentileInfo = this.calculatePercentile(player, position, allPlayersInPosition);
+
+        // Calculate confidence
+        const confidenceInfo = this.calculateConfidence(player, position, poolSize);
+
+        return {
+            position,
+            rating,
+            comparisons,
+            poolSize,
+            baseKFactor: baseK,
+            adjustedKFactor: adjustedK,
+            percentile: percentileInfo.percentile,
+            rank: percentileInfo.rank,
+            confidence: confidenceInfo.confidence,
+            confidenceLevel: confidenceInfo.level,
+            maxPossibleComparisons: confidenceInfo.maxPossible
+        };
     }
 }
 
