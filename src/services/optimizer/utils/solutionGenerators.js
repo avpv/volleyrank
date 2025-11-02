@@ -4,6 +4,27 @@
  * Generators for initial team solutions using different strategies
  */
 
+// Track warnings to avoid spam
+const warningTracker = {
+    counts: new Map(),
+    lastReset: Date.now(),
+    resetInterval: 5000, // Reset every 5 seconds
+
+    shouldWarn(key) {
+        const now = Date.now();
+        if (now - this.lastReset > this.resetInterval) {
+            this.counts.clear();
+            this.lastReset = now;
+        }
+
+        const count = this.counts.get(key) || 0;
+        this.counts.set(key, count + 1);
+
+        // Only warn once per position per reset interval
+        return count === 0;
+    }
+};
+
 /**
  * Generate multiple initial solutions using different strategies
  * All strategies now include randomization to ensure diversity
@@ -65,7 +86,10 @@ function createGreedySolution(composition, teamCount, playersByPosition, randomi
                     usedIds.add(players[playerIdx].id);
                     playerIdx++;
                 } else {
-                    console.warn(`Warning: Not enough ${position} players for team ${teamIdx + 1}`);
+                    const warningKey = `greedy-${position}`;
+                    if (warningTracker.shouldWarn(warningKey)) {
+                        console.warn(`Warning: Not enough ${position} players for team ${teamIdx + 1} (greedy allocation)`);
+                    }
                 }
             }
         }
@@ -117,7 +141,10 @@ function createBalancedSolution(composition, teamCount, playersByPosition, rando
                     usedIds.add(players[playerIdx].id);
                     playerIdx++;
                 } else {
-                    console.warn(`Warning: Not enough ${position} players for team ${teamIdx + 1}`);
+                    const warningKey = `balanced-${position}`;
+                    if (warningTracker.shouldWarn(warningKey)) {
+                        console.warn(`Warning: Not enough ${position} players for team ${teamIdx + 1} (balanced allocation)`);
+                    }
                 }
             }
         }
@@ -183,7 +210,10 @@ export function createSnakeDraftSolution(composition, teamCount, playersByPositi
             round++;
 
             if (round > 100) {
-                console.warn(`Warning: Snake draft exceeded 100 rounds for ${position}`);
+                const warningKey = `snake-exceeded-${position}`;
+                if (warningTracker.shouldWarn(warningKey)) {
+                    console.warn(`Warning: Snake draft exceeded 100 rounds for ${position}`);
+                }
                 break;
             }
         }
@@ -223,7 +253,10 @@ export function createRandomSolution(composition, teamCount, playersByPosition) 
                     usedIds.add(players[playerIdx].id);
                     playerIdx++;
                 } else {
-                    console.warn(`Warning: Not enough ${position} players for team ${teamIdx + 1}`);
+                    const warningKey = `random-${position}`;
+                    if (warningTracker.shouldWarn(warningKey)) {
+                        console.warn(`Warning: Not enough ${position} players for team ${teamIdx + 1} (random allocation)`);
+                    }
                 }
             }
         }
