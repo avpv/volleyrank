@@ -1001,6 +1001,7 @@ select.form-control {
     border-radius: var(--radius-md);
     padding: var(--spacing-4);
     margin-top: var(--spacing-6);
+    margin-bottom: var(--spacing-6);
 }
 
 .warning-box-danger {
