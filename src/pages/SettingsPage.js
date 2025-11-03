@@ -101,7 +101,7 @@ class SettingsPage extends BasePage {
                             Add Player
                         </button>
                         <button type="button" class="btn btn-secondary" id="importBtn">
-                            Import Players
+                            📥 Import Players
                         </button>
                     </div>
 
@@ -124,7 +124,7 @@ class SettingsPage extends BasePage {
                                 Reset All Ratings
                             </button>
                             <button type="button" class="btn btn-danger" id="clearAllBtn">
-                                Remove All Players
+                                🗑️ Remove All Players
                             </button>
                         </div>
                     </div>
