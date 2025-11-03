@@ -282,8 +282,6 @@
 
 /* Border Style */
 .border-solid { border-style: solid; }
-.border-dashed { border-style: dashed; }
-.border-dotted { border-style: dotted; }
 .border-none { border-style: none; }
 
 /* Border Color */
@@ -304,14 +302,7 @@
 .rounded { border-radius: var(--radius-md); }
 .rounded-md { border-radius: var(--radius-md); }
 .rounded-lg { border-radius: var(--radius-lg); }
-.rounded-xl { border-radius: var(--radius-xl); }
-.rounded-2xl { border-radius: var(--radius-2xl); }
 .rounded-full { border-radius: var(--radius-full); }
-
-.rounded-t-none { border-top-left-radius: 0; border-top-right-radius: 0; }
-.rounded-r-none { border-top-right-radius: 0; border-bottom-right-radius: 0; }
-.rounded-b-none { border-bottom-right-radius: 0; border-bottom-left-radius: 0; }
-.rounded-l-none { border-top-left-radius: 0; border-bottom-left-radius: 0; }
 
 /* =============================================================================
    Sizing
@@ -387,11 +378,6 @@
    ============================================================================= */
 
 .z-0 { z-index: 0; }
-.z-10 { z-index: 10; }
-.z-20 { z-index: 20; }
-.z-30 { z-index: 30; }
-.z-40 { z-index: 40; }
-.z-50 { z-index: 50; }
 .z-auto { z-index: auto; }
 
 /* =============================================================================
@@ -399,9 +385,7 @@
    ============================================================================= */
 
 .opacity-0 { opacity: 0; }
-.opacity-25 { opacity: 0.25; }
 .opacity-50 { opacity: 0.5; }
-.opacity-75 { opacity: 0.75; }
 .opacity-100 { opacity: 1; }
 
 /* =============================================================================
@@ -423,9 +407,6 @@
 .cursor-auto { cursor: auto; }
 .cursor-default { cursor: default; }
 .cursor-pointer { cursor: pointer; }
-.cursor-wait { cursor: wait; }
-.cursor-text { cursor: text; }
-.cursor-move { cursor: move; }
 .cursor-not-allowed { cursor: not-allowed; }
 
 /* User Select */
