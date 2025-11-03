@@ -504,7 +504,9 @@ select.form-control {
    Player Avatar
    ============================================================================= */
 
-.player-avatar {
+.player-avatar,
+.player-avatar.blue,
+.player-avatar.purple {
     width: 64px;
     height: 64px;
     border-radius: var(--radius-full);
@@ -519,6 +521,10 @@ select.form-control {
 
 .player-avatar.blue {
     background: linear-gradient(135deg, #2f81f7, #1f6feb);
+}
+
+.player-avatar.purple {
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
 }
 
 /* =============================================================================
