@@ -132,6 +132,13 @@
     transform: none !important;
 }
 
+/* Button Icons */
+.btn svg {
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+}
+
 .btn-loading {
     color: transparent;
 }
