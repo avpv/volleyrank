@@ -137,9 +137,6 @@ class TeamsPage extends BasePage {
                     <div class="info-badge ${balance.isBalanced ? 'success' : 'warning'}">
                         Balance: ${balance.maxDifference} ELO difference
                     </div>
-                    <div class="info-badge">
-                        Algorithm: ${algorithm}
-                    </div>
                 </div>
 
                 <div class="teams-grid">
