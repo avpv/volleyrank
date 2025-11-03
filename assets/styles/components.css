@@ -501,6 +501,27 @@ select.form-control {
 }
 
 /* =============================================================================
+   Player Avatar
+   ============================================================================= */
+
+.player-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+    color: white;
+    margin: 0 auto var(--spacing-4);
+}
+
+.player-avatar.blue {
+    background: linear-gradient(135deg, #2f81f7, #1f6feb);
+}
+
+/* =============================================================================
    Progress Bars
    ============================================================================= */
 
