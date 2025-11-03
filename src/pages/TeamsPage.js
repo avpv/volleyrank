@@ -8,6 +8,7 @@ import playerService from '../services/PlayerService.js';
 import teamOptimizerService from '../services/TeamOptimizerService.js';
 import eloService from '../services/EloService.js';
 import toast from '../components/base/Toast.js';
+import { getIcon } from '../components/base/Icons.js';
 
 class TeamsPage extends BasePage {
     constructor(container) {
@@ -130,10 +131,7 @@ class TeamsPage extends BasePage {
                             Show ELO Ratings
                         </label>
                         <button class="btn btn-secondary" id="exportTeamsBtn">
-                            <svg viewBox="0 0 16 16" fill="currentColor">
-                                <path d="M2.75 2A1.75 1.75 0 0 0 1 3.75v2.5a.75.75 0 0 0 1.5 0v-2.5c0-.138.112-.25.25-.25h10.5a.25.25 0 0 1 .25.25v2.5a.75.75 0 0 0 1.5 0v-2.5A1.75 1.75 0 0 0 13.25 2Z"></path>
-                                <path d="M7.25 8.311V14a.75.75 0 0 0 1.5 0V8.311l1.97 1.969a.749.749 0 1 0 1.06-1.06l-3.25-3.25a.749.749 0 0 0-1.06 0L4.22 9.22a.749.749 0 1 0 1.06 1.06l1.97-1.969Z"></path>
-                            </svg>
+                            ${getIcon('arrow-up', { size: 16, className: 'btn-icon' })}
                             Export Teams
                         </button>
                     </div>
