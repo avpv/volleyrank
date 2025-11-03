@@ -9,6 +9,7 @@ import stateManager from '../core/StateManager.js';
 import storage from '../core/StorageAdapter.js';
 import toast from '../components/base/Toast.js';
 import Modal from '../components/base/Modal.js';
+import { getIcon } from '../components/base/Icons.js';
 
 class SettingsPage extends BasePage {
     constructor(container) {
@@ -100,6 +101,7 @@ class SettingsPage extends BasePage {
 
                     <div class="form-actions">
                         <button type="submit" class="btn btn-primary">
+                            ${getIcon('plus', { size: 16, className: 'btn-icon' })}
                             Add Player
                         </button>
                         <button type="button" class="btn btn-secondary" id="importBtn">
