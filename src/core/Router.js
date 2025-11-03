@@ -133,12 +133,12 @@ class Router {
      * Initialize router
      */
     init() {
-        console.log('🚦 Initializing router...');
-        console.log('📂 Base path:', this.basePath || '(root)');
+        console.log('[ROUTER] Initializing router...');
+        console.log('[ROUTER] Base path:', this.basePath || '(root)');
         
         // Handle browser back/forward
         window.addEventListener('popstate', (event) => {
-            console.log('⬅️ Popstate event');
+            console.log('[NAV] Popstate event');
             const path = event.state?.path || this.getCurrentPath();
             console.log('   Target path:', path);
             this.navigate(path, false);
@@ -182,13 +182,13 @@ class Router {
             }
             
             e.preventDefault();
-            console.log('🔗 Link clicked, navigating to:', href);
+            console.log('[NAV] Link clicked, navigating to:', href);
             this.navigate(href);
         });
 
         // todo
         const currentPath = this.getCurrentPath();
-        console.log('🎯 Initial current path:', currentPath);
+        console.log('[ROUTER] Initial current path:', currentPath);
         
         // todo
         const fullPath = this.basePath + currentPath;
@@ -199,7 +199,7 @@ class Router {
         );
         
         // todo
-        console.log('🚀 Starting initial navigation...');
+        console.log('[ROUTER] Starting initial navigation...');
         this.navigate(currentPath, false);
     }
 

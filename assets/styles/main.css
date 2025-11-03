@@ -505,6 +505,14 @@ a:hover {
 .error-icon {
     color: var(--color-error);
     margin-right: var(--spacing-2);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: middle;
+}
+
+.error-icon svg {
+    display: block;
 }
 
 /* =============================================================================

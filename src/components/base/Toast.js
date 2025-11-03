@@ -1,3 +1,5 @@
+import { getIcon } from './Icons.js';
+
 /**
  * Toast - Notification component
  * Displays temporary messages to the user
@@ -71,14 +73,15 @@ class Toast {
      * Get icon for toast type
      */
     getIcon(type) {
-        const icons = {
-            success: '✓',
-            error: '✕',
-            warning: '⚠',
-            info: 'ℹ'
+        const iconMap = {
+            success: 'check',
+            error: 'x',
+            warning: 'alert',
+            info: 'info'
         };
-        
-        return icons[type] || icons.info;
+
+        const iconName = iconMap[type] || 'info';
+        return getIcon(iconName, { size: 20, className: 'toast-svg-icon' });
     }
 
     /**
