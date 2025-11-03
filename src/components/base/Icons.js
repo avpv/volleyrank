@@ -1,3 +1,5 @@
+// src/components/base/Icons.js
+
 /**
  * Icons - SVG icon components
  * Centralized icon system using inline SVG

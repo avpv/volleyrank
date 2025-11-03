@@ -1,6 +1,8 @@
+// src/app.js
+
 /**
  * Application Bootstrap
- * 
+ *
  * Main application entry point that initializes the entire VolleyRank SPA.
  * Handles routing, state management, and global event coordination.
  * 

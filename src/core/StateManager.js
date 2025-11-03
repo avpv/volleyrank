@@ -1,3 +1,5 @@
+// src/core/StateManager.js
+
 /**
  * StateManager - Centralized application state with event-driven updates
  * Enterprise-grade state management with immutability

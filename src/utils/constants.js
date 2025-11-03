@@ -1,3 +1,5 @@
+// src/utils/constants.js
+
 /**
  * Application Constants
  */

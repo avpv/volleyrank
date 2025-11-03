@@ -1,6 +1,8 @@
+// src/redirect.js
+
 /**
  * 404 Redirect Handler
- * 
+ *
  * Handles seamless client-side routing for Single Page Applications
  * deployed on GitHub Pages. Uses sessionStorage for invisible redirects
  * with query parameter fallback for maximum compatibility.

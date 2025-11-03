@@ -1,3 +1,5 @@
+// src/services/EloService.js
+
 /**
  * EloService - ELO rating calculations
  * Pure business logic with no state management

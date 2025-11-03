@@ -1,3 +1,5 @@
+// src/pages/ComparePage.js
+
 /**
  * ComparePage - Player comparison page
  */

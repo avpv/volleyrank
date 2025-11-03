@@ -1,3 +1,5 @@
+// src/core/EventBus.js
+
 /**
  * EventBus - Global event communication system
  * Enables loose coupling between components
