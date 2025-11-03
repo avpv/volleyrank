@@ -236,7 +236,7 @@ class EloService {
 
         return {
             isBalanced,
-            maxDifference: Math.round(maxDifference),
+            maxDifference: Math.round(usePositionWeights ? maxWeightedDifference : maxDifference),
             maxWeightedDifference: Math.round(maxWeightedDifference),
             teams: teamStats.map((stats, index) => ({
                 index,
