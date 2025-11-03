@@ -112,7 +112,7 @@ The app creates balanced teams by:
 - Focuses on one position at a time
 - Helps you rate all players fairly and quickly
 
-### ImportFormats
+### Import Formats
 
 #### CSV Format
 ```csv
