@@ -101,7 +101,11 @@ class SettingsPage extends BasePage {
                             Add Player
                         </button>
                         <button type="button" class="btn btn-secondary" id="importBtn">
-                            📥 Import Players
+                            <svg viewBox="0 0 16 16" fill="currentColor">
+                                <path d="M8.75 2.75a.75.75 0 0 0-1.5 0v5.69L5.03 6.22a.75.75 0 0 0-1.06 1.06l3.5 3.5a.75.75 0 0 0 1.06 0l3.5-3.5a.75.75 0 0 0-1.06-1.06L8.75 8.44V2.75z"></path>
+                                <path d="M2.5 9.5a.75.75 0 0 0-.75.75v2.5c0 .69.56 1.25 1.25 1.25h10c.69 0 1.25-.56 1.25-1.25v-2.5a.75.75 0 0 0-1.5 0v2.5H2.5v-2.5a.75.75 0 0 0-.75-.75z"></path>
+                            </svg>
+                            Import Players
                         </button>
                     </div>
 
@@ -124,7 +128,10 @@ class SettingsPage extends BasePage {
                                 Reset All Ratings
                             </button>
                             <button type="button" class="btn btn-danger" id="clearAllBtn">
-                                🗑️ Remove All Players
+                                <svg viewBox="0 0 16 16" fill="currentColor">
+                                    <path d="M11 1.75V3h2.25a.75.75 0 0 1 0 1.5H2.75a.75.75 0 0 1 0-1.5H5V1.75C5 .784 5.784 0 6.75 0h2.5C10.216 0 11 .784 11 1.75zM4.496 6.675l.66 6.6a.25.25 0 0 0 .249.225h5.19a.25.25 0 0 0 .249-.225l.66-6.6a.75.75 0 0 1 1.492.149l-.66 6.6A1.748 1.748 0 0 1 10.595 15h-5.19a1.75 1.75 0 0 1-1.741-1.575l-.66-6.6a.75.75 0 1 1 1.492-.15zM6.5 1.75V3h3V1.75a.25.25 0 0 0-.25-.25h-2.5a.25.25 0 0 0-.25.25z"></path>
+                                </svg>
+                                Remove All Players
                             </button>
                         </div>
                     </div>
