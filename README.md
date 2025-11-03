@@ -1,7 +1,5 @@
 # VolleyRank
 
-<img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'%3E%3C/circle%3E%3Cpath d='M12 2 C 16 6, 16 18, 12 22'%3E%3C/path%3E%3Cpath d='M12 2 C 8 6, 8 18, 12 22'%3E%3C/path%3E%3Cpath d='M2 12 C 6 8, 18 8, 22 12'%3E%3C/path%3E%3Cpath d='M2 12 C 6 16, 18 16, 22 12'%3E%3C/path%3E%3C/svg%3E" alt="Volleyball Icon" width="48" height="48" />
-
 **Smart team builder for volleyball coaches and organizers**
 
 Stop guessing who should play where. VolleyRank helps you:
