@@ -197,6 +197,7 @@ class ComparePage extends BasePage {
 
         const progress = comparisonService.getProgress(this.selectedPosition);
         const posName = playerService.positions[this.selectedPosition];
+        const isComplete = progress.percentage === 100;
 
         return `
             <div class="stats-section">
@@ -204,6 +205,9 @@ class ComparePage extends BasePage {
                     <div class="stat-label">${posName} Progress</div>
                     <div class="stat-value">${progress.completed} / ${progress.total}</div>
                     <div class="stat-detail">${progress.remaining} remaining</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill ${isComplete ? 'complete' : ''}" style="width: ${progress.percentage}%"></div>
+                    </div>
                 </div>
             </div>
         `;
