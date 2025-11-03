@@ -27,6 +27,7 @@ import eventBus from './core/EventBus.js';
 import stateManager from './core/StateManager.js';
 import toast from './components/base/Toast.js';
 import redirectModule from './redirect.js';
+import { getIcon } from './components/base/Icons.js';
 
 // Page imports
 import SettingsPage from './pages/SettingsPage.js';
@@ -104,7 +105,7 @@ class Application {
      */
     async init() {
         try {
-            console.log(`🏐 Initializing ${APP_CONFIG.NAME} v${APP_CONFIG.VERSION}...`);
+            console.log(`[INIT] Initializing ${APP_CONFIG.NAME} v${APP_CONFIG.VERSION}...`);
 
             // Step 1: Handle GitHub Pages 404 redirect
             this.handleRedirect();
@@ -112,9 +113,9 @@ class Application {
             // Step 2: Load persisted application state
             const loaded = stateManager.load();
             if (loaded) {
-                console.log('✓ State loaded from storage');
+                console.log('[OK] State loaded from storage');
             } else {
-                console.log('✓ Starting with fresh state');
+                console.log('[OK] Starting with fresh state');
             }
 
             // Step 3: Setup global event listeners
@@ -135,7 +136,7 @@ class Application {
             // Step 7: Setup global error handlers
             this.setupErrorHandling();
 
-            console.log(`✓ ${APP_CONFIG.NAME} initialized successfully`);
+            console.log(`[OK] ${APP_CONFIG.NAME} initialized successfully`);
 
             // Step 8: Show welcome message for first-time users
             if (!loaded) {
@@ -184,7 +185,7 @@ class Application {
         const storedPath = redirectModule.restore();
         
         if (storedPath) {
-            console.log('🔄 Restoring path from sessionStorage:', storedPath);
+            console.log('[REDIRECT] Restoring path from sessionStorage:', storedPath);
             
             // Update browser URL to correct path (no query params)
             const fullPath = router.basePath + storedPath;
@@ -197,7 +198,7 @@ class Application {
             // Store for router initialization
             this.initialPath = storedPath;
             
-            console.log('✓ Redirect handled via sessionStorage');
+            console.log('[OK] Redirect handled via sessionStorage');
             return;
         }
         
@@ -206,7 +207,7 @@ class Application {
         
         if (url.searchParams.has('redirect')) {
             const redirectPath = url.searchParams.get('redirect');
-            console.log('🔄 Restoring path from query parameter:', redirectPath);
+            console.log('[REDIRECT] Restoring path from query parameter:', redirectPath);
             
             // Remove redirect parameter from URL
             url.searchParams.delete('redirect');
@@ -224,7 +225,7 @@ class Application {
             // Store for router initialization
             this.initialPath = redirectPath;
             
-            console.log('✓ Redirect handled via query parameter');
+            console.log('[OK] Redirect handled via query parameter');
         }
     }
 
@@ -249,25 +250,25 @@ class Application {
     registerRoutes() {
         // Home/Settings page
         router.register('/', () => {
-            console.log('📍 Route: / (Settings)');
+            console.log('[ROUTE] Route: / (Settings)');
             this.renderPage('settings', SettingsPage);
         });
 
         // Player comparison page
         router.register('/compare/', () => {
-            console.log('📍 Route: /compare/');
+            console.log('[ROUTE] Route: /compare/');
             this.renderPage('compare', ComparePage);
         });
 
         // Player rankings page
         router.register('/rankings/', () => {
-            console.log('📍 Route: /rankings/');
+            console.log('[ROUTE] Route: /rankings/');
             this.renderPage('rankings', RankingsPage);
         });
 
         // Team builder page
         router.register('/teams/', () => {
-            console.log('📍 Route: /teams/');
+            console.log('[ROUTE] Route: /teams/');
             this.renderPage('teams', TeamsPage);
         });
     }
@@ -299,15 +300,15 @@ class Application {
      * @returns {void}
      */
     renderPage(name, PageClass) {
-        console.log('📄 Rendering page:', name);
+        console.log('[PAGE] Rendering page:', name);
         
         // Step 1: Cleanup - Destroy current page
         if (this.currentPage) {
-            console.log('🗑️ Destroying previous page');
+            console.log('[CLEANUP] Destroying previous page');
             try {
                 this.currentPage.destroy();
             } catch (error) {
-                console.error('❌ Error destroying page:', error);
+                console.error('[ERROR] Error destroying page:', error);
             }
             this.currentPage = null;
         }
@@ -315,7 +316,7 @@ class Application {
         // Step 2: Get main container element
         const container = document.getElementById('appMain');
         if (!container) {
-            console.error('❌ App container #appMain not found!');
+            console.error('[ERROR] App container #appMain not found!');
             return;
         }
         
@@ -323,16 +324,16 @@ class Application {
         container.innerHTML = '';
         
         // Step 4: Create new page instance
-        console.log('🆕 Creating new page instance:', PageClass.name);
+        console.log('[CREATE] Creating new page instance:', PageClass.name);
         let page;
         
         try {
             page = new PageClass(container);
         } catch (error) {
-            console.error('❌ Error creating page:', error);
+            console.error('[ERROR] Error creating page:', error);
             container.innerHTML = `
                 <div class="error-state">
-                    <div class="error-icon">⚠️</div>
+                    <div class="error-icon">${getIcon('alert', { size: 48, color: 'var(--color-warning, #f59e0b)' })}</div>
                     <p>Failed to create page: ${this.escape(error.message)}</p>
                 </div>
             `;
@@ -341,15 +342,15 @@ class Application {
 
         // Step 5: Mount page to DOM
         try {
-            console.log('⬆️ Mounting page...');
+            console.log('[MOUNT] Mounting page...');
             page.mount();
             this.currentPage = page;
-            console.log('✅ Page mounted successfully');
+            console.log('[OK] Page mounted successfully');
         } catch (error) {
-            console.error('❌ Error mounting page:', error);
+            console.error('[ERROR] Error mounting page:', error);
             container.innerHTML = `
                 <div class="error-state">
-                    <div class="error-icon">⚠️</div>
+                    <div class="error-icon">${getIcon('alert', { size: 48, color: 'var(--color-warning, #f59e0b)' })}</div>
                     <p>Failed to load page: ${this.escape(error.message)}</p>
                     <button onclick="location.reload()" class="btn btn-primary">
                         Reload Page
@@ -551,7 +552,7 @@ class Application {
         if (container) {
             container.innerHTML = `
                 <div class="error-container">
-                    <h2>⚠️ Application Error</h2>
+                    <h2>${getIcon('alert', { size: 32, color: 'var(--color-warning, #f59e0b)' })} Application Error</h2>
                     <p>Failed to load ${APP_CONFIG.NAME}</p>
                     <p class="error-message">${this.escape(error.message)}</p>
                     <button onclick="location.reload()" class="btn btn-primary">
