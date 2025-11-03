@@ -1,3 +1,5 @@
+// src/pages/SettingsPage.js
+
 /**
  * SettingsPage - Player management
  */

@@ -1,3 +1,5 @@
+// src/services/ComparisonService.js
+
 /**
  * ComparisonService - Player comparison logic
  * Handles finding pairs and processing comparisons

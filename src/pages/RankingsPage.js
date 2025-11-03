@@ -1,3 +1,5 @@
+// src/pages/RankingsPage.js
+
 /**
  * RankingsPage - Player rankings by position
  */

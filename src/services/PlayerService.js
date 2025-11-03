@@ -1,3 +1,5 @@
+// src/services/PlayerService.js
+
 /**
  * PlayerService - Player management business logic
  * Handles validation, queries, and player operations

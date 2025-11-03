@@ -1,3 +1,5 @@
+// src/pages/BasePage.js
+
 /**
  * BasePage - Base class for all pages
  * Extends Component with page-specific functionality

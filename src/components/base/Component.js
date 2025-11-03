@@ -1,3 +1,5 @@
+// src/components/base/Component.js
+
 /**
  * Component - Base class for all UI components
  * Provides lifecycle hooks and consistent API

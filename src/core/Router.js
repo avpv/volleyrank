@@ -1,3 +1,5 @@
+// src/core/Router.js
+
 /**
  * Router - Clean URL routing without hashes
  * Supports GitHub Pages with proper 404 handling

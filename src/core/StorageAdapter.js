@@ -1,3 +1,5 @@
+// src/core/StorageAdapter.js
+
 /**
  * StorageAdapter - localStorage abstraction with error handling
  * Provides consistent interface for data persistence

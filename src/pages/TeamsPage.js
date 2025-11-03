@@ -1,3 +1,5 @@
+// src/pages/TeamsPage.js
+
 /**
  * TeamsPage - Team builder page
  */

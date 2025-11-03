@@ -1,3 +1,4 @@
+// src/components/base/Modal.js
 
 /**
  * Modal - Reusable modal dialog component
