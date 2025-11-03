@@ -204,7 +204,7 @@ class ComparePage extends BasePage {
                 <div class="stat-card">
                     <div class="stat-label">${posName} Progress</div>
                     <div class="stat-value">${progress.completed} / ${progress.total}</div>
-                    <div class="stat-detail">${progress.remaining} remaining</div>
+                    <div class="stat-detail">${progress.remaining} remaining · <span class="stat-percentage ${isComplete ? 'complete' : ''}">${Math.round(progress.percentage)}%</span></div>
                     <div class="progress-bar">
                         <div class="progress-fill ${isComplete ? 'complete' : ''}" style="width: ${progress.percentage}%"></div>
                     </div>
