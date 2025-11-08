@@ -1,6 +1,6 @@
 // src/services/EloService.js
 
-import volleyballConfig from '../lib/team-optimizer.js';
+import volleyballConfig from '../config/volleyball.js';
 
 /**
  * EloService - ELO rating calculations

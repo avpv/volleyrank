@@ -7,9 +7,9 @@
 export const APP_VERSION = '4.0.0';
 export const APP_NAME = 'VolleyRank';
 
-// DEPRECATED: Use volleyballConfig.positions from lib/team-optimizer.js instead
+// DEPRECATED: Use volleyballConfig.positions from config/volleyball.js instead
 // These constants are kept for backwards compatibility only
-// Import: import volleyballConfig from './lib/team-optimizer.js';
+// Import: import volleyballConfig from '../config/volleyball.js';
 export const POSITIONS = {
     S: 'Setter',
     OPP: 'Opposite',
