@@ -37,7 +37,7 @@ export default {
         'OPP': 1, // 1 Opposite
         'OH': 2,  // 2 Outside Hitters
         'MB': 2,  // 2 Middle Blockers
-        'L': 1    // 1 Libero
+        'L': 0    // 1 Libero
     }
-    // Total team size: 7 players
+    // Total team size: 6 players
 };
