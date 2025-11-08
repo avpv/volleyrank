@@ -50,10 +50,10 @@ class VolleyballOptimizerService {
         const avg = teamStrengths.reduce((a, b) => a + b, 0) / teamStrengths.length;
         const variance = teamStrengths.reduce((sum, s) => sum + Math.pow(s - avg, 2), 0) / teamStrengths.length;
 
-        // Position-level balance with EloService position weights
+        // Position-level balance with volleyball config position weights
         let positionImbalance = 0;
         Object.keys(volleyballConfig.positions).forEach(pos => {
-            const positionWeight = eloService.POSITION_WEIGHTS[pos] || 1.0;
+            const positionWeight = volleyballConfig.positionWeights[pos] || 1.0;
             const posStrengths = teams.map(team =>
                 team.filter(p => p.assignedPosition === pos)
                     .reduce((sum, p) => sum + (p.positionRating * positionWeight), 0)
