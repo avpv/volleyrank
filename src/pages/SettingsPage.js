@@ -10,6 +10,7 @@ import storage from '../core/StorageAdapter.js';
 import toast from '../components/base/Toast.js';
 import Modal from '../components/base/Modal.js';
 import { getIcon } from '../components/base/Icons.js';
+import volleyballConfig from '../config/volleyball.js';
 
 class SettingsPage extends BasePage {
     constructor(container) {
@@ -174,7 +175,7 @@ class SettingsPage extends BasePage {
         }
 
         const sorted = [...players].sort((a, b) => {
-            const posOrder = ['S', 'OPP', 'OH', 'MB', 'L'];
+            const posOrder = volleyballConfig.positionOrder;
             const aPos = a.positions[0];
             const bPos = b.positions[0];
             const diff = posOrder.indexOf(aPos) - posOrder.indexOf(bPos);

@@ -8,6 +8,7 @@ import stateManager from '../core/StateManager.js';
 import eventBus from '../core/EventBus.js';
 import playerService from './PlayerService.js';
 import eloService from './EloService.js';
+import volleyballConfig from '../config/volleyball.js';
 
 class ComparisonService {
     /**
@@ -241,7 +242,7 @@ class ComparisonService {
      * Get all position progress
      */
     getAllProgress() {
-        const positions = ['S', 'OPP', 'OH', 'MB', 'L'];
+        const positions = volleyballConfig.positionOrder;
         const progress = {};
 
         positions.forEach(pos => {
@@ -273,7 +274,7 @@ class ComparisonService {
 
         // Recalculate total comparisons
         let totalComparisons = 0;
-        const allPositions = ['S', 'OPP', 'OH', 'MB', 'L'];
+        const allPositions = volleyballConfig.positionOrder;
         const nonResetPositions = allPositions.filter(p => !positions.includes(p));
         
         updatedPlayers.forEach(player => {

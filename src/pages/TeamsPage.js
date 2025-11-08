@@ -20,7 +20,7 @@ class TeamsPage extends BasePage {
             isOptimizing: false,
             showEloRatings: true,
             teamCount: 2,
-            composition: { S: 1, OPP: 1, OH: 2, MB: 2, L: 0 }
+            composition: volleyballConfig.defaultComposition
         };
     }
 
@@ -247,7 +247,7 @@ class TeamsPage extends BasePage {
     }
 
     getComposition() {
-        const positions = ['S', 'OPP', 'OH', 'MB', 'L'];
+        const positions = volleyballConfig.positionOrder;
         const composition = {};
 
         positions.forEach(pos => {

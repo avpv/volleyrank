@@ -262,7 +262,7 @@ class PlayerService {
 
         // Recalculate total comparisons
         let totalComparisons = 0;
-        const allPositions = ['S', 'OPP', 'OH', 'MB', 'L'];
+        const allPositions = volleyballConfig.positionOrder;
         const nonResetPositions = allPositions.filter(p => !positions.includes(p));
         
         updatedPlayers.forEach(player => {
