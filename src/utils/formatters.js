@@ -1,6 +1,6 @@
 // src/utils/formatters.js
 
-import volleyballConfig from '../lib/team-optimizer.js';
+import volleyballConfig from '../config/volleyball.js';
 
 /**
  * Data Formatting Utilities

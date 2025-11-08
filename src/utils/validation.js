@@ -1,6 +1,6 @@
 // src/utils/validation.js
 
-import volleyballConfig from '../lib/team-optimizer.js';
+import volleyballConfig from '../config/volleyball.js';
 
 /**
  * Validation Utilities
