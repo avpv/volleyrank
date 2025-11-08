@@ -26,9 +26,10 @@ let TeamOptimizerService;
 let loadError = null;
 
 try {
-    // Dynamic import of TeamOptimizerService from CDN
-    const module = await import(`${CDN_BASE_URL}/src/core/TeamOptimizerService.js`);
-    TeamOptimizerService = module.default || module.TeamOptimizerService;
+    // Dynamic import of TeamOptimizerService from CDN main export
+    // Using src/index.js ensures all internal dependencies are properly resolved
+    const module = await import(`${CDN_BASE_URL}/src/index.js`);
+    TeamOptimizerService = module.TeamOptimizerService;
 } catch (error) {
     loadError = error;
     console.error('Failed to load TeamOptimizerService from CDN:', error);
