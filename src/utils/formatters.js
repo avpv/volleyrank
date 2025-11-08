@@ -1,5 +1,7 @@
 // src/utils/formatters.js
 
+import volleyballConfig from 'https://cdn.jsdelivr.net/gh/avpv/team-optimizer@main/src/config/volleyball.js';
+
 /**
  * Data Formatting Utilities
  */
@@ -53,17 +55,10 @@ export function formatPercentage(value, decimals = 0) {
 
 /**
  * Format position name
+ * Uses positions from team-optimizer for consistency
  */
 export function formatPosition(positionKey) {
-    const positions = {
-        'S': 'Setter',
-        'OPP': 'Opposite',
-        'OH': 'Outside Hitter',
-        'MB': 'Middle Blocker',
-        'L': 'Libero'
-    };
-    
-    return positions[positionKey] || positionKey;
+    return volleyballConfig.positions[positionKey] || positionKey;
 }
 
 /**

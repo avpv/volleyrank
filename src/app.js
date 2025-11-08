@@ -30,6 +30,7 @@ import stateManager from './core/StateManager.js';
 import toast from './components/base/Toast.js';
 import redirectModule from './redirect.js';
 import { getIcon } from './components/base/Icons.js';
+import volleyballConfig from 'https://cdn.jsdelivr.net/gh/avpv/team-optimizer@main/src/config/volleyball.js';
 
 // Page imports
 import SettingsPage from './pages/SettingsPage.js';
@@ -567,30 +568,24 @@ class Application {
 
     /**
      * Get human-readable position name
-     * 
+     *
      * Converts position codes to full display names.
      * Used throughout the application for consistent display.
-     * 
+     * Uses positions from team-optimizer for consistency.
+     *
      * Position Mapping:
      * - S: Setter
      * - OPP: Opposite
      * - OH: Outside Hitter
      * - MB: Middle Blocker
      * - L: Libero
-     * 
+     *
      * @private
      * @param {string} pos - Position code (S, OPP, OH, MB, L)
      * @returns {string} Position full name or original code if unknown
      */
     getPositionName(pos) {
-        const positions = {
-            'S': 'Setter',
-            'OPP': 'Opposite',
-            'OH': 'Outside Hitter',
-            'MB': 'Middle Blocker',
-            'L': 'Libero'
-        };
-        return positions[pos] || pos;
+        return volleyballConfig.positions[pos] || pos;
     }
 
     /**

@@ -6,17 +6,13 @@
  */
 import stateManager from '../core/StateManager.js';
 import eventBus from '../core/EventBus.js';
+import volleyballConfig from 'https://cdn.jsdelivr.net/gh/avpv/team-optimizer@main/src/config/volleyball.js';
 
 class PlayerService {
     constructor() {
-        this.positions = {
-            'S': 'Setter',
-            'OPP': 'Opposite',
-            'OH': 'Outside Hitter',
-            'MB': 'Middle Blocker',
-            'L': 'Libero'
-        };
-        
+        // Import positions from team-optimizer for consistency
+        this.positions = volleyballConfig.positions;
+
         this.DEFAULT_RATING = 1500;
     }
 

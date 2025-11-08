@@ -1,5 +1,7 @@
 // src/services/EloService.js
 
+import volleyballConfig from 'https://cdn.jsdelivr.net/gh/avpv/team-optimizer@main/src/config/volleyball.js';
+
 /**
  * EloService - ELO rating calculations
  * Pure business logic with no state management
@@ -10,14 +12,9 @@ class EloService {
         this.BASE_K_FACTOR = 30;
 
         // Position weights for team optimization
+        // Imported from team-optimizer library to ensure consistency
         // Reflects the impact each position has on team balance
-        this.POSITION_WEIGHTS = {
-            'S': 1.3,    // Setter - highest impact, "brain of the team"
-            'OPP': 1.2,  // Opposite - high impact, "main attacking power"
-            'OH': 1.1,   // Outside Hitter - medium impact, "universal soldier"
-            'MB': 1.0,   // Middle Blocker - baseline impact, reference unit
-            'L': 0.9     // Libero - lowest impact, defensive specialist
-        };
+        this.POSITION_WEIGHTS = volleyballConfig.positionWeights;
     }
 
     /**
