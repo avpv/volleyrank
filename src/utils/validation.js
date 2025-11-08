@@ -1,5 +1,7 @@
 // src/utils/validation.js
 
+import volleyballConfig from '../lib/team-optimizer.js';
+
 /**
  * Validation Utilities
  */
@@ -11,7 +13,8 @@ export const VALIDATION_RULES = {
     MIN_POSITIONS: 1
 };
 
-export const VALID_POSITIONS = ['S', 'OPP', 'OH', 'MB', 'L'];
+// Get valid positions from volleyball config (single source of truth)
+export const VALID_POSITIONS = Object.keys(volleyballConfig.positions);
 
 /**
  * Validate player name
