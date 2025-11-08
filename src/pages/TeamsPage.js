@@ -9,6 +9,7 @@ import teamOptimizerService from '../services/TeamOptimizerService.js';
 import eloService from '../services/EloService.js';
 import toast from '../components/base/Toast.js';
 import { getIcon } from '../components/base/Icons.js';
+import volleyballConfig from 'https://cdn.jsdelivr.net/gh/avpv/team-optimizer@main/src/config/volleyball.js';
 
 class TeamsPage extends BasePage {
     constructor(container) {
@@ -89,15 +90,8 @@ class TeamsPage extends BasePage {
     }
 
     renderCompositionInputs() {
-        const positions = {
-            'S': 'Setter',
-            'OPP': 'Opposite',
-            'OH': 'Outside Hitter',
-            'MB': 'Middle Blocker',
-            'L': 'Libero'
-        };
-
-        return Object.entries(positions).map(([key, name]) => `
+        // Use positions from team-optimizer for consistency
+        return Object.entries(volleyballConfig.positions).map(([key, name]) => `
             <div class="composition-item">
                 <label>${name}</label>
                 <input 
