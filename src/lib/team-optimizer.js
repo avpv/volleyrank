@@ -7,20 +7,20 @@
  *
  * External dependency:
  * - team-optimizer: https://github.com/avpv/team-optimizer
- * - Version: baf498c (2024-11-08)
+ * - Version: @main (latest)
  */
 
 // Import volleyball configuration from local copy
 // This ensures we have a stable configuration even if CDN is unavailable
 import volleyballConfig from '../config/volleyball.js';
 
-// CDN version pinned to specific commit for stability
-const TEAM_OPTIMIZER_VERSION = 'baf498c';
+// CDN version uses @main to always get latest algorithms and improvements
+const TEAM_OPTIMIZER_VERSION = 'main';
 const CDN_BASE_URL = `https://cdn.jsdelivr.net/gh/avpv/team-optimizer@${TEAM_OPTIMIZER_VERSION}`;
 
 /**
  * Import TeamOptimizerService from CDN
- * Using specific commit hash instead of @main for stability
+ * Using @main to get latest algorithms and improvements
  */
 let TeamOptimizerService;
 let loadError = null;
