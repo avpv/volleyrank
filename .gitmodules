@@ -1,3 +1,0 @@
-[submodule "src/lib/team-optimizer"]
-	path = src/lib/team-optimizer
-	url = https://github.com/avpv/team-optimizer.git
