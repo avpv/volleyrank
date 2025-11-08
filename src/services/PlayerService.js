@@ -6,7 +6,7 @@
  */
 import stateManager from '../core/StateManager.js';
 import eventBus from '../core/EventBus.js';
-import volleyballConfig from 'https://cdn.jsdelivr.net/gh/avpv/team-optimizer@main/src/config/volleyball.js';
+import volleyballConfig from '../lib/team-optimizer.js';
 
 class PlayerService {
     constructor() {

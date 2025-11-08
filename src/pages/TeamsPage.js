@@ -9,7 +9,7 @@ import teamOptimizerService from '../services/TeamOptimizerService.js';
 import eloService from '../services/EloService.js';
 import toast from '../components/base/Toast.js';
 import { getIcon } from '../components/base/Icons.js';
-import volleyballConfig from 'https://cdn.jsdelivr.net/gh/avpv/team-optimizer@main/src/config/volleyball.js';
+import volleyballConfig from '../lib/team-optimizer.js';
 
 class TeamsPage extends BasePage {
     constructor(container) {

@@ -6,8 +6,7 @@
  */
 
 import eloService from './EloService.js';
-import TeamOptimizerService from 'https://cdn.jsdelivr.net/gh/avpv/team-optimizer@main/src/core/TeamOptimizerService.js';
-import volleyballConfig from 'https://cdn.jsdelivr.net/gh/avpv/team-optimizer@main/src/config/volleyball.js';
+import { TeamOptimizerService, volleyballConfig } from '../lib/team-optimizer.js';
 
 
 class VolleyballOptimizerService {

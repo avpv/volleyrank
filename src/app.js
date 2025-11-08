@@ -30,7 +30,7 @@ import stateManager from './core/StateManager.js';
 import toast from './components/base/Toast.js';
 import redirectModule from './redirect.js';
 import { getIcon } from './components/base/Icons.js';
-import volleyballConfig from 'https://cdn.jsdelivr.net/gh/avpv/team-optimizer@main/src/config/volleyball.js';
+import volleyballConfig from './lib/team-optimizer.js';
 
 // Page imports
 import SettingsPage from './pages/SettingsPage.js';
