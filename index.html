@@ -16,7 +16,25 @@
     <link rel="stylesheet" href="assets/styles/utilities.css">
     
     <!-- Preload critical resources -->
-    <link rel="preload" href="src/app.js" as="script" crossorigin="anonymous">
+    <link rel="preload" href="src/app.js" as="script" crossorigin>
+
+    <!-- Import Maps for CDN module resolution -->
+    <script type="importmap">
+    {
+        "imports": {
+            "/src/lib/team-optimizer/": "https://cdn.jsdelivr.net/gh/avpv/team-optimizer@main/src/",
+            "/src/lib/team-optimizer/src/": "https://cdn.jsdelivr.net/gh/avpv/team-optimizer@main/src/"
+        },
+        "scopes": {
+            "https://cdn.jsdelivr.net/gh/avpv/team-optimizer@main/": {
+                "../lib/team-optimizer/": "https://cdn.jsdelivr.net/gh/avpv/team-optimizer@main/src/",
+                "./lib/team-optimizer/": "https://cdn.jsdelivr.net/gh/avpv/team-optimizer@main/src/",
+                "/src/lib/team-optimizer/": "https://cdn.jsdelivr.net/gh/avpv/team-optimizer@main/src/",
+                "/src/lib/team-optimizer/src/": "https://cdn.jsdelivr.net/gh/avpv/team-optimizer@main/src/"
+            }
+        }
+    }
+    </script>
 </head>
 <body>
     <!-- App Container -->
