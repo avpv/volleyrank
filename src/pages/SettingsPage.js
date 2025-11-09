@@ -84,13 +84,14 @@ class SettingsPage extends BasePage {
     }
 
     renderActivitySelector() {
-        const currentActivity = storage.get('selectedActivity', 'volleyball');
+        const currentActivity = storage.get('selectedActivity', null);
 
         return `
             <div class="activity-selector-section">
                 <div class="form-group">
                     <label for="activitySelect">Activity Type</label>
                     <select id="activitySelect" class="activity-select">
+                        <option value="" ${!currentActivity ? 'selected' : ''}>Select an activity...</option>
                         ${Object.entries(activities)
                             .sort((a, b) => a[1].name.localeCompare(b[1].name))
                             .map(([key, config]) => `
@@ -108,67 +109,79 @@ class SettingsPage extends BasePage {
     }
 
     renderAddPlayerForm() {
+        const currentActivity = storage.get('selectedActivity', null);
+        const isOpen = !!currentActivity;
+
         return `
-            <div class="add-player-section">
-                <form class="player-form" id="playerForm">
-                    <div class="form-row">
+            <div class="accordion add-player-section">
+                <button type="button" class="accordion-header" id="addPlayerAccordionHeader">
+                    <span>Add Players</span>
+                    ${getIcon('chevron-down', { size: 16, className: `accordion-icon${isOpen ? ' open' : ''}` })}
+                </button>
+                <div class="accordion-content${isOpen ? ' open' : ''}" id="addPlayerAccordionContent">
+                    <form class="player-form" id="playerForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Player Name</label>
+                                <input
+                                    type="text"
+                                    id="playerNameInput"
+                                    placeholder="Enter player name"
+                                    required
+                                    ${!currentActivity ? 'disabled' : ''}
+                                >
+                            </div>
+                        </div>
+
                         <div class="form-group">
-                            <label>Player Name</label>
-                            <input 
-                                type="text" 
-                                id="playerNameInput" 
-                                placeholder="Enter player name"
-                                required
-                            >
+                            <label>Positions (select all applicable)</label>
+                            <div class="positions-grid" id="positionsGrid">
+                                ${this.renderPositionCheckboxes()}
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="form-group">
-                        <label>Positions (select all applicable)</label>
-                        <div class="positions-grid" id="positionsGrid">
-                            ${this.renderPositionCheckboxes()}
-                        </div>
-                    </div>
-
-                    <div class="form-actions">
-                        <button type="submit" class="btn btn-primary">
-                            ${getIcon('plus', { size: 16, className: 'btn-icon' })}
-                            Add Player
-                        </button>
-                        <button type="button" class="btn btn-secondary" id="importBtn">
-                            ${getIcon('arrow-down', { size: 16, className: 'btn-icon' })}
-                            Import Players
-                        </button>
-                    </div>
-
-                    <div class="form-section danger-zone">
-                        <label class="form-section-title">Reset & Delete</label>
-                        <div class="form-section-actions">
-                            <button type="button" class="btn btn-warning" id="resetAllBtn">
-                                ${getIcon('refresh', { size: 16, className: 'btn-icon' })}
-                                Reset All Ratings
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary" ${!currentActivity ? 'disabled' : ''}>
+                                ${getIcon('plus', { size: 16, className: 'btn-icon' })}
+                                Add Player
                             </button>
-                            <button type="button" class="btn btn-danger" id="clearAllBtn">
-                                ${getIcon('trash', { size: 16, className: 'btn-icon' })}
-                                Remove All Players
+                            <button type="button" class="btn btn-secondary" id="importBtn" ${!currentActivity ? 'disabled' : ''}>
+                                ${getIcon('arrow-down', { size: 16, className: 'btn-icon' })}
+                                Import Players
                             </button>
                         </div>
-                    </div>
-                </form>
+
+                        <div class="form-section danger-zone">
+                            <label class="form-section-title">Reset & Delete</label>
+                            <div class="form-section-actions">
+                                <button type="button" class="btn btn-warning" id="resetAllBtn">
+                                    ${getIcon('refresh', { size: 16, className: 'btn-icon' })}
+                                    Reset All Ratings
+                                </button>
+                                <button type="button" class="btn btn-danger" id="clearAllBtn">
+                                    ${getIcon('trash', { size: 16, className: 'btn-icon' })}
+                                    Remove All Players
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
             </div>
         `;
     }
 
     renderPositionCheckboxes() {
         const positions = this.playerService.positions;
-        
+        const currentActivity = storage.get('selectedActivity', null);
+
         return Object.entries(positions).map(([key, name]) => `
             <label class="position-checkbox">
-                <input 
-                    type="checkbox" 
-                    name="position" 
+                <input
+                    type="checkbox"
+                    name="position"
                     value="${key}"
                     class="position-input"
+                    ${!currentActivity ? 'disabled' : ''}
                 >
                 <span class="position-label">${name} (${key})</span>
             </label>
@@ -268,6 +281,14 @@ class SettingsPage extends BasePage {
             });
         }
 
+        // Accordion toggle
+        const accordionHeader = this.$('#addPlayerAccordionHeader');
+        if (accordionHeader) {
+            accordionHeader.addEventListener('click', () => {
+                this.toggleAccordion();
+            });
+        }
+
         // Form submission
         const form = this.$('#playerForm');
         if (form) {
@@ -287,11 +308,11 @@ class SettingsPage extends BasePage {
         // Reset/Clear buttons
         const resetAllBtn = this.$('#resetAllBtn');
         const clearAllBtn = this.$('#clearAllBtn');
-        
+
         if (resetAllBtn) {
             resetAllBtn.addEventListener('click', () => this.showResetAllModal());
         }
-        
+
         if (clearAllBtn) {
             clearAllBtn.addEventListener('click', () => this.handleClearAll());
         }
@@ -330,7 +351,22 @@ class SettingsPage extends BasePage {
         }
     }
 
+    toggleAccordion() {
+        const content = this.$('#addPlayerAccordionContent');
+        const icon = this.$('.accordion-icon');
+
+        if (content && icon) {
+            content.classList.toggle('open');
+            icon.classList.toggle('open');
+        }
+    }
+
     handleActivityChange(activityKey) {
+        // If empty selection, do nothing
+        if (!activityKey) {
+            return;
+        }
+
         const selectedActivity = activities[activityKey];
         if (!selectedActivity) {
             toast.error('Invalid activity selected');
