@@ -26,9 +26,9 @@ import PlayerRepository from '../repositories/PlayerRepository.js';
 
 // Business services
 import ValidationService from '../services/ValidationService.js';
-import PlayerService from '../services/PlayerService.refactored.js';
+import PlayerService from '../services/PlayerService.js';
 import EloService from '../services/EloService.js';
-import ComparisonService from '../services/ComparisonService.refactored.js';
+import ComparisonService from '../services/ComparisonService.js';
 import TeamOptimizerService from '../services/TeamOptimizerService.js';
 
 /**
