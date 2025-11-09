@@ -449,7 +449,7 @@
 
 .composition-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: var(--spacing-4);
     margin-bottom: var(--spacing-8);
 }
@@ -708,6 +708,13 @@
 /* =============================================================================
    Responsive Design
    ============================================================================= */
+
+/* Large screens - limit to 5 columns max */
+@media (min-width: 1200px) {
+    .composition-grid {
+        grid-template-columns: repeat(5, 1fr);
+    }
+}
 
 @media (max-width: 768px) {
     .add-player-section,
