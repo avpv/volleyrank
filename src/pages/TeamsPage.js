@@ -81,15 +81,13 @@ class TeamsPage extends BasePage {
 
                 <div class="form-group">
                     <label>Team Composition</label>
-                    <div class="composition-grid">
-                        ${this.renderCompositionInputs()}
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label>Position Weights (для балансировки команд)</label>
-                    <div class="composition-grid">
-                        ${this.renderPositionWeightInputs()}
+                    <div class="composition-table">
+                        <div class="composition-table-header">
+                            <div class="composition-header-cell position-cell">Position</div>
+                            <div class="composition-header-cell">Count</div>
+                            <div class="composition-header-cell">Weight</div>
+                        </div>
+                        ${this.renderCompositionWithWeights()}
                     </div>
                 </div>
 
@@ -106,37 +104,32 @@ class TeamsPage extends BasePage {
         `;
     }
 
-    renderCompositionInputs() {
-        // Use positions from team-optimizer for consistency
+    renderCompositionWithWeights() {
+        // Render both composition count and weight inputs for each position
         return Object.entries(this.activityConfig.positions).map(([key, name]) => `
-            <div class="composition-item">
-                <label>${name}</label>
-                <input
-                    type="number"
-                    id="comp_${key}"
-                    value="${this.state.composition[key]}"
-                    min="0"
-                    max="6"
-                    class="composition-input"
-                >
-            </div>
-        `).join('');
-    }
-
-    renderPositionWeightInputs() {
-        // Render weight inputs for each position
-        return Object.entries(this.activityConfig.positions).map(([key, name]) => `
-            <div class="composition-item">
-                <label>${name}</label>
-                <input
-                    type="number"
-                    id="weight_${key}"
-                    value="${this.state.positionWeights[key]}"
-                    min="0.1"
-                    max="5.0"
-                    step="0.1"
-                    class="weight-input"
-                >
+            <div class="composition-row">
+                <div class="composition-cell position-name">${name}</div>
+                <div class="composition-cell">
+                    <input
+                        type="number"
+                        id="comp_${key}"
+                        value="${this.state.composition[key]}"
+                        min="0"
+                        max="6"
+                        class="composition-input"
+                    >
+                </div>
+                <div class="composition-cell">
+                    <input
+                        type="number"
+                        id="weight_${key}"
+                        value="${this.state.positionWeights[key]}"
+                        min="0.1"
+                        max="5.0"
+                        step="0.1"
+                        class="weight-input"
+                    >
+                </div>
             </div>
         `).join('');
     }
