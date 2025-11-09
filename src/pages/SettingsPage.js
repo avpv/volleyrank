@@ -90,11 +90,13 @@ class SettingsPage extends BasePage {
                 <div class="form-group">
                     <label for="activitySelect">Activity Type</label>
                     <select id="activitySelect" class="activity-select">
-                        ${Object.entries(activities).map(([key, config]) => `
-                            <option value="${key}" ${key === currentActivity ? 'selected' : ''}>
-                                ${config.name}
-                            </option>
-                        `).join('')}
+                        ${Object.entries(activities)
+                            .sort((a, b) => a[1].name.localeCompare(b[1].name))
+                            .map(([key, config]) => `
+                                <option value="${key}" ${key === currentActivity ? 'selected' : ''}>
+                                    ${config.name}
+                                </option>
+                            `).join('')}
                     </select>
                     <p class="form-help-text">
                         Changing the activity will reload the page to apply new positions and team configuration.
