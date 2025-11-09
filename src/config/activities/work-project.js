@@ -20,7 +20,11 @@ export default {
         'FE': 'Frontend Developer',
         'QA': 'QA Engineer',
         'UX': 'UX Designer',
-        'PM': 'Product Manager'
+        'PM': 'Product Manager',
+        'DA': 'Data Analyst',
+        'DE': 'Data Engineer',
+        'DS': 'Data Scientist',
+        'AD': 'App Developer'
     },
 
     // Role weights for team balancing
@@ -29,13 +33,17 @@ export default {
         'TL': 1.3,   // Tech Lead - most critical
         'PM': 1.25,  // Product Manager
         'BE': 1.2,   // Backend Developer
+        'DS': 1.2,   // Data Scientist
         'FE': 1.15,  // Frontend Developer
+        'DE': 1.15,  // Data Engineer
+        'AD': 1.15,  // App Developer
         'QA': 1.1,   // QA Engineer
-        'UX': 1.1    // UX Designer
+        'UX': 1.1,   // UX Designer
+        'DA': 1.1    // Data Analyst
     },
 
     // Order in which roles should be displayed
-    positionOrder: ['TL', 'PM', 'BE', 'FE', 'UX', 'QA'],
+    positionOrder: ['TL', 'PM', 'BE', 'FE', 'DS', 'DE', 'DA', 'AD', 'UX', 'QA'],
 
     // Default team composition
     defaultComposition: {
@@ -43,6 +51,10 @@ export default {
         'PM': 1,  // 1 Product Manager
         'BE': 2,  // 2 Backend Developers
         'FE': 1,  // 1 Frontend Developer
+        'DS': 0,  // Data Scientist (optional)
+        'DE': 0,  // Data Engineer (optional)
+        'DA': 0,  // Data Analyst (optional)
+        'AD': 0,  // App Developer (optional)
         'UX': 0,  // UX shared across teams
         'QA': 1   // 1 QA Engineer
     }
