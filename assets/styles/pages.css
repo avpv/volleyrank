@@ -52,6 +52,12 @@
     box-shadow: 0 0 0 3px rgba(47, 129, 247, 0.1);
 }
 
+@media (min-width: 768px) {
+    .activity-select {
+        max-width: calc((800px - var(--spacing-4)) / 2);
+    }
+}
+
 .form-help-text {
     font-size: var(--font-size-sm);
     color: var(--color-text-secondary);
