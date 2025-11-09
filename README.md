@@ -1,107 +1,107 @@
 # TeamBalance 🎯
 
-### Покончите с бесконечными спорами о командах. Создавайте идеально сбалансированные команды за минуты.
+### Stop endless team arguments. Create perfectly balanced teams in minutes.
 
-**Работает для любой деятельности**: волейбол, баскетбол, рабочие проекты, образовательные группы и многое другое.
+**Works for any activity**: volleyball, basketball, work projects, educational groups, and more.
 
 <div align="center">
 
-### [🚀 Попробовать демо прямо сейчас](https://avpv.github.io/team-balance/)
-*Работает в браузере. Установка не требуется.*
+### [🚀 Try the Demo Now](https://avpv.github.io/team-balance/)
+*Works in your browser. No installation required.*
 
 </div>
 
 ---
 
-## 😫 Знакомая проблема?
+## 😫 Sound Familiar?
 
-- **Бесконечные споры** о том, кто в какой команде должен быть
-- **Неравные команды**, где одна команда постоянно выигрывает
-- **Потеря времени** на ручное распределение игроков/участников
-- **Субъективные оценки**, основанные на эмоциях и личных предпочтениях
-- **Недовольство** участников из-за несправедливого распределения
+- **Endless arguments** about who should be on which team
+- **Unbalanced teams** where one side dominates every time
+- **Wasted time** manually distributing players/participants
+- **Subjective assessments** based on emotions and personal preferences
+- **Unhappy participants** due to unfair distribution
 
-## ✨ Решение — TeamBalance
+## ✨ The Solution — TeamBalance
 
-TeamBalance использует **математически доказанную систему рейтингов** (ту же, что используется в шахматах и профессиональном спорте), чтобы создавать по-настоящему сбалансированные команды.
+TeamBalance uses a **mathematically proven rating system** (the same one used in chess and professional sports) to create truly balanced teams.
 
-### 🎯 Что вы получаете:
+### 🎯 What You Get:
 
-- ⚡ **Экономия времени**: 2 минуты вместо 20 на формирование команд
-- 🎪 **Справедливость**: Математически сбалансированные команды, без субъективности
-- 📊 **Объективность**: Система рейтингов на основе реальных сравнений
-- 🔄 **Гибкость**: Учет нескольких позиций для каждого участника
-- 💾 **Постоянство**: Все данные сохраняются автоматически
-- 🌍 **Универсальность**: Работает для спорта, работы, учебы — чего угодно!
-
----
-
-## 💪 Для кого это?
-
-### 🏃 Спортивные тренеры
-Формируйте сбалансированные команды для тренировок, где все получают удовольствие от честной игры.
-
-### 👔 Руководители проектов
-Распределяйте разработчиков, дизайнеров и других специалистов по проектным командам оптимально.
-
-### 🎓 Преподаватели
-Создавайте учебные группы с учетом навыков студентов в разных областях.
-
-### 🎪 Организаторы мероприятий
-Формируйте команды для хакатонов, воркшопов и тренингов быстро и справедливо.
+- ⚡ **Save Time**: 2 minutes instead of 20 to form teams
+- 🎪 **Fairness**: Mathematically balanced teams, no subjectivity
+- 📊 **Objectivity**: Rating system based on real comparisons
+- 🔄 **Flexibility**: Account for multiple positions per participant
+- 💾 **Persistence**: All data saved automatically
+- 🌍 **Universal**: Works for sports, work, education — anything!
 
 ---
 
-## 🚀 Как это работает
+## 💪 Who Is This For?
 
-### Просто. Интуитивно. Эффективно.
+### 🏃 Sports Coaches
+Form balanced teams for training where everyone enjoys fair play.
 
-**1️⃣ Добавьте участников**
-- Введите имена
-- Укажите позиции/роли, которые они могут занимать
-- Готово! (5 секунд на участника)
+### 👔 Project Managers
+Distribute developers, designers, and other specialists across project teams optimally.
 
-**2️⃣ Сравните навыки**
-- Система покажет вам пары участников
-- Выберите, кто лучше на конкретной позиции
-- Всего 10-15 сравнений — и рейтинги готовы!
+### 🎓 Educators
+Create study groups accounting for student skills in different areas.
 
-**3️⃣ Создайте команды**
-- Нажмите кнопку "Создать команды"
-- Алгоритм подберет оптимальное распределение
-- Получите готовые сбалансированные команды за секунды!
-
-### 🧠 Магия под капотом
-
-TeamBalance использует **ELO-рейтинг** — проверенную систему, которая применяется в шахматах, киберспорте и профессиональных лигах по всему миру. Система автоматически учитывает:
-- Силу каждого участника на каждой позиции
-- Неожиданные результаты (сюрпризы дают больше информации)
-- Постоянное совершенствование рейтингов
-
-Затем **генетический алгоритм оптимизации** находит наилучшее распределение команд, учитывая все рейтинги и позиции.
-
-**Результат?** Команды настолько сбалансированы, насколько это возможно математически.
+### 🎪 Event Organizers
+Form teams for hackathons, workshops, and training sessions quickly and fairly.
 
 ---
 
-## 🌍 Универсальное решение
+## 🚀 How It Works
 
-**TeamBalance — не просто для волейбола!** Настройте под любую деятельность за 5 минут.
+### Simple. Intuitive. Effective.
 
-### ✅ Уже готовые конфигурации:
-- 🏐 Волейбол (Setter, Outside Hitter, Middle Blocker, Opposite, Libero)
-- 🏀 Баскетбол (Point Guard, Shooting Guard, Small Forward, Power Forward, Center)
-- ⚽ Футбол (Goalkeeper, Defender, Midfielder, Forward)
-- 💼 Проектные команды (Tech Lead, Backend, Frontend, QA, UX, PM)
+**1️⃣ Add Participants**
+- Enter names
+- Specify positions/roles they can fill
+- Done! (5 seconds per participant)
 
-### 🎨 Создайте свою конфигурацию!
+**2️⃣ Compare Skills**
+- System shows you pairs of participants
+- Choose who's better at a specific position
+- Just 10-15 comparisons — and ratings are ready!
 
-Нужна конфигурация для хоккея? Театральной труппы? Исследовательских групп?
+**3️⃣ Create Teams**
+- Click "Create Teams" button
+- Algorithm finds optimal distribution
+- Get balanced teams in seconds!
 
-**Просто создайте конфигурационный файл** с вашими позициями и весами. Примеры и инструкции включены!
+### 🧠 The Magic Behind It
+
+TeamBalance uses **ELO rating** — a proven system used in chess, esports, and professional leagues worldwide. The system automatically accounts for:
+- Each participant's strength at every position
+- Unexpected results (surprises provide more information)
+- Continuous rating improvements
+
+Then a **genetic optimization algorithm** finds the best team distribution, considering all ratings and positions.
+
+**The result?** Teams as balanced as mathematically possible.
+
+---
+
+## 🌍 Universal Solution
+
+**TeamBalance isn't just for volleyball!** Configure it for any activity in 5 minutes.
+
+### ✅ Pre-built Configurations:
+- 🏐 Volleyball (Setter, Outside Hitter, Middle Blocker, Opposite, Libero)
+- 🏀 Basketball (Point Guard, Shooting Guard, Small Forward, Power Forward, Center)
+- ⚽ Soccer (Goalkeeper, Defender, Midfielder, Forward)
+- 💼 Project Teams (Tech Lead, Backend, Frontend, QA, UX, PM)
+
+### 🎨 Create Your Own Configuration!
+
+Need a config for hockey? Theater troupe? Research groups?
+
+**Just create a configuration file** with your positions and weights. Examples and instructions included!
 
 <details>
-<summary><b>📋 Пример: Баскетбол (клик для просмотра)</b></summary>
+<summary><b>📋 Example: Basketball (click to view)</b></summary>
 
 ```javascript
 export default {
@@ -123,106 +123,106 @@ export default {
 
 ---
 
-## 🎁 Дополнительные возможности
+## 🎁 Additional Features
 
-- 📥 **Импорт/Экспорт**: Загружайте участников из CSV или Excel
-- 📊 **Рейтинговые таблицы**: Отслеживайте прогресс по каждой позиции
-- 💾 **Автосохранение**: Никогда не потеряйте свои данные
-- 🔒 **Приватность**: Все данные хранятся локально в вашем браузере
-- 📱 **Работает везде**: Десктоп, планшет, мобильный телефон
-- 🚀 **Нет установки**: Просто откройте ссылку и начинайте работать
+- 📥 **Import/Export**: Load participants from CSV or Excel
+- 📊 **Rating Tables**: Track progress by each position
+- 💾 **Auto-save**: Never lose your data
+- 🔒 **Privacy**: All data stored locally in your browser
+- 📱 **Works Everywhere**: Desktop, tablet, mobile
+- 🚀 **No Installation**: Just open the link and start working
 
 ---
 
-## ⚡ Начните прямо сейчас!
+## ⚡ Get Started Now!
 
-### Онлайн версия (рекомендуется)
-**[👉 Открыть TeamBalance](https://avpv.github.io/team-balance/)**
+### Online Version (Recommended)
+**[👉 Open TeamBalance](https://avpv.github.io/team-balance/)**
 
-Работает сразу в браузере. Ничего не нужно устанавливать!
+Works immediately in your browser. Nothing to install!
 
-### Локальная версия
+### Local Version
 ```bash
-# Склонируйте репозиторий
+# Clone the repository
 git clone https://github.com/avpv/team-balance.git
 cd team-balance
 
-# Запустите локальный сервер
+# Start a local server
 python -m http.server 8000
-# или
+# or
 npx serve
 ```
 
-Откройте `http://localhost:8000` в браузере.
+Open `http://localhost:8000` in your browser.
 
 ---
 
-## 💡 Реальные сценарии использования
+## 💡 Real-World Use Cases
 
-**🏐 Волейбольный клуб** — Тренер создает 4 команды из 24 игроков для турнира. Раньше уходило 30 минут и всегда были недовольные. Теперь — 5 минут, все команды равны по силе.
+**🏐 Volleyball Club** — Coach creates 4 teams from 24 players for a tournament. Previously took 30 minutes and there were always complaints. Now — 5 minutes, all teams equally matched.
 
-**💼 IT-компания** — Руководитель формирует 3 проектные команды из 18 разработчиков с разными навыками. TeamBalance учитывает, что некоторые разработчики могут быть и frontend, и backend.
+**💼 IT Company** — Manager forms 3 project teams from 18 developers with different skills. TeamBalance accounts for developers who can do both frontend and backend.
 
-**🎓 Университет** — Преподаватель создает группы для лабораторных работ, учитывая сильные стороны каждого студента в программировании, тестировании и документации.
+**🎓 University** — Professor creates groups for lab work, considering each student's strengths in programming, testing, and documentation.
 
 ---
 
-## 🛠️ Технические детали (для интересующихся)
+## 🛠️ Technical Details (For the Curious)
 
 <details>
-<summary><b>Что внутри?</b></summary>
+<summary><b>What's Inside?</b></summary>
 
-### Технологии
-- **Vanilla JavaScript (ES6)** — быстро, без лишних зависимостей
-- **ELO Rating System** — математически обоснованная система рейтингов
-- **Genetic Algorithm** — оптимизация распределения команд
-- **localStorage** — автоматическое сохранение данных
-- **GitHub Pages** — бесплатный хостинг
+### Technologies
+- **Vanilla JavaScript (ES6)** — fast, no unnecessary dependencies
+- **ELO Rating System** — mathematically sound rating system
+- **Genetic Algorithm** — team distribution optimization
+- **localStorage** — automatic data persistence
+- **GitHub Pages** — free hosting
 
-### Архитектура
-- Чистая архитектура с разделением ответственности
-- Конфигурационно-ориентированный подход
-- Event-driven взаимодействие между компонентами
-- Dependency injection для гибкости
+### Architecture
+- Clean architecture with separation of concerns
+- Configuration-driven approach
+- Event-driven component interaction
+- Dependency injection for flexibility
 
 ### Open Source
-Полный исходный код доступен на GitHub. Вы можете:
-- Изучить алгоритмы
-- Предложить улучшения
-- Создать свою версию
-- Добавить новые возможности
+Full source code available on GitHub. You can:
+- Study the algorithms
+- Suggest improvements
+- Create your own version
+- Add new features
 
 </details>
 
 ---
 
-## 🤝 Присоединяйтесь к сообществу
+## 🤝 Join the Community
 
-- 💬 **Вопросы?** Откройте issue на GitHub
-- 🐛 **Нашли баг?** Сообщите нам!
-- 💡 **Есть идея?** Мы рады предложениям!
-- 🌟 **Нравится проект?** Поставьте звезду на GitHub!
-
----
-
-## 📄 Лицензия
-
-MIT License — используйте свободно для любых целей!
+- 💬 **Questions?** Open an issue on GitHub
+- 🐛 **Found a bug?** Let us know!
+- 💡 **Have an idea?** We welcome suggestions!
+- 🌟 **Like the project?** Star it on GitHub!
 
 ---
 
-## 🌟 Связанные проекты
+## 📄 License
 
-- [team-optimizer](https://github.com/avpv/team-optimizer) — библиотека оптимизации команд (используется в TeamBalance)
+MIT License — use freely for any purpose!
+
+---
+
+## 🌟 Related Projects
+
+- [team-optimizer](https://github.com/avpv/team-optimizer) — team optimization library (used in TeamBalance)
 
 ---
 
 <div align="center">
 
-### Готовы создавать идеальные команды?
+### Ready to Create Perfect Teams?
 
-**[🚀 Попробовать TeamBalance сейчас](https://avpv.github.io/team-balance/)**
+**[🚀 Try TeamBalance Now](https://avpv.github.io/team-balance/)**
 
-*Сделано с ❤️ для тренеров, организаторов и руководителей команд по всему миру*
+*Made with ❤️ for coaches, organizers, and team leaders worldwide*
 
 </div>
