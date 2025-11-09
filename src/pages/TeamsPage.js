@@ -132,8 +132,8 @@ class TeamsPage extends BasePage {
                 </div>
 
                 <div class="result-info">
-                    <div class="info-badge ${balance.isBalanced ? 'success' : 'warning'}">
-                        Balance: ${balance.maxDifference} ELO difference
+                    <div class="info-badge ${balance.difference <= 50 ? 'success' : 'warning'}">
+                        Balance: ${balance.difference} ELO difference
                     </div>
                 </div>
 
@@ -290,7 +290,7 @@ class TeamsPage extends BasePage {
                 isOptimizing: false 
             });
 
-            toast.success(`Teams created! Balance: ${result.balance.maxDifference} ELO difference`);
+            toast.success(`Teams created! Balance: ${result.balance.difference} ELO difference`);
 
         } catch (error) {
             this.setState({ isOptimizing: false });
