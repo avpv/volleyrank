@@ -389,6 +389,19 @@ a:hover {
     font-weight: var(--font-weight-semibold);
 }
 
+.nav-link.disabled {
+    color: var(--color-text-muted);
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.nav-link.disabled:hover {
+    color: var(--color-text-muted);
+    background-color: transparent;
+    border-color: transparent;
+}
+
 /* Main Content */
 .app-main {
     flex: 1;
