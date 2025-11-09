@@ -18,7 +18,7 @@ class SettingsPage extends BasePage {
 
         // Get services from props
         this.activityConfig = props.activityConfig;
-        this.this.playerService = props.services?.resolve('this.playerService');
+        this.playerService = props.services?.resolve('playerService');
 
         this.selectedPositions = [];
         this.importModal = null;
