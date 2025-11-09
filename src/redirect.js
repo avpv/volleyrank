@@ -56,8 +56,8 @@
  * @property {boolean} DEBUG - Enable detailed debug logging
  */
 const REDIRECT_CONFIG = {
-    BASE_URL: '/volleyrank',
-    STORAGE_KEY: 'volleyrank_redirect_path',
+    BASE_URL: '/team-balance',
+    STORAGE_KEY: 'team-balance_redirect_path',
     QUERY_PARAM: 'redirect',
     DEBUG: false
 };
