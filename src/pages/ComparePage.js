@@ -13,8 +13,8 @@ class ComparePage extends BasePage {
 
         // Get services from props
         this.activityConfig = props.activityConfig;
-        this.this.playerService = props.services?.resolve('this.playerService');
-        this.this.comparisonService = props.services?.resolve('this.comparisonService');
+        this.playerService = props.services?.resolve('playerService');
+        this.comparisonService = props.services?.resolve('comparisonService');
 
         this.selectedPosition = '';
         this.currentPair = null;
