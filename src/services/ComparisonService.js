@@ -207,6 +207,68 @@ class ComparisonService {
     }
 
     /**
+     * Process a draw comparison
+     * Both players receive equal points (0.5 each)
+     *
+     * @param {string} player1Id - First player ID
+     * @param {string} player2Id - Second player ID
+     * @param {string} position - Position being compared
+     * @returns {Object} Comparison result
+     * @throws {Error} If validation fails
+     */
+    processDraw(player1Id, player2Id, position) {
+        // Validate input
+        this.validateComparisonInput(player1Id, player2Id, position);
+
+        // Get players
+        const player1 = this.playerRepository.getById(player1Id);
+        const player2 = this.playerRepository.getById(player2Id);
+
+        // Validate players exist and have required data
+        this.validatePlayers(player1, player2, position);
+
+        // Check if already compared
+        this.checkAlreadyCompared(player1, player2, position);
+
+        // Calculate rating changes for draw
+        const poolSize = this.playerRepository.countByPosition(position);
+        const changes = this.eloService.calculateDrawRatingChange(
+            player1,
+            player2,
+            position,
+            poolSize
+        );
+
+        // Update player data
+        this.updatePlayersAfterDraw(
+            player1Id,
+            player2Id,
+            position,
+            changes,
+            player1.name,
+            player2.name
+        );
+
+        // Get updated players
+        const updatedPlayer1 = this.playerRepository.getById(player1Id);
+        const updatedPlayer2 = this.playerRepository.getById(player2Id);
+
+        // Build result
+        const result = {
+            player1: updatedPlayer1,
+            player2: updatedPlayer2,
+            position,
+            changes,
+            isDraw: true
+        };
+
+        // Emit event
+        this.eventBus.emit('comparison:completed', result);
+
+        return result;
+    }
+
+    /**
      * Validate comparison input
      * @private
      */
@@ -269,6 +331,32 @@ class ComparisonService {
                     ratings: this.buildUpdatedRatings(loserId, position, changes.loser.newRating),
                     comparisons: this.buildUpdatedComparisons(loserId, position),
                     comparedWith: this.buildUpdatedComparedWith(loserId, position, winnerName)
+                }
+            }
+        ]);
+    }
+
+    /**
+     * Update players after draw
+     * @private
+     */
+    updatePlayersAfterDraw(player1Id, player2Id, position, changes, player1Name, player2Name) {
+        // Update both players in a single batch operation
+        this.playerRepository.updateMany([
+            {
+                id: player1Id,
+                updates: {
+                    ratings: this.buildUpdatedRatings(player1Id, position, changes.player1.newRating),
+                    comparisons: this.buildUpdatedComparisons(player1Id, position),
+                    comparedWith: this.buildUpdatedComparedWith(player1Id, position, player2Name)
+                }
+            },
+            {
+                id: player2Id,
+                updates: {
+                    ratings: this.buildUpdatedRatings(player2Id, position, changes.player2.newRating),
+                    comparisons: this.buildUpdatedComparisons(player2Id, position),
+                    comparedWith: this.buildUpdatedComparedWith(player2Id, position, player1Name)
                 }
             }
         ]);

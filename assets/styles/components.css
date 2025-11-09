@@ -944,11 +944,44 @@ select.form-control {
    ============================================================================= */
 
 .vs-divider {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-4);
+    padding: 0 var(--spacing-4);
+    user-select: none;
+}
+
+.vs-text {
     color: var(--color-text-tertiary);
     font-size: var(--font-size-xl);
     font-weight: var(--font-weight-bold);
-    padding: 0 var(--spacing-4);
-    user-select: none;
+}
+
+.draw-button {
+    padding: var(--spacing-2) var(--spacing-4);
+    background-color: var(--color-surface-raised);
+    border: 2px solid var(--color-border-default);
+    border-radius: var(--radius-md);
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    cursor: pointer;
+    transition: all var(--transition-default);
+    white-space: nowrap;
+}
+
+.draw-button:hover {
+    background-color: var(--color-brand-secondary);
+    border-color: var(--color-brand-primary);
+    color: var(--color-text-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.draw-button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 /* =============================================================================

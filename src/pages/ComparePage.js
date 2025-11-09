@@ -178,7 +178,12 @@ class ComparePage extends BasePage {
                         <div class="player-comparisons">${player1.comparisons[this.selectedPosition]} comparisons</div>
                     </div>
 
-                    <div class="vs-divider">VS</div>
+                    <div class="vs-divider">
+                        <div class="vs-text">VS</div>
+                        <button class="draw-button" id="drawButton" data-player1-id="${player1.id}" data-player2-id="${player2.id}">
+                            Draw
+                        </button>
+                    </div>
 
                     <div class="player-card clickable" data-winner-id="${player2.id}" data-loser-id="${player1.id}">
                         <div class="player-avatar purple">
@@ -248,6 +253,25 @@ class ComparePage extends BasePage {
                 });
             });
         }
+
+        // Draw button
+        const drawButton = this.$('#drawButton');
+        if (drawButton) {
+            drawButton.addEventListener('click', () => {
+                const player1Id = drawButton.getAttribute('data-player1-id');
+                const player2Id = drawButton.getAttribute('data-player2-id');
+
+                // Validate attributes exist and are not 'undefined' string
+                if (!player1Id || player1Id === 'undefined' ||
+                    !player2Id || player2Id === 'undefined') {
+                    console.error('Invalid player IDs in draw button:', { player1Id, player2Id });
+                    toast.error('Error: Invalid player data');
+                    return;
+                }
+
+                this.handleDraw(player1Id, player2Id);
+            });
+        }
     }
 
     loadNextPair() {
@@ -263,6 +287,14 @@ class ComparePage extends BasePage {
     handleComparison(winnerId, loserId) {
         try {
             this.comparisonService.processComparison(winnerId, loserId, this.selectedPosition);
+        } catch (error) {
+            toast.error(error.message);
+        }
+    }
+
+    handleDraw(player1Id, player2Id) {
+        try {
+            this.comparisonService.processDraw(player1Id, player2Id, this.selectedPosition);
         } catch (error) {
             toast.error(error.message);
         }
