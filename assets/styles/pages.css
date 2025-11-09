@@ -449,32 +449,9 @@
 
 .composition-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: var(--spacing-4);
     margin-bottom: var(--spacing-8);
-    max-height: 400px;
-    overflow-y: auto;
-    padding: var(--spacing-1);
-    scrollbar-width: thin;
-    scrollbar-color: var(--color-border-strong) var(--color-surface-base);
-}
-
-.composition-grid::-webkit-scrollbar {
-    width: 8px;
-}
-
-.composition-grid::-webkit-scrollbar-track {
-    background: var(--color-surface-base);
-    border-radius: var(--radius-sm);
-}
-
-.composition-grid::-webkit-scrollbar-thumb {
-    background: var(--color-border-strong);
-    border-radius: var(--radius-sm);
-}
-
-.composition-grid::-webkit-scrollbar-thumb:hover {
-    background: var(--color-border-active);
 }
 
 .composition-item {
@@ -732,10 +709,10 @@
    Responsive Design
    ============================================================================= */
 
-/* Large screens - more columns for better space utilization */
-@media (min-width: 1024px) {
+/* Large screens - limit to 5 columns max */
+@media (min-width: 1200px) {
     .composition-grid {
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        grid-template-columns: repeat(5, 1fr);
     }
 }
 
