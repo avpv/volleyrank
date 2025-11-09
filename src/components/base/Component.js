@@ -5,6 +5,7 @@
  * Provides lifecycle hooks and consistent API
  */
 import eventBus from '../../core/EventBus.js';
+import { escapeHtml } from '../../utils/stringUtils.js';
 
 class Component {
     constructor(container, props = {}) {
@@ -218,19 +219,13 @@ class Component {
 
     /**
      * Safely escape HTML
+     * Uses centralized escapeHtml from stringUtils
+     *
+     * @param {string} text - Text to escape
+     * @returns {string} Escaped text safe for HTML
      */
     escape(text) {
-        if (typeof text !== 'string') return '';
-        
-        const map = {
-            '&': '&amp;',
-            '<': '&lt;',
-            '>': '&gt;',
-            '"': '&quot;',
-            "'": '&#039;'
-        };
-        
-        return text.replace(/[&<>"']/g, m => map[m]);
+        return escapeHtml(text);
     }
 
     /**

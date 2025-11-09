@@ -1,15 +1,34 @@
 // src/services/EloService.js
 
 import volleyballConfig from '../config/volleyball.js';
+import ratingConfig from '../config/rating.js';
 
 /**
  * EloService - ELO rating calculations
  * Pure business logic with no state management
+ *
+ * This service handles all ELO rating calculations using centralized configuration
+ * from rating.js, ensuring consistency across the application.
  */
 class EloService {
     constructor() {
-        this.DEFAULT_RATING = 1500;
-        this.BASE_K_FACTOR = 30;
+        // Import rating constants from centralized config
+        this.DEFAULT_RATING = ratingConfig.RATING_CONSTANTS.DEFAULT;
+        this.BASE_K_FACTOR = ratingConfig.K_FACTORS.BASE;
+        this.RATING_DIVISOR = ratingConfig.RATING_CONSTANTS.RATING_DIVISOR;
+        this.PROBABILITY_BASE = ratingConfig.RATING_CONSTANTS.PROBABILITY_BASE;
+
+        // K-factor thresholds
+        this.K_FACTORS = ratingConfig.K_FACTORS;
+
+        // Pool adjustment settings
+        this.POOL_ADJUSTMENT = ratingConfig.POOL_ADJUSTMENT;
+
+        // Balance thresholds
+        this.BALANCE_THRESHOLDS = ratingConfig.BALANCE_THRESHOLDS;
+
+        // Confidence levels
+        this.CONFIDENCE_LEVELS = ratingConfig.CONFIDENCE_LEVELS;
 
         // Position weights for team optimization
         // Imported from team-optimizer library to ensure consistency
@@ -19,19 +38,45 @@ class EloService {
 
     /**
      * Calculate expected match outcome
+     * Uses standard ELO probability formula
+     *
+     * @param {number} playerRating - Player's current rating
+     * @param {number} opponentRating - Opponent's current rating
+     * @returns {number} Expected score (0-1, where 1 = 100% win probability)
      */
     calculateExpectedScore(playerRating, opponentRating) {
         const ratingDifference = opponentRating - playerRating;
-        return 1 / (1 + Math.pow(10, ratingDifference / 400));
+        return 1 / (1 + Math.pow(this.PROBABILITY_BASE, ratingDifference / this.RATING_DIVISOR));
     }
 
     /**
-     * Dynamic K-factor based on experience
+     * Dynamic K-factor based on experience and skill level
+     * Higher K-factor for new players (more volatile)
+     * Lower K-factor for experienced/high-rated players (more stable)
+     *
+     * @param {number} comparisons - Number of comparisons completed
+     * @param {number} rating - Current rating
+     * @returns {number} Calculated K-factor
      */
     calculateKFactor(comparisons, rating) {
-        if (comparisons < 20) return 40;
-        if (rating > 2000 && comparisons > 50) return 15;
-        if (rating > 1800 && comparisons > 30) return 20;
+        const thresholds = this.K_FACTORS.THRESHOLDS;
+
+        // Novice players: high volatility
+        if (comparisons < thresholds.NOVICE_COMPARISONS) {
+            return this.K_FACTORS.NOVICE;
+        }
+
+        // Master players: low volatility
+        if (rating > thresholds.MASTER_RATING && comparisons > thresholds.MASTER_COMPARISONS) {
+            return this.K_FACTORS.MASTER;
+        }
+
+        // Expert players: reduced volatility
+        if (rating > thresholds.EXPERT_RATING && comparisons > thresholds.EXPERT_COMPARISONS) {
+            return this.K_FACTORS.EXPERT;
+        }
+
+        // Default: standard volatility
         return this.BASE_K_FACTOR;
     }
 
@@ -41,20 +86,26 @@ class EloService {
      *
      * @param {number} baseK - Base K-factor from calculateKFactor
      * @param {number} poolSize - Number of players in the position pool
-     * @param {number} referenceSize - Reference pool size (default: 15)
+     * @param {number} referenceSize - Reference pool size (from config)
      * @returns {number} Adjusted K-factor
      */
-    calculatePoolAdjustedKFactor(baseK, poolSize, referenceSize = 15) {
+    calculatePoolAdjustedKFactor(baseK, poolSize, referenceSize = null) {
+        // Use config reference size if not provided
+        const refSize = referenceSize || this.POOL_ADJUSTMENT.REFERENCE_SIZE;
+
         // Validate inputs
         if (poolSize <= 0) return baseK;
         if (poolSize === 1) return baseK; // Single player, no adjustment needed
 
         // Calculate adjustment factor: sqrt(referenceSize / poolSize)
         // This gives more volatility to smaller pools
-        const adjustmentFactor = Math.sqrt(referenceSize / poolSize);
+        const adjustmentFactor = Math.sqrt(refSize / poolSize);
 
-        // Apply adjustment with reasonable bounds [0.5x to 2.0x]
-        const boundedFactor = Math.max(0.5, Math.min(2.0, adjustmentFactor));
+        // Apply adjustment with reasonable bounds from config
+        const boundedFactor = Math.max(
+            this.POOL_ADJUSTMENT.MIN_FACTOR,
+            Math.min(this.POOL_ADJUSTMENT.MAX_FACTOR, adjustmentFactor)
+        );
 
         return Math.round(baseK * boundedFactor);
     }
@@ -130,6 +181,12 @@ class EloService {
 
     /**
      * Predict match outcome
+     * Calculates win probabilities based on ratings
+     *
+     * @param {Object} player1 - First player
+     * @param {Object} player2 - Second player
+     * @param {string} position - Position to compare
+     * @returns {Object} Match prediction details
      */
     predictMatch(player1, player2, position) {
         const p1Rating = player1.ratings?.[position] || this.DEFAULT_RATING;
@@ -137,6 +194,8 @@ class EloService {
 
         const p1WinProb = this.calculateExpectedScore(p1Rating, p2Rating);
         const p2WinProb = this.calculateExpectedScore(p2Rating, p1Rating);
+
+        const ratingDiff = Math.abs(p1Rating - p2Rating);
 
         return {
             player1: {
@@ -153,8 +212,8 @@ class EloService {
                 winProbability: p2WinProb,
                 winPercentage: Math.round(p2WinProb * 100)
             },
-            ratingDifference: Math.abs(p1Rating - p2Rating),
-            isBalanced: Math.abs(p1Rating - p2Rating) < 200
+            ratingDifference: ratingDiff,
+            isBalanced: ratingDiff < this.BALANCE_THRESHOLDS.MATCHUP_BALANCED
         };
     }
 
@@ -230,8 +289,8 @@ class EloService {
         const minWeightedRating = Math.min(...weightedRatings);
         const maxWeightedDifference = maxWeightedRating - minWeightedRating;
 
-        // Use weighted difference for balance check
-        const isBalanced = maxWeightedDifference < 350;
+        // Use weighted difference for balance check (from config)
+        const isBalanced = maxWeightedDifference < this.BALANCE_THRESHOLDS.TEAM_BALANCED;
 
         return {
             isBalanced,
@@ -352,12 +411,13 @@ class EloService {
         // Calculate confidence as percentage of completed comparisons
         const confidence = Math.min(100, Math.round((comparisons / maxPossible) * 100));
 
-        // Determine confidence level
+        // Determine confidence level using centralized thresholds
         let level;
-        if (confidence < 20) level = 'very-low';
-        else if (confidence < 40) level = 'low';
-        else if (confidence < 60) level = 'medium';
-        else if (confidence < 80) level = 'high';
+        const levels = this.CONFIDENCE_LEVELS;
+        if (confidence < levels.LOW) level = 'very-low';
+        else if (confidence < levels.MEDIUM) level = 'low';
+        else if (confidence < levels.HIGH) level = 'medium';
+        else if (confidence < levels.VERY_HIGH) level = 'high';
         else level = 'very-high';
 
         return {

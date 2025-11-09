@@ -2,7 +2,12 @@
 
 /**
  * Application Constants
+ *
+ * IMPORTANT: Rating-related constants have been moved to config/rating.js
+ * IMPORTANT: Position constants should use config/volleyball.js
  */
+
+import ratingConfig from '../config/rating.js';
 
 export const APP_VERSION = '4.0.0';
 export const APP_NAME = 'VolleyRank';
@@ -20,9 +25,11 @@ export const POSITIONS = {
 
 export const POSITION_KEYS = Object.keys(POSITIONS);
 
-export const DEFAULT_RATING = 1500;
-export const MIN_RATING = 0;
-export const MAX_RATING = 3000;
+// Rating constants - imported from centralized config
+// DEPRECATED: Import directly from config/rating.js instead
+export const DEFAULT_RATING = ratingConfig.RATING_CONSTANTS.DEFAULT;
+export const MIN_RATING = ratingConfig.RATING_CONSTANTS.MIN;
+export const MAX_RATING = ratingConfig.RATING_CONSTANTS.MAX;
 
 export const ROUTES = {
     HOME: '/',

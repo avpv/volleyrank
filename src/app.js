@@ -31,6 +31,7 @@ import toast from './components/base/Toast.js';
 import redirectModule from './redirect.js';
 import { getIcon } from './components/base/Icons.js';
 import volleyballConfig from './config/volleyball.js';
+import { escapeHtml } from './utils/stringUtils.js';
 
 // Page imports
 import SettingsPage from './pages/SettingsPage.js';
@@ -610,17 +611,7 @@ class Application {
      * @returns {string} Escaped text safe for HTML insertion
      */
     escape(text) {
-        if (typeof text !== 'string') return '';
-        
-        const map = {
-            '&': '&amp;',
-            '<': '&lt;',
-            '>': '&gt;',
-            '"': '&quot;',
-            "'": '&#039;'
-        };
-        
-        return text.replace(/[&<>"']/g, m => map[m]);
+        return escapeHtml(text);
     }
 
     /**
