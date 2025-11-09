@@ -1094,11 +1094,7 @@ select.form-control {
 }
 
 .draw-button:hover {
-    background-color: var(--color-brand-secondary);
     border-color: var(--color-brand-primary);
-    color: var(--color-text-primary);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .draw-button:active {
