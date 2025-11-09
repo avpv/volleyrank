@@ -455,7 +455,10 @@ export function createRegistry(services = {}) {
     const registry = new ServiceRegistry();
 
     Object.entries(services).forEach(([name, config]) => {
-        registry.register(name, config.implementation, {
+        // Use factory if provided, otherwise use implementation
+        const implementation = config.factory || config.implementation;
+
+        registry.register(name, implementation, {
             lifetime: config.lifetime || ServiceLifetime.SINGLETON,
             dependencies: config.dependencies || []
         });
