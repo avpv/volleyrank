@@ -1,4 +1,4 @@
-# TeamBalance 🎯
+# TeamBalance
 
 ### Stop endless team arguments. Create perfectly balanced teams in minutes.
 
@@ -6,7 +6,7 @@
 
 <div align="center">
 
-### [🚀 Try the Demo Now](https://avpv.github.io/team-balance/)
+### [🚀 Try Now](https://avpv.github.io/team-balance/)
 *Works in your browser. No installation required.*
 
 </div>
@@ -140,68 +140,6 @@ export default {
 **[👉 Open TeamBalance](https://avpv.github.io/team-balance/)**
 
 Works immediately in your browser. Nothing to install!
-
-### Local Version
-```bash
-# Clone the repository
-git clone https://github.com/avpv/team-balance.git
-cd team-balance
-
-# Start a local server
-python -m http.server 8000
-# or
-npx serve
-```
-
-Open `http://localhost:8000` in your browser.
-
----
-
-## 💡 Real-World Use Cases
-
-**🏐 Volleyball Club** — Coach creates 4 teams from 24 players for a tournament. Previously took 30 minutes and there were always complaints. Now — 5 minutes, all teams equally matched.
-
-**💼 IT Company** — Manager forms 3 project teams from 18 developers with different skills. TeamBalance accounts for developers who can do both frontend and backend.
-
-**🎓 University** — Professor creates groups for lab work, considering each student's strengths in programming, testing, and documentation.
-
----
-
-## 🛠️ Technical Details (For the Curious)
-
-<details>
-<summary><b>What's Inside?</b></summary>
-
-### Technologies
-- **Vanilla JavaScript (ES6)** — fast, no unnecessary dependencies
-- **ELO Rating System** — mathematically sound rating system
-- **Genetic Algorithm** — team distribution optimization
-- **localStorage** — automatic data persistence
-- **GitHub Pages** — free hosting
-
-### Architecture
-- Clean architecture with separation of concerns
-- Configuration-driven approach
-- Event-driven component interaction
-- Dependency injection for flexibility
-
-### Open Source
-Full source code available on GitHub. You can:
-- Study the algorithms
-- Suggest improvements
-- Create your own version
-- Add new features
-
-</details>
-
----
-
-## 🤝 Join the Community
-
-- 💬 **Questions?** Open an issue on GitHub
-- 🐛 **Found a bug?** Let us know!
-- 💡 **Have an idea?** We welcome suggestions!
-- 🌟 **Like the project?** Star it on GitHub!
 
 ---
 
