@@ -91,8 +91,18 @@ class ServiceRegistration {
                 // Create instance with dependencies
                 return new this.implementation(...deps);
             } else {
-                // It's a factory function
-                return this.implementation(...deps);
+                // It's a factory function - pass dependencies as object
+                if (this.dependencies.length === 0) {
+                    // No dependencies - call factory with no arguments
+                    return this.implementation();
+                } else {
+                    // Create dependency object with named properties
+                    const depsObj = {};
+                    this.dependencies.forEach((depName, index) => {
+                        depsObj[depName] = deps[index];
+                    });
+                    return this.implementation(depsObj);
+                }
             }
         }
 
