@@ -19,12 +19,12 @@ class Router {
      */
     detectBasePath() {
         const path = window.location.pathname;
-        
+
         // Check if running on GitHub Pages
-        if (path.includes('/volleyrank')) {
-            return '/volleyrank';
+        if (path.includes('/team-balance')) {
+            return '/team-balance';
         }
-        
+
         return '';
     }
 

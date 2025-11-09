@@ -11,7 +11,7 @@ Stop guessing who should be on which team. TeamBalance helps you:
 
 Perfect for coaches, organizers, managers - anyone who needs to build fair, balanced teams quickly.
 
-[Try the Volleyball demo](https://avpv.github.io/volleyrank/) - runs entirely in your browser
+[Try the Volleyball demo](https://avpv.github.io/team-balance/) - runs entirely in your browser
 
 ---
 
@@ -275,8 +275,8 @@ TeamBalance follows clean architecture principles:
 
 ```bash
 # Clone the repository
-git clone https://github.com/avpv/volleyrank.git
-cd volleyrank
+git clone https://github.com/avpv/team-balance.git
+cd team-balance
 
 # Open in browser (no build step required!)
 # Use a local server for development:
