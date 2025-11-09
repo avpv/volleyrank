@@ -180,7 +180,7 @@ class TeamsPage extends BasePage {
     }
 
     renderTeam(team, index) {
-        const strength = this.eloService.calculateTeamStrength(team, false);
+        const strength = this.eloService.calculateTeamStrength(team);
         const showElo = this.state.showEloRatings;
 
         return `
