@@ -180,7 +180,7 @@ class TeamsPage extends BasePage {
     }
 
     renderTeam(team, index) {
-        const strength = this.eloService.calculateTeamStrength(team, true);
+        const strength = this.eloService.calculateTeamStrength(team, false);
         const showElo = this.state.showEloRatings;
 
         return `
@@ -190,7 +190,7 @@ class TeamsPage extends BasePage {
                 </div>
                 ${showElo ? `
                     <div class="team-rating">
-                        ${strength.weightedRating} weighted ELO (${strength.totalRating} raw, avg ${strength.averageRating})
+                        ${strength.totalRating} total ELO (avg ${strength.averageRating})
                     </div>
                 ` : ''}
 
@@ -329,12 +329,9 @@ class TeamsPage extends BasePage {
             // Show optimizing message
             toast.info('Optimizing teams... This may take a moment', 10000);
 
-            // Apply custom position weights temporarily
+            // Apply custom position weights temporarily for optimization
             const originalWeights = { ...this.activityConfig.positionWeights };
             Object.assign(this.activityConfig.positionWeights, this.state.positionWeights);
-
-            // Update EloService weights as well
-            this.eloService.POSITION_WEIGHTS = this.state.positionWeights;
 
             try {
                 // Optimize (async)
@@ -353,7 +350,6 @@ class TeamsPage extends BasePage {
             } finally {
                 // Restore original weights
                 Object.assign(this.activityConfig.positionWeights, originalWeights);
-                this.eloService.POSITION_WEIGHTS = originalWeights;
             }
 
         } catch (error) {
