@@ -14,9 +14,9 @@ class TeamsPage extends BasePage {
 
         // Get services from props
         this.activityConfig = props.activityConfig;
-        this.this.playerService = props.services?.resolve('this.playerService');
-        this.this.teamOptimizerService = props.services?.resolve('this.teamOptimizerService');
-        this.this.eloService = props.services?.resolve('this.eloService');
+        this.playerService = props.services?.resolve('playerService');
+        this.teamOptimizerService = props.services?.resolve('teamOptimizerService');
+        this.eloService = props.services?.resolve('eloService');
 
         this.state = {
             teams: null,
