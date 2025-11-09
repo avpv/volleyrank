@@ -295,6 +295,7 @@ class ComparePage extends BasePage {
     handleDraw(player1Id, player2Id) {
         try {
             this.comparisonService.processDraw(player1Id, player2Id, this.selectedPosition);
+            toast.success('Draw recorded', 2000);
         } catch (error) {
             toast.error(error.message);
         }
