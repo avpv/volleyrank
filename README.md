@@ -6,7 +6,7 @@
 
 <div align="center">
 
-### [🚀 Try Now](https://avpv.github.io/team-balance/)
+### [🚀 Try TeamBalance Now](https://avpv.github.io/team-balance/)
 *Works in your browser. No installation required.*
 
 </div>
