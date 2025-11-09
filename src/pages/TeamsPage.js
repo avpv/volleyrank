@@ -18,12 +18,19 @@ class TeamsPage extends BasePage {
         this.teamOptimizerService = props.services?.resolve('teamOptimizerService');
         this.eloService = props.services?.resolve('eloService');
 
+        // Initialize position weights from config
+        const initialWeights = {};
+        Object.keys(this.activityConfig.positions).forEach(pos => {
+            initialWeights[pos] = this.activityConfig.positionWeights[pos] || 1.0;
+        });
+
         this.state = {
             teams: null,
             isOptimizing: false,
             showEloRatings: true,
             teamCount: 2,
-            composition: this.activityConfig.defaultComposition
+            composition: this.activityConfig.defaultComposition,
+            positionWeights: initialWeights
         };
     }
 
@@ -79,6 +86,13 @@ class TeamsPage extends BasePage {
                     </div>
                 </div>
 
+                <div class="form-group">
+                    <label>Position Weights (для балансировки команд)</label>
+                    <div class="composition-grid">
+                        ${this.renderPositionWeightInputs()}
+                    </div>
+                </div>
+
                 <div class="builder-settings">
                     <button
                         class="btn btn-primary btn-large"
@@ -97,13 +111,31 @@ class TeamsPage extends BasePage {
         return Object.entries(this.activityConfig.positions).map(([key, name]) => `
             <div class="composition-item">
                 <label>${name}</label>
-                <input 
-                    type="number" 
-                    id="comp_${key}" 
-                    value="${this.state.composition[key]}" 
-                    min="0" 
+                <input
+                    type="number"
+                    id="comp_${key}"
+                    value="${this.state.composition[key]}"
+                    min="0"
                     max="6"
                     class="composition-input"
+                >
+            </div>
+        `).join('');
+    }
+
+    renderPositionWeightInputs() {
+        // Render weight inputs for each position
+        return Object.entries(this.activityConfig.positions).map(([key, name]) => `
+            <div class="composition-item">
+                <label>${name}</label>
+                <input
+                    type="number"
+                    id="weight_${key}"
+                    value="${this.state.positionWeights[key]}"
+                    min="0.1"
+                    max="5.0"
+                    step="0.1"
+                    class="weight-input"
                 >
             </div>
         `).join('');
@@ -113,6 +145,7 @@ class TeamsPage extends BasePage {
         if (!this.state.teams) return '';
 
         const { teams, balance, algorithm } = this.state.teams;
+        const weightedBalance = this.calculateWeightedBalance(teams);
 
         return `
             <div class="teams-result">
@@ -120,9 +153,9 @@ class TeamsPage extends BasePage {
                     <h3>Generated Teams</h3>
                     <div class="result-controls">
                         <label class="toggle-label">
-                            <input 
-                                type="checkbox" 
-                                id="showEloToggle" 
+                            <input
+                                type="checkbox"
+                                id="showEloToggle"
                                 ${this.state.showEloRatings ? 'checked' : ''}
                             >
                             Show ELO Ratings
@@ -135,8 +168,8 @@ class TeamsPage extends BasePage {
                 </div>
 
                 <div class="result-info">
-                    <div class="info-badge ${balance.difference <= 50 ? 'success' : 'warning'}">
-                        Balance: ${balance.difference} ELO difference
+                    <div class="info-badge ${weightedBalance <= 50 ? 'success' : 'warning'}">
+                        Balance: ${weightedBalance} weighted ELO difference
                     </div>
                 </div>
 
@@ -147,8 +180,19 @@ class TeamsPage extends BasePage {
         `;
     }
 
+    calculateWeightedBalance(teams) {
+        if (!teams || teams.length < 2) return 0;
+
+        const weightedRatings = teams.map(team => this.calculateWeightedTeamRating(team));
+        const maxRating = Math.max(...weightedRatings);
+        const minRating = Math.min(...weightedRatings);
+
+        return maxRating - minRating;
+    }
+
     renderTeam(team, index) {
-        const strength = this.eloService.calculateTeamStrength(team, true);
+        const strength = this.eloService.calculateTeamStrength(team);
+        const weightedRating = this.calculateWeightedTeamRating(team);
         const showElo = this.state.showEloRatings;
 
         return `
@@ -158,7 +202,7 @@ class TeamsPage extends BasePage {
                 </div>
                 ${showElo ? `
                     <div class="team-rating">
-                        ${strength.weightedRating} weighted ELO (${strength.totalRating} raw, avg ${strength.averageRating})
+                        ${weightedRating} weighted ELO (${strength.totalRating} raw, avg ${strength.averageRating})
                     </div>
                 ` : ''}
 
@@ -167,6 +211,24 @@ class TeamsPage extends BasePage {
                 </div>
             </div>
         `;
+    }
+
+    calculateWeightedTeamRating(team) {
+        if (!team || team.length === 0) return 0;
+
+        let weightedTotal = 0;
+
+        team.forEach(player => {
+            const position = player.assignedPosition || player.positions?.[0];
+            const rating = position && player.ratings?.[position]
+                ? player.ratings[position]
+                : 1500; // DEFAULT_RATING
+
+            const weight = this.state.positionWeights[position] || 1.0;
+            weightedTotal += rating * weight;
+        });
+
+        return Math.round(weightedTotal);
     }
 
     renderTeamPlayer(player, showElo) {
@@ -215,12 +277,28 @@ class TeamsPage extends BasePage {
                 // Clone to remove old event listeners
                 const newInput = input.cloneNode(true);
                 input.parentNode.replaceChild(newInput, input);
-                
+
                 newInput.addEventListener('input', (e) => {
                     const pos = newInput.id.replace('comp_', '');
                     const value = parseInt(e.target.value) || 0;
                     this.state.composition[pos] = value;
                     updatePlayersPerTeam();
+                });
+            });
+        }
+
+        // Position weight inputs
+        const weightInputs = this.container.querySelectorAll('.weight-input');
+        if (weightInputs && weightInputs.length > 0) {
+            weightInputs.forEach(input => {
+                // Clone to remove old event listeners
+                const newInput = input.cloneNode(true);
+                input.parentNode.replaceChild(newInput, input);
+
+                newInput.addEventListener('input', (e) => {
+                    const pos = newInput.id.replace('weight_', '');
+                    const value = parseFloat(e.target.value) || 1.0;
+                    this.state.positionWeights[pos] = value;
                 });
             });
         }
@@ -281,19 +359,31 @@ class TeamsPage extends BasePage {
             // Show optimizing message
             toast.info('Optimizing teams... This may take a moment', 10000);
 
-            // Optimize (async)
-            const result = await this.teamOptimizerService.optimize(
-                composition,
-                teamCount,
-                players
-            );
+            // Apply custom position weights temporarily for optimization
+            const originalWeights = { ...this.activityConfig.positionWeights };
+            Object.assign(this.activityConfig.positionWeights, this.state.positionWeights);
 
-            this.setState({ 
-                teams: result,
-                isOptimizing: false 
-            });
+            try {
+                // Optimize (async)
+                const result = await this.teamOptimizerService.optimize(
+                    composition,
+                    teamCount,
+                    players
+                );
 
-            toast.success(`Teams created! Balance: ${result.balance.difference} ELO difference`);
+                // Calculate weighted balance for display
+                const weightedBalance = this.calculateWeightedBalance(result.teams);
+
+                this.setState({
+                    teams: result,
+                    isOptimizing: false
+                });
+
+                toast.success(`Teams created! Balance: ${weightedBalance} weighted ELO difference`);
+            } finally {
+                // Restore original weights
+                Object.assign(this.activityConfig.positionWeights, originalWeights);
+            }
 
         } catch (error) {
             this.setState({ isOptimizing: false });

@@ -24,10 +24,10 @@ export default {
     // Position weights for team balancing
     // Higher weight = more important position
     positionWeights: {
-        'GK': 1.3,   // Goalkeeper
-        'PIV': 1.25, // Pivot
-        'FIX': 1.2,  // Fixo
-        'ALA': 1.15  // Ala
+        'GK': 1.0,   // Goalkeeper
+        'PIV': 1.0, // Pivot
+        'FIX': 1.0,  // Fixo
+        'ALA': 1.0  // Ala
     },
 
     // Order in which positions should be displayed

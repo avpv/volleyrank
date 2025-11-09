@@ -22,8 +22,8 @@ export default {
     // Position weights for team balancing
     // Higher weight = more important position
     positionWeights: {
-        'BLK': 1.15,  // Blocker
-        'DEF': 1.15   // Defender - equal importance
+        'BLK': 1.0,  // Blocker
+        'DEF': 1.0   // Defender - equal importance
     },
 
     // Order in which positions should be displayed

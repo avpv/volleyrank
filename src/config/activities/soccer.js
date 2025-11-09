@@ -24,10 +24,10 @@ export default {
     // Position weights for team balancing
     // Higher weight = more important position
     positionWeights: {
-        'GK': 1.3,   // Goalkeeper is critical
-        'DF': 1.15,  // Defender
-        'MF': 1.2,   // Midfielder - most versatile
-        'FW': 1.1    // Forward
+        'GK': 1.0,   // Goalkeeper is critical
+        'DF': 1.0,  // Defender
+        'MF': 1.0,   // Midfielder - most versatile
+        'FW': 1.0    // Forward
     },
 
     // Order in which positions should be displayed

@@ -31,11 +31,6 @@ class EloService {
 
         // Confidence levels
         this.CONFIDENCE_LEVELS = ratingConfig.CONFIDENCE_LEVELS;
-
-        // Position weights for team optimization
-        // Imported from activity config to ensure consistency
-        // Reflects the impact each position has on team balance
-        this.POSITION_WEIGHTS = activityConfig.positionWeights;
     }
 
     /**
@@ -292,23 +287,20 @@ class EloService {
     }
 
     /**
-     * Calculate team strength
+     * Calculate team strength based on player ELO ratings
      * @param {Array} players - Team players
-     * @param {boolean} usePositionWeights - Whether to apply position weights
      * @returns {Object} Team strength statistics
      */
-    calculateTeamStrength(players, usePositionWeights = true) {
+    calculateTeamStrength(players) {
         if (!players || players.length === 0) {
             return {
                 totalRating: 0,
-                weightedRating: 0,
                 averageRating: 0,
                 playerCount: 0
             };
         }
 
         let totalRating = 0;
-        let weightedRating = 0;
 
         players.forEach(player => {
             const position = player.assignedPosition || player.positions?.[0];
@@ -317,63 +309,46 @@ class EloService {
                 : this.DEFAULT_RATING;
 
             totalRating += rating;
-
-            // Apply position weight if enabled
-            if (usePositionWeights && position) {
-                const weight = this.POSITION_WEIGHTS[position] || 1.0;
-                weightedRating += rating * weight;
-            } else {
-                weightedRating += rating;
-            }
         });
 
         return {
             totalRating: Math.round(totalRating),
-            weightedRating: Math.round(weightedRating),
             averageRating: Math.round(totalRating / players.length),
             playerCount: players.length
         };
     }
 
     /**
-     * Evaluate balance between teams
+     * Evaluate balance between teams based on ELO ratings
      * @param {Array} teams - Array of teams to evaluate
-     * @param {boolean} usePositionWeights - Whether to use weighted ratings for balance
      * @returns {Object} Balance evaluation
      */
-    evaluateBalance(teams, usePositionWeights = true) {
+    evaluateBalance(teams) {
         if (!teams || teams.length < 2) {
             return {
                 isBalanced: true,
                 maxDifference: 0,
-                maxWeightedDifference: 0,
                 teams: []
             };
         }
 
-        const teamStats = teams.map(team => this.calculateTeamStrength(team, usePositionWeights));
+        const teamStats = teams.map(team => this.calculateTeamStrength(team));
         const ratings = teamStats.map(stats => stats.totalRating);
-        const weightedRatings = teamStats.map(stats => stats.weightedRating);
 
         const maxRating = Math.max(...ratings);
         const minRating = Math.min(...ratings);
         const maxDifference = maxRating - minRating;
 
-        const maxWeightedRating = Math.max(...weightedRatings);
-        const minWeightedRating = Math.min(...weightedRatings);
-        const maxWeightedDifference = maxWeightedRating - minWeightedRating;
-
-        // Use weighted difference for balance check (from config)
-        const isBalanced = maxWeightedDifference < this.BALANCE_THRESHOLDS.TEAM_BALANCED;
+        // Use difference for balance check (from config)
+        const isBalanced = maxDifference < this.BALANCE_THRESHOLDS.TEAM_BALANCED;
 
         return {
             isBalanced,
-            maxDifference: Math.round(usePositionWeights ? maxWeightedDifference : maxDifference),
-            maxWeightedDifference: Math.round(maxWeightedDifference),
+            maxDifference: Math.round(maxDifference),
             teams: teamStats.map((stats, index) => ({
                 index,
                 ...stats,
-                strengthRank: weightedRatings.filter(r => r > stats.weightedRating).length + 1
+                strengthRank: ratings.filter(r => r > stats.totalRating).length + 1
             }))
         };
     }

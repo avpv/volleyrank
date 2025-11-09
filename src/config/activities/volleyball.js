@@ -26,10 +26,10 @@ export default {
     // Position weights for team balancing
     // Higher weight = more important position
     positionWeights: {
-        'S': 1.3,    // Setter is most important
-        'OPP': 1.2,  // Opposite
-        'OH': 1.15,  // Outside Hitter
-        'MB': 1.1,   // Middle Blocker
+        'S': 1.0,    // Setter is most important
+        'OPP': 1.0,  // Opposite
+        'OH': 1.0,  // Outside Hitter
+        'MB': 1.0,   // Middle Blocker
         'L': 1.0     // Libero
     },
 

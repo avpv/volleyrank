@@ -30,16 +30,16 @@ export default {
     // Role weights for team balancing
     // Higher weight = more critical role for project success
     positionWeights: {
-        'TL': 1.3,   // Tech Lead - most critical
-        'PM': 1.25,  // Product Manager
-        'BE': 1.2,   // Backend Developer
-        'DS': 1.2,   // Data Scientist
-        'FE': 1.15,  // Frontend Developer
-        'DE': 1.15,  // Data Engineer
-        'AD': 1.15,  // App Developer
-        'QA': 1.1,   // QA Engineer
-        'UX': 1.1,   // UX Designer
-        'DA': 1.1    // Data Analyst
+        'TL': 1.0,   // Tech Lead - most critical
+        'PM': 1.0,  // Product Manager
+        'BE': 1.0,   // Backend Developer
+        'DS': 1.0,   // Data Scientist
+        'FE': 1.0,  // Frontend Developer
+        'DE': 1.0,  // Data Engineer
+        'AD': 1.0,  // App Developer
+        'QA': 1.0,   // QA Engineer
+        'UX': 1.0,   // UX Designer
+        'DA': 1.0    // Data Analyst
     },
 
     // Order in which roles should be displayed

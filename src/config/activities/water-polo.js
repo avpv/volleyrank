@@ -27,13 +27,13 @@ export default {
     // Position weights for team balancing
     // Higher weight = more important position
     positionWeights: {
-        'GK': 1.35,  // Goalkeeper
-        'CF': 1.3,   // Center Forward - hole set
-        'CD': 1.25,  // Center Defender
-        'LD': 1.2,   // Left Driver
-        'RD': 1.2,   // Right Driver
-        'LW': 1.15,  // Left Wing
-        'RW': 1.15   // Right Wing
+        'GK': 1.0,  // Goalkeeper
+        'CF': 1.0,   // Center Forward - hole set
+        'CD': 1.0,  // Center Defender
+        'LD': 1.0,   // Left Driver
+        'RD': 1.0,   // Right Driver
+        'LW': 1.0,  // Left Wing
+        'RW': 1.0   // Right Wing
     },
 
     // Order in which positions should be displayed

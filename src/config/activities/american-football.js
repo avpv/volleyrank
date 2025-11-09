@@ -29,15 +29,15 @@ export default {
     // Position weights for team balancing
     // Higher weight = more important position
     positionWeights: {
-        'QB': 1.5,   // Quarterback is most critical
-        'OL': 1.3,   // Offensive Line
-        'WR': 1.2,   // Wide Receiver
-        'RB': 1.15,  // Running Back
-        'TE': 1.1,   // Tight End
-        'DL': 1.25,  // Defensive Line
-        'LB': 1.2,   // Linebacker
-        'CB': 1.15,  // Cornerback
-        'S': 1.1     // Safety
+        'QB': 1.0,   // Quarterback is most critical
+        'OL': 1.0,   // Offensive Line
+        'WR': 1.0,   // Wide Receiver
+        'RB': 1.0,  // Running Back
+        'TE': 1.0,   // Tight End
+        'DL': 1.0,  // Defensive Line
+        'LB': 1.0,   // Linebacker
+        'CB': 1.0,  // Cornerback
+        'S': 1.0     // Safety
     },
 
     // Order in which positions should be displayed
