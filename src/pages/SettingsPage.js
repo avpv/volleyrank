@@ -53,6 +53,7 @@ class SettingsPage extends BasePage {
     render() {
         const players = this.playerService.getAll();
         const stats = this.playerService.getPositionStats();
+        const currentActivity = storage.get('selectedActivity', null);
 
         return this.renderPage(`
             <div class="page-header">
@@ -63,7 +64,7 @@ class SettingsPage extends BasePage {
 
             ${this.renderActivitySelector()}
             ${this.renderAddPlayerForm()}
-            ${this.renderPositionStats(stats)}
+            ${currentActivity ? this.renderPositionStats(stats) : ''}
             ${this.renderPlayersList(players)}
         `);
     }

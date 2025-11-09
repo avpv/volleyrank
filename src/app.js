@@ -152,6 +152,9 @@ class Application {
             // Step 3: Setup global event listeners
             this.setupEventListeners();
 
+            // Step 3.5: Setup navigation click handlers
+            this.setupNavigationHandlers();
+
             // Step 4: Register application routes
             this.registerRoutes();
 
@@ -405,29 +408,45 @@ class Application {
 
     /**
      * Update navigation active state
-     * 
+     *
      * Highlights the current route's navigation link by adding
      * an 'active' class to the corresponding nav element.
-     * 
+     * Also disables Compare, Rankings, and Teams links when no activity is selected.
+     *
      * Process:
      * 1. Query all navigation links with .nav-link class
-     * 2. Check each link's data-route attribute
-     * 3. Compare with current router route
-     * 4. Add/remove 'active' class accordingly
-     * 
+     * 2. Check if activity is selected
+     * 3. Disable/enable relevant links based on activity selection
+     * 4. Check each link's data-route attribute
+     * 5. Compare with current router route
+     * 6. Add/remove 'active' class accordingly
+     *
      * This method is called:
      * - After page render
      * - On route change events
      * - During initial navigation
-     * 
+     *
      * @private
      * @returns {void}
      */
     updateNavigation() {
         const links = document.querySelectorAll('.nav-link');
-        
+        const currentActivity = storage.get('selectedActivity', null);
+        const disabledRoutes = ['/compare/', '/rankings/', '/teams/'];
+
         links.forEach(link => {
             const route = link.getAttribute('data-route');
+
+            // Disable Compare, Rankings, Teams if no activity selected
+            if (!currentActivity && disabledRoutes.includes(route)) {
+                link.classList.add('disabled');
+                link.setAttribute('aria-disabled', 'true');
+            } else {
+                link.classList.remove('disabled');
+                link.removeAttribute('aria-disabled');
+            }
+
+            // Update active state
             if (router.isActive(route)) {
                 link.classList.add('active');
             } else {
@@ -437,21 +456,48 @@ class Application {
     }
 
     /**
+     * Setup navigation click handlers
+     *
+     * Prevents navigation to disabled routes when no activity is selected.
+     * Shows a toast message to guide the user to select an activity first.
+     *
+     * @private
+     * @returns {void}
+     */
+    setupNavigationHandlers() {
+        const links = document.querySelectorAll('.nav-link');
+        const disabledRoutes = ['/compare/', '/rankings/', '/teams/'];
+
+        links.forEach(link => {
+            link.addEventListener('click', (e) => {
+                const route = link.getAttribute('data-route');
+                const currentActivity = storage.get('selectedActivity', null);
+
+                // Prevent navigation if no activity selected and route is disabled
+                if (!currentActivity && disabledRoutes.includes(route)) {
+                    e.preventDefault();
+                    toast.error('Please select an activity type first');
+                }
+            });
+        });
+    }
+
+    /**
      * Setup global event listeners
-     * 
+     *
      * Subscribes to application-wide events for cross-component communication.
      * Uses EventBus for loose coupling between components.
-     * 
+     *
      * Event Categories:
      * - State Management: load, save, migration
      * - Player Operations: add, remove, update, reset
      * - Comparison Operations: completed
      * - Route Changes: navigation updates
      * - Error Handling: save/load failures
-     * 
+     *
      * All event handlers show appropriate toast notifications
      * for user feedback on important operations.
-     * 
+     *
      * @private
      * @returns {void}
      */
