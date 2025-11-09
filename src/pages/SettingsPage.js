@@ -114,7 +114,7 @@ class SettingsPage extends BasePage {
 
         return `
             <div class="accordion add-player-section">
-                <button type="button" class="accordion-header" id="addPlayerAccordionHeader">
+                <button type="button" class="accordion-header${!currentActivity ? ' disabled' : ''}" id="addPlayerAccordionHeader">
                     <span>Add Players</span>
                     ${getIcon('chevron-down', { size: 16, className: `accordion-icon${isOpen ? ' open' : ''}` })}
                 </button>
@@ -352,6 +352,14 @@ class SettingsPage extends BasePage {
     }
 
     toggleAccordion() {
+        const currentActivity = storage.get('selectedActivity', null);
+
+        // Prevent opening if no activity selected
+        if (!currentActivity) {
+            toast.error('Please select an activity type first');
+            return;
+        }
+
         const content = this.$('#addPlayerAccordionContent');
         const icon = this.$('.accordion-icon');
 
