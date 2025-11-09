@@ -72,9 +72,10 @@ class SettingsPage extends BasePage {
         return `
             <div class="welcome-guide">
                 <h3>Welcome to TeamBalance!</h3>
-                <p>Get started in 3 easy steps:</p>
+                <p>Get started in 4 easy steps:</p>
                 <ol>
-                    <li><strong>Add players</strong> with their positions below</li>
+                    <li><strong>Select Activity Type</strong> from the dropdown below</li>
+                    <li><strong>Add players</strong> with their positions</li>
                     <li><strong>Compare players</strong> to build accurate skill ratings</li>
                     <li><strong>Create balanced teams</strong> automatically</li>
                 </ol>
