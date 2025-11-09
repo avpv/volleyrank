@@ -4,15 +4,17 @@
  * PlayerService - Player management business logic
  * Handles validation, queries, and player operations
  */
-import stateManager from '../core/StateManager.js';
-import eventBus from '../core/EventBus.js';
-import volleyballConfig from '../config/volleyball.js';
 
 class PlayerService {
-    constructor() {
-        // Import positions from team-optimizer for consistency
-        this.positions = volleyballConfig.positions;
+    constructor(activityConfig, this.stateManager, this.eventBus, eloService) {
+        // Store dependencies
+        this.config = activityConfig;
+        this.this.stateManager = this.stateManager;
+        this.this.eventBus = this.eventBus;
+        this.eloService = eloService;
 
+        // Import positions from activity config for consistency
+        this.positions = activityConfig.positions;
         this.DEFAULT_RATING = 1500;
     }
 
@@ -75,7 +77,7 @@ class PlayerService {
         const { name: cleanName, positions: cleanPositions } = validation.sanitized;
         
         // Check for duplicate
-        const state = stateManager.getState();
+        const state = this.this.stateManager.getState();
         if (state.players.some(p => p.name === cleanName)) {
             throw new Error('Player with this name already exists');
         }
@@ -102,14 +104,14 @@ class PlayerService {
         };
 
         // Update state
-        stateManager.setState({
+        this.stateManager.setState({
             players: [...state.players, player]
         }, {
             event: 'player:added',
             save: true
         });
 
-        eventBus.emit('player:added', player);
+        this.eventBus.emit('player:added', player);
         return player;
     }
 
@@ -123,7 +125,7 @@ class PlayerService {
             throw new Error(validation.errors.join(', '));
         }
 
-        const state = stateManager.getState();
+        const state = this.stateManager.getState();
         const playerIndex = state.players.findIndex(p => p.id === playerId);
         
         if (playerIndex === -1) {
@@ -155,8 +157,8 @@ class PlayerService {
         const updatedPlayers = [...state.players];
         updatedPlayers[playerIndex] = updatedPlayer;
 
-        stateManager.setState({ players: updatedPlayers });
-        eventBus.emit('player:updated', updatedPlayer);
+        this.stateManager.setState({ players: updatedPlayers });
+        this.eventBus.emit('player:updated', updatedPlayer);
         
         return updatedPlayer;
     }
@@ -165,7 +167,7 @@ class PlayerService {
      * Remove a player
      */
     remove(playerId) {
-        const state = stateManager.getState();
+        const state = this.stateManager.getState();
         const player = state.players.find(p => p.id === playerId);
         
         if (!player) {
@@ -183,8 +185,8 @@ class PlayerService {
             });
         });
 
-        stateManager.setState({ players: updatedPlayers });
-        eventBus.emit('player:removed', player);
+        this.stateManager.setState({ players: updatedPlayers });
+        this.eventBus.emit('player:removed', player);
         
         return player;
     }
@@ -193,7 +195,7 @@ class PlayerService {
      * Reset player ratings (all positions)
      */
     reset(playerId, positions = null) {
-        const state = stateManager.getState();
+        const state = this.stateManager.getState();
         const playerIndex = state.players.findIndex(p => p.id === playerId);
         
         if (playerIndex === -1) {
@@ -220,8 +222,8 @@ class PlayerService {
         // because that would create inconsistency in their comparison counts.
         // The reset only affects this player's data.
 
-        stateManager.setState({ players: updatedPlayers });
-        eventBus.emit('player:reset', { player: updatedPlayer, positions: positionsToReset });
+        this.stateManager.setState({ players: updatedPlayers });
+        this.eventBus.emit('player:reset', { player: updatedPlayer, positions: positionsToReset });
         
         return updatedPlayer;
     }
@@ -245,7 +247,7 @@ class PlayerService {
             throw new Error('At least one position is required');
         }
 
-        const state = stateManager.getState();
+        const state = this.stateManager.getState();
         const updatedPlayers = state.players.map(player => {
             const updated = { ...player };
             
@@ -262,7 +264,7 @@ class PlayerService {
 
         // Recalculate total comparisons
         let totalComparisons = 0;
-        const allPositions = volleyballConfig.positionOrder;
+        const allPositions = this.config.positionOrder;
         const nonResetPositions = allPositions.filter(p => !positions.includes(p));
         
         updatedPlayers.forEach(player => {
@@ -274,12 +276,12 @@ class PlayerService {
         });
         totalComparisons = Math.floor(totalComparisons / 2);
 
-        stateManager.setState({
+        this.stateManager.setState({
             players: updatedPlayers,
             comparisons: totalComparisons
         });
 
-        eventBus.emit('players:reset-all-positions', {
+        this.eventBus.emit('players:reset-all-positions', {
             positions,
             playersAffected: updatedPlayers.length
         });
@@ -291,7 +293,7 @@ class PlayerService {
      * Get players by position
      */
     getByPosition(position) {
-        const state = stateManager.getState();
+        const state = this.stateManager.getState();
         return state.players.filter(p => 
             p.positions && p.positions.includes(position)
         );
@@ -301,7 +303,7 @@ class PlayerService {
      * Get player by ID
      */
     getById(playerId) {
-        const state = stateManager.getState();
+        const state = this.stateManager.getState();
         return state.players.find(p => p.id === playerId);
     }
 
@@ -309,7 +311,7 @@ class PlayerService {
      * Get all players
      */
     getAll() {
-        return stateManager.get('players') || [];
+        return this.stateManager.get('players') || [];
     }
 
     /**
@@ -321,7 +323,7 @@ class PlayerService {
         }
 
         const term = searchTerm.toLowerCase().trim();
-        const state = stateManager.getState();
+        const state = this.stateManager.getState();
         
         return state.players.filter(player => {
             if (player.name.toLowerCase().includes(term)) {
@@ -338,7 +340,7 @@ class PlayerService {
      * Get position statistics
      */
     getPositionStats() {
-        const state = stateManager.getState();
+        const state = this.stateManager.getState();
         const stats = {};
         
         Object.keys(this.positions).forEach(pos => {
@@ -360,7 +362,7 @@ class PlayerService {
      * Get rankings by position
      */
     getRankings() {
-        const state = stateManager.getState();
+        const state = this.stateManager.getState();
         const rankings = {};
 
         Object.keys(this.positions).forEach(position => {
@@ -380,4 +382,4 @@ class PlayerService {
     }
 }
 
-export default new PlayerService();
+export default PlayerService;

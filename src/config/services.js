@@ -22,118 +22,153 @@ import ComparisonService from '../services/ComparisonService.js';
 import TeamOptimizerService from '../services/TeamOptimizerService.js';
 
 /**
- * Service configuration
+ * Service configuration factory
  * Defines how each service should be registered
+ *
+ * @param {Object} activityConfig - Activity configuration (positions, weights, etc.)
+ * @returns {Object} Service configuration
  */
-export const serviceConfig = {
-    // ===== Core Services =====
+export function createServiceConfig(activityConfig) {
+    return {
+        // ===== Core Services =====
 
-    /**
-     * Event Bus - Event aggregator
-     * Singleton: One event bus for entire app
-     */
-    eventBus: {
-        implementation: EventBus,
-        lifetime: ServiceLifetime.SINGLETON,
-        dependencies: []
-    },
+        /**
+         * Event Bus - Event aggregator
+         * Singleton: One event bus for entire app
+         */
+        eventBus: {
+            implementation: EventBus,
+            lifetime: ServiceLifetime.SINGLETON,
+            dependencies: []
+        },
 
-    /**
-     * Storage Adapter - localStorage wrapper
-     * Singleton: One storage instance
-     */
-    storageAdapter: {
-        implementation: StorageAdapter,
-        lifetime: ServiceLifetime.SINGLETON,
-        dependencies: []
-    },
+        /**
+         * Storage Adapter - localStorage wrapper
+         * Singleton: One storage instance
+         */
+        storageAdapter: {
+            implementation: StorageAdapter,
+            lifetime: ServiceLifetime.SINGLETON,
+            dependencies: []
+        },
 
-    /**
-     * State Manager - Application state
-     * Singleton: One state for entire app
-     * Dependencies: storageAdapter, eventBus
-     */
-    stateManager: {
-        implementation: StateManager,
-        lifetime: ServiceLifetime.SINGLETON,
-        dependencies: ['storageAdapter', 'eventBus']
-    },
+        /**
+         * State Manager - Application state
+         * Singleton: One state for entire app
+         * Dependencies: storageAdapter, eventBus
+         */
+        stateManager: {
+            implementation: StateManager,
+            lifetime: ServiceLifetime.SINGLETON,
+            dependencies: ['storageAdapter', 'eventBus']
+        },
 
-    /**
-     * Router - Page routing
-     * Singleton: One router for entire app
-     * Dependencies: eventBus
-     */
-    router: {
-        implementation: Router,
-        lifetime: ServiceLifetime.SINGLETON,
-        dependencies: ['eventBus']
-    },
+        /**
+         * Router - Page routing
+         * Singleton: One router for entire app
+         * Dependencies: eventBus
+         */
+        router: {
+            implementation: Router,
+            lifetime: ServiceLifetime.SINGLETON,
+            dependencies: ['eventBus']
+        },
 
-    /**
-     * Error Handler - Error management
-     * Singleton: One error handler for entire app
-     */
-    errorHandler: {
-        implementation: errorHandler,
-        lifetime: ServiceLifetime.SINGLETON,
-        dependencies: []
-    },
+        /**
+         * Error Handler - Error management
+         * Singleton: One error handler for entire app
+         */
+        errorHandler: {
+            implementation: errorHandler,
+            lifetime: ServiceLifetime.SINGLETON,
+            dependencies: []
+        },
 
-    // ===== Business Services =====
+        // ===== Business Services =====
 
-    /**
-     * Player Service - Player management
-     * Singleton: One player service
-     * Dependencies: stateManager, eventBus, eloService
-     */
-    playerService: {
-        implementation: PlayerService,
-        lifetime: ServiceLifetime.SINGLETON,
-        dependencies: ['stateManager', 'eventBus', 'eloService']
-    },
+        /**
+         * ELO Service - Rating calculations
+         * Singleton: Stateless service, can be singleton
+         * Dependencies: activityConfig (for position weights)
+         */
+        eloService: {
+            implementation: EloService,
+            lifetime: ServiceLifetime.SINGLETON,
+            dependencies: [],
+            factory: () => new EloService(activityConfig)
+        },
 
-    /**
-     * ELO Service - Rating calculations
-     * Singleton: Stateless service, can be singleton
-     */
-    eloService: {
-        implementation: EloService,
-        lifetime: ServiceLifetime.SINGLETON,
-        dependencies: []
-    },
+        /**
+         * Player Service - Player management
+         * Singleton: One player service
+         * Dependencies: activityConfig, stateManager, eventBus, eloService
+         */
+        playerService: {
+            implementation: PlayerService,
+            lifetime: ServiceLifetime.SINGLETON,
+            dependencies: ['stateManager', 'eventBus', 'eloService'],
+            factory: (deps) => new PlayerService(
+                activityConfig,
+                deps.stateManager,
+                deps.eventBus,
+                deps.eloService
+            )
+        },
 
-    /**
-     * Comparison Service - Player comparisons
-     * Singleton: One comparison service
-     * Dependencies: playerService, eloService, eventBus
-     */
-    comparisonService: {
-        implementation: ComparisonService,
-        lifetime: ServiceLifetime.SINGLETON,
-        dependencies: ['playerService', 'eloService', 'eventBus']
-    },
+        /**
+         * Comparison Service - Player comparisons
+         * Singleton: One comparison service
+         * Dependencies: activityConfig, playerService, eloService, eventBus
+         */
+        comparisonService: {
+            implementation: ComparisonService,
+            lifetime: ServiceLifetime.SINGLETON,
+            dependencies: ['playerService', 'eloService', 'eventBus'],
+            factory: (deps) => new ComparisonService(
+                activityConfig,
+                deps.playerService,
+                deps.eloService,
+                deps.eventBus
+            )
+        },
 
-    /**
-     * Team Optimizer Service - Team generation
-     * Singleton: Stateless service
-     * Dependencies: eloService
-     */
-    teamOptimizerService: {
-        implementation: TeamOptimizerService,
-        lifetime: ServiceLifetime.SINGLETON,
-        dependencies: ['eloService']
-    }
-};
+        /**
+         * Team Optimizer Service - Team generation
+         * Singleton: Stateless service
+         * Dependencies: activityConfig, eloService
+         */
+        teamOptimizerService: {
+            implementation: TeamOptimizerService,
+            lifetime: ServiceLifetime.SINGLETON,
+            dependencies: ['eloService'],
+            factory: (deps) => new TeamOptimizerService(
+                activityConfig,
+                deps.eloService
+            )
+        }
+    };
+}
+
+// Backwards compatibility: export serviceConfig as empty object
+// Applications should now call createServiceConfig(activityConfig)
+export const serviceConfig = {};
 
 /**
  * Initialize service registry
  * Creates and configures the global service registry
  *
+ * @param {Object} activityConfig - Activity configuration (positions, weights, etc.)
  * @returns {ServiceRegistry} Configured registry
  */
-export function initializeServices() {
-    const registry = createRegistry(serviceConfig);
+export function initializeServices(activityConfig) {
+    if (!activityConfig) {
+        throw new Error('Activity configuration is required. Import from config/activities/');
+    }
+
+    console.log(`[Services] Initializing with activity: ${activityConfig.name || 'Unknown'}`);
+
+    const config = createServiceConfig(activityConfig);
+    const registry = createRegistry(config);
 
     // Validate configuration
     const validation = registry.validate();
@@ -164,6 +199,7 @@ export function getServiceGraph(registry) {
 
 export default {
     serviceConfig,
+    createServiceConfig,
     initializeServices,
     getServiceGraph
 };

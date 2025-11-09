@@ -3,27 +3,14 @@
 /**
  * Application Constants
  *
- * IMPORTANT: Rating-related constants have been moved to config/rating.js
- * IMPORTANT: Position constants should use config/volleyball.js
+ * IMPORTANT: Rating-related constants are in config/rating.js
+ * IMPORTANT: Activity-specific constants (positions, etc.) are in config/activities/
  */
 
 import ratingConfig from '../config/rating.js';
 
 export const APP_VERSION = '4.0.0';
-export const APP_NAME = 'VolleyRank';
-
-// DEPRECATED: Use volleyballConfig.positions from config/volleyball.js instead
-// These constants are kept for backwards compatibility only
-// Import: import volleyballConfig from '../config/volleyball.js';
-export const POSITIONS = {
-    S: 'Setter',
-    OPP: 'Opposite',
-    OH: 'Outside Hitter',
-    MB: 'Middle Blocker',
-    L: 'Libero'
-};
-
-export const POSITION_KEYS = Object.keys(POSITIONS);
+export const APP_NAME = 'TeamBuilding';
 
 // Rating constants - imported from centralized config
 // DEPRECATED: Import directly from config/rating.js instead
@@ -80,8 +67,6 @@ export const VALIDATION = {
 export default {
     APP_VERSION,
     APP_NAME,
-    POSITIONS,
-    POSITION_KEYS,
     DEFAULT_RATING,
     ROUTES,
     STORAGE_KEYS,

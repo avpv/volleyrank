@@ -4,23 +4,26 @@
  * TeamsPage - Team builder page
  */
 import BasePage from './BasePage.js';
-import playerService from '../services/PlayerService.js';
-import teamOptimizerService from '../services/TeamOptimizerService.js';
-import eloService from '../services/EloService.js';
 import toast from '../components/base/Toast.js';
 import { getIcon } from '../components/base/Icons.js';
-import volleyballConfig from '../config/volleyball.js';
 
 class TeamsPage extends BasePage {
-    constructor(container) {
-        super(container);
+    constructor(container, props = {}) {
+        super(container, props);
         this.setTitle('Teams');
+
+        // Get services from props
+        this.activityConfig = props.activityConfig;
+        this.this.playerService = props.services?.resolve('this.playerService');
+        this.this.teamOptimizerService = props.services?.resolve('this.teamOptimizerService');
+        this.this.eloService = props.services?.resolve('this.eloService');
+
         this.state = {
             teams: null,
             isOptimizing: false,
             showEloRatings: true,
             teamCount: 2,
-            composition: volleyballConfig.defaultComposition
+            composition: this.activityConfig.defaultComposition
         };
     }
 
@@ -51,7 +54,7 @@ class TeamsPage extends BasePage {
     }
 
     renderTeamBuilder() {
-        const players = playerService.getAll();
+        const players = this.playerService.getAll();
 
         return `
             <div class="team-builder">
@@ -91,7 +94,7 @@ class TeamsPage extends BasePage {
 
     renderCompositionInputs() {
         // Use positions from team-optimizer for consistency
-        return Object.entries(volleyballConfig.positions).map(([key, name]) => `
+        return Object.entries(this.activityConfig.positions).map(([key, name]) => `
             <div class="composition-item">
                 <label>${name}</label>
                 <input 
@@ -145,7 +148,7 @@ class TeamsPage extends BasePage {
     }
 
     renderTeam(team, index) {
-        const strength = eloService.calculateTeamStrength(team, true);
+        const strength = this.eloService.calculateTeamStrength(team, true);
         const showElo = this.state.showEloRatings;
 
         return `
@@ -169,7 +172,7 @@ class TeamsPage extends BasePage {
     renderTeamPlayer(player, showElo) {
         const position = player.assignedPosition;
         const rating = Math.round(player.positionRating);
-        const posName = playerService.positions[position];
+        const posName = this.playerService.positions[position];
 
         return `
             <div class="team-player">
@@ -247,7 +250,7 @@ class TeamsPage extends BasePage {
     }
 
     getComposition() {
-        const positions = volleyballConfig.positionOrder;
+        const positions = this.activityConfig.positionOrder;
         const composition = {};
 
         positions.forEach(pos => {
@@ -266,7 +269,7 @@ class TeamsPage extends BasePage {
 
             const teamCount = this.state.teamCount;
             const composition = this.getComposition();
-            const players = playerService.getAll();
+            const players = this.playerService.getAll();
 
             // Validate
             if (Object.values(composition).every(v => v === 0)) {
@@ -279,7 +282,7 @@ class TeamsPage extends BasePage {
             toast.info('Optimizing teams... This may take a moment', 10000);
 
             // Optimize (async)
-            const result = await teamOptimizerService.optimize(
+            const result = await this.teamOptimizerService.optimize(
                 composition,
                 teamCount,
                 players
@@ -315,7 +318,7 @@ class TeamsPage extends BasePage {
             teams.forEach((team, teamIndex) => {
                 team.forEach(player => {
                     const position = player.assignedPosition;
-                    const posName = playerService.positions[position];
+                    const posName = this.playerService.positions[position];
                     const rating = Math.round(player.positionRating);
                     
                     const row = [

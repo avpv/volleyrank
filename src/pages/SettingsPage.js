@@ -4,18 +4,21 @@
  * SettingsPage - Player management
  */
 import BasePage from './BasePage.js';
-import playerService from '../services/PlayerService.js';
 import stateManager from '../core/StateManager.js';
 import storage from '../core/StorageAdapter.js';
 import toast from '../components/base/Toast.js';
 import Modal from '../components/base/Modal.js';
 import { getIcon } from '../components/base/Icons.js';
-import volleyballConfig from '../config/volleyball.js';
 
 class SettingsPage extends BasePage {
-    constructor(container) {
-        super(container);
+    constructor(container, props = {}) {
+        super(container, props);
         this.setTitle('Settings');
+
+        // Get services from props
+        this.activityConfig = props.activityConfig;
+        this.this.playerService = props.services?.resolve('this.playerService');
+
         this.selectedPositions = [];
         this.importModal = null;
     }
@@ -47,8 +50,8 @@ class SettingsPage extends BasePage {
     }
 
     render() {
-        const players = playerService.getAll();
-        const stats = playerService.getPositionStats();
+        const players = this.playerService.getAll();
+        const stats = this.playerService.getPositionStats();
 
         return this.renderPage(`
             <div class="page-header">
@@ -141,7 +144,7 @@ class SettingsPage extends BasePage {
     }
 
     renderPositionCheckboxes() {
-        const positions = playerService.positions;
+        const positions = this.playerService.positions;
         
         return Object.entries(positions).map(([key, name]) => `
             <label class="position-checkbox">
@@ -175,7 +178,7 @@ class SettingsPage extends BasePage {
         }
 
         const sorted = [...players].sort((a, b) => {
-            const posOrder = volleyballConfig.positionOrder;
+            const posOrder = this.activityConfig.positionOrder;
             const aPos = a.positions[0];
             const bPos = b.positions[0];
             const diff = posOrder.indexOf(aPos) - posOrder.indexOf(bPos);
@@ -196,7 +199,7 @@ class SettingsPage extends BasePage {
         const positions = player.positions.map(pos => {
             const rating = Math.round(player.ratings[pos]);
             const comparisons = player.comparisons[pos];
-            const name = playerService.positions[pos];
+            const name = this.playerService.positions[pos];
             
             return `
                 <div class="position-badge">
@@ -301,7 +304,7 @@ class SettingsPage extends BasePage {
         }
 
         try {
-            playerService.add(name, positions);
+            this.playerService.add(name, positions);
             
             // Reset form
             nameInput.value = '';
@@ -324,9 +327,9 @@ class SettingsPage extends BasePage {
                     break;
                     
                 case 'remove':
-                    const player = playerService.getById(playerId);
+                    const player = this.playerService.getById(playerId);
                     if (confirm(`Remove ${player.name}?`)) {
-                        playerService.remove(playerId);
+                        this.playerService.remove(playerId);
                     }
                     break;
             }
@@ -337,7 +340,7 @@ class SettingsPage extends BasePage {
 
     // ===== MODAL: Edit Positions =====
     showEditPositionsModal(playerId) {
-        const player = playerService.getById(playerId);
+        const player = this.playerService.getById(playerId);
         if (!player) {
             toast.error('Player not found');
             return;
@@ -357,7 +360,7 @@ class SettingsPage extends BasePage {
                     return false;
                 }
                 try {
-                    playerService.updatePositions(playerId, selected);
+                    this.playerService.updatePositions(playerId, selected);
                     toast.success(`Positions updated for ${player.name}`);
                     return true;
                 } catch (error) {
@@ -378,7 +381,7 @@ class SettingsPage extends BasePage {
                 <div class="form-group">
                     <label>Positions (select all applicable):</label>
                     <div class="positions-grid">
-                        ${Object.entries(playerService.positions).map(([key, name]) => `
+                        ${Object.entries(this.playerService.positions).map(([key, name]) => `
                             <label class="position-checkbox">
                                 <input 
                                     type="checkbox" 
@@ -397,7 +400,7 @@ class SettingsPage extends BasePage {
 
     // ===== MODAL: Reset Player =====
     showResetPlayerModal(playerId) {
-        const player = playerService.getById(playerId);
+        const player = this.playerService.getById(playerId);
         if (!player) {
             toast.error('Player not found');
             return;
@@ -417,8 +420,8 @@ class SettingsPage extends BasePage {
                     return false;
                 }
                 try {
-                    playerService.resetPositions(playerId, selected);
-                    const posNames = selected.map(p => playerService.positions[p]).join(', ');
+                    this.playerService.resetPositions(playerId, selected);
+                    const posNames = selected.map(p => this.playerService.positions[p]).join(', ');
                     toast.success(`Reset ${posNames} for ${player.name}`);
                     return true;
                 } catch (error) {
@@ -451,7 +454,7 @@ class SettingsPage extends BasePage {
                                         checked
                                     >
                                     <span class="position-label">
-                                        ${playerService.positions[pos]}
+                                        ${this.playerService.positions[pos]}
                                         <span class="position-stats-inline">(${rating} ELO, ${comparisons} comp.)</span>
                                     </span>
                                 </label>
@@ -471,7 +474,7 @@ class SettingsPage extends BasePage {
 
     // ===== MODAL: Reset All =====
     showResetAllModal() {
-        const players = playerService.getAll();
+        const players = this.playerService.getAll();
         if (players.length === 0) {
             toast.error('No players to reset');
             return;
@@ -491,8 +494,8 @@ class SettingsPage extends BasePage {
                     return false;
                 }
                 try {
-                    playerService.resetAllPositions(selected);
-                    const posNames = selected.map(p => playerService.positions[p]).join(', ');
+                    this.playerService.resetAllPositions(selected);
+                    const posNames = selected.map(p => this.playerService.positions[p]).join(', ');
                     toast.success(`Reset ${posNames} for all players`);
                     return true;
                 } catch (error) {
@@ -508,14 +511,14 @@ class SettingsPage extends BasePage {
     }
 
     renderResetAllContent() {
-        const stats = playerService.getPositionStats();
+        const stats = this.playerService.getPositionStats();
         
         return `
             <div class="modal-content-inner">
                 <div class="form-group">
                     <label>Select positions to reset for ALL players:</label>
                     <div class="positions-grid">
-                        ${Object.entries(playerService.positions)
+                        ${Object.entries(this.playerService.positions)
                             .filter(([pos]) => stats[pos].count > 0)
                             .map(([pos, name]) => {
                                 const posStats = stats[pos];
@@ -745,7 +748,7 @@ class SettingsPage extends BasePage {
             let imported = 0, skipped = 0;
             players.forEach(playerData => {
                 try {
-                    playerService.add(playerData.name, playerData.positions);
+                    this.playerService.add(playerData.name, playerData.positions);
                     imported++;
                 } catch (error) {
                     skipped++;

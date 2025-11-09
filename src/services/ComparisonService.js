@@ -4,19 +4,23 @@
  * ComparisonService - Player comparison logic
  * Handles finding pairs and processing comparisons
  */
-import stateManager from '../core/StateManager.js';
-import eventBus from '../core/EventBus.js';
-import playerService from './PlayerService.js';
-import eloService from './EloService.js';
-import volleyballConfig from '../config/volleyball.js';
 
 class ComparisonService {
+    constructor(activityConfig, this.playerService, this.eloService, this.eventBus) {
+        // Store dependencies
+        this.config = activityConfig;
+        this.this.playerService = this.playerService;
+        this.this.eloService = this.eloService;
+        this.this.eventBus = this.eventBus;
+        this.this.stateManager = this.playerService.this.stateManager; // Get this.stateManager from this.playerService
+    }
+
     /**
      * Find next pair for comparison at position
      * Deterministic - returns same pair for same state
      */
     findNextPair(position) {
-        const players = playerService.getByPosition(position);
+        const players = this.this.playerService.getByPosition(position);
         
         if (players.length < 2) {
             return null;
@@ -75,7 +79,7 @@ class ComparisonService {
      * Check if position is ready for comparisons
      */
     checkStatus(position) {
-        const players = playerService.getByPosition(position);
+        const players = this.playerService.getByPosition(position);
         
         if (players.length < 2) {
             return {
@@ -112,7 +116,7 @@ class ComparisonService {
             throw new Error('Cannot compare a player with themselves');
         }
 
-        const state = stateManager.getState();
+        const state = this.stateManager.getState();
         const winner = state.players.find(p => p.id === winnerId);
         const loser = state.players.find(p => p.id === loserId);
 
@@ -131,10 +135,10 @@ class ComparisonService {
         }
 
         // Get pool size for fair K-factor adjustment
-        const poolSize = playerService.getByPosition(position).length;
+        const poolSize = this.playerService.getByPosition(position).length;
 
         // Calculate rating changes with pool-adjusted K-factor
-        const changes = eloService.calculateRatingChange(winner, loser, position, poolSize);
+        const changes = this.eloService.calculateRatingChange(winner, loser, position, poolSize);
 
         // Update players
         const updatedPlayers = state.players.map(p => {
@@ -181,7 +185,7 @@ class ComparisonService {
         });
 
         // Update state
-        stateManager.setState({
+        this.stateManager.setState({
             players: updatedPlayers,
             comparisons: state.comparisons + 1
         });
@@ -193,7 +197,7 @@ class ComparisonService {
             changes
         };
 
-        eventBus.emit('comparison:completed', result);
+        this.eventBus.emit('comparison:completed', result);
         
         return result;
     }
@@ -202,7 +206,7 @@ class ComparisonService {
      * Get comparison progress for position
      */
     getProgress(position) {
-        const players = playerService.getByPosition(position);
+        const players = this.playerService.getByPosition(position);
         
         if (players.length < 2) {
             return {
@@ -242,7 +246,7 @@ class ComparisonService {
      * Get all position progress
      */
     getAllProgress() {
-        const positions = volleyballConfig.positionOrder;
+        const positions = this.config.positionOrder;
         const progress = {};
 
         positions.forEach(pos => {
@@ -256,7 +260,7 @@ class ComparisonService {
      * Reset all comparisons for positions
      */
     resetAll(positions) {
-        const state = stateManager.getState();
+        const state = this.stateManager.getState();
         
         const updatedPlayers = state.players.map(player => {
             const updated = { ...player };
@@ -274,7 +278,7 @@ class ComparisonService {
 
         // Recalculate total comparisons
         let totalComparisons = 0;
-        const allPositions = volleyballConfig.positionOrder;
+        const allPositions = this.config.positionOrder;
         const nonResetPositions = allPositions.filter(p => !positions.includes(p));
         
         updatedPlayers.forEach(player => {
@@ -286,16 +290,16 @@ class ComparisonService {
         });
         totalComparisons = Math.floor(totalComparisons / 2);
 
-        stateManager.setState({
+        this.stateManager.setState({
             players: updatedPlayers,
             comparisons: totalComparisons
         });
 
-        eventBus.emit('comparison:reset-all', {
+        this.eventBus.emit('comparison:reset-all', {
             positions,
             playersAffected: updatedPlayers.length
         });
     }
 }
 
-export default new ComparisonService();
+export default ComparisonService;
