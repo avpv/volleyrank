@@ -15,6 +15,45 @@
    Settings Page - Player Management
    ============================================================================= */
 
+/* Activity Selector Section */
+.activity-selector-section {
+    background-color: var(--color-surface-raised);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-6);
+    margin-bottom: var(--spacing-6);
+}
+
+.activity-select {
+    width: 100%;
+    max-width: 400px;
+    padding: var(--spacing-3);
+    font-size: var(--font-size-base);
+    color: var(--color-text-primary);
+    background-color: var(--color-surface-default);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.activity-select:hover {
+    border-color: var(--color-primary);
+}
+
+.activity-select:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-help-text {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    margin-top: var(--spacing-2);
+    margin-bottom: 0;
+}
+
 .add-player-section {
     background-color: var(--color-surface-raised);
     border: 1px solid var(--color-border-default);
