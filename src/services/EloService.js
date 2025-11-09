@@ -1,6 +1,5 @@
 // src/services/EloService.js
 
-import volleyballConfig from '../config/volleyball.js';
 import ratingConfig from '../config/rating.js';
 
 /**
@@ -11,7 +10,10 @@ import ratingConfig from '../config/rating.js';
  * from rating.js, ensuring consistency across the application.
  */
 class EloService {
-    constructor() {
+    constructor(activityConfig) {
+        // Store activity config
+        this.config = activityConfig;
+
         // Import rating constants from centralized config
         this.DEFAULT_RATING = ratingConfig.RATING_CONSTANTS.DEFAULT;
         this.BASE_K_FACTOR = ratingConfig.K_FACTORS.BASE;
@@ -31,9 +33,9 @@ class EloService {
         this.CONFIDENCE_LEVELS = ratingConfig.CONFIDENCE_LEVELS;
 
         // Position weights for team optimization
-        // Imported from team-optimizer library to ensure consistency
+        // Imported from activity config to ensure consistency
         // Reflects the impact each position has on team balance
-        this.POSITION_WEIGHTS = volleyballConfig.positionWeights;
+        this.POSITION_WEIGHTS = activityConfig.positionWeights;
     }
 
     /**
@@ -470,4 +472,4 @@ class EloService {
     }
 }
 
-export default new EloService();
+export default EloService;

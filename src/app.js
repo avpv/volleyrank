@@ -30,8 +30,9 @@ import stateManager from './core/StateManager.js';
 import toast from './components/base/Toast.js';
 import redirectModule from './redirect.js';
 import { getIcon } from './components/base/Icons.js';
-import volleyballConfig from './config/volleyball.js';
+import { defaultActivity } from './config/activities/index.js';
 import { escapeHtml } from './utils/stringUtils.js';
+import { initializeServices } from './config/services.js';
 
 // Page imports
 import SettingsPage from './pages/SettingsPage.js';
@@ -46,10 +47,10 @@ import TeamsPage from './pages/TeamsPage.js';
 const APP_CONFIG = {
     /** @property {string} Application version */
     VERSION: '4.0.0',
-    
-    /** @property {string} Application name */
-    NAME: 'VolleyRank',
-    
+
+    /** @property {string} Base application name */
+    NAME: 'TeamBalance',
+
     /** @property {number} Welcome toast duration (ms) */
     WELCOME_TOAST_DURATION: 5000
 };
@@ -73,16 +74,20 @@ const APP_CONFIG = {
 class Application {
     /**
      * Initialize application instance
-     * 
+     *
      * Sets up initial state and prepares for bootstrap.
      * Does not perform any async operations or side effects.
-     * 
+     *
      * @constructor
+     * @param {Object} activityConfig - Activity configuration (positions, weights, composition)
      */
-    constructor() {
+    constructor(activityConfig = defaultActivity) {
+        /** @private {Object} Activity configuration */
+        this.activityConfig = activityConfig;
+
         /** @private {BasePage|null} Current active page instance */
         this.currentPage = null;
-        
+
         /** @private {string|null} Initial path from 404 redirect */
         this.initialPath = null;
     }
@@ -110,11 +115,16 @@ class Application {
     async init() {
         try {
             console.log(`[INIT] Initializing ${APP_CONFIG.NAME} v${APP_CONFIG.VERSION}...`);
+            console.log(`[INIT] Activity: ${this.activityConfig.name}`);
 
-            // Step 1: Handle GitHub Pages 404 redirect
+            // Step 1: Initialize services with activity config
+            this.services = initializeServices(this.activityConfig);
+            console.log('[OK] Services initialized');
+
+            // Step 2: Handle GitHub Pages 404 redirect
             this.handleRedirect();
 
-            // Step 2: Load persisted application state
+            // Step 3: Load persisted application state
             const loaded = stateManager.load();
             if (loaded) {
                 console.log('[OK] State loaded from storage');
@@ -330,9 +340,13 @@ class Application {
         // Step 4: Create new page instance
         console.log('[CREATE] Creating new page instance:', PageClass.name);
         let page;
-        
+
         try {
-            page = new PageClass(container);
+            // Pass activity config and services to all pages via props
+            page = new PageClass(container, {
+                activityConfig: this.activityConfig,
+                services: this.services
+            });
         } catch (error) {
             console.error('[ERROR] Error creating page:', error);
             container.innerHTML = `
@@ -572,21 +586,14 @@ class Application {
      *
      * Converts position codes to full display names.
      * Used throughout the application for consistent display.
-     * Uses positions from team-optimizer for consistency.
-     *
-     * Position Mapping:
-     * - S: Setter
-     * - OPP: Opposite
-     * - OH: Outside Hitter
-     * - MB: Middle Blocker
-     * - L: Libero
+     * Uses positions from activity config for consistency.
      *
      * @private
-     * @param {string} pos - Position code (S, OPP, OH, MB, L)
+     * @param {string} pos - Position code
      * @returns {string} Position full name or original code if unknown
      */
     getPositionName(pos) {
-        return volleyballConfig.positions[pos] || pos;
+        return this.activityConfig.positions[pos] || pos;
     }
 
     /**

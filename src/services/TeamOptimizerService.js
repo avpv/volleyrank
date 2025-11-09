@@ -1,23 +1,27 @@
 // src/services/TeamOptimizerService.js
 
 /**
- * Volleyball Team Optimizer Service
+ * Team Optimizer Service
  * Wrapper around team-optimizer library
+ * Activity-agnostic - works with any activity configuration
  */
 
-import { TeamOptimizerService } from '../lib/team-optimizer/src/index.js';
-import volleyballConfig from '../config/volleyball.js';
+import { TeamOptimizerService as LibraryTeamOptimizer } from '../lib/team-optimizer/src/index.js';
 
 
-class VolleyballOptimizerService {
-    constructor() {
-        // Initialize optimizer with volleyball config
+class TeamOptimizerServiceWrapper {
+    constructor(activityConfig, eloService) {
+        // Store dependencies
+        this.activityConfig = activityConfig;
+        this.eloService = eloService;
+
+        // Initialize optimizer with activity config
         // No custom evaluation needed - EvaluationService uses the same player.ratings[position] data
-        this.optimizer = new TeamOptimizerService(volleyballConfig);
+        this.optimizer = new LibraryTeamOptimizer(activityConfig);
 
         // Expose positions for backward compatibility
-        this.positions = volleyballConfig.positions;
-        this.positionOrder = volleyballConfig.positionOrder;
+        this.positions = activityConfig.positions;
+        this.positionOrder = activityConfig.positionOrder;
 
         // Expose config for external access
         this.config = this.optimizer.config;
@@ -59,4 +63,4 @@ class VolleyballOptimizerService {
     }
 }
 
-export default new VolleyballOptimizerService();
+export default TeamOptimizerServiceWrapper;

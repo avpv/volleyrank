@@ -4,14 +4,18 @@
  * ComparePage - Player comparison page
  */
 import BasePage from './BasePage.js';
-import playerService from '../services/PlayerService.js';
-import comparisonService from '../services/ComparisonService.js';
 import toast from '../components/base/Toast.js';
 
 class ComparePage extends BasePage {
-    constructor(container) {
-        super(container);
+    constructor(container, props = {}) {
+        super(container, props);
         this.setTitle('Compare');
+
+        // Get services from props
+        this.activityConfig = props.activityConfig;
+        this.this.playerService = props.services?.resolve('this.playerService');
+        this.this.comparisonService = props.services?.resolve('this.comparisonService');
+
         this.selectedPosition = '';
         this.currentPair = null;
     }
@@ -51,7 +55,7 @@ class ComparePage extends BasePage {
     }
 
     renderPositionSelector() {
-        const positions = playerService.positions;
+        const positions = this.playerService.positions;
         
         return `
             <div class="position-selector">
@@ -69,8 +73,8 @@ class ComparePage extends BasePage {
     }
 
     renderProgressBars() {
-        const progress = comparisonService.getAllProgress();
-        const positions = playerService.positions;
+        const progress = this.comparisonService.getAllProgress();
+        const positions = this.playerService.positions;
 
         return `
             <div class="progress-section">
@@ -78,7 +82,7 @@ class ComparePage extends BasePage {
                 <div class="progress-bars">
                     ${Object.entries(positions).map(([key, name]) => {
                         const prog = progress[key];
-                        const players = playerService.getByPosition(key);
+                        const players = this.playerService.getByPosition(key);
                         
                         if (players.length < 2) {
                             return `
@@ -121,7 +125,7 @@ class ComparePage extends BasePage {
             return this.renderEmpty('Select a position to start comparing players');
         }
 
-        const status = comparisonService.checkStatus(this.selectedPosition);
+        const status = this.comparisonService.checkStatus(this.selectedPosition);
         
         if (!status.canCompare) {
             return `
@@ -155,7 +159,7 @@ class ComparePage extends BasePage {
             `;
         }
         
-        const posName = playerService.positions[this.selectedPosition];
+        const posName = this.playerService.positions[this.selectedPosition];
 
         return `
             <div class="comparison-area">
@@ -195,8 +199,8 @@ class ComparePage extends BasePage {
             return '';
         }
 
-        const progress = comparisonService.getProgress(this.selectedPosition);
-        const posName = playerService.positions[this.selectedPosition];
+        const progress = this.comparisonService.getProgress(this.selectedPosition);
+        const posName = this.playerService.positions[this.selectedPosition];
         const isComplete = progress.percentage === 100;
 
         return `
@@ -252,13 +256,13 @@ class ComparePage extends BasePage {
             return;
         }
 
-        const status = comparisonService.checkStatus(this.selectedPosition);
+        const status = this.comparisonService.checkStatus(this.selectedPosition);
         this.currentPair = status.canCompare ? status.nextPair : null;
     }
 
     handleComparison(winnerId, loserId) {
         try {
-            comparisonService.processComparison(winnerId, loserId, this.selectedPosition);
+            this.comparisonService.processComparison(winnerId, loserId, this.selectedPosition);
         } catch (error) {
             toast.error(error.message);
         }

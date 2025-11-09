@@ -4,12 +4,15 @@
  * RankingsPage - Player rankings by position
  */
 import BasePage from './BasePage.js';
-import playerService from '../services/PlayerService.js';
 
 class RankingsPage extends BasePage {
-    constructor(container) {
-        super(container);
+    constructor(container, props = {}) {
+        super(container, props);
         this.setTitle('Rankings');
+
+        // Get services from props
+        this.activityConfig = props.activityConfig;
+        this.this.playerService = props.services?.resolve('this.playerService');
     }
 
     onCreate() {
@@ -20,8 +23,8 @@ class RankingsPage extends BasePage {
     }
 
     render() {
-        const rankings = playerService.getRankings();
-        const positions = playerService.positions;
+        const rankings = this.playerService.getRankings();
+        const positions = this.playerService.positions;
 
         return this.renderPage(`
             <div class="page-header">
