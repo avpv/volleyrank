@@ -388,6 +388,7 @@ class Application {
                     <div class="error-icon">${getIcon('alert', { size: 48, color: 'var(--color-warning, #f59e0b)' })}</div>
                     <p>Failed to load page: ${this.escape(error.message)}</p>
                     <button onclick="location.reload()" class="btn btn-primary">
+                        ${getIcon('refresh', { size: 16, className: 'btn-icon' })}
                         Reload Page
                     </button>
                 </div>
@@ -591,6 +592,7 @@ class Application {
                     <p>Failed to load ${APP_CONFIG.NAME}</p>
                     <p class="error-message">${this.escape(error.message)}</p>
                     <button onclick="location.reload()" class="btn btn-primary">
+                        ${getIcon('refresh', { size: 16, className: 'btn-icon' })}
                         Reload Page
                     </button>
                 </div>

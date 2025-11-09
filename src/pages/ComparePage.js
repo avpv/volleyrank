@@ -5,6 +5,7 @@
  */
 import BasePage from './BasePage.js';
 import toast from '../components/base/Toast.js';
+import { getIcon } from '../components/base/Icons.js';
 
 class ComparePage extends BasePage {
     constructor(container, props = {}) {
@@ -181,6 +182,7 @@ class ComparePage extends BasePage {
                     <div class="vs-divider">
                         <div class="vs-text">VS</div>
                         <button class="draw-button" id="drawButton" data-player1-id="${player1.id}" data-player2-id="${player2.id}">
+                            ${getIcon('shuffle', { size: 16, className: 'btn-icon' })}
                             Draw
                         </button>
                     </div>
