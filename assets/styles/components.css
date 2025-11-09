@@ -274,6 +274,66 @@ select.form-control {
     box-shadow: 0 0 0 3px rgba(47, 129, 247, 0.1);
 }
 
+/* Composition Table */
+.composition-table {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2);
+}
+
+.composition-table-header {
+    display: grid;
+    grid-template-columns: 1fr 100px 100px;
+    gap: var(--spacing-3);
+    padding: var(--spacing-2) var(--spacing-3);
+    background-color: var(--color-surface-raised);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--spacing-2);
+}
+
+.composition-header-cell {
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: var(--letter-spacing-wide);
+    text-align: center;
+}
+
+.composition-header-cell.position-cell {
+    text-align: left;
+}
+
+.composition-row {
+    display: grid;
+    grid-template-columns: 1fr 100px 100px;
+    gap: var(--spacing-3);
+    align-items: center;
+    padding: var(--spacing-2) var(--spacing-3);
+    background-color: var(--color-bg-primary);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-md);
+    transition: var(--transition-default);
+}
+
+.composition-row:hover {
+    border-color: var(--color-border-strong);
+    background-color: var(--color-surface-raised);
+}
+
+.composition-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.composition-cell.position-name {
+    justify-content: flex-start;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-primary);
+}
+
 /* Position Checkboxes */
 .positions-grid {
     display: grid;
@@ -1199,8 +1259,24 @@ select.form-control {
     .team-count-input,
     .composition-input,
     .weight-input {
-        width: 70px;
+        width: 60px;
+        padding: var(--spacing-1) var(--spacing-2);
+        font-size: var(--font-size-sm);
+    }
+
+    .composition-table-header,
+    .composition-row {
+        grid-template-columns: 1fr 70px 70px;
+        gap: var(--spacing-2);
         padding: var(--spacing-2);
+    }
+
+    .composition-header-cell {
+        font-size: 10px;
+    }
+
+    .composition-cell.position-name {
+        font-size: var(--font-size-xs);
     }
 
     .accordion-header {
