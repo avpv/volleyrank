@@ -63,8 +63,8 @@ class VolleyballOptimizerService {
             }
         });
 
-        return balance + Math.sqrt(variance) * optimizer.config.adaptiveParameters.varianceWeight +
-            positionImbalance * optimizer.config.adaptiveParameters.positionBalanceWeight;
+        return balance + Math.sqrt(variance) * optimizer.adaptiveParameters.varianceWeight +
+            positionImbalance * optimizer.adaptiveParameters.positionBalanceWeight;
     }
 
     /**
