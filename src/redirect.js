@@ -26,15 +26,14 @@
  * Usage:
  * ```javascript
  * // In 404.html (automatic execution)
- * <script type="module" src="/volleyrank/src/redirect.js"></script>
- * 
+ * <script type="module" src="/team-balance/src/redirect.js"></script>
+ *
  * // In app.js (restore path)
  * import redirectModule from './redirect.js';
  * const storedPath = redirectModule.restore();
  * ```
- * 
+ *
  * @module redirect
- * @author VolleyRank Team
  * @version 4.0.0
  * @license MIT
  */
@@ -172,8 +171,8 @@ const PathUtils = {
      * 4. Return normalized path
      * 
      * Examples:
-     * - /volleyrank/teams/ → /teams/
-     * - /volleyrank/compare/ → /compare/
+     * - /team-balance/teams/ → /teams/
+     * - /team-balance/compare/ → /compare/
      * - /teams/ → /teams/
      * 
      * @returns {string} Application path without base URL
