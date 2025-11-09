@@ -145,6 +145,7 @@ class TeamsPage extends BasePage {
         if (!this.state.teams) return '';
 
         const { teams, balance, algorithm } = this.state.teams;
+        const weightedBalance = this.calculateWeightedBalance(teams);
 
         return `
             <div class="teams-result">
@@ -152,9 +153,9 @@ class TeamsPage extends BasePage {
                     <h3>Generated Teams</h3>
                     <div class="result-controls">
                         <label class="toggle-label">
-                            <input 
-                                type="checkbox" 
-                                id="showEloToggle" 
+                            <input
+                                type="checkbox"
+                                id="showEloToggle"
                                 ${this.state.showEloRatings ? 'checked' : ''}
                             >
                             Show ELO Ratings
@@ -167,8 +168,8 @@ class TeamsPage extends BasePage {
                 </div>
 
                 <div class="result-info">
-                    <div class="info-badge ${balance.difference <= 50 ? 'success' : 'warning'}">
-                        Balance: ${balance.difference} ELO difference
+                    <div class="info-badge ${weightedBalance <= 50 ? 'success' : 'warning'}">
+                        Balance: ${weightedBalance} weighted ELO difference
                     </div>
                 </div>
 
@@ -179,8 +180,19 @@ class TeamsPage extends BasePage {
         `;
     }
 
+    calculateWeightedBalance(teams) {
+        if (!teams || teams.length < 2) return 0;
+
+        const weightedRatings = teams.map(team => this.calculateWeightedTeamRating(team));
+        const maxRating = Math.max(...weightedRatings);
+        const minRating = Math.min(...weightedRatings);
+
+        return maxRating - minRating;
+    }
+
     renderTeam(team, index) {
         const strength = this.eloService.calculateTeamStrength(team);
+        const weightedRating = this.calculateWeightedTeamRating(team);
         const showElo = this.state.showEloRatings;
 
         return `
@@ -190,7 +202,7 @@ class TeamsPage extends BasePage {
                 </div>
                 ${showElo ? `
                     <div class="team-rating">
-                        ${strength.totalRating} total ELO (avg ${strength.averageRating})
+                        ${weightedRating} weighted ELO (${strength.totalRating} raw, avg ${strength.averageRating})
                     </div>
                 ` : ''}
 
@@ -199,6 +211,24 @@ class TeamsPage extends BasePage {
                 </div>
             </div>
         `;
+    }
+
+    calculateWeightedTeamRating(team) {
+        if (!team || team.length === 0) return 0;
+
+        let weightedTotal = 0;
+
+        team.forEach(player => {
+            const position = player.assignedPosition || player.positions?.[0];
+            const rating = position && player.ratings?.[position]
+                ? player.ratings[position]
+                : 1500; // DEFAULT_RATING
+
+            const weight = this.state.positionWeights[position] || 1.0;
+            weightedTotal += rating * weight;
+        });
+
+        return Math.round(weightedTotal);
     }
 
     renderTeamPlayer(player, showElo) {
@@ -341,12 +371,15 @@ class TeamsPage extends BasePage {
                     players
                 );
 
+                // Calculate weighted balance for display
+                const weightedBalance = this.calculateWeightedBalance(result.teams);
+
                 this.setState({
                     teams: result,
                     isOptimizing: false
                 });
 
-                toast.success(`Teams created! Balance: ${result.balance.difference} ELO difference`);
+                toast.success(`Teams created! Balance: ${weightedBalance} weighted ELO difference`);
             } finally {
                 // Restore original weights
                 Object.assign(this.activityConfig.positionWeights, originalWeights);
