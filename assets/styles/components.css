@@ -245,7 +245,8 @@ select.form-control {
 
 /* Team Builder Inputs */
 .team-count-input,
-.composition-input {
+.composition-input,
+.weight-input {
     width: 80px;
     padding: var(--spacing-2) var(--spacing-3);
     font-family: inherit;
@@ -260,12 +261,14 @@ select.form-control {
 }
 
 .team-count-input:hover,
-.composition-input:hover {
+.composition-input:hover,
+.weight-input:hover {
     border-color: var(--color-border-strong);
 }
 
 .team-count-input:focus,
-.composition-input:focus {
+.composition-input:focus,
+.weight-input:focus {
     outline: none;
     border-color: var(--color-brand-primary);
     box-shadow: 0 0 0 3px rgba(47, 129, 247, 0.1);
@@ -317,6 +320,65 @@ select.form-control {
     gap: var(--spacing-3);
     margin-top: var(--spacing-6);
     flex-wrap: wrap;
+}
+
+/* =============================================================================
+   Accordion
+   ============================================================================= */
+
+.accordion {
+    margin-bottom: var(--spacing-6);
+}
+
+.accordion-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: var(--spacing-3) var(--spacing-4);
+    font-family: inherit;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-primary);
+    background-color: var(--color-surface-raised);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: var(--transition-default);
+    text-align: left;
+}
+
+.accordion-header:hover {
+    background-color: var(--color-surface-overlay);
+    border-color: var(--color-border-strong);
+}
+
+.accordion-header span {
+    flex: 1;
+}
+
+.accordion-icon {
+    width: 16px;
+    height: 16px;
+    transition: transform var(--transition-default);
+    flex-shrink: 0;
+    color: var(--color-text-secondary);
+}
+
+.accordion-icon.open {
+    transform: rotate(180deg);
+}
+
+.accordion-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+}
+
+.accordion-content.open {
+    max-height: 1000px;
+    padding-top: var(--spacing-4);
+    transition: max-height 0.3s ease-in;
 }
 
 /* Form Sections */
@@ -1135,9 +1197,19 @@ select.form-control {
     }
 
     .team-count-input,
-    .composition-input {
+    .composition-input,
+    .weight-input {
         width: 70px;
         padding: var(--spacing-2);
+    }
+
+    .accordion-header {
+        padding: var(--spacing-2) var(--spacing-3);
+        font-size: var(--font-size-xs);
+    }
+
+    .accordion-content.open {
+        padding-top: var(--spacing-3);
     }
 
     .ranking-item {

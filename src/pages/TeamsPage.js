@@ -30,7 +30,8 @@ class TeamsPage extends BasePage {
             showEloRatings: true,
             teamCount: 2,
             composition: this.activityConfig.defaultComposition,
-            positionWeights: initialWeights
+            positionWeights: initialWeights,
+            weightsAccordionOpen: false
         };
     }
 
@@ -86,10 +87,17 @@ class TeamsPage extends BasePage {
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label>Position Weights (для балансировки команд)</label>
-                    <div class="composition-grid">
-                        ${this.renderPositionWeightInputs()}
+                <div class="accordion">
+                    <button class="accordion-header" id="weightsAccordionBtn" type="button">
+                        <span>Position Weights</span>
+                        <svg class="accordion-icon ${this.state.weightsAccordionOpen ? 'open' : ''}" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M4.427 7.427l3.396 3.396a.25.25 0 00.354 0l3.396-3.396A.25.25 0 0011.396 7H4.604a.25.25 0 00-.177.427z"/>
+                        </svg>
+                    </button>
+                    <div class="accordion-content ${this.state.weightsAccordionOpen ? 'open' : ''}">
+                        <div class="composition-grid">
+                            ${this.renderPositionWeightInputs()}
+                        </div>
                     </div>
                 </div>
 
@@ -324,6 +332,15 @@ class TeamsPage extends BasePage {
         const exportBtn = this.$('#exportTeamsBtn');
         if (exportBtn) {
             exportBtn.addEventListener('click', () => this.handleExport());
+        }
+
+        // Weights accordion toggle
+        const weightsAccordionBtn = this.$('#weightsAccordionBtn');
+        if (weightsAccordionBtn) {
+            weightsAccordionBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.setState({ weightsAccordionOpen: !this.state.weightsAccordionOpen });
+            });
         }
     }
 
