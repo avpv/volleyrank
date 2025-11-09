@@ -3,23 +3,22 @@
 /**
  * Application Bootstrap
  *
- * Main application entry point that initializes the entire VolleyRank SPA.
+ * Main application entry point that initializes the entire SPA.
  * Handles routing, state management, and global event coordination.
- * 
+ *
  * Architecture:
  * - Singleton application instance
  * - Event-driven component communication
  * - Centralized state management
  * - Clean routing with History API
  * - Seamless 404 redirect handling
- * 
+ *
  * @module app
  * @requires core/Router
  * @requires core/EventBus
  * @requires core/StateManager
  * @requires components/base/Toast
  * @requires redirect
- * @author VolleyRank Team
  * @version 4.0.0
  * @license MIT
  */

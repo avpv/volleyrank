@@ -341,7 +341,7 @@ class TeamsPage extends BasePage {
             
             const link = document.createElement('a');
             link.href = url;
-            link.download = `volleyrank-teams-${new Date().toISOString().split('T')[0]}.csv`;
+            link.download = `teams-${new Date().toISOString().split('T')[0]}.csv`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);

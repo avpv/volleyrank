@@ -71,7 +71,7 @@ class SettingsPage extends BasePage {
     renderWelcomeGuide() {
         return `
             <div class="welcome-guide">
-                <h3>Welcome to VolleyRank!</h3>
+                <h3>Welcome to TeamBalance!</h3>
                 <p>Get started in 3 easy steps:</p>
                 <ol>
                     <li><strong>Add players</strong> with their positions below</li>

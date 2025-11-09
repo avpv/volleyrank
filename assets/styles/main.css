@@ -1,23 +1,23 @@
 /**
- * Main Styles - Volleyrank Dark Theme
- * 
- * Volleyrank-inspired design system with:
- * - Volleyrank Dark color palette
+ * Main Styles - Dark Theme
+ *
+ * Modern design system with:
+ * - Dark color palette
  * - Clean, professional interface
  * - Subtle animations and interactions
  * - Optimized for developer experience
- * 
+ *
  * @version 5.1.0
- * @theme Volleyrank Dark
+ * @theme Dark
  */
 
 /* =============================================================================
-   Volleyrank Design Tokens
+   Design Tokens
    ============================================================================= */
 
 :root {
     /* ==========================================================================
-       Volleyrank Dark Color System
+       Dark Color System
        ========================================================================== */
     
     /* Primary Backgrounds */
@@ -46,7 +46,7 @@
     --color-text-inverse: #0d1117;
     --color-text-link: #58a6ff;
     
-    /* Brand Colors - Volleyrank Blue */
+    /* Brand Colors - Blue */
     --color-brand-primary: #2f81f7;
     --color-brand-primary-hover: #58a6ff;
     --color-brand-primary-active: #1f6feb;
@@ -79,7 +79,7 @@
     --gradient-dark: linear-gradient(135deg, #161b22 0%, #0d1117 100%);
     
     /* ==========================================================================
-       Typography - Volleyrank Scale
+       Typography - Scale
        ========================================================================== */
     
     /* Font Families */
@@ -117,7 +117,7 @@
     --letter-spacing-wide: 0.01em;
     
     /* ==========================================================================
-       Spacing - Volleyrank Scale
+       Spacing - Scale
        ========================================================================== */
     
     --spacing-1: 0.25rem;
@@ -204,7 +204,7 @@ body {
     text-rendering: optimizeLegibility;
 }
 
-/* Volleyrank-like background pattern */
+/* Background pattern */
 body::before {
     content: '';
     position: fixed;

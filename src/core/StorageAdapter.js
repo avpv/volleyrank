@@ -5,7 +5,7 @@
  * Provides consistent interface for data persistence
  */
 class StorageAdapter {
-    constructor(prefix = 'volleyrank') {
+    constructor(prefix = 'team-balance') {
         this.prefix = prefix;
         this.cache = new Map();
         this.isAvailable = this.checkAvailability();
@@ -268,7 +268,7 @@ class StorageAdapter {
 }
 
 // Export singleton
-const storage = new StorageAdapter('volleyrank');
+const storage = new StorageAdapter('team-balance');
 export default storage;
 
 // For debugging
