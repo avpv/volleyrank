@@ -1,9 +1,15 @@
 /**
- * Services Configuration
+ * Services Configuration (REFACTORED)
  * Central configuration for dependency injection
  *
  * This file defines all application services and their dependencies,
  * providing a clear picture of the application architecture.
+ *
+ * CHANGES:
+ * - Added PlayerRepository for data access layer
+ * - Added ValidationService for centralized validation
+ * - Updated service dependencies to use repository pattern
+ * - Cleaner separation of concerns
  */
 
 import { ServiceLifetime, createRegistry } from '../core/ServiceRegistry.js';
@@ -15,10 +21,14 @@ import StorageAdapter from '../core/StorageAdapter.js';
 import Router from '../core/Router.js';
 import errorHandler from '../core/ErrorHandler.js';
 
+// Repository layer (NEW)
+import PlayerRepository from '../repositories/PlayerRepository.js';
+
 // Business services
-import PlayerService from '../services/PlayerService.js';
+import ValidationService from '../services/ValidationService.js';
+import PlayerService from '../services/PlayerService.refactored.js';
 import EloService from '../services/EloService.js';
-import ComparisonService from '../services/ComparisonService.js';
+import ComparisonService from '../services/ComparisonService.refactored.js';
 import TeamOptimizerService from '../services/TeamOptimizerService.js';
 
 /**
@@ -84,11 +94,44 @@ export function createServiceConfig(activityConfig) {
             dependencies: []
         },
 
+        // ===== Repository Layer (NEW) =====
+
+        /**
+         * Player Repository - Data access for players
+         * Singleton: One repository instance
+         * Dependencies: stateManager, eventBus
+         *
+         * Purpose: Encapsulate all data access operations
+         * Benefits: Loose coupling, easier testing, single source of truth
+         */
+        playerRepository: {
+            implementation: PlayerRepository,
+            lifetime: ServiceLifetime.SINGLETON,
+            dependencies: ['stateManager', 'eventBus']
+        },
+
+        // ===== Validation Layer (NEW) =====
+
+        /**
+         * Validation Service - Centralized validation
+         * Singleton: Stateless service
+         * Dependencies: activityConfig
+         *
+         * Purpose: Centralize all validation logic
+         * Benefits: Reusability, consistency, easier testing
+         */
+        validationService: {
+            implementation: ValidationService,
+            lifetime: ServiceLifetime.SINGLETON,
+            dependencies: [],
+            factory: () => new ValidationService(activityConfig)
+        },
+
         // ===== Business Services =====
 
         /**
          * ELO Service - Rating calculations
-         * Singleton: Stateless service, can be singleton
+         * Singleton: Stateless service
          * Dependencies: activityConfig (for position weights)
          */
         eloService: {
@@ -99,34 +142,47 @@ export function createServiceConfig(activityConfig) {
         },
 
         /**
-         * Player Service - Player management
+         * Player Service - Player management (REFACTORED)
          * Singleton: One player service
-         * Dependencies: activityConfig, stateManager, eventBus, eloService
+         * Dependencies: activityConfig, playerRepository, validationService, eventBus, eloService
+         *
+         * Changes:
+         * - Now uses PlayerRepository instead of StateManager
+         * - Now uses ValidationService instead of internal validation
+         * - Focused on business logic only
          */
         playerService: {
             implementation: PlayerService,
             lifetime: ServiceLifetime.SINGLETON,
-            dependencies: ['stateManager', 'eventBus', 'eloService'],
+            dependencies: ['playerRepository', 'validationService', 'eventBus', 'eloService'],
             factory: (deps) => new PlayerService(
                 activityConfig,
-                deps.stateManager,
+                deps.playerRepository,
+                deps.validationService,
                 deps.eventBus,
                 deps.eloService
             )
         },
 
         /**
-         * Comparison Service - Player comparisons
+         * Comparison Service - Player comparisons (REFACTORED)
          * Singleton: One comparison service
-         * Dependencies: activityConfig, playerService, eloService, eventBus
+         * Dependencies: activityConfig, playerRepository, validationService, eloService, eventBus
+         *
+         * Changes:
+         * - Now uses PlayerRepository instead of StateManager
+         * - Now uses ValidationService for input validation
+         * - Split long methods into smaller focused methods
+         * - Better separation of concerns
          */
         comparisonService: {
             implementation: ComparisonService,
             lifetime: ServiceLifetime.SINGLETON,
-            dependencies: ['playerService', 'eloService', 'eventBus'],
+            dependencies: ['playerRepository', 'validationService', 'eloService', 'eventBus'],
             factory: (deps) => new ComparisonService(
                 activityConfig,
-                deps.playerService,
+                deps.playerRepository,
+                deps.validationService,
                 deps.eloService,
                 deps.eventBus
             )
@@ -182,6 +238,13 @@ export function initializeServices(activityConfig) {
 
     console.log('[Services] Initialized successfully');
     console.log('[Services] Available services:', registry.getServiceNames());
+
+    // Log architecture improvements
+    console.log('[Services] Architecture improvements:');
+    console.log('  ✓ Repository pattern for data access');
+    console.log('  ✓ Centralized validation service');
+    console.log('  ✓ Improved separation of concerns');
+    console.log('  ✓ Better testability and maintainability');
 
     return registry;
 }

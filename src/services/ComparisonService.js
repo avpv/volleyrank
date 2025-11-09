@@ -1,27 +1,54 @@
-// src/services/ComparisonService.js
+// src/services/ComparisonService.js (Refactored)
 
 /**
  * ComparisonService - Player comparison logic
- * Handles finding pairs and processing comparisons
+ *
+ * Responsibilities (REFACTORED):
+ * - Find optimal pairs for comparison
+ * - Process comparison results
+ * - Track comparison progress
+ * - Coordinate rating updates
+ *
+ * What changed:
+ * - Removed direct StateManager access (now uses PlayerRepository)
+ * - Split long methods into smaller focused methods
+ * - Removed data manipulation (now uses PlayerRepository)
+ * - Added validation through ValidationService
+ * - Extracted rating update logic
+ *
+ * Benefits:
+ * - Single Responsibility Principle
+ * - Easier to test
+ * - Cleaner code
+ * - Better separation of concerns
  */
 
 class ComparisonService {
-    constructor(activityConfig, playerService, eloService, eventBus) {
-        // Store dependencies
+    /**
+     * @param {Object} activityConfig - Activity configuration
+     * @param {PlayerRepository} playerRepository - Player data repository
+     * @param {ValidationService} validationService - Validation service
+     * @param {EloService} eloService - ELO rating service
+     * @param {EventBus} eventBus - Event bus
+     */
+    constructor(activityConfig, playerRepository, validationService, eloService, eventBus) {
         this.config = activityConfig;
-        this.playerService = playerService;
+        this.playerRepository = playerRepository;
+        this.validationService = validationService;
         this.eloService = eloService;
         this.eventBus = eventBus;
-        this.stateManager = playerService.stateManager; // Get stateManager from playerService
     }
 
     /**
      * Find next pair for comparison at position
      * Deterministic - returns same pair for same state
+     *
+     * @param {string} position - Position to compare
+     * @returns {Array|null} Pair of players or null if no valid pair
      */
     findNextPair(position) {
-        const players = this.playerService.getByPosition(position);
-        
+        const players = this.playerRepository.getByPosition(position);
+
         if (players.length < 2) {
             return null;
         }
@@ -30,23 +57,23 @@ class ComparisonService {
         const minComparisons = Math.min(
             ...players.map(p => p.comparisons[position] || 0)
         );
-        
+
         let pool = players.filter(
             p => (p.comparisons[position] || 0) === minComparisons
         );
-        
+
         // Sort deterministically by ID
         pool.sort((a, b) => a.id - b.id);
-        
+
         let pair = this.findValidPair(pool, position);
-        
+
         if (!pair) {
             // Try all players sorted by comparisons
             const allPlayers = [...players].sort((a, b) => {
                 const compDiff = (a.comparisons[position] || 0) - (b.comparisons[position] || 0);
                 return compDiff !== 0 ? compDiff : a.id - b.id;
             });
-            
+
             pair = this.findValidPair(allPlayers, position);
         }
 
@@ -55,32 +82,44 @@ class ComparisonService {
 
     /**
      * Find valid pair (not yet compared)
+     * @private
      */
     findValidPair(players, position) {
         for (let i = 0; i < players.length; i++) {
             for (let j = i + 1; j < players.length; j++) {
                 const p1 = players[i];
                 const p2 = players[j];
-                
-                const p1Compared = p1.comparedWith[position] || [];
-                const p2Compared = p2.comparedWith[position] || [];
-                
-                if (!p1Compared.includes(p2.name) && 
-                    !p2Compared.includes(p1.name)) {
+
+                if (this.canCompare(p1, p2, position)) {
                     return [p1, p2];
                 }
             }
         }
-        
+
         return null;
     }
 
     /**
+     * Check if two players can be compared at position
+     * @private
+     */
+    canCompare(player1, player2, position) {
+        const p1Compared = player1.comparedWith[position] || [];
+        const p2Compared = player2.comparedWith[position] || [];
+
+        return !p1Compared.includes(player2.name) &&
+               !p2Compared.includes(player1.name);
+    }
+
+    /**
      * Check if position is ready for comparisons
+     *
+     * @param {string} position - Position to check
+     * @returns {Object} Status information
      */
     checkStatus(position) {
-        const players = this.playerService.getByPosition(position);
-        
+        const players = this.playerRepository.getByPosition(position);
+
         if (players.length < 2) {
             return {
                 canCompare: false,
@@ -90,7 +129,7 @@ class ComparisonService {
         }
 
         const pair = this.findNextPair(position);
-        
+
         if (!pair) {
             return {
                 canCompare: false,
@@ -109,17 +148,85 @@ class ComparisonService {
 
     /**
      * Process a comparison
+     *
+     * @param {string} winnerId - Winner player ID
+     * @param {string} loserId - Loser player ID
+     * @param {string} position - Position being compared
+     * @returns {Object} Comparison result
+     * @throws {Error} If validation fails
      */
     processComparison(winnerId, loserId, position) {
-        // Validate that winner and loser are different
-        if (winnerId === loserId) {
-            throw new Error('Cannot compare a player with themselves');
+        // Validate input
+        this.validateComparisonInput(winnerId, loserId, position);
+
+        // Get players
+        const winner = this.playerRepository.getById(winnerId);
+        const loser = this.playerRepository.getById(loserId);
+
+        // Validate players exist and have required data
+        this.validatePlayers(winner, loser, position);
+
+        // Check if already compared
+        this.checkAlreadyCompared(winner, loser, position);
+
+        // Calculate rating changes
+        const poolSize = this.playerRepository.countByPosition(position);
+        const changes = this.eloService.calculateRatingChange(
+            winner,
+            loser,
+            position,
+            poolSize
+        );
+
+        // Update player data
+        this.updatePlayersAfterComparison(
+            winnerId,
+            loserId,
+            position,
+            changes,
+            winner.name,
+            loser.name
+        );
+
+        // Get updated players
+        const updatedWinner = this.playerRepository.getById(winnerId);
+        const updatedLoser = this.playerRepository.getById(loserId);
+
+        // Build result
+        const result = {
+            winner: updatedWinner,
+            loser: updatedLoser,
+            position,
+            changes
+        };
+
+        // Emit event
+        this.eventBus.emit('comparison:completed', result);
+
+        return result;
+    }
+
+    /**
+     * Validate comparison input
+     * @private
+     */
+    validateComparisonInput(winnerId, loserId, position) {
+        const validation = this.validationService.validateComparison(
+            winnerId,
+            loserId,
+            position
+        );
+
+        if (!validation.isValid) {
+            throw new Error(validation.errors.join(', '));
         }
+    }
 
-        const state = this.stateManager.getState();
-        const winner = state.players.find(p => p.id === winnerId);
-        const loser = state.players.find(p => p.id === loserId);
-
+    /**
+     * Validate that players exist and have required ratings
+     * @private
+     */
+    validatePlayers(winner, loser, position) {
         if (!winner || !loser) {
             throw new Error('Players not found');
         }
@@ -127,87 +234,94 @@ class ComparisonService {
         if (!winner.ratings[position] || !loser.ratings[position]) {
             throw new Error(`Players don't have ratings for ${position}`);
         }
+    }
 
-        // Check if players have already been compared at this position
+    /**
+     * Check if players have already been compared
+     * @private
+     */
+    checkAlreadyCompared(winner, loser, position) {
         const winnerCompared = winner.comparedWith[position] || [];
+
         if (winnerCompared.includes(loser.name)) {
             throw new Error('These players have already been compared at this position');
         }
+    }
 
-        // Get pool size for fair K-factor adjustment
-        const poolSize = this.playerService.getByPosition(position).length;
-
-        // Calculate rating changes with pool-adjusted K-factor
-        const changes = this.eloService.calculateRatingChange(winner, loser, position, poolSize);
-
-        // Update players
-        const updatedPlayers = state.players.map(p => {
-            if (p.id === winnerId) {
-                return {
-                    ...p,
-                    ratings: {
-                        ...p.ratings,
-                        [position]: changes.winner.newRating
-                    },
-                    comparisons: {
-                        ...p.comparisons,
-                        [position]: (p.comparisons[position] || 0) + 1
-                    },
-                    comparedWith: {
-                        ...p.comparedWith,
-                        [position]: [
-                            ...(p.comparedWith[position] || []),
-                            loser.name
-                        ].filter((name, idx, arr) => arr.indexOf(name) === idx)
-                    }
-                };
-            } else if (p.id === loserId) {
-                return {
-                    ...p,
-                    ratings: {
-                        ...p.ratings,
-                        [position]: changes.loser.newRating
-                    },
-                    comparisons: {
-                        ...p.comparisons,
-                        [position]: (p.comparisons[position] || 0) + 1
-                    },
-                    comparedWith: {
-                        ...p.comparedWith,
-                        [position]: [
-                            ...(p.comparedWith[position] || []),
-                            winner.name
-                        ].filter((name, idx, arr) => arr.indexOf(name) === idx)
-                    }
-                };
+    /**
+     * Update players after comparison
+     * @private
+     */
+    updatePlayersAfterComparison(winnerId, loserId, position, changes, winnerName, loserName) {
+        // Update both players in a single batch operation
+        this.playerRepository.updateMany([
+            {
+                id: winnerId,
+                updates: {
+                    ratings: this.buildUpdatedRatings(winnerId, position, changes.winner.newRating),
+                    comparisons: this.buildUpdatedComparisons(winnerId, position),
+                    comparedWith: this.buildUpdatedComparedWith(winnerId, position, loserName)
+                }
+            },
+            {
+                id: loserId,
+                updates: {
+                    ratings: this.buildUpdatedRatings(loserId, position, changes.loser.newRating),
+                    comparisons: this.buildUpdatedComparisons(loserId, position),
+                    comparedWith: this.buildUpdatedComparedWith(loserId, position, winnerName)
+                }
             }
-            return p;
-        });
+        ]);
+    }
 
-        // Update state
-        this.stateManager.setState({
-            players: updatedPlayers,
-            comparisons: state.comparisons + 1
-        });
-
-        const result = {
-            winner: updatedPlayers.find(p => p.id === winnerId),
-            loser: updatedPlayers.find(p => p.id === loserId),
-            position,
-            changes
+    /**
+     * Build updated ratings object
+     * @private
+     */
+    buildUpdatedRatings(playerId, position, newRating) {
+        const player = this.playerRepository.getById(playerId);
+        return {
+            ...player.ratings,
+            [position]: newRating
         };
+    }
 
-        this.eventBus.emit('comparison:completed', result);
-        
-        return result;
+    /**
+     * Build updated comparisons object
+     * @private
+     */
+    buildUpdatedComparisons(playerId, position) {
+        const player = this.playerRepository.getById(playerId);
+        return {
+            ...player.comparisons,
+            [position]: (player.comparisons[position] || 0) + 1
+        };
+    }
+
+    /**
+     * Build updated comparedWith object
+     * @private
+     */
+    buildUpdatedComparedWith(playerId, position, opponentName) {
+        const player = this.playerRepository.getById(playerId);
+        const currentCompared = player.comparedWith[position] || [];
+
+        // Add opponent and remove duplicates
+        return {
+            ...player.comparedWith,
+            [position]: [...new Set([...currentCompared, opponentName])]
+        };
     }
 
     /**
      * Get comparison progress for position
+     *
+     * @param {string} position - Position to check
+     * @returns {Object} Progress information
      */
     getProgress(position) {
-        const players = this.playerService.getByPosition(position);
-        
+        const players = this.playerRepository.getByPosition(position);
+
         if (players.length < 2) {
             return {
                 completed: 0,
@@ -218,24 +332,13 @@ class ComparisonService {
         }
 
         const totalPairs = (players.length * (players.length - 1)) / 2;
-        const comparedPairs = new Set();
-        
-        // Each comparison is stored in both players' comparedWith lists,
-        // but the Set with sorted names ensures each pair is counted only once
-        players.forEach(player => {
-            const compared = player.comparedWith[position] || [];
-            compared.forEach(opponentName => {
-                const pair = [player.name, opponentName].sort().join('|');
-                comparedPairs.add(pair);
-            });
-        });
-        
-        const completed = comparedPairs.size;
-        const remaining = totalPairs - completed;
-        const percentage = Math.round((completed / totalPairs) * 100);
+        const comparedPairs = this.countComparedPairs(players, position);
+
+        const remaining = totalPairs - comparedPairs;
+        const percentage = Math.round((comparedPairs / totalPairs) * 100);
 
         return {
-            completed,
+            completed: comparedPairs,
             total: totalPairs,
             percentage,
             remaining
@@ -243,7 +346,27 @@ class ComparisonService {
     }
 
     /**
+     * Count how many pairs have been compared
+     * @private
+     */
+    countComparedPairs(players, position) {
+        const comparedPairs = new Set();
+
+        players.forEach(player => {
+            const compared = player.comparedWith[position] || [];
+            compared.forEach(opponentName => {
+                const pair = [player.name, opponentName].sort().join('|');
+                comparedPairs.add(pair);
+            });
+        });
+
+        return comparedPairs.size;
+    }
+
+    /**
      * Get all position progress
+     *
+     * @returns {Object} Progress by position
      */
     getAllProgress() {
         const positions = this.config.positionOrder;
@@ -258,46 +381,17 @@ class ComparisonService {
 
     /**
      * Reset all comparisons for positions
+     *
+     * @param {Array<string>} positions - Positions to reset
      */
     resetAll(positions) {
-        const state = this.stateManager.getState();
-        
-        const updatedPlayers = state.players.map(player => {
-            const updated = { ...player };
-            
-            positions.forEach(pos => {
-                if (updated.ratings[pos]) {
-                    updated.ratings[pos] = 1500;
-                    updated.comparisons[pos] = 0;
-                    updated.comparedWith[pos] = [];
-                }
-            });
-            
-            return updated;
-        });
+        // Use repository method to reset all positions
+        this.playerRepository.resetAllPositions(positions);
 
-        // Recalculate total comparisons
-        let totalComparisons = 0;
-        const allPositions = this.config.positionOrder;
-        const nonResetPositions = allPositions.filter(p => !positions.includes(p));
-        
-        updatedPlayers.forEach(player => {
-            nonResetPositions.forEach(pos => {
-                if (player.comparisons[pos]) {
-                    totalComparisons += player.comparisons[pos];
-                }
-            });
-        });
-        totalComparisons = Math.floor(totalComparisons / 2);
-
-        this.stateManager.setState({
-            players: updatedPlayers,
-            comparisons: totalComparisons
-        });
-
+        // Emit event
         this.eventBus.emit('comparison:reset-all', {
             positions,
-            playersAffected: updatedPlayers.length
+            playersAffected: this.playerRepository.count()
         });
     }
 }

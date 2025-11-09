@@ -1,235 +1,208 @@
-// src/services/PlayerService.js
+// src/services/PlayerService.js (Refactored)
 
 /**
  * PlayerService - Player management business logic
- * Handles validation, queries, and player operations
+ *
+ * Responsibilities (REFACTORED):
+ * - Orchestrate player operations
+ * - Enforce business rules
+ * - Coordinate between repository and validation
+ *
+ * What changed:
+ * - Removed direct StateManager access (now uses PlayerRepository)
+ * - Removed validation logic (now uses ValidationService)
+ * - Removed data manipulation (now uses PlayerRepository)
+ * - Focused on business logic only
+ *
+ * Benefits:
+ * - Single Responsibility Principle
+ * - Easier to test
+ * - Looser coupling
+ * - Cleaner code
  */
 
 class PlayerService {
-    constructor(activityConfig, stateManager, eventBus, eloService) {
-        // Store dependencies
+    /**
+     * @param {Object} activityConfig - Activity configuration
+     * @param {PlayerRepository} playerRepository - Player data repository
+     * @param {ValidationService} validationService - Validation service
+     * @param {EventBus} eventBus - Event bus
+     * @param {EloService} eloService - ELO service
+     */
+    constructor(activityConfig, playerRepository, validationService, eventBus, eloService) {
         this.config = activityConfig;
-        this.stateManager = stateManager;
+        this.playerRepository = playerRepository;
+        this.validationService = validationService;
         this.eventBus = eventBus;
         this.eloService = eloService;
 
-        // Import positions from activity config for consistency
         this.positions = activityConfig.positions;
         this.DEFAULT_RATING = 1500;
     }
 
     /**
      * Validate player data
+     * Delegates to ValidationService
      */
     validate(name, positions) {
-        const errors = [];
-
-        // Name validation
-        if (!name || typeof name !== 'string') {
-            errors.push('Player name is required');
-        } else {
-            const trimmed = name.trim();
-            if (trimmed.length === 0) {
-                errors.push('Player name cannot be empty');
-            } else if (trimmed.length > 50) {
-                errors.push('Player name is too long (max 50 characters)');
-            } else if (!/^[a-zA-Z\s\u0400-\u04FF'-]+$/.test(trimmed)) {
-                errors.push('Player name contains invalid characters');
-            }
-        }
-
-        // Position validation
-        if (!Array.isArray(positions) || positions.length === 0) {
-            errors.push('At least one position is required');
-        } else {
-            const validPositions = Object.keys(this.positions);
-            const invalid = positions.filter(pos => !validPositions.includes(pos));
-            
-            if (invalid.length > 0) {
-                errors.push(`Invalid positions: ${invalid.join(', ')}`);
-            }
-            
-            if (new Set(positions).size !== positions.length) {
-                errors.push('Duplicate positions not allowed');
-            }
-        }
-
-        return {
-            isValid: errors.length === 0,
-            errors,
-            sanitized: {
-                name: name?.trim() || '',
-                positions: Array.isArray(positions) ? [...new Set(positions)] : []
-            }
-        };
+        return this.validationService.validatePlayer(name, positions);
     }
 
     /**
      * Add a new player
+     * @param {string} name - Player name
+     * @param {Array<string>} positions - Player positions
+     * @returns {Object} Created player
+     * @throws {Error} If validation fails or player already exists
      */
     add(name, positions) {
+        // Validate input
         const validation = this.validate(name, positions);
-        
+
         if (!validation.isValid) {
             throw new Error(validation.errors.join(', '));
         }
 
         const { name: cleanName, positions: cleanPositions } = validation.sanitized;
-        
-        // Check for duplicate
-        const state = this.stateManager.getState();
-        if (state.players.some(p => p.name === cleanName)) {
+
+        // Check for duplicates
+        if (this.playerRepository.existsByName(cleanName)) {
             throw new Error('Player with this name already exists');
         }
 
         // Create player object
+        const player = this.createPlayerObject(cleanName, cleanPositions);
+
+        // Add to repository
+        return this.playerRepository.add(player);
+    }
+
+    /**
+     * Create player object with default values
+     * @private
+     */
+    createPlayerObject(name, positions) {
         const ratings = {};
         const comparisons = {};
         const comparedWith = {};
-        
-        cleanPositions.forEach(pos => {
+
+        positions.forEach(pos => {
             ratings[pos] = this.DEFAULT_RATING;
             comparisons[pos] = 0;
             comparedWith[pos] = [];
         });
 
-        const player = {
-            id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-            name: cleanName,
-            positions: cleanPositions,
+        return {
+            id: this.generateId(),
+            name,
+            positions,
             ratings,
             comparisons,
             comparedWith,
             createdAt: new Date().toISOString()
         };
-
-        // Update state
-        this.stateManager.setState({
-            players: [...state.players, player]
-        }, {
-            event: 'player:added',
-            save: true
-        });
-
-        this.eventBus.emit('player:added', player);
-        return player;
     }
 
     /**
-     * Update player positions (NEW METHOD)
+     * Generate unique player ID
+     * @private
+     */
+    generateId() {
+        return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    }
+
+    /**
+     * Update player positions
+     * @param {string} playerId - Player ID
+     * @param {Array<string>} positions - New positions
+     * @returns {Object} Updated player
+     * @throws {Error} If validation fails or player not found
      */
     updatePositions(playerId, positions) {
-        const validation = this.validate('temp', positions);
-        
+        // Validate positions
+        const validation = this.validationService.validatePositions(positions);
+
         if (!validation.isValid) {
             throw new Error(validation.errors.join(', '));
         }
 
-        const state = this.stateManager.getState();
-        const playerIndex = state.players.findIndex(p => p.id === playerId);
-        
-        if (playerIndex === -1) {
+        const player = this.playerRepository.getById(playerId);
+        if (!player) {
             throw new Error('Player not found');
         }
 
-        const player = state.players[playerIndex];
-        const newPositions = validation.sanitized.positions;
-        
-        // Update ratings structure
+        const newPositions = validation.sanitized;
+
+        // Build new ratings structure
         const newRatings = {};
         const newComparisons = {};
         const newComparedWith = {};
-        
+
         newPositions.forEach(pos => {
             newRatings[pos] = player.ratings[pos] || this.DEFAULT_RATING;
             newComparisons[pos] = player.comparisons[pos] || 0;
             newComparedWith[pos] = player.comparedWith[pos] || [];
         });
 
-        const updatedPlayer = {
-            ...player,
+        // Update through repository
+        return this.playerRepository.update(playerId, {
             positions: newPositions,
             ratings: newRatings,
             comparisons: newComparisons,
             comparedWith: newComparedWith
-        };
-
-        const updatedPlayers = [...state.players];
-        updatedPlayers[playerIndex] = updatedPlayer;
-
-        this.stateManager.setState({ players: updatedPlayers });
-        this.eventBus.emit('player:updated', updatedPlayer);
-        
-        return updatedPlayer;
+        });
     }
 
     /**
      * Remove a player
+     * @param {string} playerId - Player ID
+     * @returns {Object} Removed player
+     * @throws {Error} If player not found
      */
     remove(playerId) {
-        const state = this.stateManager.getState();
-        const player = state.players.find(p => p.id === playerId);
-        
-        if (!player) {
-            throw new Error('Player not found');
-        }
+        const player = this.playerRepository.remove(playerId);
 
-        const updatedPlayers = state.players.filter(p => p.id !== playerId);
-        
-        // Remove from other players' comparison lists
-        updatedPlayers.forEach(p => {
-            Object.keys(p.comparedWith).forEach(pos => {
-                p.comparedWith[pos] = p.comparedWith[pos].filter(
-                    name => name !== player.name
-                );
-            });
-        });
+        // Clean up: remove from other players' compared lists
+        this.playerRepository.removeFromComparedLists(player.name);
 
-        this.stateManager.setState({ players: updatedPlayers });
-        this.eventBus.emit('player:removed', player);
-        
         return player;
     }
 
     /**
-     * Reset player ratings (all positions)
+     * Reset player ratings for all or specific positions
+     * @param {string} playerId - Player ID
+     * @param {Array<string>|null} positions - Positions to reset (null = all)
+     * @returns {Object} Updated player
+     * @throws {Error} If player not found
      */
     reset(playerId, positions = null) {
-        const state = this.stateManager.getState();
-        const playerIndex = state.players.findIndex(p => p.id === playerId);
-        
-        if (playerIndex === -1) {
+        const player = this.playerRepository.getById(playerId);
+        if (!player) {
             throw new Error('Player not found');
         }
 
-        const player = state.players[playerIndex];
         const positionsToReset = positions || player.positions;
-        
-        const updatedPlayer = { ...player };
-        
-        positionsToReset.forEach(pos => {
-            if (updatedPlayer.ratings[pos]) {
-                updatedPlayer.ratings[pos] = this.DEFAULT_RATING;
-                updatedPlayer.comparisons[pos] = 0;
-                updatedPlayer.comparedWith[pos] = [];
-            }
+
+        const updatedPlayer = this.playerRepository.resetPlayerPositions(
+            playerId,
+            positionsToReset,
+            this.DEFAULT_RATING
+        );
+
+        this.eventBus.emit('player:reset', {
+            player: updatedPlayer,
+            positions: positionsToReset
         });
 
-        const updatedPlayers = [...state.players];
-        updatedPlayers[playerIndex] = updatedPlayer;
-        
-        // Note: We don't remove this player from other players' comparedWith lists
-        // because that would create inconsistency in their comparison counts.
-        // The reset only affects this player's data.
-
-        this.stateManager.setState({ players: updatedPlayers });
-        this.eventBus.emit('player:reset', { player: updatedPlayer, positions: positionsToReset });
-        
         return updatedPlayer;
     }
 
     /**
-     * Reset specific positions for a player (NEW METHOD)
+     * Reset specific positions for a player
+     * @param {string} playerId - Player ID
+     * @param {Array<string>} positions - Positions to reset
+     * @returns {Object} Updated player
+     * @throws {Error} If validation fails or player not found
      */
     resetPositions(playerId, positions) {
         if (!Array.isArray(positions) || positions.length === 0) {
@@ -240,46 +213,20 @@ class PlayerService {
     }
 
     /**
-     * Reset all players' ratings for specific positions (NEW METHOD)
+     * Reset all players' ratings for specific positions
+     * @param {Array<string>} positions - Positions to reset
+     * @returns {Array<Object>} Updated players
+     * @throws {Error} If validation fails
      */
     resetAllPositions(positions) {
         if (!Array.isArray(positions) || positions.length === 0) {
             throw new Error('At least one position is required');
         }
 
-        const state = this.stateManager.getState();
-        const updatedPlayers = state.players.map(player => {
-            const updated = { ...player };
-            
-            positions.forEach(pos => {
-                if (updated.ratings[pos]) {
-                    updated.ratings[pos] = this.DEFAULT_RATING;
-                    updated.comparisons[pos] = 0;
-                    updated.comparedWith[pos] = [];
-                }
-            });
-            
-            return updated;
-        });
-
-        // Recalculate total comparisons
-        let totalComparisons = 0;
-        const allPositions = this.config.positionOrder;
-        const nonResetPositions = allPositions.filter(p => !positions.includes(p));
-        
-        updatedPlayers.forEach(player => {
-            nonResetPositions.forEach(pos => {
-                if (player.comparisons[pos]) {
-                    totalComparisons += player.comparisons[pos];
-                }
-            });
-        });
-        totalComparisons = Math.floor(totalComparisons / 2);
-
-        this.stateManager.setState({
-            players: updatedPlayers,
-            comparisons: totalComparisons
-        });
+        const updatedPlayers = this.playerRepository.resetAllPositions(
+            positions,
+            this.DEFAULT_RATING
+        );
 
         this.eventBus.emit('players:reset-all-positions', {
             positions,
@@ -291,63 +238,49 @@ class PlayerService {
 
     /**
      * Get players by position
+     * @param {string} position - Position name
+     * @returns {Array<Object>} Players for this position
      */
     getByPosition(position) {
-        const state = this.stateManager.getState();
-        return state.players.filter(p => 
-            p.positions && p.positions.includes(position)
-        );
+        return this.playerRepository.getByPosition(position);
     }
 
     /**
      * Get player by ID
+     * @param {string} playerId - Player ID
+     * @returns {Object|null} Player or null
      */
     getById(playerId) {
-        const state = this.stateManager.getState();
-        return state.players.find(p => p.id === playerId);
+        return this.playerRepository.getById(playerId);
     }
 
     /**
      * Get all players
+     * @returns {Array<Object>} All players
      */
     getAll() {
-        return this.stateManager.get('players') || [];
+        return this.playerRepository.getAll();
     }
 
     /**
-     * Search players
+     * Search players by name or position
+     * @param {string} searchTerm - Search term
+     * @returns {Array<Object>} Matching players
      */
     search(searchTerm) {
-        if (!searchTerm || searchTerm.trim().length === 0) {
-            return [];
-        }
-
-        const term = searchTerm.toLowerCase().trim();
-        const state = this.stateManager.getState();
-        
-        return state.players.filter(player => {
-            if (player.name.toLowerCase().includes(term)) {
-                return true;
-            }
-            
-            return player.positions?.some(pos => 
-                this.positions[pos]?.toLowerCase().includes(term)
-            );
-        });
+        return this.playerRepository.search(searchTerm, this.positions);
     }
 
     /**
      * Get position statistics
+     * @returns {Object} Statistics by position
      */
     getPositionStats() {
-        const state = this.stateManager.getState();
         const stats = {};
-        
+
         Object.keys(this.positions).forEach(pos => {
-            const players = state.players.filter(p => 
-                p.positions && p.positions.includes(pos)
-            );
-            
+            const players = this.playerRepository.getByPosition(pos);
+
             stats[pos] = {
                 count: players.length,
                 players: players,
@@ -360,21 +293,20 @@ class PlayerService {
 
     /**
      * Get rankings by position
+     * @returns {Object} Rankings by position
      */
     getRankings() {
-        const state = this.stateManager.getState();
         const rankings = {};
 
         Object.keys(this.positions).forEach(position => {
-            const players = state.players
-                .filter(p => p.positions && p.positions.includes(position))
+            const players = this.playerRepository.getByPosition(position)
                 .map(p => ({
                     ...p,
                     positionRating: p.ratings[position],
                     positionComparisons: p.comparisons[position]
                 }))
                 .sort((a, b) => b.positionRating - a.positionRating);
-            
+
             rankings[position] = players;
         });
 
