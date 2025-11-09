@@ -10,15 +10,20 @@ import storage from './StorageAdapter.js';
 class StateManager {
     constructor() {
         this.state = {
-            players: [],
+            playersByActivity: {
+                volleyball: [],
+                basketball: [],
+                soccer: [],
+                'work-project': []
+            },
             comparisons: 0,
-            version: '4.0',
+            version: '4.1',
             settings: {
                 showEloRatings: true,
                 theme: 'dark'
             }
         };
-        
+
         this.storageKey = 'app_state';
         this.autoSave = true;
         this.saveTimeout = null;
@@ -179,11 +184,11 @@ class StateManager {
      */
     migrate(data) {
         const version = data.version || '1.0';
-        
+
         // Version 3.0 -> 4.0 migration
         if (version < '4.0') {
             console.log('Migrating data from version', version, 'to 4.0');
-            
+
             // Ensure players have correct structure
             if (data.players) {
                 data.players = data.players.map(player => {
@@ -197,7 +202,7 @@ class StateManager {
                     const ratings = {};
                     const comparisons = {};
                     const comparedWith = {};
-                    
+
                     positions.forEach(pos => {
                         ratings[pos] = player.rating || 1500;
                         comparisons[pos] = player.comparisons || 0;
@@ -217,11 +222,53 @@ class StateManager {
             }
 
             data.version = '4.0';
-            
+
             eventBus.emit('state:migrated', {
                 from: version,
                 to: '4.0',
                 playersUpdated: data.players?.length || 0
+            });
+        }
+
+        // Version 4.0 -> 4.1 migration (players -> playersByActivity)
+        if (version < '4.1') {
+            console.log('Migrating data from version', version, 'to 4.1');
+
+            // Get the currently selected activity from storage
+            const selectedActivity = storage.get('selectedActivity', 'volleyball');
+
+            // If old players array exists, move it to the selected activity
+            if (data.players && Array.isArray(data.players)) {
+                data.playersByActivity = {
+                    volleyball: [],
+                    basketball: [],
+                    soccer: [],
+                    'work-project': []
+                };
+
+                // Place existing players under the currently selected activity
+                data.playersByActivity[selectedActivity] = data.players;
+
+                // Remove old players array
+                delete data.players;
+
+                console.log(`Migrated ${data.playersByActivity[selectedActivity].length} players to activity: ${selectedActivity}`);
+            } else if (!data.playersByActivity) {
+                // Initialize empty playersByActivity if it doesn't exist
+                data.playersByActivity = {
+                    volleyball: [],
+                    basketball: [],
+                    soccer: [],
+                    'work-project': []
+                };
+            }
+
+            data.version = '4.1';
+
+            eventBus.emit('state:migrated', {
+                from: version,
+                to: '4.1',
+                playersMigrated: data.playersByActivity[selectedActivity]?.length || 0
             });
         }
 
@@ -235,9 +282,14 @@ class StateManager {
         const { clearStorage = true } = options;
 
         this.state = {
-            players: [],
+            playersByActivity: {
+                volleyball: [],
+                basketball: [],
+                soccer: [],
+                'work-project': []
+            },
             comparisons: 0,
-            version: '4.0',
+            version: '4.1',
             settings: {
                 showEloRatings: true,
                 theme: 'dark'
@@ -294,12 +346,17 @@ class StateManager {
      * Get state statistics
      */
     getStats() {
+        const selectedActivity = storage.get('selectedActivity', 'volleyball');
+        const playersByActivity = this.state.playersByActivity || {};
+        const currentPlayers = playersByActivity[selectedActivity] || [];
+
         return {
-            playerCount: this.state.players?.length || 0,
+            playerCount: currentPlayers.length,
             totalComparisons: this.state.comparisons || 0,
             version: this.state.version,
             storageSize: storage.getSizeFormatted(),
-            lastSaved: storage.get(this.storageKey)?.savedAt
+            lastSaved: storage.get(this.storageKey)?.savedAt,
+            currentActivity: selectedActivity
         };
     }
 }

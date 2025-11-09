@@ -20,18 +20,21 @@ class PlayerRepository {
     /**
      * @param {StateManager} stateManager - State management service
      * @param {EventBus} eventBus - Event bus for notifications
+     * @param {string} activityKey - Current activity key (e.g., 'volleyball', 'basketball')
      */
-    constructor(stateManager, eventBus) {
+    constructor(stateManager, eventBus, activityKey = 'volleyball') {
         this.stateManager = stateManager;
         this.eventBus = eventBus;
+        this.activityKey = activityKey;
     }
 
     /**
-     * Get all players
-     * @returns {Array<Object>} All players
+     * Get all players for the current activity
+     * @returns {Array<Object>} All players for current activity
      */
     getAll() {
-        return this.stateManager.get('players') || [];
+        const playersByActivity = this.stateManager.get('playersByActivity') || {};
+        return playersByActivity[this.activityKey] || [];
     }
 
     /**
@@ -74,16 +77,21 @@ class PlayerRepository {
     }
 
     /**
-     * Add a new player
+     * Add a new player to the current activity
      * @param {Object} player - Player object to add
      * @returns {Object} Added player
      */
     add(player) {
         const state = this.stateManager.getState();
-        const updatedPlayers = [...state.players, player];
+        const playersByActivity = state.playersByActivity || {};
+        const currentPlayers = playersByActivity[this.activityKey] || [];
+        const updatedPlayers = [...currentPlayers, player];
 
         this.stateManager.setState({
-            players: updatedPlayers
+            playersByActivity: {
+                ...playersByActivity,
+                [this.activityKey]: updatedPlayers
+            }
         }, {
             event: 'player:added',
             save: true
@@ -94,7 +102,7 @@ class PlayerRepository {
     }
 
     /**
-     * Update existing player
+     * Update existing player in the current activity
      * @param {string} playerId - Player ID
      * @param {Object} updates - Fields to update
      * @returns {Object} Updated player
@@ -102,22 +110,27 @@ class PlayerRepository {
      */
     update(playerId, updates) {
         const state = this.stateManager.getState();
-        const playerIndex = state.players.findIndex(p => p.id === playerId);
+        const playersByActivity = state.playersByActivity || {};
+        const currentPlayers = playersByActivity[this.activityKey] || [];
+        const playerIndex = currentPlayers.findIndex(p => p.id === playerId);
 
         if (playerIndex === -1) {
             throw new Error('Player not found');
         }
 
         const updatedPlayer = {
-            ...state.players[playerIndex],
+            ...currentPlayers[playerIndex],
             ...updates
         };
 
-        const updatedPlayers = [...state.players];
+        const updatedPlayers = [...currentPlayers];
         updatedPlayers[playerIndex] = updatedPlayer;
 
         this.stateManager.setState({
-            players: updatedPlayers
+            playersByActivity: {
+                ...playersByActivity,
+                [this.activityKey]: updatedPlayers
+            }
         }, {
             event: 'player:updated',
             save: true
@@ -128,13 +141,15 @@ class PlayerRepository {
     }
 
     /**
-     * Update multiple players at once
+     * Update multiple players at once in the current activity
      * @param {Array<{id: string, updates: Object}>} playerUpdates - Array of player updates
      * @returns {Array<Object>} Updated players
      */
     updateMany(playerUpdates) {
         const state = this.stateManager.getState();
-        const updatedPlayers = [...state.players];
+        const playersByActivity = state.playersByActivity || {};
+        const currentPlayers = playersByActivity[this.activityKey] || [];
+        const updatedPlayers = [...currentPlayers];
 
         const results = [];
 
@@ -150,7 +165,10 @@ class PlayerRepository {
         });
 
         this.stateManager.setState({
-            players: updatedPlayers
+            playersByActivity: {
+                ...playersByActivity,
+                [this.activityKey]: updatedPlayers
+            }
         }, {
             event: 'players:updated',
             save: true
@@ -161,23 +179,28 @@ class PlayerRepository {
     }
 
     /**
-     * Remove player
+     * Remove player from the current activity
      * @param {string} playerId - Player ID
      * @returns {Object} Removed player
      * @throws {Error} If player not found
      */
     remove(playerId) {
         const state = this.stateManager.getState();
-        const player = state.players.find(p => p.id === playerId);
+        const playersByActivity = state.playersByActivity || {};
+        const currentPlayers = playersByActivity[this.activityKey] || [];
+        const player = currentPlayers.find(p => p.id === playerId);
 
         if (!player) {
             throw new Error('Player not found');
         }
 
-        const updatedPlayers = state.players.filter(p => p.id !== playerId);
+        const updatedPlayers = currentPlayers.filter(p => p.id !== playerId);
 
         this.stateManager.setState({
-            players: updatedPlayers
+            playersByActivity: {
+                ...playersByActivity,
+                [this.activityKey]: updatedPlayers
+            }
         }, {
             event: 'player:removed',
             save: true

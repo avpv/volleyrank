@@ -20,6 +20,7 @@ import StateManager from '../core/StateManager.js';
 import StorageAdapter from '../core/StorageAdapter.js';
 import Router from '../core/Router.js';
 import errorHandler from '../core/ErrorHandler.js';
+import storage from '../core/StorageAdapter.js';
 
 // Repository layer (NEW)
 import PlayerRepository from '../repositories/PlayerRepository.js';
@@ -107,7 +108,12 @@ export function createServiceConfig(activityConfig) {
         playerRepository: {
             implementation: PlayerRepository,
             lifetime: ServiceLifetime.SINGLETON,
-            dependencies: ['stateManager', 'eventBus']
+            dependencies: ['stateManager', 'eventBus'],
+            factory: (deps) => {
+                // Get the selected activity from storage
+                const selectedActivity = storage.get('selectedActivity', 'volleyball');
+                return new PlayerRepository(deps.stateManager, deps.eventBus, selectedActivity);
+            }
         },
 
         // ===== Validation Layer (NEW) =====
