@@ -1,10 +1,10 @@
-# TeamBuilding
+# TeamBalance
 
 **Universal smart team builder for any activity - sports, work, education, and more**
 
 **Currently configured for: Volleyball** 🏐
 
-Stop guessing who should be on which team. TeamBuilding helps you:
+Stop guessing who should be on which team. TeamBalance helps you:
 - Rate each participant's skill at every role/position they can fill
 - Compare participants through simple head-to-head matchups
 - Automatically create balanced teams using advanced optimization algorithms
@@ -17,7 +17,7 @@ Perfect for coaches, organizers, managers - anyone who needs to build fair, bala
 
 ## 🌟 Universal Design
 
-**TeamBuilding is activity-agnostic**. It works for:
+**TeamBalance is activity-agnostic**. It works for:
 
 - ✅ **Sports**: Volleyball, Basketball, Soccer, Tennis, etc.
 - ✅ **Work**: Project teams, department distribution, study groups
@@ -96,7 +96,7 @@ The demo is currently configured for volleyball with these positions:
 
 ### ELO Rating System Explained
 
-TeamBuilding uses the **ELO rating system**, the same proven method used in chess rankings and competitive sports worldwide. Here's how it works:
+TeamBalance uses the **ELO rating system**, the same proven method used in chess rankings and competitive sports worldwide. Here's how it works:
 
 **The Basics:**
 - Every participant starts with the **same rating** (1500 points) for each role they can fill
@@ -130,7 +130,7 @@ But if Alice (lower rated) had won instead:
 
 ## Configuration for Different Activities
 
-TeamBuilding is designed to be universal. You can configure it for **any activity** by creating a config file.
+TeamBalance is designed to be universal. You can configure it for **any activity** by creating a config file.
 
 ### Example Configurations
 
@@ -261,7 +261,7 @@ See `src/config/activities/README.md` for a complete guide on creating custom ac
 
 ## Architecture
 
-TeamBuilding follows clean architecture principles:
+TeamBalance follows clean architecture principles:
 
 - **Activity-Agnostic Core**: All business logic is independent of any specific activity
 - **Configuration-Driven**: Activities are defined through simple config files

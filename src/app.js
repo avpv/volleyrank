@@ -49,7 +49,7 @@ const APP_CONFIG = {
     VERSION: '4.0.0',
 
     /** @property {string} Base application name */
-    NAME: 'TeamBuilding',
+    NAME: 'TeamBalance',
 
     /** @property {number} Welcome toast duration (ms) */
     WELCOME_TOAST_DURATION: 5000

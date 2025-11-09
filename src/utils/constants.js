@@ -10,7 +10,7 @@
 import ratingConfig from '../config/rating.js';
 
 export const APP_VERSION = '4.0.0';
-export const APP_NAME = 'TeamBuilding';
+export const APP_NAME = 'TeamBalance';
 
 // Rating constants - imported from centralized config
 // DEPRECATED: Import directly from config/rating.js instead

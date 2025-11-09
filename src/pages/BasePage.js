@@ -9,7 +9,7 @@ import Component from '../components/base/Component.js';
 class BasePage extends Component {
     constructor(container, props = {}) {
         super(container, props);
-        this.title = 'VolleyRank';
+        this.title = 'TeamBalance';
         this.components = [];
     }
 
@@ -18,7 +18,7 @@ class BasePage extends Component {
      */
     setTitle(title) {
         this.title = title;
-        document.title = `${title} - VolleyRank`;
+        document.title = `${title} - TeamBalance`;
     }
 
     /**

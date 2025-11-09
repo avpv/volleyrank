@@ -6,11 +6,11 @@
  */
 
 class PlayerService {
-    constructor(activityConfig, this.stateManager, this.eventBus, eloService) {
+    constructor(activityConfig, stateManager, eventBus, eloService) {
         // Store dependencies
         this.config = activityConfig;
-        this.this.stateManager = this.stateManager;
-        this.this.eventBus = this.eventBus;
+        this.stateManager = stateManager;
+        this.eventBus = eventBus;
         this.eloService = eloService;
 
         // Import positions from activity config for consistency
@@ -77,7 +77,7 @@ class PlayerService {
         const { name: cleanName, positions: cleanPositions } = validation.sanitized;
         
         // Check for duplicate
-        const state = this.this.stateManager.getState();
+        const state = this.stateManager.getState();
         if (state.players.some(p => p.name === cleanName)) {
             throw new Error('Player with this name already exists');
         }

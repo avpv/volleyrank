@@ -6,13 +6,13 @@
  */
 
 class ComparisonService {
-    constructor(activityConfig, this.playerService, this.eloService, this.eventBus) {
+    constructor(activityConfig, playerService, eloService, eventBus) {
         // Store dependencies
         this.config = activityConfig;
-        this.this.playerService = this.playerService;
-        this.this.eloService = this.eloService;
-        this.this.eventBus = this.eventBus;
-        this.this.stateManager = this.playerService.this.stateManager; // Get this.stateManager from this.playerService
+        this.playerService = playerService;
+        this.eloService = eloService;
+        this.eventBus = eventBus;
+        this.stateManager = playerService.stateManager; // Get stateManager from playerService
     }
 
     /**
@@ -20,7 +20,7 @@ class ComparisonService {
      * Deterministic - returns same pair for same state
      */
     findNextPair(position) {
-        const players = this.this.playerService.getByPosition(position);
+        const players = this.playerService.getByPosition(position);
         
         if (players.length < 2) {
             return null;
