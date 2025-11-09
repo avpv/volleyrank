@@ -9,6 +9,7 @@ import storage from '../core/StorageAdapter.js';
 import toast from '../components/base/Toast.js';
 import Modal from '../components/base/Modal.js';
 import { getIcon } from '../components/base/Icons.js';
+import { activities } from '../config/activities/index.js';
 
 class SettingsPage extends BasePage {
     constructor(container, props = {}) {
@@ -60,6 +61,7 @@ class SettingsPage extends BasePage {
 
             ${players.length === 0 ? this.renderWelcomeGuide() : ''}
 
+            ${this.renderActivitySelector()}
             ${this.renderAddPlayerForm()}
             ${this.renderPositionStats(stats)}
             ${this.renderPlayersList(players)}
@@ -76,6 +78,28 @@ class SettingsPage extends BasePage {
                     <li><strong>Compare players</strong> to build accurate skill ratings</li>
                     <li><strong>Create balanced teams</strong> automatically</li>
                 </ol>
+            </div>
+        `;
+    }
+
+    renderActivitySelector() {
+        const currentActivity = storage.get('selectedActivity', 'volleyball');
+
+        return `
+            <div class="activity-selector-section">
+                <div class="form-group">
+                    <label for="activitySelect">Activity Type</label>
+                    <select id="activitySelect" class="activity-select">
+                        ${Object.entries(activities).map(([key, config]) => `
+                            <option value="${key}" ${key === currentActivity ? 'selected' : ''}>
+                                ${config.name}
+                            </option>
+                        `).join('')}
+                    </select>
+                    <p class="form-help-text">
+                        Changing the activity will reload the page to apply new positions and team configuration.
+                    </p>
+                </div>
             </div>
         `;
     }
@@ -241,6 +265,14 @@ class SettingsPage extends BasePage {
     }
 
     attachEventListeners() {
+        // Activity selector
+        const activitySelect = this.$('#activitySelect');
+        if (activitySelect) {
+            activitySelect.addEventListener('change', (e) => {
+                this.handleActivityChange(e.target.value);
+            });
+        }
+
         // Form submission
         const form = this.$('#playerForm');
         if (form) {
@@ -294,7 +326,7 @@ class SettingsPage extends BasePage {
     handleAddPlayer() {
         const nameInput = this.$('#playerNameInput');
         const name = nameInput.value.trim();
-        
+
         const checkedBoxes = this.$$('.position-input:checked');
         const positions = Array.from(checkedBoxes).map(cb => cb.value);
 
@@ -305,7 +337,7 @@ class SettingsPage extends BasePage {
 
         try {
             this.playerService.add(name, positions);
-            
+
             // Reset form
             nameInput.value = '';
             checkedBoxes.forEach(cb => cb.checked = false);
@@ -313,6 +345,25 @@ class SettingsPage extends BasePage {
         } catch (error) {
             toast.error(error.message);
         }
+    }
+
+    handleActivityChange(activityKey) {
+        const selectedActivity = activities[activityKey];
+        if (!selectedActivity) {
+            toast.error('Invalid activity selected');
+            return;
+        }
+
+        // Save selected activity to localStorage
+        storage.set('selectedActivity', activityKey);
+
+        // Show confirmation toast
+        toast.success(`Switching to ${selectedActivity.name}. Reloading...`, 2000);
+
+        // Reload the page to apply new activity configuration
+        setTimeout(() => {
+            window.location.reload();
+        }, 2000);
     }
 
     handlePlayerAction(action, playerId) {

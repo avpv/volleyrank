@@ -30,9 +30,10 @@ import stateManager from './core/StateManager.js';
 import toast from './components/base/Toast.js';
 import redirectModule from './redirect.js';
 import { getIcon } from './components/base/Icons.js';
-import { defaultActivity } from './config/activities/index.js';
+import { defaultActivity, activities } from './config/activities/index.js';
 import { escapeHtml } from './utils/stringUtils.js';
 import { initializeServices } from './config/services.js';
+import storage from './core/StorageAdapter.js';
 
 // Page imports
 import SettingsPage from './pages/SettingsPage.js';
@@ -79,17 +80,34 @@ class Application {
      * Does not perform any async operations or side effects.
      *
      * @constructor
-     * @param {Object} activityConfig - Activity configuration (positions, weights, composition)
      */
-    constructor(activityConfig = defaultActivity) {
+    constructor() {
         /** @private {Object} Activity configuration */
-        this.activityConfig = activityConfig;
+        this.activityConfig = this.loadActivityConfig();
 
         /** @private {BasePage|null} Current active page instance */
         this.currentPage = null;
 
         /** @private {string|null} Initial path from 404 redirect */
         this.initialPath = null;
+    }
+
+    /**
+     * Load activity configuration from localStorage or use default
+     *
+     * @private
+     * @returns {Object} Activity configuration
+     */
+    loadActivityConfig() {
+        const selectedActivity = storage.get('selectedActivity', 'volleyball');
+        const activityConfig = activities[selectedActivity];
+
+        if (!activityConfig) {
+            console.warn(`Activity '${selectedActivity}' not found, using default`);
+            return defaultActivity;
+        }
+
+        return activityConfig;
     }
 
     /**
