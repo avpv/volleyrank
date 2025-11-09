@@ -4,6 +4,7 @@
  * Modal - Reusable modal dialog component
  */
 import Component from './Component.js';
+import { getIcon } from './Icons.js';
 
 class Modal extends Component {
     constructor(props = {}) {
@@ -35,7 +36,7 @@ class Modal extends Component {
             <div class="modal-dialog modal-${size}">
                 <div class="modal-header">
                     <h3>${this.escape(title)}</h3>
-                    <button class="modal-close-btn" data-action="close">&times;</button>
+                    <button class="modal-close-btn" data-action="close">${getIcon('x', { size: 20 })}</button>
                 </div>
                 <div class="modal-body">
                     ${content}
@@ -43,11 +44,13 @@ class Modal extends Component {
                 <div class="modal-footer">
                     ${showCancel ? `
                         <button class="btn btn-secondary" data-action="cancel">
+                            ${getIcon('x', { size: 16, className: 'btn-icon' })}
                             ${this.escape(cancelText)}
                         </button>
                     ` : ''}
                     ${showConfirm ? `
                         <button class="btn btn-primary" data-action="confirm">
+                            ${getIcon('check', { size: 16, className: 'btn-icon' })}
                             ${this.escape(confirmText)}
                         </button>
                     ` : ''}

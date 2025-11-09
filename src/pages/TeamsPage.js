@@ -97,6 +97,7 @@ class TeamsPage extends BasePage {
                         id="optimizeBtn"
                         ${players.length < 2 ? 'disabled' : ''}
                     >
+                        ${getIcon('users', { size: 18, className: 'btn-icon' })}
                         ${this.state.isOptimizing ? 'Optimizing...' : 'Create Teams'}
                     </button>
                 </div>
