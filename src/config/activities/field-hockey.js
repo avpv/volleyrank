@@ -26,12 +26,12 @@ export default {
     // Position weights for team balancing
     // Higher weight = more important position
     positionWeights: {
-        'GK': 1.35,  // Goalkeeper
-        'CF': 1.25,  // Center Forward
-        'HB': 1.2,   // Halfback
-        'FB': 1.2,   // Fullback
-        'IF': 1.15,  // Inside Forward
-        'W': 1.1     // Winger
+        'GK': 1.0,  // Goalkeeper
+        'CF': 1.0,  // Center Forward
+        'HB': 1.0,   // Halfback
+        'FB': 1.0,   // Fullback
+        'IF': 1.0,  // Inside Forward
+        'W': 1.0     // Winger
     },
 
     // Order in which positions should be displayed

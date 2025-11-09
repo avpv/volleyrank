@@ -30,16 +30,16 @@ export default {
     // Position weights for team balancing
     // Higher weight = more important position
     positionWeights: {
-        'FH': 1.35,  // Fly-half - playmaker
-        'SH': 1.3,   // Scrum-half
-        'HK': 1.25,  // Hooker
-        'N8': 1.25,  // Number 8
-        'PR': 1.2,   // Prop
-        'LK': 1.2,   // Lock
-        'FL': 1.2,   // Flanker
-        'CT': 1.15,  // Center
-        'FB': 1.15,  // Fullback
-        'WG': 1.1    // Wing
+        'FH': 1.0,  // Fly-half - playmaker
+        'SH': 1.0,   // Scrum-half
+        'HK': 1.0,  // Hooker
+        'N8': 1.0,  // Number 8
+        'PR': 1.0,   // Prop
+        'LK': 1.0,   // Lock
+        'FL': 1.0,   // Flanker
+        'CT': 1.0,  // Center
+        'FB': 1.0,  // Fullback
+        'WG': 1.0    // Wing
     },
 
     // Order in which positions should be displayed

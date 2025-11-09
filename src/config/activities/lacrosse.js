@@ -25,11 +25,11 @@ export default {
     // Position weights for team balancing
     // Higher weight = more important position
     positionWeights: {
-        'G': 1.35,   // Goalie
-        'LSM': 1.25, // Long Stick Middie
-        'M': 1.2,    // Midfielder
-        'A': 1.2,    // Attack
-        'D': 1.2     // Defenseman
+        'G': 1.0,   // Goalie
+        'LSM': 1.0, // Long Stick Middie
+        'M': 1.0,    // Midfielder
+        'A': 1.0,    // Attack
+        'D': 1.0     // Defenseman
     },
 
     // Order in which positions should be displayed

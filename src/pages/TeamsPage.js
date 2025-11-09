@@ -18,12 +18,19 @@ class TeamsPage extends BasePage {
         this.teamOptimizerService = props.services?.resolve('teamOptimizerService');
         this.eloService = props.services?.resolve('eloService');
 
+        // Initialize position weights from config
+        const initialWeights = {};
+        Object.keys(this.activityConfig.positions).forEach(pos => {
+            initialWeights[pos] = this.activityConfig.positionWeights[pos] || 1.0;
+        });
+
         this.state = {
             teams: null,
             isOptimizing: false,
             showEloRatings: true,
             teamCount: 2,
-            composition: this.activityConfig.defaultComposition
+            composition: this.activityConfig.defaultComposition,
+            positionWeights: initialWeights
         };
     }
 
@@ -79,6 +86,13 @@ class TeamsPage extends BasePage {
                     </div>
                 </div>
 
+                <div class="form-group">
+                    <label>Position Weights (для балансировки команд)</label>
+                    <div class="composition-grid">
+                        ${this.renderPositionWeightInputs()}
+                    </div>
+                </div>
+
                 <div class="builder-settings">
                     <button
                         class="btn btn-primary btn-large"
@@ -97,13 +111,31 @@ class TeamsPage extends BasePage {
         return Object.entries(this.activityConfig.positions).map(([key, name]) => `
             <div class="composition-item">
                 <label>${name}</label>
-                <input 
-                    type="number" 
-                    id="comp_${key}" 
-                    value="${this.state.composition[key]}" 
-                    min="0" 
+                <input
+                    type="number"
+                    id="comp_${key}"
+                    value="${this.state.composition[key]}"
+                    min="0"
                     max="6"
                     class="composition-input"
+                >
+            </div>
+        `).join('');
+    }
+
+    renderPositionWeightInputs() {
+        // Render weight inputs for each position
+        return Object.entries(this.activityConfig.positions).map(([key, name]) => `
+            <div class="composition-item">
+                <label>${name}</label>
+                <input
+                    type="number"
+                    id="weight_${key}"
+                    value="${this.state.positionWeights[key]}"
+                    min="0.1"
+                    max="5.0"
+                    step="0.1"
+                    class="weight-input"
                 >
             </div>
         `).join('');
@@ -215,12 +247,28 @@ class TeamsPage extends BasePage {
                 // Clone to remove old event listeners
                 const newInput = input.cloneNode(true);
                 input.parentNode.replaceChild(newInput, input);
-                
+
                 newInput.addEventListener('input', (e) => {
                     const pos = newInput.id.replace('comp_', '');
                     const value = parseInt(e.target.value) || 0;
                     this.state.composition[pos] = value;
                     updatePlayersPerTeam();
+                });
+            });
+        }
+
+        // Position weight inputs
+        const weightInputs = this.container.querySelectorAll('.weight-input');
+        if (weightInputs && weightInputs.length > 0) {
+            weightInputs.forEach(input => {
+                // Clone to remove old event listeners
+                const newInput = input.cloneNode(true);
+                input.parentNode.replaceChild(newInput, input);
+
+                newInput.addEventListener('input', (e) => {
+                    const pos = newInput.id.replace('weight_', '');
+                    const value = parseFloat(e.target.value) || 1.0;
+                    this.state.positionWeights[pos] = value;
                 });
             });
         }
@@ -281,19 +329,32 @@ class TeamsPage extends BasePage {
             // Show optimizing message
             toast.info('Optimizing teams... This may take a moment', 10000);
 
-            // Optimize (async)
-            const result = await this.teamOptimizerService.optimize(
-                composition,
-                teamCount,
-                players
-            );
+            // Apply custom position weights temporarily
+            const originalWeights = { ...this.activityConfig.positionWeights };
+            Object.assign(this.activityConfig.positionWeights, this.state.positionWeights);
 
-            this.setState({ 
-                teams: result,
-                isOptimizing: false 
-            });
+            // Update EloService weights as well
+            this.eloService.POSITION_WEIGHTS = this.state.positionWeights;
 
-            toast.success(`Teams created! Balance: ${result.balance.difference} ELO difference`);
+            try {
+                // Optimize (async)
+                const result = await this.teamOptimizerService.optimize(
+                    composition,
+                    teamCount,
+                    players
+                );
+
+                this.setState({
+                    teams: result,
+                    isOptimizing: false
+                });
+
+                toast.success(`Teams created! Balance: ${result.balance.difference} ELO difference`);
+            } finally {
+                // Restore original weights
+                Object.assign(this.activityConfig.positionWeights, originalWeights);
+                this.eloService.POSITION_WEIGHTS = originalWeights;
+            }
 
         } catch (error) {
             this.setState({ isOptimizing: false });

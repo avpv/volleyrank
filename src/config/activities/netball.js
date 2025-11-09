@@ -27,13 +27,13 @@ export default {
     // Position weights for team balancing
     // Higher weight = more important position
     positionWeights: {
-        'C': 1.3,    // Center - most versatile
-        'GS': 1.25,  // Goal Shooter
-        'GA': 1.2,   // Goal Attack
-        'GK': 1.2,   // Goal Keeper
-        'GD': 1.15,  // Goal Defense
-        'WA': 1.1,   // Wing Attack
-        'WD': 1.1    // Wing Defense
+        'C': 1.0,    // Center - most versatile
+        'GS': 1.0,  // Goal Shooter
+        'GA': 1.0,   // Goal Attack
+        'GK': 1.0,   // Goal Keeper
+        'GD': 1.0,  // Goal Defense
+        'WA': 1.0,   // Wing Attack
+        'WD': 1.0    // Wing Defense
     },
 
     // Order in which positions should be displayed

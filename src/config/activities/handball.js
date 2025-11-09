@@ -27,13 +27,13 @@ export default {
     // Position weights for team balancing
     // Higher weight = more important position
     positionWeights: {
-        'GK': 1.35,  // Goalkeeper
-        'CB': 1.25,  // Center Back - playmaker
-        'P': 1.2,    // Pivot
-        'LB': 1.15,  // Left Back
-        'RB': 1.15,  // Right Back
-        'LW': 1.1,   // Left Wing
-        'RW': 1.1    // Right Wing
+        'GK': 1.0,  // Goalkeeper
+        'CB': 1.0,  // Center Back - playmaker
+        'P': 1.0,    // Pivot
+        'LB': 1.0,  // Left Back
+        'RB': 1.0,  // Right Back
+        'LW': 1.0,   // Left Wing
+        'RW': 1.0    // Right Wing
     },
 
     // Order in which positions should be displayed

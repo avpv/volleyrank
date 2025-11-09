@@ -24,10 +24,10 @@ export default {
     // Position weights for team balancing
     // Higher weight = more important position
     positionWeights: {
-        'HAND': 1.25,  // Handler - primary thrower
-        'CUT': 1.2,    // Cutter
-        'DEEP': 1.15,  // Deep
-        'MID': 1.15    // Mid
+        'HAND': 1.0,  // Handler - primary thrower
+        'CUT': 1.0,    // Cutter
+        'DEEP': 1.0,  // Deep
+        'MID': 1.0    // Mid
     },
 
     // Order in which positions should be displayed

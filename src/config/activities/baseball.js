@@ -29,15 +29,15 @@ export default {
     // Position weights for team balancing
     // Higher weight = more important position
     positionWeights: {
-        'P': 1.5,    // Pitcher is most critical
-        'C': 1.3,    // Catcher
-        'SS': 1.25,  // Shortstop
-        '2B': 1.2,   // Second Base
-        '3B': 1.15,  // Third Base
-        '1B': 1.1,   // First Base
-        'CF': 1.2,   // Center Field
-        'LF': 1.1,   // Left Field
-        'RF': 1.1    // Right Field
+        'P': 1.0,    // Pitcher is most critical
+        'C': 1.0,    // Catcher
+        'SS': 1.0,  // Shortstop
+        '2B': 1.0,   // Second Base
+        '3B': 1.0,  // Third Base
+        '1B': 1.0,   // First Base
+        'CF': 1.0,   // Center Field
+        'LF': 1.0,   // Left Field
+        'RF': 1.0    // Right Field
     },
 
     // Order in which positions should be displayed

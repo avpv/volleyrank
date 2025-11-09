@@ -25,11 +25,11 @@ export default {
     // Position weights for team balancing
     // Higher weight = more important position
     positionWeights: {
-        'PG': 1.25,  // Point Guard - floor general
-        'SG': 1.15,  // Shooting Guard
-        'SF': 1.2,   // Small Forward - versatile
-        'PF': 1.1,   // Power Forward
-        'C': 1.2     // Center - rim protector
+        'PG': 1.0,  // Point Guard - floor general
+        'SG': 1.0,  // Shooting Guard
+        'SF': 1.0,   // Small Forward - versatile
+        'PF': 1.0,   // Power Forward
+        'C': 1.0     // Center - rim protector
     },
 
     // Order in which positions should be displayed

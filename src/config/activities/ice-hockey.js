@@ -26,12 +26,12 @@ export default {
     // Position weights for team balancing
     // Higher weight = more important position
     positionWeights: {
-        'G': 1.4,   // Goaltender is critical
-        'C': 1.3,   // Center
-        'LD': 1.2,  // Left Defense
-        'RD': 1.2,  // Right Defense
-        'LW': 1.15, // Left Wing
-        'RW': 1.15  // Right Wing
+        'G': 1.0,   // Goaltender is critical
+        'C': 1.0,   // Center
+        'LD': 1.0,  // Left Defense
+        'RD': 1.0,  // Right Defense
+        'LW': 1.0, // Left Wing
+        'RW': 1.0  // Right Wing
     },
 
     // Order in which positions should be displayed

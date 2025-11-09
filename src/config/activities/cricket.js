@@ -25,11 +25,11 @@ export default {
     // Position weights for team balancing
     // Higher weight = more important position
     positionWeights: {
-        'WK': 1.3,    // Wicket-keeper
-        'AR': 1.25,   // All-rounder - most versatile
-        'FAST': 1.2,  // Fast Bowler
-        'SPIN': 1.15, // Spin Bowler
-        'BAT': 1.1    // Batsman
+        'WK': 1.0,    // Wicket-keeper
+        'AR': 1.0,   // All-rounder - most versatile
+        'FAST': 1.0,  // Fast Bowler
+        'SPIN': 1.0, // Spin Bowler
+        'BAT': 1.0    // Batsman
     },
 
     // Order in which positions should be displayed
