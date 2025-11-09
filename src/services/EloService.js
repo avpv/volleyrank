@@ -182,6 +182,78 @@ class EloService {
     }
 
     /**
+     * Calculate rating changes for a draw
+     * In a draw, both players receive a score of 0.5
+     *
+     * @param {Object} player1 - First player object
+     * @param {Object} player2 - Second player object
+     * @param {string} position - Position being compared
+     * @param {number} poolSize - Optional: Number of players in position pool (for fair K-factor adjustment)
+     * @returns {Object} Rating change details
+     */
+    calculateDrawRatingChange(player1, player2, position, poolSize = null) {
+        // Validate that players are different
+        if (player1.id === player2.id) {
+            throw new Error('Cannot calculate rating change for same player');
+        }
+
+        const player1Rating = player1.ratings?.[position] || this.DEFAULT_RATING;
+        const player2Rating = player2.ratings?.[position] || this.DEFAULT_RATING;
+        const player1Comparisons = player1.comparisons?.[position] || 0;
+        const player2Comparisons = player2.comparisons?.[position] || 0;
+
+        // Validate rating values
+        if (player1Rating < 0 || player2Rating < 0) {
+            throw new Error('Invalid rating value: ratings cannot be negative');
+        }
+        if (!isFinite(player1Rating) || !isFinite(player2Rating)) {
+            throw new Error('Invalid rating value: ratings must be finite numbers');
+        }
+
+        const player1Expected = this.calculateExpectedScore(player1Rating, player2Rating);
+        const player2Expected = this.calculateExpectedScore(player2Rating, player1Rating);
+
+        // Calculate base K-factors
+        const player1BaseK = this.calculateKFactor(player1Comparisons, player1Rating);
+        const player2BaseK = this.calculateKFactor(player2Comparisons, player2Rating);
+
+        // Apply pool-size adjustment if poolSize is provided
+        let player1K = player1BaseK;
+        let player2K = player2BaseK;
+
+        if (poolSize && poolSize > 1) {
+            player1K = this.calculatePoolAdjustedKFactor(player1BaseK, poolSize);
+            player2K = this.calculatePoolAdjustedKFactor(player2BaseK, poolSize);
+        }
+
+        // In a draw, both players score 0.5
+        const player1Change = player1K * (0.5 - player1Expected);
+        const player2Change = player2K * (0.5 - player2Expected);
+
+        return {
+            player1: {
+                oldRating: player1Rating,
+                newRating: player1Rating + player1Change,
+                change: player1Change,
+                kFactor: player1K,
+                baseKFactor: player1BaseK,
+                expected: player1Expected
+            },
+            player2: {
+                oldRating: player2Rating,
+                newRating: player2Rating + player2Change,
+                change: player2Change,
+                kFactor: player2K,
+                baseKFactor: player2BaseK,
+                expected: player2Expected
+            },
+            poolSize: poolSize || null,
+            poolAdjusted: poolSize && poolSize > 1,
+            isDraw: true
+        };
+    }
+
+    /**
      * Predict match outcome
      * Calculates win probabilities based on ratings
      *
