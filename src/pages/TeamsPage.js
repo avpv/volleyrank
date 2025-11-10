@@ -13,8 +13,9 @@ class TeamsPage extends BasePage {
         super(container, props);
         this.setTitle('Teams');
 
-        // Get services from props
+        // Get services and activity info from props
         this.activityConfig = props.activityConfig;
+        this.activityKey = props.activityKey; // Key like 'volleyball', 'basketball', etc.
         this.playerService = props.services?.resolve('playerService');
         this.teamOptimizerService = props.services?.resolve('teamOptimizerService');
         this.eloService = props.services?.resolve('eloService');
@@ -57,8 +58,7 @@ class TeamsPage extends BasePage {
      * Get storage key for current activity
      */
     getStorageKey() {
-        const currentActivity = storage.get('selectedActivity', 'volleyball');
-        return `teamBuilderSettings_${currentActivity}`;
+        return `teamBuilderSettings_${this.activityKey}`;
     }
 
     /**
