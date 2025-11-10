@@ -19,7 +19,7 @@ class BasePage extends Component {
      */
     setTitle(title) {
         this.title = title;
-        document.title = `${title} - TeamBalance`;
+        document.title = `${title} | TeamBalance`;
     }
 
     /**
