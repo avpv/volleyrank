@@ -316,7 +316,7 @@ a:hover {
 /* Yin-Yang Style for T and B */
 .title-t,
 .title-b {
-    padding: var(--spacing-1) var(--spacing-3);
+    padding: var(--spacing-1) var(--spacing-2);
     font-size: var(--font-size-sm);
     font-weight: var(--font-weight-medium);
     border: 2px solid;
@@ -332,11 +332,11 @@ a:hover {
     color: var(--color-text-primary);
 }
 
-/* B (Yang ☯) - Light background, dark border */
+/* B (Yang ☯) - Light background same as T text color, dark text */
 .title-b {
-    background-color: var(--color-surface-overlay);
+    background-color: var(--color-text-primary);
     border-color: var(--color-border-strong);
-    color: var(--color-text-primary);
+    color: var(--color-text-inverse);
 }
 
 .app-title-link {
