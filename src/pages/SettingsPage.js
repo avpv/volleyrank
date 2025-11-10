@@ -75,10 +75,10 @@ class SettingsPage extends BasePage {
                 <h3>Welcome to TeamBalance!</h3>
                 <p>Get started in 4 easy steps:</p>
                 <ol>
-                    <li><strong>Select Activity Type</strong> from the dropdown below</li>
-                    <li><strong>Add players</strong> with their positions</li>
-                    <li><strong>Compare players</strong> to build accurate skill ratings</li>
-                    <li><strong>Create balanced teams</strong> automatically</li>
+                    <li><a href="#" class="guide-link" data-action="select-activity"><strong>Select Activity Type</strong></a> from the dropdown below</li>
+                    <li><a href="#" class="guide-link" data-action="add-players"><strong>Add players</strong></a> with their positions</li>
+                    <li><a href="/compare/" class="guide-link"><strong>Compare players</strong></a> to build accurate skill ratings</li>
+                    <li><a href="/teams/" class="guide-link"><strong>Create balanced teams</strong></a> automatically</li>
                 </ol>
             </div>
         `;
@@ -274,6 +274,17 @@ class SettingsPage extends BasePage {
     }
 
     attachEventListeners() {
+        // Welcome guide links
+        this.$$('.guide-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                const action = link.getAttribute('data-action');
+                if (action) {
+                    e.preventDefault();
+                    this.handleGuideAction(action);
+                }
+            });
+        });
+
         // Activity selector
         const activitySelect = this.$('#activitySelect');
         if (activitySelect) {
@@ -367,6 +378,46 @@ class SettingsPage extends BasePage {
         if (content && icon) {
             content.classList.toggle('open');
             icon.classList.toggle('open');
+        }
+    }
+
+    handleGuideAction(action) {
+        const currentActivity = storage.get('selectedActivity', null);
+
+        switch (action) {
+            case 'select-activity':
+                // Scroll to activity selector
+                const activitySelect = this.$('#activitySelect');
+                if (activitySelect) {
+                    activitySelect.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    // Focus the select to draw attention
+                    setTimeout(() => activitySelect.focus(), 300);
+                }
+                break;
+
+            case 'add-players':
+                if (!currentActivity) {
+                    toast.error('Please select an activity type first');
+                    // Scroll to activity selector instead
+                    const select = this.$('#activitySelect');
+                    if (select) {
+                        select.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        setTimeout(() => select.focus(), 300);
+                    }
+                } else {
+                    // Scroll to accordion and open it
+                    const accordionHeader = this.$('#addPlayerAccordionHeader');
+                    if (accordionHeader) {
+                        accordionHeader.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                        // Open accordion if closed
+                        const content = this.$('#addPlayerAccordionContent');
+                        if (content && !content.classList.contains('open')) {
+                            setTimeout(() => this.toggleAccordion(), 300);
+                        }
+                    }
+                }
+                break;
         }
     }
 
