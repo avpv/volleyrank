@@ -836,22 +836,18 @@ select.form-control {
 /* Toast Variants */
 .toast-success {
     border-color: var(--color-success);
-    border-left: 4px solid var(--color-success);
 }
 
 .toast-error {
     border-color: var(--color-error);
-    border-left: 4px solid var(--color-error);
 }
 
 .toast-warning {
     border-color: var(--color-warning);
-    border-left: 4px solid var(--color-warning);
 }
 
 .toast-info {
     border-color: var(--color-info);
-    border-left: 4px solid var(--color-info);
 }
 
 /* =============================================================================
