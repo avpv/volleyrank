@@ -182,8 +182,8 @@ class ComparePage extends BasePage {
                     <div class="vs-divider">
                         <div class="vs-text">VS</div>
                         <button class="draw-button" id="drawButton" data-player1-id="${player1.id}" data-player2-id="${player2.id}">
-                            ${getIcon('shuffle', { size: 16, className: 'btn-icon' })}
-                            Draw
+                            ${getIcon('win-win', { size: 16, className: 'btn-icon' })}
+                            Win-Win
                         </button>
                     </div>
 
@@ -297,7 +297,7 @@ class ComparePage extends BasePage {
     handleDraw(player1Id, player2Id) {
         try {
             this.comparisonService.processDraw(player1Id, player2Id, this.selectedPosition);
-            toast.success('Draw recorded', 2000);
+            toast.success('Win-Win recorded', 2000);
         } catch (error) {
             toast.error(error.message);
         }
