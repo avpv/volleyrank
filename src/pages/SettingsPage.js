@@ -155,11 +155,11 @@ class SettingsPage extends BasePage {
                         <div class="form-section danger-zone">
                             <label class="form-section-title">Reset & Delete</label>
                             <div class="form-section-actions">
-                                <button type="button" class="btn btn-warning" id="resetAllBtn">
+                                <button type="button" class="btn btn-secondary" id="resetAllBtn">
                                     ${getIcon('refresh', { size: 16, className: 'btn-icon' })}
                                     Reset All Ratings
                                 </button>
-                                <button type="button" class="btn btn-danger" id="clearAllBtn">
+                                <button type="button" class="btn btn-secondary" id="clearAllBtn">
                                     ${getIcon('trash', { size: 16, className: 'btn-icon' })}
                                     Remove All Players
                                 </button>
@@ -261,11 +261,11 @@ class SettingsPage extends BasePage {
                         ${getIcon('edit', { size: 14, className: 'btn-icon' })}
                         Edit
                     </button>
-                    <button class="btn btn-sm btn-warning" data-action="reset" data-player-id="${player.id}">
+                    <button class="btn btn-sm btn-secondary" data-action="reset" data-player-id="${player.id}">
                         ${getIcon('refresh', { size: 14, className: 'btn-icon' })}
                         Reset
                     </button>
-                    <button class="btn btn-sm btn-danger" data-action="remove" data-player-id="${player.id}">
+                    <button class="btn btn-sm btn-secondary" data-action="remove" data-player-id="${player.id}">
                         ${getIcon('trash', { size: 14, className: 'btn-icon' })}
                         Remove
                     </button>
