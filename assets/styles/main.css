@@ -325,10 +325,10 @@ a:hover {
     transition: var(--transition-default);
 }
 
-/* T (Yin ☯) - No background, light border */
+/* T (Yin ☯) - No background, border same as text color */
 .title-t {
     background-color: transparent;
-    border-color: var(--color-border-active);
+    border-color: var(--color-text-primary);
     color: var(--color-text-primary);
 }
 
