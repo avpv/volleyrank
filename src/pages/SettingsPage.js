@@ -699,6 +699,24 @@ class SettingsPage extends BasePage {
             .map(([key, name]) => `${name} (${key})`)
             .join(', ');
 
+        // Generate example positions from current activity
+        const positionKeys = Object.keys(positions);
+        const examplePos1 = positionKeys[0] || 'POS1';
+        const examplePos2 = positionKeys[1] || 'POS2';
+        const examplePos3 = positionKeys[2] || 'POS3';
+
+        // Generate CSV example
+        const csvExample = `name,positions
+"John Smith","${examplePos1},${examplePos2}"
+"Alice Johnson","${examplePos2}"
+"Bob Williams","${examplePos3}"`;
+
+        // Generate JSON example
+        const jsonExample = `[
+  {"name": "John Smith", "positions": ["${examplePos1}", "${examplePos2}"]},
+  {"name": "Alice Johnson", "positions": ["${examplePos2}"]}
+]`;
+
         return `
             <div class="import-modal-content">
                 <p class="modal-description">
@@ -714,18 +732,12 @@ class SettingsPage extends BasePage {
 
                 <div class="format-example">
                     <strong>CSV Format:</strong>
-                    <pre class="code-block">name,positions
-"John Smith","OH,MB"
-"Alice Johnson","S"
-"Bob Williams","L"</pre>
+                    <pre class="code-block">${csvExample}</pre>
                 </div>
 
                 <div class="format-example">
                     <strong>JSON Format:</strong>
-                    <pre class="code-block">[
-  {"name": "John Smith", "positions": ["OH", "MB"]},
-  {"name": "Alice Johnson", "positions": ["S"]}
-]</pre>
+                    <pre class="code-block">${jsonExample}</pre>
                 </div>
 
                 <div class="form-group">
