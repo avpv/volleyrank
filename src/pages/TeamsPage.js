@@ -84,8 +84,24 @@ class TeamsPage extends BasePage {
                     <div class="composition-table">
                         <div class="composition-table-header">
                             <div class="composition-header-cell position-cell">Position</div>
-                            <div class="composition-header-cell">Count</div>
-                            <div class="composition-header-cell">Weight</div>
+                            <div class="composition-header-cell">
+                                <span class="tooltip-wrapper">
+                                    Count
+                                    <span class="tooltip-icon">
+                                        ${getIcon('info', { size: 14 })}
+                                        <span class="tooltip-content">Number of players per position</span>
+                                    </span>
+                                </span>
+                            </div>
+                            <div class="composition-header-cell">
+                                <span class="tooltip-wrapper">
+                                    Weight
+                                    <span class="tooltip-icon">
+                                        ${getIcon('info', { size: 14 })}
+                                        <span class="tooltip-content">Position importance multiplier</span>
+                                    </span>
+                                </span>
+                            </div>
                         </div>
                         ${this.renderCompositionWithWeights()}
                     </div>
