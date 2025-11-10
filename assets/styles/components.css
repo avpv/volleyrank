@@ -413,7 +413,6 @@ select.form-control {
     color: var(--color-text-primary);
     background: linear-gradient(135deg, var(--color-surface-raised) 0%, var(--color-surface-base) 100%);
     border: none;
-    border-bottom: 1px solid var(--color-border-default);
     cursor: pointer;
     transition: all var(--duration-default) ease;
     text-align: left;
