@@ -702,8 +702,9 @@ class SettingsPage extends BasePage {
         // Generate example positions from current activity
         const positionKeys = Object.keys(positions);
         const examplePos1 = positionKeys[0] || 'POS1';
-        const examplePos2 = positionKeys[1] || 'POS2';
-        // Only use third position if it exists, otherwise fallback to first position
+        // Fallback to first position if second doesn't exist (for single-position activities)
+        const examplePos2 = positionKeys[1] || examplePos1;
+        // Fallback to first position if third doesn't exist
         const examplePos3 = positionKeys[2] || examplePos1;
 
         // Generate CSV example
