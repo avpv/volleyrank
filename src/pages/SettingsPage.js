@@ -703,7 +703,8 @@ class SettingsPage extends BasePage {
         const positionKeys = Object.keys(positions);
         const examplePos1 = positionKeys[0] || 'POS1';
         const examplePos2 = positionKeys[1] || 'POS2';
-        const examplePos3 = positionKeys[2] || 'POS3';
+        // Only use third position if it exists, otherwise fallback to first position
+        const examplePos3 = positionKeys[2] || examplePos1;
 
         // Generate CSV example
         const csvExample = `name,positions
