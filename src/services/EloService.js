@@ -177,8 +177,8 @@ class EloService {
     }
 
     /**
-     * Calculate rating changes for a draw
-     * In a draw, both players receive a score of 0.5
+     * Calculate rating changes for a Win-Win
+     * In a Win-Win, both players receive a score of 0.5
      *
      * @param {Object} player1 - First player object
      * @param {Object} player2 - Second player object
@@ -221,7 +221,7 @@ class EloService {
             player2K = this.calculatePoolAdjustedKFactor(player2BaseK, poolSize);
         }
 
-        // In a draw, both players score 0.5
+        // In a Win-Win, both players score 0.5
         const player1Change = player1K * (0.5 - player1Expected);
         const player2Change = player2K * (0.5 - player2Expected);
 

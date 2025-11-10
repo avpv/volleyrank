@@ -207,7 +207,7 @@ class ComparisonService {
     }
 
     /**
-     * Process a draw comparison
+     * Process a Win-Win comparison
      * Both players receive equal points (0.5 each)
      *
      * @param {string} player1Id - First player ID
@@ -230,7 +230,7 @@ class ComparisonService {
         // Check if already compared
         this.checkAlreadyCompared(player1, player2, position);
 
-        // Calculate rating changes for draw
+        // Calculate rating changes for Win-Win
         const poolSize = this.playerRepository.countByPosition(position);
         const changes = this.eloService.calculateDrawRatingChange(
             player1,
@@ -337,7 +337,7 @@ class ComparisonService {
     }
 
     /**
-     * Update players after draw
+     * Update players after Win-Win
      * @private
      */
     updatePlayersAfterDraw(player1Id, player2Id, position, changes, player1Name, player2Name) {
