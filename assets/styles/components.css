@@ -430,15 +430,6 @@ select.form-control {
     transition: all var(--duration-default) ease;
 }
 
-.accordion-header:hover:not(.disabled)::before {
-    background: var(--color-brand-primary);
-}
-
-.accordion-header:hover:not(.disabled) {
-    background: linear-gradient(135deg, var(--color-surface-overlay) 0%, var(--color-surface-raised) 100%);
-    padding-left: calc(var(--spacing-6) + 8px);
-}
-
 .accordion-header:focus {
     outline: 2px solid var(--color-brand-primary);
     outline-offset: -2px;
@@ -470,18 +461,9 @@ select.form-control {
     color: var(--color-brand-primary);
 }
 
-.accordion-header:hover:not(.disabled) .accordion-icon {
-    color: var(--color-brand-secondary);
-    transform: scale(1.1);
-}
-
 .accordion-icon.open {
     transform: rotate(180deg);
     color: var(--color-success);
-}
-
-.accordion-header:hover:not(.disabled) .accordion-icon.open {
-    transform: rotate(180deg) scale(1.1);
 }
 
 .accordion-content {
