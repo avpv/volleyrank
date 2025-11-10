@@ -961,7 +961,7 @@ select.form-control {
 }
 
 .welcome-guide h3 {
-    color: var(--color-brand-primary);
+    color: var(--color-text-primary);
     margin-bottom: var(--spacing-3);
     font-size: var(--font-size-base);
     font-weight: var(--font-weight-semibold);
@@ -990,8 +990,30 @@ select.form-control {
 }
 
 .welcome-guide ol li strong {
+    color: var(--color-text-primary);
+    font-weight: var(--font-weight-semibold);
+}
+
+.welcome-guide .guide-link {
+    color: inherit;
+    text-decoration: none;
+    transition: var(--transition-default);
+}
+
+.welcome-guide .guide-link:hover {
+    opacity: 0.8;
+}
+
+.welcome-guide .guide-link strong {
     color: var(--color-brand-primary);
     font-weight: var(--font-weight-semibold);
+    text-decoration: underline;
+    text-decoration-color: transparent;
+    transition: var(--transition-default);
+}
+
+.welcome-guide .guide-link:hover strong {
+    text-decoration-color: var(--color-brand-primary);
 }
 
 /* =============================================================================
@@ -1298,26 +1320,31 @@ select.form-control {
     .welcome-guide {
         padding: var(--spacing-4);
     }
-    
+
     .welcome-guide h3 {
         font-size: var(--font-size-sm);
         margin-bottom: var(--spacing-2);
+        color: var(--color-text-primary);
     }
-    
+
     .welcome-guide p {
         font-size: var(--font-size-xs);
         margin-bottom: var(--spacing-2);
     }
-    
+
     .welcome-guide ol {
         margin: var(--spacing-3) 0 0 0;
         padding-left: var(--spacing-4);
     }
-    
+
     .welcome-guide ol li {
         font-size: var(--font-size-xs);
         margin-bottom: var(--spacing-1);
         line-height: var(--line-height-normal);
+    }
+
+    .welcome-guide .guide-link strong {
+        font-size: var(--font-size-xs);
     }
 }
 

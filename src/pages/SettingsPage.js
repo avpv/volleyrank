@@ -75,7 +75,7 @@ class SettingsPage extends BasePage {
                 <h3>Welcome to TeamBalance!</h3>
                 <p>Get started in 4 easy steps:</p>
                 <ol>
-                    <li><strong>Select Activity Type</strong> from the dropdown below</li>
+                    <li><a href="#" class="guide-link" data-action="select-activity"><strong>Select Activity Type</strong></a> from the dropdown below</li>
                     <li><strong>Add players</strong> with their positions</li>
                     <li><strong>Compare players</strong> to build accurate skill ratings</li>
                     <li><strong>Create balanced teams</strong> automatically</li>
@@ -274,6 +274,17 @@ class SettingsPage extends BasePage {
     }
 
     attachEventListeners() {
+        // Welcome guide links
+        this.$$('.guide-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                const action = link.getAttribute('data-action');
+                if (action) {
+                    e.preventDefault();
+                    this.handleGuideAction(action);
+                }
+            });
+        });
+
         // Activity selector
         const activitySelect = this.$('#activitySelect');
         if (activitySelect) {
@@ -367,6 +378,20 @@ class SettingsPage extends BasePage {
         if (content && icon) {
             content.classList.toggle('open');
             icon.classList.toggle('open');
+        }
+    }
+
+    handleGuideAction(action) {
+        switch (action) {
+            case 'select-activity':
+                // Scroll to activity selector
+                const activitySelect = this.$('#activitySelect');
+                if (activitySelect) {
+                    activitySelect.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    // Focus the select to draw attention
+                    setTimeout(() => activitySelect.focus(), 300);
+                }
+                break;
         }
     }
 
