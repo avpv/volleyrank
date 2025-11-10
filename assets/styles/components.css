@@ -989,6 +989,11 @@ select.form-control {
     margin-bottom: 0;
 }
 
+.welcome-guide ol li strong {
+    color: var(--color-text-primary);
+    font-weight: var(--font-weight-semibold);
+}
+
 .welcome-guide .guide-link {
     color: inherit;
     text-decoration: none;
