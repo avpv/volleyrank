@@ -691,11 +691,25 @@ class SettingsPage extends BasePage {
     }
 
     renderImportModalContent() {
+        const currentActivity = storage.get('selectedActivity', null);
+        const activityName = currentActivity ? activities[currentActivity]?.name : 'Unknown';
+        const positions = this.playerService.positions;
+        const positionsList = Object.entries(positions)
+            .map(([key, name]) => `${name} (${key})`)
+            .join(', ');
+
         return `
             <div class="import-modal-content">
                 <p class="modal-description">
                     Import players from CSV or JSON format. You can paste data or upload a file.
                 </p>
+
+                <div class="info-box">
+                    <div class="info-title">Current Activity: ${this.escape(activityName)}</div>
+                    <div class="info-text">
+                        Players should have positions for this activity: <strong>${positionsList}</strong>
+                    </div>
+                </div>
 
                 <div class="format-example">
                     <strong>CSV Format:</strong>
