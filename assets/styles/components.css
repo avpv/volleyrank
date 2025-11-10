@@ -432,8 +432,7 @@ select.form-control {
 }
 
 .accordion-header:focus {
-    outline: 2px solid var(--color-brand-primary);
-    outline-offset: -2px;
+    outline: none;
 }
 
 .accordion-header:active:not(.disabled) {
