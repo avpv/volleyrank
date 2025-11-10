@@ -65,12 +65,9 @@
     margin-bottom: 0;
 }
 
+/* Add player accordion uses .accordion styles from components.css */
 .add-player-section {
-    background-color: var(--color-surface-raised);
-    border: 1px solid var(--color-border-default);
-    border-radius: var(--radius-lg);
-    padding: var(--spacing-8);
-    margin-bottom: var(--spacing-8);
+    /* Inherits accordion styling - no additional styles needed */
 }
 
 .player-form {
