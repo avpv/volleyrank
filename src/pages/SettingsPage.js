@@ -396,8 +396,13 @@ class SettingsPage extends BasePage {
     }
 
     handleActivityChange(activityKey) {
-        // If empty selection, do nothing
+        // If empty selection, clear the activity
         if (!activityKey) {
+            storage.remove('selectedActivity');
+            toast.success('Activity cleared. Reloading...', 2000);
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
             return;
         }
 
