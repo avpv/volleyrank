@@ -470,7 +470,6 @@ select.form-control {
 .accordion-content {
     max-height: 0;
     overflow: hidden;
-    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), padding 0.4s ease;
     border-top: 0 solid var(--color-border-default);
     background-color: var(--color-surface-base);
 }
@@ -478,8 +477,7 @@ select.form-control {
 .accordion-content.open {
     max-height: 1500px;
     padding: var(--spacing-6);
-    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), padding 0.4s ease;
-    border-top: 2px solid var(--color-brand-primary);
+    border-top: 2px solid var(--color-border-default);
 }
 
 /* Form Sections */
