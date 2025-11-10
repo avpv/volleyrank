@@ -186,7 +186,6 @@
 }
 
 .progress-item.current-position {
-    border-left: 3px solid var(--color-brand-primary);
     background-color: var(--color-surface-interactive);
 }
 
