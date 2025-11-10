@@ -701,21 +701,45 @@ class SettingsPage extends BasePage {
 
         // Generate example positions from current activity
         const positionKeys = Object.keys(positions);
-        const examplePos1 = positionKeys[0] || 'POS1';
-        const examplePos2 = positionKeys[1] || 'POS2';
-        const examplePos3 = positionKeys[2] || 'POS3';
 
-        // Generate CSV example
-        const csvExample = `name,positions
-"John Smith","${examplePos1},${examplePos2}"
-"Alice Johnson","${examplePos2}"
-"Bob Williams","${examplePos3}"`;
+        // Create examples based on number of available positions
+        let csvExample, jsonExample;
 
-        // Generate JSON example
-        const jsonExample = `[
-  {"name": "John Smith", "positions": ["${examplePos1}", "${examplePos2}"]},
-  {"name": "Alice Johnson", "positions": ["${examplePos2}"]}
+        if (positionKeys.length === 0) {
+            // No positions defined - use placeholders
+            csvExample = `name,positions
+"John Smith","POS1"
+"Alice Johnson","POS1"
+"Bob Williams","POS2"`;
+            jsonExample = `[
+  {"name": "John Smith", "positions": ["POS1"]},
+  {"name": "Alice Johnson", "positions": ["POS1"]}
 ]`;
+        } else if (positionKeys.length === 1) {
+            // Single position - all players have the same position (no duplicates per player)
+            const pos = positionKeys[0];
+            csvExample = `name,positions
+"John Smith","${pos}"
+"Alice Johnson","${pos}"
+"Bob Williams","${pos}"`;
+            jsonExample = `[
+  {"name": "John Smith", "positions": ["${pos}"]},
+  {"name": "Alice Johnson", "positions": ["${pos}"]}
+]`;
+        } else {
+            // Multiple positions - show variety with unique positions per player
+            const pos1 = positionKeys[0];
+            const pos2 = positionKeys[1];
+            const pos3 = positionKeys[2] || pos1;
+            csvExample = `name,positions
+"John Smith","${pos1},${pos2}"
+"Alice Johnson","${pos2}"
+"Bob Williams","${pos3}"`;
+            jsonExample = `[
+  {"name": "John Smith", "positions": ["${pos1}", "${pos2}"]},
+  {"name": "Alice Johnson", "positions": ["${pos2}"]}
+]`;
+        }
 
         return `
             <div class="import-modal-content">
