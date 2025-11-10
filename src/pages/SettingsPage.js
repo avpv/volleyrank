@@ -65,7 +65,7 @@ class SettingsPage extends BasePage {
             ${this.renderActivitySelector()}
             ${this.renderAddPlayerForm()}
             ${currentActivity ? this.renderPositionStats(stats) : ''}
-            ${this.renderPlayersList(players)}
+            ${currentActivity ? this.renderPlayersList(players) : ''}
         `);
     }
 
