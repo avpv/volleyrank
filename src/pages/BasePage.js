@@ -5,6 +5,7 @@
  * Extends Component with page-specific functionality
  */
 import Component from '../components/base/Component.js';
+import { getLogo } from '../components/base/Icons.js';
 
 class BasePage extends Component {
     constructor(container, props = {}) {
@@ -74,7 +75,7 @@ class BasePage extends Component {
     renderEmpty(message, icon = '') {
         return `
             <div class="empty-state">
-                ${icon ? `<div class="empty-icon">${icon}</div>` : ''}
+                <div class="empty-icon">${getLogo({ size: 48 })}</div>
                 <p>${message}</p>
             </div>
         `;
