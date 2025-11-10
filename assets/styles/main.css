@@ -358,6 +358,7 @@ a:hover {
     color: inherit;
     display: flex;
     align-items: center;
+    gap: var(--spacing-2);
     transition: var(--transition-default);
     border-radius: var(--radius-md);
     padding: var(--spacing-2) var(--spacing-3);
@@ -375,6 +376,18 @@ a:hover {
 
 .app-title-link:active {
     transform: scale(0.98);
+}
+
+/* App Logo */
+.app-logo {
+    flex-shrink: 0;
+    transition: var(--transition-default);
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.app-title-link:hover .app-logo {
+    filter: drop-shadow(0 4px 8px rgba(47, 129, 247, 0.3));
+    transform: translateY(-1px);
 }
 
 .app-subtitle {
