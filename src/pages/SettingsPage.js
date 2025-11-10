@@ -204,7 +204,8 @@ class SettingsPage extends BasePage {
 
     renderPlayersList(players) {
         if (players.length === 0) {
-            return this.renderEmpty('No players yet. Add your first player above!');
+            const emptyIcon = getIcon('users-x', { size: 64, color: 'var(--color-text-secondary)' });
+            return this.renderEmpty('No players yet. Add your first player above!', emptyIcon);
         }
 
         const sorted = [...players].sort((a, b) => {
