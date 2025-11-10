@@ -6,6 +6,7 @@
 import BasePage from './BasePage.js';
 import toast from '../components/base/Toast.js';
 import { getIcon } from '../components/base/Icons.js';
+import storage from '../core/StorageAdapter.js';
 
 class TeamsPage extends BasePage {
     constructor(container, props = {}) {
@@ -24,13 +25,16 @@ class TeamsPage extends BasePage {
             initialWeights[pos] = this.activityConfig.positionWeights[pos] || 1.0;
         });
 
+        // Load saved settings from localStorage
+        const savedSettings = this.loadSettings();
+
         this.state = {
             teams: null,
             isOptimizing: false,
-            showEloRatings: true,
-            teamCount: 2,
-            composition: this.activityConfig.defaultComposition,
-            positionWeights: initialWeights
+            showEloRatings: savedSettings.showEloRatings ?? true,
+            teamCount: savedSettings.teamCount ?? 2,
+            composition: savedSettings.composition ?? this.activityConfig.defaultComposition,
+            positionWeights: savedSettings.positionWeights ?? initialWeights
         };
     }
 
@@ -47,6 +51,49 @@ class TeamsPage extends BasePage {
 
     onUpdate() {
         this.attachEventListeners();
+    }
+
+    /**
+     * Get storage key for current activity
+     */
+    getStorageKey() {
+        const currentActivity = storage.get('selectedActivity', 'volleyball');
+        return `teamBuilderSettings_${currentActivity}`;
+    }
+
+    /**
+     * Load settings from localStorage
+     */
+    loadSettings() {
+        const storageKey = this.getStorageKey();
+        const saved = storage.get(storageKey, null);
+
+        if (!saved) {
+            return {};
+        }
+
+        return {
+            showEloRatings: saved.showEloRatings,
+            teamCount: saved.teamCount,
+            composition: saved.composition,
+            positionWeights: saved.positionWeights
+        };
+    }
+
+    /**
+     * Save settings to localStorage
+     */
+    saveSettings() {
+        const storageKey = this.getStorageKey();
+        const settings = {
+            showEloRatings: this.state.showEloRatings,
+            teamCount: this.state.teamCount,
+            composition: this.state.composition,
+            positionWeights: this.state.positionWeights,
+            savedAt: new Date().toISOString()
+        };
+
+        storage.set(storageKey, settings);
     }
 
     render() {
@@ -264,11 +311,14 @@ class TeamsPage extends BasePage {
         const updatePlayersPerTeam = () => {
             const teamCountInput = this.$('#teamCount');
             const teamCount = parseInt(teamCountInput?.value) || 2;
-            
+
             // Update state directly without triggering re-render
             this.state.teamCount = teamCount;
-            
+
             const composition = this.getComposition();
+
+            // Save settings to localStorage
+            this.saveSettings();
         };
 
         // Team count change
@@ -309,6 +359,9 @@ class TeamsPage extends BasePage {
                     const pos = newInput.id.replace('weight_', '');
                     const value = parseFloat(e.target.value) || 1.0;
                     this.state.positionWeights[pos] = value;
+
+                    // Save settings to localStorage
+                    this.saveSettings();
                 });
             });
         }
@@ -327,6 +380,9 @@ class TeamsPage extends BasePage {
         if (showEloToggle) {
             showEloToggle.addEventListener('change', (e) => {
                 this.setState({ showEloRatings: e.target.checked });
+
+                // Save settings to localStorage
+                this.saveSettings();
             });
         }
 
