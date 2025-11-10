@@ -95,7 +95,7 @@ class Application {
      * Load activity configuration from localStorage or use default
      *
      * @private
-     * @returns {Object} Activity configuration
+     * @returns {Object} Activity configuration with key
      */
     loadActivityConfig() {
         const selectedActivity = storage.get('selectedActivity', 'volleyball');
@@ -103,10 +103,10 @@ class Application {
 
         if (!activityConfig) {
             console.warn(`Activity '${selectedActivity}' not found, using default`);
-            return defaultActivity;
+            return { key: 'volleyball', config: defaultActivity };
         }
 
-        return activityConfig;
+        return { key: selectedActivity, config: activityConfig };
     }
 
     /**
@@ -132,10 +132,10 @@ class Application {
     async init() {
         try {
             console.log(`[INIT] Initializing ${APP_CONFIG.NAME} v${APP_CONFIG.VERSION}...`);
-            console.log(`[INIT] Activity: ${this.activityConfig.name}`);
+            console.log(`[INIT] Activity: ${this.activityConfig.config.name}`);
 
             // Step 1: Initialize services with activity config
-            this.services = initializeServices(this.activityConfig);
+            this.services = initializeServices(this.activityConfig.config);
             console.log('[OK] Services initialized');
 
             // Step 2: Handle GitHub Pages 404 redirect
@@ -362,9 +362,10 @@ class Application {
         let page;
 
         try {
-            // Pass activity config and services to all pages via props
+            // Pass activity config, activity key, and services to all pages via props
             page = new PageClass(container, {
-                activityConfig: this.activityConfig,
+                activityConfig: this.activityConfig.config,
+                activityKey: this.activityConfig.key,
                 services: this.services
             });
         } catch (error) {
@@ -658,7 +659,7 @@ class Application {
      * @returns {string} Position full name or original code if unknown
      */
     getPositionName(pos) {
-        return this.activityConfig.positions[pos] || pos;
+        return this.activityConfig.config.positions[pos] || pos;
     }
 
     /**
