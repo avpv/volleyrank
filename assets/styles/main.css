@@ -316,25 +316,25 @@ a:hover {
 /* Yin-Yang Style for T and B */
 .title-t,
 .title-b {
-    padding: var(--spacing-2) var(--spacing-4);
+    padding: var(--spacing-1) var(--spacing-3);
     font-size: var(--font-size-sm);
     font-weight: var(--font-weight-medium);
-    border: 1px solid;
+    border: 2px solid;
     border-radius: var(--radius-md);
     display: inline-block;
     transition: var(--transition-default);
 }
 
-/* Dark T (Yin) */
+/* T (Yin ☯) - No background, border same as text color */
 .title-t {
-    background-color: var(--color-surface-raised);
-    border-color: var(--color-border-strong);
+    background-color: transparent;
+    border-color: var(--color-text-primary);
     color: var(--color-text-primary);
 }
 
-/* Light B (Yang) */
+/* B (Yang ☯) - Light background, dark border */
 .title-b {
-    background-color: var(--color-bg-elevated);
+    background-color: var(--color-surface-overlay);
     border-color: var(--color-border-strong);
     color: var(--color-text-primary);
 }
