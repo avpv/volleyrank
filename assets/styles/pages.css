@@ -70,6 +70,36 @@
     /* Inherits accordion styling - no additional styles needed */
 }
 
+/* Player sections within accordion */
+.player-section {
+    padding: var(--spacing-6);
+    background-color: var(--color-surface-raised);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-md);
+}
+
+.player-section + .player-section {
+    margin-top: var(--spacing-6);
+}
+
+.player-section .section-title {
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+    margin: 0 0 var(--spacing-4) 0;
+    padding-bottom: var(--spacing-3);
+    border-bottom: 1px solid var(--color-border-default);
+}
+
+.player-section .section-content {
+    margin-top: var(--spacing-4);
+}
+
+.import-section .section-content {
+    display: flex;
+    gap: var(--spacing-3);
+}
+
 .player-form {
     max-width: 800px;
 }

@@ -120,52 +120,63 @@ class SettingsPage extends BasePage {
                     ${getIcon('chevron-down', { size: 16, className: `accordion-icon${isOpen ? ' open' : ''}` })}
                 </button>
                 <div class="accordion-content${isOpen ? ' open' : ''}" id="addPlayerAccordionContent">
-                    <form class="player-form" id="playerForm">
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Player Name</label>
-                                <input
-                                    type="text"
-                                    id="playerNameInput"
-                                    placeholder="Enter player name"
-                                    required
-                                    ${!currentActivity ? 'disabled' : ''}
-                                >
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Positions (select all applicable)</label>
-                            <div class="positions-grid" id="positionsGrid">
-                                ${this.renderPositionCheckboxes()}
-                            </div>
-                        </div>
-
-                        <div class="form-actions">
-                            <button type="submit" class="btn btn-primary" ${!currentActivity ? 'disabled' : ''}>
-                                ${getIcon('plus', { size: 16, className: 'btn-icon' })}
-                                Add Player
-                            </button>
+                    <!-- Import Players Section -->
+                    <div class="player-section import-section">
+                        <h4 class="section-title">Import Players</h4>
+                        <div class="section-content">
                             <button type="button" class="btn btn-secondary" id="importBtn" ${!currentActivity ? 'disabled' : ''}>
                                 ${getIcon('arrow-down', { size: 16, className: 'btn-icon' })}
                                 Import Players
                             </button>
                         </div>
+                    </div>
 
-                        <div class="form-section danger-zone">
-                            <label class="form-section-title">Reset & Delete</label>
-                            <div class="form-section-actions">
-                                <button type="button" class="btn btn-secondary" id="resetAllBtn">
-                                    ${getIcon('refresh', { size: 16, className: 'btn-icon' })}
-                                    Reset All Ratings
-                                </button>
-                                <button type="button" class="btn btn-secondary" id="clearAllBtn">
-                                    ${getIcon('trash', { size: 16, className: 'btn-icon' })}
-                                    Remove All Players
+                    <!-- Manual Add Players Section -->
+                    <div class="player-section manual-add-section">
+                        <h4 class="section-title">Manual Add Players</h4>
+                        <form class="player-form" id="playerForm">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Player Name</label>
+                                    <input
+                                        type="text"
+                                        id="playerNameInput"
+                                        placeholder="Enter player name"
+                                        required
+                                        ${!currentActivity ? 'disabled' : ''}
+                                    >
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Positions (select all applicable)</label>
+                                <div class="positions-grid" id="positionsGrid">
+                                    ${this.renderPositionCheckboxes()}
+                                </div>
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary" ${!currentActivity ? 'disabled' : ''}>
+                                    ${getIcon('plus', { size: 16, className: 'btn-icon' })}
+                                    Add Player
                                 </button>
                             </div>
-                        </div>
-                    </form>
+
+                            <div class="form-section danger-zone">
+                                <label class="form-section-title">Reset & Delete</label>
+                                <div class="form-section-actions">
+                                    <button type="button" class="btn btn-secondary" id="resetAllBtn">
+                                        ${getIcon('refresh', { size: 16, className: 'btn-icon' })}
+                                        Reset All Ratings
+                                    </button>
+                                    <button type="button" class="btn btn-secondary" id="clearAllBtn">
+                                        ${getIcon('trash', { size: 16, className: 'btn-icon' })}
+                                        Remove All Players
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         `;
