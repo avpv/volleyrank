@@ -313,29 +313,44 @@ a:hover {
     margin: 0;
 }
 
-/* Yin-Yang Style for T and B */
+/* Badge Style Logo - Two Teams Concept */
 .title-t,
 .title-b {
-    font-size: var(--font-size-sm);
-    font-weight: var(--font-weight-medium);
-    border: 2px solid;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
     border-radius: var(--radius-md);
-    display: inline-block;
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
+    color: white;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
     transition: var(--transition-default);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
-/* T (Yin ☯) - No background, border same as text color */
+/* T - Team 1 (Blue gradient) */
 .title-t {
-    background-color: transparent;
-    border-color: var(--color-text-primary);
-    color: var(--color-text-primary);
+    background: linear-gradient(135deg, #2f81f7 0%, #1f6feb 100%);
 }
 
-/* B (Yang ☯) - Inverted style of T */
+/* B - Team 2 (Purple gradient) */
 .title-b {
-    background-color: var(--color-text-primary);
-    border-color: var(--color-text-inverse);
-    color: var(--color-text-inverse);
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+}
+
+.title-t:hover,
+.title-b:hover {
+    transform: translateY(-2px);
+}
+
+.title-t:hover {
+    box-shadow: 0 4px 12px rgba(47, 129, 247, 0.4);
+}
+
+.title-b:hover {
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
 }
 
 .app-title-link {
