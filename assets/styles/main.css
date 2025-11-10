@@ -316,7 +316,6 @@ a:hover {
 /* Yin-Yang Style for T and B */
 .title-t,
 .title-b {
-    padding: var(--spacing-1) var(--spacing-2);
     font-size: var(--font-size-sm);
     font-weight: var(--font-weight-medium);
     border: 2px solid;
