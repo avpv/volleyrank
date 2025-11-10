@@ -309,7 +309,7 @@ a:hover {
     color: var(--color-text-primary);
     display: flex;
     align-items: center;
-    gap: var(--spacing-3);
+    gap: var(--spacing-1);
     margin: 0;
 }
 
