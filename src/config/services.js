@@ -24,6 +24,7 @@ import storage from '../core/StorageAdapter.js';
 
 // Repository layer (NEW)
 import PlayerRepository from '../repositories/PlayerRepository.js';
+import SessionRepository from '../repositories/SessionRepository.js';
 
 // Business services
 import ValidationService from '../services/ValidationService.js';
@@ -31,6 +32,7 @@ import PlayerService from '../services/PlayerService.js';
 import EloService from '../services/EloService.js';
 import ComparisonService from '../services/ComparisonService.js';
 import TeamOptimizerService from '../services/TeamOptimizerService.js';
+import SessionService from '../services/SessionService.js';
 
 /**
  * Service configuration factory
@@ -96,6 +98,23 @@ export function createServiceConfig(activityConfig) {
         },
 
         // ===== Repository Layer (NEW) =====
+
+        /**
+         * Session Repository - Data access for sessions
+         * Singleton: One repository instance
+         * Dependencies: stateManager, eventBus
+         *
+         * Purpose: Encapsulate all session data operations
+         * Benefits: Centralized session management, loose coupling
+         */
+        sessionRepository: {
+            implementation: SessionRepository,
+            lifetime: ServiceLifetime.SINGLETON,
+            dependencies: ['stateManager', 'eventBus'],
+            factory: (deps) => {
+                return new SessionRepository(deps.stateManager, deps.eventBus);
+            }
+        },
 
         /**
          * Player Repository - Data access for players
@@ -206,6 +225,24 @@ export function createServiceConfig(activityConfig) {
             factory: (deps) => new TeamOptimizerService(
                 activityConfig,
                 deps.eloService
+            )
+        },
+
+        /**
+         * Session Service - Session management
+         * Singleton: One session service
+         * Dependencies: sessionRepository, eventBus
+         *
+         * Purpose: Manage session lifecycle (create, switch, delete)
+         * Benefits: Centralized session operations, automatic active session management
+         */
+        sessionService: {
+            implementation: SessionService,
+            lifetime: ServiceLifetime.SINGLETON,
+            dependencies: ['sessionRepository', 'eventBus'],
+            factory: (deps) => new SessionService(
+                deps.sessionRepository,
+                deps.eventBus
             )
         }
     };
