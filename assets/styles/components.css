@@ -1522,3 +1522,136 @@ select.form-control {
     border: 4px solid transparent;
     border-top-color: var(--color-bg-tertiary);
 }
+
+/* =============================================================================
+   Sidebar - Session Management
+   ============================================================================= */
+
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background-color: var(--color-bg-secondary);
+    border-right: 1px solid var(--color-border);
+    overflow: hidden;
+}
+
+.sidebar__header {
+    padding: var(--spacing-4);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.sidebar__list {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--spacing-2);
+}
+
+.sidebar__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-8) var(--spacing-4);
+    text-align: center;
+    color: var(--color-text-tertiary);
+}
+
+.sidebar__empty p:first-child {
+    font-weight: var(--font-weight-medium);
+    margin-bottom: var(--spacing-2);
+}
+
+/* Session Item */
+.session-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-3);
+    padding: var(--spacing-3);
+    margin-bottom: var(--spacing-2);
+    background-color: var(--color-bg-primary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: var(--transition-default);
+    position: relative;
+}
+
+.session-item:hover {
+    background-color: var(--color-bg-hover);
+    border-color: var(--color-brand-primary);
+}
+
+.session-item--active {
+    background-color: var(--color-bg-hover);
+    border-color: var(--color-brand-primary);
+}
+
+.session-item__indicator {
+    width: 12px;
+    flex-shrink: 0;
+    color: var(--color-brand-primary);
+    font-size: var(--font-size-lg);
+    line-height: 1;
+    padding-top: 2px;
+}
+
+.session-item__content {
+    flex: 1;
+    min-width: 0;
+}
+
+.session-item__header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+    margin-bottom: var(--spacing-2);
+}
+
+.session-item__icon {
+    font-size: var(--font-size-lg);
+    line-height: 1;
+}
+
+.session-item__name {
+    font-weight: var(--font-weight-medium);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-primary);
+}
+
+.session-item__meta {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-1);
+    font-size: var(--font-size-xs);
+    color: var(--color-text-secondary);
+}
+
+.session-item__date {
+    font-family: var(--font-family-mono);
+}
+
+.session-item__players {
+    color: var(--color-text-tertiary);
+}
+
+.session-item__delete {
+    flex-shrink: 0;
+    padding: var(--spacing-2);
+    background: transparent;
+    border: none;
+    color: var(--color-text-tertiary);
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    transition: var(--transition-default);
+    opacity: 0;
+}
+
+.session-item:hover .session-item__delete {
+    opacity: 1;
+}
+
+.session-item__delete:hover {
+    background-color: var(--color-danger);
+    color: white;
+}
