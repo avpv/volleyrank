@@ -24,8 +24,14 @@
     margin-bottom: var(--spacing-4);
 }
 
+.activity-selector-row {
+    display: flex;
+    gap: var(--spacing-3);
+    align-items: center;
+}
+
 .activity-select {
-    width: 100%;
+    flex: 1;
     padding: var(--spacing-3);
     font-family: inherit;
     font-size: var(--font-size-base);
@@ -52,9 +58,14 @@
     box-shadow: 0 0 0 3px rgba(47, 129, 247, 0.1);
 }
 
-@media (min-width: 768px) {
-    .activity-select {
-        max-width: calc((800px - var(--spacing-4)) / 2);
+@media (max-width: 768px) {
+    .activity-selector-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .activity-selector-row .btn {
+        width: 100%;
     }
 }
 
@@ -937,9 +948,9 @@
     padding: var(--spacing-6);
 }
 
-/* Mobile sidebar toggle button */
+/* Sidebar toggle button - visible on all platforms */
 .sidebar-toggle {
-    display: none;
+    display: flex;
     position: fixed;
     top: 70px;
     left: var(--spacing-4);
@@ -1002,33 +1013,29 @@
     opacity: 1;
 }
 
+/* Sidebar overlay behavior for all platforms */
+.page-layout__sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 280px;
+    height: 100vh;
+    border-right: 1px solid var(--color-border);
+    z-index: 1000;
+    background-color: var(--color-bg-primary);
+    transform: translateX(0);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.page-layout__sidebar.open {
+    transform: translateX(0);
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.3);
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
-    .page-layout {
-        flex-direction: row;
-    }
-
-    .sidebar-toggle {
-        display: flex;
-    }
-
     .page-layout__sidebar {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 280px;
-        height: 100vh;
-        border-right: 1px solid var(--color-border);
-        border-bottom: none;
-        z-index: 1000;
-        background-color: var(--color-bg-primary);
         transform: translateX(-100%);
-        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .page-layout__sidebar.open {
-        transform: translateX(0);
-        box-shadow: 2px 0 8px rgba(0, 0, 0, 0.3);
     }
 
     .page-layout__content {
