@@ -91,6 +91,20 @@
     border-bottom: 1px solid var(--color-border-default);
 }
 
+/* Transparent background sections with bottom border only on title */
+.player-section.import-section,
+.player-section.manual-add-section,
+.player-section.danger-zone-section {
+    background-color: transparent;
+    border: none;
+}
+
+.player-section.import-section .section-title,
+.player-section.manual-add-section .section-title,
+.player-section.danger-zone-section .section-title {
+    border-bottom: 1px solid var(--color-border-default);
+}
+
 .player-section .section-content {
     margin-top: var(--spacing-4);
 }
