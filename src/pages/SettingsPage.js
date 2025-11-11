@@ -121,7 +121,7 @@ class SettingsPage extends BasePage {
                     <label for="activitySelect">Activity Type</label>
                     <div class="activity-selector-row">
                         <select id="activitySelect" class="activity-select">
-                            <option value="" ${!currentActivity ? 'selected' : ''}>Select an activity...</option>
+                            <option value="" ${!currentActivity ? 'selected' : ''} disabled>Select an activity...</option>
                             ${Object.entries(activities)
                                 .sort((a, b) => a[1].name.localeCompare(b[1].name))
                                 .map(([key, config]) => `
