@@ -4,6 +4,9 @@
  * RankingsPage - Player rankings by position
  */
 import BasePage from './BasePage.js';
+import Sidebar from '../components/Sidebar.js';
+import storage from '../core/StorageAdapter.js';
+import { activities } from '../config/activities/index.js';
 
 class RankingsPage extends BasePage {
     constructor(container, props = {}) {
@@ -13,6 +16,9 @@ class RankingsPage extends BasePage {
         // Get services from props
         this.activityConfig = props.activityConfig;
         this.playerService = props.services?.resolve('playerService');
+        this.sessionService = props.services?.resolve('sessionService');
+        this.eventBus = props.services?.resolve('eventBus');
+        this.sidebar = null;
     }
 
     onCreate() {
@@ -22,11 +28,40 @@ class RankingsPage extends BasePage {
         this.on('player:reset', () => this.update());
     }
 
+    onMount() {
+        this.mountSidebar();
+    }
+
+    onDestroy() {
+        if (this.sidebar) {
+            this.sidebar.destroy();
+            this.sidebar = null;
+        }
+    }
+
+    mountSidebar() {
+        const sidebarContainer = document.getElementById('pageSidebar');
+        if (!sidebarContainer) return;
+
+        const selectedActivity = storage.get('selectedActivity', 'volleyball');
+        const activityConfig = activities[selectedActivity];
+
+        this.sidebar = new Sidebar(sidebarContainer, {
+            sessionService: this.sessionService,
+            eventBus: this.eventBus,
+            activityKey: selectedActivity,
+            activityName: activityConfig?.name || 'Unknown'
+        });
+
+        this.sidebar.mount();
+        this.addComponent(this.sidebar);
+    }
+
     render() {
         const rankings = this.playerService.getRankings();
         const positions = this.playerService.positions;
 
-        return this.renderPage(`
+        return this.renderPageWithSidebar(`
             <div class="page-header">
                 <h2>Player Rankings by Position</h2>
             </div>

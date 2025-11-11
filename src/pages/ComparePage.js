@@ -6,6 +6,9 @@
 import BasePage from './BasePage.js';
 import toast from '../components/base/Toast.js';
 import { getIcon } from '../components/base/Icons.js';
+import Sidebar from '../components/Sidebar.js';
+import storage from '../core/StorageAdapter.js';
+import { activities } from '../config/activities/index.js';
 
 class ComparePage extends BasePage {
     constructor(container, props = {}) {
@@ -16,9 +19,12 @@ class ComparePage extends BasePage {
         this.activityConfig = props.activityConfig;
         this.playerService = props.services?.resolve('playerService');
         this.comparisonService = props.services?.resolve('comparisonService');
+        this.sessionService = props.services?.resolve('sessionService');
+        this.eventBus = props.services?.resolve('eventBus');
 
         this.selectedPosition = '';
         this.currentPair = null;
+        this.sidebar = null;
     }
 
     onCreate() {
@@ -35,6 +41,7 @@ class ComparePage extends BasePage {
     }
 
     onMount() {
+        this.mountSidebar();
         this.attachEventListeners();
     }
 
@@ -42,8 +49,33 @@ class ComparePage extends BasePage {
         this.attachEventListeners();
     }
 
+    onDestroy() {
+        if (this.sidebar) {
+            this.sidebar.destroy();
+            this.sidebar = null;
+        }
+    }
+
+    mountSidebar() {
+        const sidebarContainer = document.getElementById('pageSidebar');
+        if (!sidebarContainer) return;
+
+        const selectedActivity = storage.get('selectedActivity', 'volleyball');
+        const activityConfig = activities[selectedActivity];
+
+        this.sidebar = new Sidebar(sidebarContainer, {
+            sessionService: this.sessionService,
+            eventBus: this.eventBus,
+            activityKey: selectedActivity,
+            activityName: activityConfig?.name || 'Unknown'
+        });
+
+        this.sidebar.mount();
+        this.addComponent(this.sidebar);
+    }
+
     render() {
-        return this.renderPage(`
+        return this.renderPageWithSidebar(`
             <div class="page-header">
                 <h2>Compare Players</h2>
             </div>

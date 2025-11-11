@@ -10,6 +10,7 @@ import toast from '../components/base/Toast.js';
 import Modal from '../components/base/Modal.js';
 import { getIcon } from '../components/base/Icons.js';
 import { activities } from '../config/activities/index.js';
+import Sidebar from '../components/Sidebar.js';
 
 class SettingsPage extends BasePage {
     constructor(container, props = {}) {
@@ -19,9 +20,12 @@ class SettingsPage extends BasePage {
         // Get services from props
         this.activityConfig = props.activityConfig;
         this.playerService = props.services?.resolve('playerService');
+        this.sessionService = props.services?.resolve('sessionService');
+        this.eventBus = props.services?.resolve('eventBus');
 
         this.selectedPositions = [];
         this.importModal = null;
+        this.sidebar = null;
     }
 
     onCreate() {
@@ -36,6 +40,7 @@ class SettingsPage extends BasePage {
     }
 
     onMount() {
+        this.mountSidebar();
         this.attachEventListeners();
     }
 
@@ -44,10 +49,32 @@ class SettingsPage extends BasePage {
     }
 
     onDestroy() {
+        if (this.sidebar) {
+            this.sidebar.destroy();
+            this.sidebar = null;
+        }
         if (this.importModal) {
             this.importModal.destroy();
             this.importModal = null;
         }
+    }
+
+    mountSidebar() {
+        const sidebarContainer = document.getElementById('pageSidebar');
+        if (!sidebarContainer) return;
+
+        const selectedActivity = storage.get('selectedActivity', 'volleyball');
+        const activityConfig = activities[selectedActivity];
+
+        this.sidebar = new Sidebar(sidebarContainer, {
+            sessionService: this.sessionService,
+            eventBus: this.eventBus,
+            activityKey: selectedActivity,
+            activityName: activityConfig?.name || 'Unknown'
+        });
+
+        this.sidebar.mount();
+        this.addComponent(this.sidebar);
     }
 
     render() {
@@ -55,7 +82,7 @@ class SettingsPage extends BasePage {
         const stats = this.playerService.getPositionStats();
         const currentActivity = storage.get('selectedActivity', null);
 
-        return this.renderPage(`
+        return this.renderPageWithSidebar(`
             <div class="page-header">
                 <h2>Player Management</h2>
             </div>

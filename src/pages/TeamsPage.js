@@ -7,6 +7,8 @@ import BasePage from './BasePage.js';
 import toast from '../components/base/Toast.js';
 import { getIcon } from '../components/base/Icons.js';
 import storage from '../core/StorageAdapter.js';
+import Sidebar from '../components/Sidebar.js';
+import { activities } from '../config/activities/index.js';
 
 class TeamsPage extends BasePage {
     constructor(container, props = {}) {
@@ -19,6 +21,9 @@ class TeamsPage extends BasePage {
         this.playerService = props.services?.resolve('playerService');
         this.teamOptimizerService = props.services?.resolve('teamOptimizerService');
         this.eloService = props.services?.resolve('eloService');
+        this.sessionService = props.services?.resolve('sessionService');
+        this.eventBus = props.services?.resolve('eventBus');
+        this.sidebar = null;
 
         // Initialize position weights from config
         const initialWeights = {};
@@ -47,11 +52,37 @@ class TeamsPage extends BasePage {
     }
 
     onMount() {
+        this.mountSidebar();
         this.attachEventListeners();
     }
 
     onUpdate() {
         this.attachEventListeners();
+    }
+
+    onDestroy() {
+        if (this.sidebar) {
+            this.sidebar.destroy();
+            this.sidebar = null;
+        }
+    }
+
+    mountSidebar() {
+        const sidebarContainer = document.getElementById('pageSidebar');
+        if (!sidebarContainer) return;
+
+        const selectedActivity = storage.get('selectedActivity', 'volleyball');
+        const activityConfig = activities[selectedActivity];
+
+        this.sidebar = new Sidebar(sidebarContainer, {
+            sessionService: this.sessionService,
+            eventBus: this.eventBus,
+            activityKey: selectedActivity,
+            activityName: activityConfig?.name || 'Unknown'
+        });
+
+        this.sidebar.mount();
+        this.addComponent(this.sidebar);
     }
 
     /**
@@ -97,7 +128,7 @@ class TeamsPage extends BasePage {
     }
 
     render() {
-        return this.renderPage(`
+        return this.renderPageWithSidebar(`
             <div class="page-header">
                 <h2>Create Balanced Teams</h2>
             </div>

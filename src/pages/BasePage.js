@@ -58,6 +58,20 @@ class BasePage extends Component {
     }
 
     /**
+     * Render page with sidebar layout
+     */
+    renderPageWithSidebar(content) {
+        return `
+            <div class="page-layout">
+                <div class="page-layout__sidebar" id="pageSidebar"></div>
+                <div class="page-layout__content">
+                    ${content}
+                </div>
+            </div>
+        `;
+    }
+
+    /**
      * Render loading state
      */
     renderLoading() {
