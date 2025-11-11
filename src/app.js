@@ -95,10 +95,16 @@ class Application {
      * Load activity configuration from localStorage or use default
      *
      * @private
-     * @returns {Object} Activity configuration with key
+     * @returns {Object|null} Activity configuration with key, or null if no activity selected
      */
     loadActivityConfig() {
-        const selectedActivity = storage.get('selectedActivity', 'volleyball');
+        const selectedActivity = storage.get('selectedActivity', null);
+
+        // If no activity selected, return null
+        if (!selectedActivity) {
+            return null;
+        }
+
         const activityConfig = activities[selectedActivity];
 
         if (!activityConfig) {
@@ -132,10 +138,17 @@ class Application {
     async init() {
         try {
             console.log(`[INIT] Initializing ${APP_CONFIG.NAME} v${APP_CONFIG.VERSION}...`);
-            console.log(`[INIT] Activity: ${this.activityConfig.config.name}`);
 
-            // Step 1: Initialize services with activity config
-            this.services = initializeServices(this.activityConfig.config);
+            // Check if activity is selected
+            if (this.activityConfig) {
+                console.log(`[INIT] Activity: ${this.activityConfig.config.name}`);
+            } else {
+                console.log('[INIT] No activity selected yet');
+            }
+
+            // Step 1: Initialize services with activity config (or default if none)
+            const configForServices = this.activityConfig ? this.activityConfig.config : defaultActivity;
+            this.services = initializeServices(configForServices);
             console.log('[OK] Services initialized');
 
             // Step 2: Handle GitHub Pages 404 redirect
@@ -149,10 +162,12 @@ class Application {
                 console.log('[OK] Starting with fresh state');
             }
 
-            // Step 3.1: Ensure active session exists for current activity
-            const sessionService = this.services.resolve('sessionService');
-            const activeSession = sessionService.ensureActiveSession(this.activityConfig.key);
-            console.log('[OK] Active session ensured:', activeSession.id);
+            // Step 3.1: Ensure active session exists for current activity (only if activity selected)
+            if (this.activityConfig) {
+                const sessionService = this.services.resolve('sessionService');
+                const activeSession = sessionService.ensureActiveSession(this.activityConfig.key);
+                console.log('[OK] Active session ensured:', activeSession.id);
+            }
 
             // Step 4: Setup global event listeners
             this.setupEventListeners();
@@ -369,8 +384,8 @@ class Application {
         try {
             // Pass activity config, activity key, and services to all pages via props
             page = new PageClass(container, {
-                activityConfig: this.activityConfig.config,
-                activityKey: this.activityConfig.key,
+                activityConfig: this.activityConfig ? this.activityConfig.config : null,
+                activityKey: this.activityConfig ? this.activityConfig.key : null,
                 services: this.services
             });
         } catch (error) {
@@ -664,6 +679,9 @@ class Application {
      * @returns {string} Position full name or original code if unknown
      */
     getPositionName(pos) {
+        if (!this.activityConfig) {
+            return pos;
+        }
         return this.activityConfig.config.positions[pos] || pos;
     }
 
