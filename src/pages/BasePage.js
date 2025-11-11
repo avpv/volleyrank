@@ -123,14 +123,6 @@ class BasePage extends Component {
      */
     renderPageWithSidebar(content) {
         return `
-            <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
-                <span class="sidebar-toggle__icon">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </span>
-            </button>
-            <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
             <div class="page-layout">
                 <div class="page-layout__sidebar" id="pageSidebar"></div>
                 <div class="page-layout__content">

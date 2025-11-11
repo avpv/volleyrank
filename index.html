@@ -45,12 +45,22 @@
         <!-- Navigation -->
         <nav class="app-nav">
             <div class="nav-container">
+                <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
+                    <span class="sidebar-toggle__icon">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </span>
+                </button>
                 <a href="/" class="nav-link active" data-route="/">Settings</a>
                 <a href="/compare/" class="nav-link" data-route="/compare/">Compare</a>
                 <a href="/rankings/" class="nav-link" data-route="/rankings/">Rankings</a>
                 <a href="/teams/" class="nav-link" data-route="/teams/">Teams</a>
             </div>
         </nav>
+
+        <!-- Sidebar Backdrop -->
+        <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 
         <!-- Main Content Area -->
         <main class="app-main" id="appMain">
