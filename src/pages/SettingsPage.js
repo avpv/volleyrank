@@ -130,17 +130,15 @@ class SettingsPage extends BasePage {
                                     </option>
                                 `).join('')}
                         </select>
-                        ${currentActivity ? `
-                            <button type="button" class="btn btn--secondary" id="createSessionBtn" title="Create new session">
-                                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="vertical-align: middle; margin-right: 4px;">
-                                    <path d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z"/>
-                                </svg>
-                                Новый сеанс
-                            </button>
-                        ` : ''}
+                        <button type="button" class="btn btn--secondary" id="createSessionBtn" title="Create new session">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="vertical-align: middle; margin-right: 4px;">
+                                <path d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z"/>
+                            </svg>
+                            New teams
+                        </button>
                     </div>
                     <p class="form-help-text">
-                        Changing the activity will reload the page to apply new positions and team configuration.
+                        Select an activity and click "New teams" to create a session. Activity changes will be applied when creating a new session.
                     </p>
                 </div>
             </div>
@@ -457,13 +455,11 @@ class SettingsPage extends BasePage {
     }
 
     handleActivityChange(activityKey) {
-        // If empty selection, clear the activity
+        const currentActivity = storage.get('selectedActivity', null);
+
+        // If empty selection, just clear pending activity
         if (!activityKey) {
-            storage.remove('selectedActivity');
-            toast.success('Activity cleared. Reloading...', 2000);
-            setTimeout(() => {
-                window.location.reload();
-            }, 2000);
+            storage.remove('pendingActivity');
             return;
         }
 
@@ -473,27 +469,47 @@ class SettingsPage extends BasePage {
             return;
         }
 
-        // Save selected activity to localStorage
-        storage.set('selectedActivity', activityKey);
+        // Store pending activity selection
+        storage.set('pendingActivity', activityKey);
 
-        // Show confirmation toast
-        toast.success(`Switching to ${selectedActivity.name}. Reloading...`, 2000);
-
-        // Reload the page to apply new activity configuration
-        setTimeout(() => {
-            window.location.reload();
-        }, 2000);
+        // Show info toast
+        if (currentActivity !== activityKey) {
+            toast.info(`${selectedActivity.name} will be applied when you create a new session`);
+        }
     }
 
     handleCreateSession() {
+        // Check if there's a pending activity change
+        const pendingActivity = storage.get('pendingActivity', null);
         const currentActivity = storage.get('selectedActivity', null);
-        if (!currentActivity) {
+
+        // Determine which activity to use (prefer pending if it exists)
+        const targetActivity = pendingActivity || currentActivity;
+
+        if (!targetActivity) {
             toast.error('Please select an activity first');
             return;
         }
 
         try {
+            // If activity is changing, apply it and reload
+            if (pendingActivity && targetActivity !== currentActivity) {
+                storage.set('selectedActivity', targetActivity);
+                storage.remove('pendingActivity');
+
+                const selectedActivity = activities[targetActivity];
+                const newSession = this.sessionService.createSession(targetActivity);
+                toast.success(`Switching to ${selectedActivity.name} and creating new session. Reloading...`, 2000);
+
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2000);
+                return;
+            }
+
+            // Same activity, just create a new session
             const newSession = this.sessionService.createSession(currentActivity);
+            storage.remove('pendingActivity');
             toast.success('New session created');
             // Page will auto-update via event bus
         } catch (error) {

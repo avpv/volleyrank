@@ -22,6 +22,7 @@ class TeamsPage extends BasePage {
         this.teamOptimizerService = props.services?.resolve('teamOptimizerService');
         this.eloService = props.services?.resolve('eloService');
         this.sessionService = props.services?.resolve('sessionService');
+        this.sessionRepository = props.services?.resolve('sessionRepository');
         this.eventBus = props.services?.resolve('eventBus');
         this.sidebar = null;
 
@@ -31,11 +32,12 @@ class TeamsPage extends BasePage {
             initialWeights[pos] = this.activityConfig.positionWeights[pos] || 1.0;
         });
 
-        // Load saved settings from localStorage
+        // Load saved settings and teams from active session
         const savedSettings = this.loadSettings();
+        const savedTeams = this.loadTeams();
 
         this.state = {
-            teams: null,
+            teams: savedTeams,
             isOptimizing: false,
             showEloRatings: savedSettings.showEloRatings ?? true,
             teamCount: savedSettings.teamCount ?? 2,
@@ -48,7 +50,28 @@ class TeamsPage extends BasePage {
         this.on('player:added', () => this.update());
         this.on('player:removed', () => {
             this.setState({ teams: null });
+            this.saveTeams(null);
         });
+        this.on('session:activated', () => {
+            // When session changes, reload settings and teams
+            const savedSettings = this.loadSettings();
+            const savedTeams = this.loadTeams();
+            this.setState({
+                teams: savedTeams,
+                showEloRatings: savedSettings.showEloRatings ?? true,
+                teamCount: savedSettings.teamCount ?? 2,
+                composition: savedSettings.composition ?? this.activityConfig.defaultComposition,
+                positionWeights: this.getInitialWeights()
+            });
+        });
+    }
+
+    getInitialWeights() {
+        const initialWeights = {};
+        Object.keys(this.activityConfig.positions).forEach(pos => {
+            initialWeights[pos] = this.activityConfig.positionWeights[pos] || 1.0;
+        });
+        return initialWeights;
     }
 
     onMount() {
@@ -87,45 +110,89 @@ class TeamsPage extends BasePage {
     }
 
     /**
-     * Get storage key for current activity
-     */
-    getStorageKey() {
-        return `teamBuilderSettings_${this.activityKey}`;
-    }
-
-    /**
-     * Load settings from localStorage
+     * Load settings from active session
      */
     loadSettings() {
-        const storageKey = this.getStorageKey();
-        const saved = storage.get(storageKey, null);
+        try {
+            const activeSessionId = this.sessionRepository.getActiveSessionId(this.activityKey);
+            if (!activeSessionId) {
+                return {};
+            }
 
-        if (!saved) {
+            const saved = this.sessionRepository.getTeamBuilderSettings(this.activityKey, activeSessionId);
+            if (!saved) {
+                return {};
+            }
+
+            return {
+                showEloRatings: saved.showEloRatings,
+                teamCount: saved.teamCount,
+                composition: saved.composition,
+                positionWeights: saved.positionWeights
+            };
+        } catch (error) {
+            console.error('Error loading settings from session:', error);
             return {};
         }
-
-        return {
-            showEloRatings: saved.showEloRatings,
-            teamCount: saved.teamCount,
-            composition: saved.composition,
-            positionWeights: saved.positionWeights
-        };
     }
 
     /**
-     * Save settings to localStorage
+     * Save settings to active session
      */
     saveSettings() {
-        const storageKey = this.getStorageKey();
-        const settings = {
-            showEloRatings: this.state.showEloRatings,
-            teamCount: this.state.teamCount,
-            composition: this.state.composition,
-            positionWeights: this.state.positionWeights,
-            savedAt: new Date().toISOString()
-        };
+        try {
+            const activeSessionId = this.sessionRepository.getActiveSessionId(this.activityKey);
+            if (!activeSessionId) {
+                console.warn('No active session to save settings to');
+                return;
+            }
 
-        storage.set(storageKey, settings);
+            const settings = {
+                showEloRatings: this.state.showEloRatings,
+                teamCount: this.state.teamCount,
+                composition: this.state.composition,
+                positionWeights: this.state.positionWeights,
+                savedAt: new Date().toISOString()
+            };
+
+            this.sessionRepository.updateTeamBuilderSettings(this.activityKey, activeSessionId, settings);
+        } catch (error) {
+            console.error('Error saving settings to session:', error);
+        }
+    }
+
+    /**
+     * Load generated teams from active session
+     */
+    loadTeams() {
+        try {
+            const activeSessionId = this.sessionRepository.getActiveSessionId(this.activityKey);
+            if (!activeSessionId) {
+                return null;
+            }
+
+            return this.sessionRepository.getGeneratedTeams(this.activityKey, activeSessionId);
+        } catch (error) {
+            console.error('Error loading teams from session:', error);
+            return null;
+        }
+    }
+
+    /**
+     * Save generated teams to active session
+     */
+    saveTeams(teams) {
+        try {
+            const activeSessionId = this.sessionRepository.getActiveSessionId(this.activityKey);
+            if (!activeSessionId) {
+                console.warn('No active session to save teams to');
+                return;
+            }
+
+            this.sessionRepository.updateGeneratedTeams(this.activityKey, activeSessionId, teams);
+        } catch (error) {
+            console.error('Error saving teams to session:', error);
+        }
     }
 
     render() {
@@ -476,6 +543,9 @@ class TeamsPage extends BasePage {
                     teams: result,
                     isOptimizing: false
                 });
+
+                // Save teams to active session
+                this.saveTeams(result);
 
                 toast.success(`Teams created! Balance: ${weightedBalance} weighted ELO difference`);
             } finally {
