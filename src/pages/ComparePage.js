@@ -72,6 +72,7 @@ class ComparePage extends BasePage {
 
         this.sidebar.mount();
         this.addComponent(this.sidebar);
+        this.setupMobileSidebarToggle();
     }
 
     render() {
