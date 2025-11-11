@@ -37,20 +37,35 @@ class Sidebar extends Component {
     }
 
     render() {
-        const sessions = this.sessionService.getAllSessions(this.activityKey);
-        const activeSessionId = this.sessionService.getActiveSessionId(this.activityKey);
+        // Get all sessions across all activities
+        const allSessions = [];
+        const storage = this.sessionService.storage;
+        const activities = storage.get('activities', {});
+
+        for (const activityKey in activities) {
+            const activitySessions = this.sessionService.getAllSessions(activityKey);
+            activitySessions.forEach(session => {
+                allSessions.push({
+                    ...session,
+                    activityKey: activityKey
+                });
+            });
+        }
+
+        // Sort by creation date (newest first)
+        allSessions.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+        const activeSessionId = this.activityKey ? this.sessionService.getActiveSessionId(this.activityKey) : null;
 
         return `
             <div class="sidebar">
                 <div class="sidebar__header">
-                    <button class="btn btn-primary btn-block" id="create-session-btn">
-                        ${getIcon('plus')} Новый сеанс
-                    </button>
+                    <h3 class="sidebar__title">Recent</h3>
                 </div>
 
                 <div class="sidebar__list">
-                    ${sessions.length === 0 ? this.renderEmptyState() : ''}
-                    ${sessions.map(session => this.renderSessionItem(session, activeSessionId)).join('')}
+                    ${allSessions.length === 0 ? this.renderEmptyState() : ''}
+                    ${allSessions.map(session => this.renderSessionItem(session, activeSessionId)).join('')}
                 </div>
             </div>
         `;
@@ -72,16 +87,20 @@ class Sidebar extends Component {
         const timeStr = this.formatTime(date);
         const playerCount = session.players?.length || 0;
 
+        // Get activity name from session's activityKey
+        const activityKey = session.activityKey || this.activityKey;
+        const activityName = this.getActivityName(activityKey);
+
         return `
             <div class="session-item ${isActive ? 'session-item--active' : ''}"
-                 data-session-id="${session.id}">
+                 data-session-id="${session.id}"
+                 data-activity-key="${activityKey}">
                 <div class="session-item__indicator">
                     ${isActive ? '●' : ''}
                 </div>
                 <div class="session-item__content">
                     <div class="session-item__header">
-                        <span class="session-item__icon">${this.getActivityIcon()}</span>
-                        <span class="session-item__name">${this.activityName}</span>
+                        <span class="session-item__name">${activityName}</span>
                     </div>
                     <div class="session-item__meta">
                         <span class="session-item__date">${dateStr} ${timeStr}</span>
@@ -90,6 +109,7 @@ class Sidebar extends Component {
                 </div>
                 <button class="session-item__delete"
                         data-session-id="${session.id}"
+                        data-activity-key="${activityKey}"
                         title="Удалить сеанс">
                     ${getIcon('trash')}
                 </button>
@@ -97,31 +117,32 @@ class Sidebar extends Component {
         `;
     }
 
-    getActivityIcon() {
-        const iconMap = {
-            volleyball: '🏐',
-            basketball: '🏀',
-            soccer: '⚽',
-            baseball: '⚾',
-            football: '🏈',
-            rugby: '🏉',
-            cricket: '🏏',
-            hockey: '🏒',
-            'ice-hockey': '🏒',
-            'field-hockey': '🏑',
-            lacrosse: '🥍',
-            'water-polo': '🤽',
-            'beach-volleyball': '🏐',
-            futsal: '⚽',
-            softball: '⚾',
-            netball: '🏀',
-            handball: '🤾',
-            'ultimate-frisbee': '🥏',
-            'work-project': '💼',
-            general: '🎯'
+    getActivityName(activityKey) {
+        // Import activities config dynamically
+        const activityNames = {
+            volleyball: 'Volleyball',
+            basketball: 'Basketball',
+            soccer: 'Soccer',
+            baseball: 'Baseball',
+            football: 'Football',
+            rugby: 'Rugby',
+            cricket: 'Cricket',
+            hockey: 'Hockey',
+            'ice-hockey': 'Ice Hockey',
+            'field-hockey': 'Field Hockey',
+            lacrosse: 'Lacrosse',
+            'water-polo': 'Water Polo',
+            'beach-volleyball': 'Beach Volleyball',
+            futsal: 'Futsal',
+            softball: 'Softball',
+            netball: 'Netball',
+            handball: 'Handball',
+            'ultimate-frisbee': 'Ultimate Frisbee',
+            'work-project': 'Work Project',
+            general: 'General'
         };
 
-        return iconMap[this.activityKey] || '🎯';
+        return activityNames[activityKey] || 'Unknown Activity';
     }
 
     formatDate(date) {
@@ -137,20 +158,15 @@ class Sidebar extends Component {
     }
 
     attachEventListeners() {
-        // Create session button
-        const createBtn = this.container.querySelector('#create-session-btn');
-        if (createBtn) {
-            createBtn.addEventListener('click', () => this.handleCreateSession());
-        }
-
         // Session item clicks (switch session)
         const sessionItems = this.container.querySelectorAll('.session-item__content');
         sessionItems.forEach(item => {
             item.addEventListener('click', (e) => {
                 const sessionItem = e.target.closest('.session-item');
                 const sessionId = sessionItem?.dataset.sessionId;
-                if (sessionId) {
-                    this.handleSwitchSession(sessionId);
+                const activityKey = sessionItem?.dataset.activityKey;
+                if (sessionId && activityKey) {
+                    this.handleSwitchSession(sessionId, activityKey);
                 }
             });
         });
@@ -161,23 +177,16 @@ class Sidebar extends Component {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation(); // Prevent session switch
                 const sessionId = btn.dataset.sessionId;
-                if (sessionId) {
-                    this.handleDeleteSession(sessionId);
+                const activityKey = btn.dataset.activityKey;
+                if (sessionId && activityKey) {
+                    this.handleDeleteSession(sessionId, activityKey);
                 }
             });
         });
     }
 
-    handleCreateSession() {
-        const result = this.sessionService.createSession(this.activityKey);
-        if (result.success) {
-            console.log('Session created:', result.session.id);
-            // UI will update automatically via event listener
-        }
-    }
-
-    handleSwitchSession(sessionId) {
-        const result = this.sessionService.switchSession(this.activityKey, sessionId);
+    handleSwitchSession(sessionId, activityKey) {
+        const result = this.sessionService.switchSession(activityKey, sessionId);
         if (result.success) {
             console.log('Switched to session:', sessionId);
             // UI will update automatically via event listener
@@ -186,8 +195,8 @@ class Sidebar extends Component {
         }
     }
 
-    handleDeleteSession(sessionId) {
-        const session = this.sessionService.getSession(this.activityKey, sessionId);
+    handleDeleteSession(sessionId, activityKey) {
+        const session = this.sessionService.getSession(activityKey, sessionId);
         const playerCount = session?.players?.length || 0;
 
         let confirmMessage = 'Удалить этот сеанс?';
@@ -196,7 +205,7 @@ class Sidebar extends Component {
         }
 
         if (confirm(confirmMessage)) {
-            const result = this.sessionService.deleteSession(this.activityKey, sessionId);
+            const result = this.sessionService.deleteSession(activityKey, sessionId);
             if (result.success) {
                 console.log('Session deleted:', sessionId);
                 // UI will update automatically via event listener
