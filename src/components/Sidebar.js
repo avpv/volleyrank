@@ -60,7 +60,7 @@ class Sidebar extends Component {
         return `
             <div class="sidebar">
                 <div class="sidebar__header">
-                    <h3 class="sidebar__title">Recent</h3>
+                    <h3 class="sidebar__title">Recents</h3>
                 </div>
 
                 <div class="sidebar__list">
