@@ -84,6 +84,8 @@ class SessionRepository {
             players: [],
             comparisons: 0,
             settings: {},
+            teamBuilderSettings: null,
+            generatedTeams: null,
             ...sessionData
         };
 
@@ -313,6 +315,50 @@ class SessionRepository {
      */
     updatePlayers(activityKey, sessionId, players) {
         return this.update(activityKey, sessionId, { players });
+    }
+
+    /**
+     * Get team builder settings for a specific session
+     * @param {string} activityKey - Activity key
+     * @param {string} sessionId - Session ID
+     * @returns {Object|null} Team builder settings or null
+     */
+    getTeamBuilderSettings(activityKey, sessionId) {
+        const session = this.getById(activityKey, sessionId);
+        return session?.teamBuilderSettings || null;
+    }
+
+    /**
+     * Update team builder settings for a specific session
+     * @param {string} activityKey - Activity key
+     * @param {string} sessionId - Session ID
+     * @param {Object} teamBuilderSettings - Team builder settings
+     * @returns {Object} Updated session
+     */
+    updateTeamBuilderSettings(activityKey, sessionId, teamBuilderSettings) {
+        return this.update(activityKey, sessionId, { teamBuilderSettings });
+    }
+
+    /**
+     * Get generated teams for a specific session
+     * @param {string} activityKey - Activity key
+     * @param {string} sessionId - Session ID
+     * @returns {Array|null} Generated teams or null
+     */
+    getGeneratedTeams(activityKey, sessionId) {
+        const session = this.getById(activityKey, sessionId);
+        return session?.generatedTeams || null;
+    }
+
+    /**
+     * Update generated teams for a specific session
+     * @param {string} activityKey - Activity key
+     * @param {string} sessionId - Session ID
+     * @param {Array} generatedTeams - Generated teams array
+     * @returns {Object} Updated session
+     */
+    updateGeneratedTeams(activityKey, sessionId, generatedTeams) {
+        return this.update(activityKey, sessionId, { generatedTeams });
     }
 }
 

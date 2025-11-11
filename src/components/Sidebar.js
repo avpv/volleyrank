@@ -75,8 +75,8 @@ class Sidebar extends Component {
     renderEmptyState() {
         return `
             <div class="sidebar__empty">
-                <p>Нет сеансов</p>
-                <p class="text-muted">Создайте первый сеанс</p>
+                <p>No sessions</p>
+                <p class="text-muted">Create your first session</p>
             </div>
         `;
     }
