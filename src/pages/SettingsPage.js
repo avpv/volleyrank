@@ -161,21 +161,24 @@ class SettingsPage extends BasePage {
                                     Add Player
                                 </button>
                             </div>
-
-                            <div class="form-section danger-zone">
-                                <label class="form-section-title">Reset & Delete</label>
-                                <div class="form-section-actions">
-                                    <button type="button" class="btn btn-secondary" id="resetAllBtn">
-                                        ${getIcon('refresh', { size: 16, className: 'btn-icon' })}
-                                        Reset All Ratings
-                                    </button>
-                                    <button type="button" class="btn btn-secondary" id="clearAllBtn">
-                                        ${getIcon('trash', { size: 16, className: 'btn-icon' })}
-                                        Remove All Players
-                                    </button>
-                                </div>
-                            </div>
                         </form>
+                    </div>
+
+                    <!-- Danger Zone Section -->
+                    <div class="player-section danger-zone-section">
+                        <h4 class="section-title">Reset & Delete</h4>
+                        <div class="form-section danger-zone">
+                            <div class="form-section-actions">
+                                <button type="button" class="btn btn-secondary" id="resetAllBtn" ${!currentActivity ? 'disabled' : ''}>
+                                    ${getIcon('refresh', { size: 16, className: 'btn-icon' })}
+                                    Reset All Ratings
+                                </button>
+                                <button type="button" class="btn btn-secondary" id="clearAllBtn" ${!currentActivity ? 'disabled' : ''}>
+                                    ${getIcon('trash', { size: 16, className: 'btn-icon' })}
+                                    Remove All Players
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
