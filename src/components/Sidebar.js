@@ -39,10 +39,11 @@ class Sidebar extends Component {
     render() {
         // Get all sessions across all activities
         const allSessions = [];
-        const storage = this.sessionService.storage;
-        const activities = storage.get('activities', {});
 
-        for (const activityKey in activities) {
+        // Get sessions from state (sessions are organized by activity key)
+        const sessionsState = this.sessionService.sessionRepository.stateManager.get('sessions') || {};
+
+        for (const activityKey in sessionsState) {
             const activitySessions = this.sessionService.getAllSessions(activityKey);
             activitySessions.forEach(session => {
                 allSessions.push({
