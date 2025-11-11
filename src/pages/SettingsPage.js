@@ -10,6 +10,7 @@ import toast from '../components/base/Toast.js';
 import Modal from '../components/base/Modal.js';
 import { getIcon } from '../components/base/Icons.js';
 import { activities } from '../config/activities/index.js';
+import Sidebar from '../components/Sidebar.js';
 
 class SettingsPage extends BasePage {
     constructor(container, props = {}) {
@@ -19,9 +20,12 @@ class SettingsPage extends BasePage {
         // Get services from props
         this.activityConfig = props.activityConfig;
         this.playerService = props.services?.resolve('playerService');
+        this.sessionService = props.services?.resolve('sessionService');
+        this.eventBus = props.services?.resolve('eventBus');
 
         this.selectedPositions = [];
         this.importModal = null;
+        this.sidebar = null;
     }
 
     onCreate() {
@@ -36,6 +40,7 @@ class SettingsPage extends BasePage {
     }
 
     onMount() {
+        this.mountSidebar();
         this.attachEventListeners();
     }
 
@@ -44,10 +49,33 @@ class SettingsPage extends BasePage {
     }
 
     onDestroy() {
+        if (this.sidebar) {
+            this.sidebar.destroy();
+            this.sidebar = null;
+        }
         if (this.importModal) {
             this.importModal.destroy();
             this.importModal = null;
         }
+    }
+
+    mountSidebar() {
+        const sidebarContainer = document.getElementById('pageSidebar');
+        if (!sidebarContainer) return;
+
+        const selectedActivity = storage.get('selectedActivity', 'volleyball');
+        const activityConfig = activities[selectedActivity];
+
+        this.sidebar = new Sidebar(sidebarContainer, {
+            sessionService: this.sessionService,
+            eventBus: this.eventBus,
+            activityKey: selectedActivity,
+            activityName: activityConfig?.name || 'Unknown'
+        });
+
+        this.sidebar.mount();
+        this.addComponent(this.sidebar);
+        this.setupMobileSidebarToggle();
     }
 
     render() {
@@ -55,7 +83,7 @@ class SettingsPage extends BasePage {
         const stats = this.playerService.getPositionStats();
         const currentActivity = storage.get('selectedActivity', null);
 
-        return this.renderPage(`
+        return this.renderPageWithSidebar(`
             <div class="page-header">
                 <h2>Player Management</h2>
             </div>
@@ -91,16 +119,26 @@ class SettingsPage extends BasePage {
             <div class="activity-selector-section">
                 <div class="form-group">
                     <label for="activitySelect">Activity Type</label>
-                    <select id="activitySelect" class="activity-select">
-                        <option value="" ${!currentActivity ? 'selected' : ''}>Select an activity...</option>
-                        ${Object.entries(activities)
-                            .sort((a, b) => a[1].name.localeCompare(b[1].name))
-                            .map(([key, config]) => `
-                                <option value="${key}" ${key === currentActivity ? 'selected' : ''}>
-                                    ${config.name}
-                                </option>
-                            `).join('')}
-                    </select>
+                    <div class="activity-selector-row">
+                        <select id="activitySelect" class="activity-select">
+                            <option value="" ${!currentActivity ? 'selected' : ''}>Select an activity...</option>
+                            ${Object.entries(activities)
+                                .sort((a, b) => a[1].name.localeCompare(b[1].name))
+                                .map(([key, config]) => `
+                                    <option value="${key}" ${key === currentActivity ? 'selected' : ''}>
+                                        ${config.name}
+                                    </option>
+                                `).join('')}
+                        </select>
+                        ${currentActivity ? `
+                            <button type="button" class="btn btn--secondary" id="createSessionBtn" title="Create new session">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="vertical-align: middle; margin-right: 4px;">
+                                    <path d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z"/>
+                                </svg>
+                                Новый сеанс
+                            </button>
+                        ` : ''}
+                    </div>
                     <p class="form-help-text">
                         Changing the activity will reload the page to apply new positions and team configuration.
                     </p>
@@ -308,6 +346,14 @@ class SettingsPage extends BasePage {
             });
         }
 
+        // Create session button
+        const createSessionBtn = this.$('#createSessionBtn');
+        if (createSessionBtn) {
+            createSessionBtn.addEventListener('click', () => {
+                this.handleCreateSession();
+            });
+        }
+
         // Accordion toggle
         const accordionHeader = this.$('#addPlayerAccordionHeader');
         if (accordionHeader) {
@@ -437,6 +483,22 @@ class SettingsPage extends BasePage {
         setTimeout(() => {
             window.location.reload();
         }, 2000);
+    }
+
+    handleCreateSession() {
+        const currentActivity = storage.get('selectedActivity', null);
+        if (!currentActivity) {
+            toast.error('Please select an activity first');
+            return;
+        }
+
+        try {
+            const newSession = this.sessionService.createSession(currentActivity);
+            toast.success('New session created');
+            // Page will auto-update via event bus
+        } catch (error) {
+            toast.error(error.message);
+        }
     }
 
     handlePlayerAction(action, playerId) {

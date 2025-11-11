@@ -334,6 +334,9 @@ class ComparisonService {
                 }
             }
         ]);
+
+        // Increment session comparison counter
+        this.playerRepository.incrementSessionComparison();
     }
 
     /**
@@ -360,6 +363,9 @@ class ComparisonService {
                 }
             }
         ]);
+
+        // Increment session comparison counter
+        this.playerRepository.incrementSessionComparison();
     }
 
     /**

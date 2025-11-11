@@ -10,14 +10,9 @@ import storage from './StorageAdapter.js';
 class StateManager {
     constructor() {
         this.state = {
-            playersByActivity: {
-                volleyball: [],
-                basketball: [],
-                soccer: [],
-                'work-project': []
-            },
-            comparisons: 0,
-            version: '4.1',
+            sessions: {},
+            activeSessions: {},
+            version: '5.0',
             settings: {
                 showEloRatings: true,
                 theme: 'dark'
@@ -272,6 +267,71 @@ class StateManager {
             });
         }
 
+        // Version 4.1 -> 5.0 migration (playersByActivity -> sessions)
+        if (version < '5.0') {
+            console.log('Migrating data from version', version, 'to 5.0');
+
+            data.sessions = {};
+            data.activeSessions = {};
+
+            // If playersByActivity exists, convert it to sessions
+            if (data.playersByActivity) {
+                const activityKeys = Object.keys(data.playersByActivity);
+                let totalPlayersMigrated = 0;
+
+                activityKeys.forEach(activityKey => {
+                    const players = data.playersByActivity[activityKey] || [];
+
+                    // Only create a session if there are players
+                    if (players.length > 0) {
+                        const sessionId = `session-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+                        const timestamp = new Date().toISOString();
+
+                        // Create first session with existing players
+                        data.sessions[activityKey] = {
+                            [sessionId]: {
+                                id: sessionId,
+                                createdAt: timestamp,
+                                players: players,
+                                comparisons: data.comparisons || 0,
+                                settings: {}
+                            }
+                        };
+
+                        // Set as active session
+                        data.activeSessions[activityKey] = sessionId;
+
+                        totalPlayersMigrated += players.length;
+                        console.log(`Migrated ${players.length} players for ${activityKey} to session ${sessionId}`);
+                    } else {
+                        // No players, initialize empty sessions object for this activity
+                        data.sessions[activityKey] = {};
+                        data.activeSessions[activityKey] = null;
+                    }
+                });
+
+                // Remove old playersByActivity structure
+                delete data.playersByActivity;
+
+                console.log(`Total players migrated: ${totalPlayersMigrated}`);
+            } else {
+                // No existing data, initialize empty structure
+                data.sessions = {};
+                data.activeSessions = {};
+            }
+
+            // Remove old comparisons count (now stored per session)
+            delete data.comparisons;
+
+            data.version = '5.0';
+
+            eventBus.emit('state:migrated', {
+                from: version,
+                to: '5.0',
+                sessionsCreated: Object.keys(data.sessions).length
+            });
+        }
+
         return data;
     }
 
@@ -282,14 +342,9 @@ class StateManager {
         const { clearStorage = true } = options;
 
         this.state = {
-            playersByActivity: {
-                volleyball: [],
-                basketball: [],
-                soccer: [],
-                'work-project': []
-            },
-            comparisons: 0,
-            version: '4.1',
+            sessions: {},
+            activeSessions: {},
+            version: '5.0',
             settings: {
                 showEloRatings: true,
                 theme: 'dark'
@@ -347,12 +402,31 @@ class StateManager {
      */
     getStats() {
         const selectedActivity = storage.get('selectedActivity', 'volleyball');
-        const playersByActivity = this.state.playersByActivity || {};
-        const currentPlayers = playersByActivity[selectedActivity] || [];
+        const sessions = this.state.sessions || {};
+        const activeSessions = this.state.activeSessions || {};
+        const activeSessionId = activeSessions[selectedActivity];
+
+        let playerCount = 0;
+        let totalComparisons = 0;
+        let sessionCount = 0;
+
+        // Get stats for selected activity
+        if (sessions[selectedActivity]) {
+            const activitySessions = sessions[selectedActivity];
+            sessionCount = Object.keys(activitySessions).length;
+
+            // Get active session stats
+            if (activeSessionId && activitySessions[activeSessionId]) {
+                const activeSession = activitySessions[activeSessionId];
+                playerCount = activeSession.players?.length || 0;
+                totalComparisons = activeSession.comparisons || 0;
+            }
+        }
 
         return {
-            playerCount: currentPlayers.length,
-            totalComparisons: this.state.comparisons || 0,
+            playerCount,
+            totalComparisons,
+            sessionCount,
             version: this.state.version,
             storageSize: storage.getSizeFormatted(),
             lastSaved: storage.get(this.storageKey)?.savedAt,

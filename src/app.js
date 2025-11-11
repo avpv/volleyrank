@@ -149,7 +149,12 @@ class Application {
                 console.log('[OK] Starting with fresh state');
             }
 
-            // Step 3: Setup global event listeners
+            // Step 3.1: Ensure active session exists for current activity
+            const sessionService = this.services.resolve('sessionService');
+            const activeSession = sessionService.ensureActiveSession(this.activityConfig.key);
+            console.log('[OK] Active session ensured:', activeSession.id);
+
+            // Step 4: Setup global event listeners
             this.setupEventListeners();
 
             // Step 3.5: Setup navigation click handlers

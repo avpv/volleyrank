@@ -29,12 +29,74 @@ class PlayerRepository {
     }
 
     /**
-     * Get all players for the current activity
-     * @returns {Array<Object>} All players for current activity
+     * Get active session for current activity
+     * @private
+     * @returns {Object|null} Active session or null
+     */
+    _getActiveSession() {
+        const sessions = this.stateManager.get('sessions') || {};
+        const activeSessions = this.stateManager.get('activeSessions') || {};
+        const activeSessionId = activeSessions[this.activityKey];
+
+        if (!activeSessionId || !sessions[this.activityKey]) {
+            return null;
+        }
+
+        return sessions[this.activityKey][activeSessionId] || null;
+    }
+
+    /**
+     * Get active session ID for current activity
+     * @private
+     * @returns {string|null} Active session ID or null
+     */
+    _getActiveSessionId() {
+        const activeSessions = this.stateManager.get('activeSessions') || {};
+        return activeSessions[this.activityKey] || null;
+    }
+
+    /**
+     * Update active session data
+     * @private
+     * @param {Object} updates - Session updates
+     */
+    _updateActiveSession(updates) {
+        const sessionId = this._getActiveSessionId();
+        if (!sessionId) {
+            throw new Error('No active session found');
+        }
+
+        const state = this.stateManager.getState();
+        const sessions = state.sessions || {};
+        const activitySessions = sessions[this.activityKey] || {};
+        const currentSession = activitySessions[sessionId] || {};
+
+        const updatedSession = {
+            ...currentSession,
+            ...updates
+        };
+
+        this.stateManager.setState({
+            sessions: {
+                ...sessions,
+                [this.activityKey]: {
+                    ...activitySessions,
+                    [sessionId]: updatedSession
+                }
+            }
+        }, {
+            event: 'session:updated',
+            save: true
+        });
+    }
+
+    /**
+     * Get all players for the current activity's active session
+     * @returns {Array<Object>} All players for current active session
      */
     getAll() {
-        const playersByActivity = this.stateManager.get('playersByActivity') || {};
-        return playersByActivity[this.activityKey] || [];
+        const session = this._getActiveSession();
+        return session?.players || [];
     }
 
     /**
@@ -77,41 +139,29 @@ class PlayerRepository {
     }
 
     /**
-     * Add a new player to the current activity
+     * Add a new player to the current activity's active session
      * @param {Object} player - Player object to add
      * @returns {Object} Added player
      */
     add(player) {
-        const state = this.stateManager.getState();
-        const playersByActivity = state.playersByActivity || {};
-        const currentPlayers = playersByActivity[this.activityKey] || [];
+        const currentPlayers = this.getAll();
         const updatedPlayers = [...currentPlayers, player];
 
-        this.stateManager.setState({
-            playersByActivity: {
-                ...playersByActivity,
-                [this.activityKey]: updatedPlayers
-            }
-        }, {
-            event: 'player:added',
-            save: true
-        });
+        this._updateActiveSession({ players: updatedPlayers });
 
         this.eventBus.emit('player:added', player);
         return player;
     }
 
     /**
-     * Update existing player in the current activity
+     * Update existing player in the current activity's active session
      * @param {string} playerId - Player ID
      * @param {Object} updates - Fields to update
      * @returns {Object} Updated player
      * @throws {Error} If player not found
      */
     update(playerId, updates) {
-        const state = this.stateManager.getState();
-        const playersByActivity = state.playersByActivity || {};
-        const currentPlayers = playersByActivity[this.activityKey] || [];
+        const currentPlayers = this.getAll();
         const playerIndex = currentPlayers.findIndex(p => p.id === playerId);
 
         if (playerIndex === -1) {
@@ -126,29 +176,19 @@ class PlayerRepository {
         const updatedPlayers = [...currentPlayers];
         updatedPlayers[playerIndex] = updatedPlayer;
 
-        this.stateManager.setState({
-            playersByActivity: {
-                ...playersByActivity,
-                [this.activityKey]: updatedPlayers
-            }
-        }, {
-            event: 'player:updated',
-            save: true
-        });
+        this._updateActiveSession({ players: updatedPlayers });
 
         this.eventBus.emit('player:updated', updatedPlayer);
         return updatedPlayer;
     }
 
     /**
-     * Update multiple players at once in the current activity
+     * Update multiple players at once in the current activity's active session
      * @param {Array<{id: string, updates: Object}>} playerUpdates - Array of player updates
      * @returns {Array<Object>} Updated players
      */
     updateMany(playerUpdates) {
-        const state = this.stateManager.getState();
-        const playersByActivity = state.playersByActivity || {};
-        const currentPlayers = playersByActivity[this.activityKey] || [];
+        const currentPlayers = this.getAll();
         const updatedPlayers = [...currentPlayers];
 
         const results = [];
@@ -164,30 +204,20 @@ class PlayerRepository {
             }
         });
 
-        this.stateManager.setState({
-            playersByActivity: {
-                ...playersByActivity,
-                [this.activityKey]: updatedPlayers
-            }
-        }, {
-            event: 'players:updated',
-            save: true
-        });
+        this._updateActiveSession({ players: updatedPlayers });
 
         this.eventBus.emit('players:updated', results);
         return results;
     }
 
     /**
-     * Remove player from the current activity
+     * Remove player from the current activity's active session
      * @param {string} playerId - Player ID
      * @returns {Object} Removed player
      * @throws {Error} If player not found
      */
     remove(playerId) {
-        const state = this.stateManager.getState();
-        const playersByActivity = state.playersByActivity || {};
-        const currentPlayers = playersByActivity[this.activityKey] || [];
+        const currentPlayers = this.getAll();
         const player = currentPlayers.find(p => p.id === playerId);
 
         if (!player) {
@@ -196,15 +226,7 @@ class PlayerRepository {
 
         const updatedPlayers = currentPlayers.filter(p => p.id !== playerId);
 
-        this.stateManager.setState({
-            playersByActivity: {
-                ...playersByActivity,
-                [this.activityKey]: updatedPlayers
-            }
-        }, {
-            event: 'player:removed',
-            save: true
-        });
+        this._updateActiveSession({ players: updatedPlayers });
 
         this.eventBus.emit('player:removed', player);
         return player;
@@ -316,6 +338,20 @@ class PlayerRepository {
         };
 
         return this.update(playerId, { comparisons: updatedComparisons });
+    }
+
+    /**
+     * Increment session comparison counter
+     * Should be called after each comparison
+     */
+    incrementSessionComparison() {
+        const session = this._getActiveSession();
+        if (!session) {
+            throw new Error('No active session found');
+        }
+
+        const newCount = (session.comparisons || 0) + 1;
+        this._updateActiveSession({ comparisons: newCount });
     }
 
     /**
