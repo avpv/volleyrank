@@ -503,7 +503,10 @@ select.form-control {
     flex-wrap: wrap;
 }
 
-/* Danger Zone Styling - Removed, using default form-section styles */
+/* Danger Zone Styling - No border */
+.form-section.danger-zone {
+    border: none;
+}
 
 /* =============================================================================
    Cards
