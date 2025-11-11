@@ -76,7 +76,7 @@ class Sidebar extends Component {
         return `
             <div class="sidebar__empty">
                 <p>No sessions</p>
-                <p class="text-muted">Create your first session</p>
+                <p class="text-muted">Create your first teams</p>
             </div>
         `;
     }
