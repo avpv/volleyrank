@@ -65,7 +65,7 @@ export default {
 
 ### Example: Adding Tennis
 
-Create `tennis.js`:
+**Step 1:** Create `tennis.js`:
 
 ```javascript
 export default {
@@ -93,15 +93,15 @@ export default {
 };
 ```
 
-Then add to `index.js`:
+**Step 2:** Add to `index.js`:
 ```javascript
-import tennis from './tennis.js';
-
-export const activities = {
+const ACTIVITY_FILES = {
     // ... existing activities
-    tennis
+    tennis: 'tennis.js'  // Add this line!
 };
 ```
+
+**That's it!** The activity will be automatically loaded at app startup. No need to manually import or add to the activities object.
 
 ## Position Weight Guidelines
 
@@ -127,13 +127,17 @@ The algorithm uses these weights with player ratings to create balanced teams.
 To change the default activity, modify `index.js`:
 
 ```javascript
-export const defaultActivity = basketball; // Change this
+export async function initializeActivities() {
+    activities = await loadAllActivities();
+    defaultActivityRef.current = activities.basketball; // Change this
+    return activities;
+}
 ```
 
-Or load dynamically:
+Or access activities after initialization:
 ```javascript
-import { getActivityConfig } from './activities/index.js';
-const config = getActivityConfig('basketball');
+import { activities } from './activities/index.js';
+const config = activities.basketball;
 ```
 
 ## Philosophy

@@ -29,7 +29,7 @@ import stateManager from './core/StateManager.js';
 import toast from './components/base/Toast.js';
 import redirectModule from './redirect.js';
 import { getIcon } from './components/base/Icons.js';
-import { defaultActivity, activities } from './config/activities/index.js';
+import { initializeActivities, activities, getDefaultActivity } from './config/activities/index.js';
 import { escapeHtml } from './utils/stringUtils.js';
 import { initializeServices } from './config/services.js';
 import storage from './core/StorageAdapter.js';
@@ -109,6 +109,7 @@ class Application {
 
         if (!activityConfig) {
             console.warn(`Activity '${selectedActivity}' not found, using default`);
+            const defaultActivity = getDefaultActivity();
             return { key: 'volleyball', config: defaultActivity };
         }
 
@@ -139,6 +140,11 @@ class Application {
         try {
             console.log(`[INIT] Initializing ${APP_CONFIG.NAME} v${APP_CONFIG.VERSION}...`);
 
+            // Step 0: Initialize activities (load all activity configs)
+            console.log('[INIT] Loading activity configurations...');
+            await initializeActivities();
+            console.log(`[OK] Loaded ${Object.keys(activities).length} activities`);
+
             // Check if activity is selected
             if (this.activityConfig) {
                 console.log(`[INIT] Activity: ${this.activityConfig.config.name}`);
@@ -147,6 +153,7 @@ class Application {
             }
 
             // Step 1: Initialize services with activity config (or default if none)
+            const defaultActivity = getDefaultActivity();
             const configForServices = this.activityConfig ? this.activityConfig.config : defaultActivity;
             this.services = initializeServices(configForServices);
             console.log('[OK] Services initialized');
