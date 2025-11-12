@@ -233,6 +233,9 @@ class Sidebar extends Component {
             if (result.success) {
                 console.log('Session deleted:', sessionId);
 
+                // Close mobile sidebar and backdrop after session deletion
+                this.closeMobileSidebar();
+
                 // Check if there are any remaining sessions for the current activity
                 const remainingSessions = this.sessionService.getAllSessions(activityKey);
 
