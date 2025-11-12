@@ -145,6 +145,10 @@ class Application {
             await initializeActivities();
             console.log(`[OK] Loaded ${Object.keys(activities).length} activities`);
 
+            // Reload activity config after activities are initialized
+            // This ensures getDefaultActivity() returns a valid config
+            this.activityConfig = this.loadActivityConfig();
+
             // Check if activity is selected
             if (this.activityConfig) {
                 console.log(`[INIT] Activity: ${this.activityConfig.config.name}`);
