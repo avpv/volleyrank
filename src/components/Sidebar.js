@@ -15,6 +15,7 @@ import { getIcon } from './base/Icons.js';
 import router from '../core/Router.js';
 import storage from '../core/StorageAdapter.js';
 import toast from './base/Toast.js';
+import { activities } from '../config/activities/index.js';
 
 class Sidebar extends Component {
     constructor(container, props = {}) {
@@ -127,31 +128,9 @@ class Sidebar extends Component {
     }
 
     getActivityName(activityKey) {
-        // Import activities config dynamically
-        const activityNames = {
-            volleyball: 'Volleyball',
-            basketball: 'Basketball',
-            soccer: 'Soccer',
-            baseball: 'Baseball',
-            football: 'Football',
-            rugby: 'Rugby',
-            cricket: 'Cricket',
-            hockey: 'Hockey',
-            'ice-hockey': 'Ice Hockey',
-            'field-hockey': 'Field Hockey',
-            lacrosse: 'Lacrosse',
-            'water-polo': 'Water Polo',
-            'beach-volleyball': 'Beach Volleyball',
-            futsal: 'Futsal',
-            softball: 'Softball',
-            netball: 'Netball',
-            handball: 'Handball',
-            'ultimate-frisbee': 'Ultimate Frisbee',
-            'work-project': 'Work Project',
-            general: 'General'
-        };
-
-        return activityNames[activityKey] || 'Unknown Activity';
+        // Get activity name from loaded activities config
+        const activity = activities[activityKey];
+        return activity?.name || 'Unknown Activity';
     }
 
     formatDate(date) {
