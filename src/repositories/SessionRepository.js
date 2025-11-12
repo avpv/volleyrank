@@ -184,10 +184,20 @@ class SessionRepository {
         // Remove session
         delete activitySessions[sessionId];
 
-        const updatedSessions = {
-            ...sessions,
-            [activityKey]: activitySessions
-        };
+        // Clean up: if no sessions left for this activity, remove the activity key entirely
+        const remainingSessions = Object.keys(activitySessions);
+        let updatedSessions;
+        if (remainingSessions.length === 0) {
+            // Remove the activity key entirely when last session is deleted
+            updatedSessions = { ...sessions };
+            delete updatedSessions[activityKey];
+        } else {
+            // Keep the activity key with remaining sessions
+            updatedSessions = {
+                ...sessions,
+                [activityKey]: activitySessions
+            };
+        }
 
         // If deleted session was active, set a new active session
         const activeSessions = state.activeSessions || {};
@@ -195,7 +205,6 @@ class SessionRepository {
 
         if (activeSessionId === sessionId) {
             // Find another session to set as active
-            const remainingSessions = Object.keys(activitySessions);
             const newActiveSessionId = remainingSessions.length > 0 ? remainingSessions[0] : null;
 
             this.stateManager.setState({
