@@ -393,12 +393,18 @@ class Application {
         let page;
 
         try {
+            // Reload activity config to ensure we have the latest activity after session switch
+            const currentActivityConfig = this.loadActivityConfig();
+
             // Pass activity config, activity key, and services to all pages via props
             page = new PageClass(container, {
-                activityConfig: this.activityConfig ? this.activityConfig.config : null,
-                activityKey: this.activityConfig ? this.activityConfig.key : null,
+                activityConfig: currentActivityConfig ? currentActivityConfig.config : null,
+                activityKey: currentActivityConfig ? currentActivityConfig.key : null,
                 services: this.services
             });
+
+            // Update cached activity config
+            this.activityConfig = currentActivityConfig;
         } catch (error) {
             console.error('[ERROR] Error creating page:', error);
             container.innerHTML = `
