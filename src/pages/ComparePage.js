@@ -236,7 +236,6 @@ class ComparePage extends BasePage {
                     <div class="vs-divider">
                         <div class="vs-text">VS</div>
                         <button class="draw-button" id="drawButton" data-player1-id="${player1.id}" data-player2-id="${player2.id}">
-                            ${getIcon('win-win', { size: 16, className: 'btn-icon' })}
                             Win-Win
                         </button>
                     </div>
