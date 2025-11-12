@@ -131,30 +131,32 @@ class SettingsPage extends BasePage {
         const currentActivity = storage.get('selectedActivity', null);
 
         return `
-            <div class="activity-selector-section player-form">
-                <div class="form-group">
-                    <label for="activitySelect">Activity Type</label>
-                    <div class="activity-selector-row form-row">
-                        <select id="activitySelect" class="activity-select">
-                            <option value="" ${!currentActivity ? 'selected' : ''} disabled>Select an activity...</option>
-                            ${Object.entries(activities)
-                                .sort((a, b) => a[1].name.localeCompare(b[1].name))
-                                .map(([key, config]) => `
-                                    <option value="${key}" ${key === currentActivity ? 'selected' : ''}>
-                                        ${config.name}
-                                    </option>
-                                `).join('')}
-                        </select>
-                        <button type="button" class="btn btn--secondary" id="createSessionBtn" title="Create new session">
-                            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="vertical-align: middle; margin-right: 4px;">
-                                <path d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z"/>
-                            </svg>
-                            New teams
-                        </button>
+            <div class="activity-selector-section">
+                <div class="player-form">
+                    <div class="form-group">
+                        <label for="activitySelect">Activity Type</label>
+                        <div class="activity-selector-row form-row">
+                            <select id="activitySelect" class="activity-select">
+                                <option value="" ${!currentActivity ? 'selected' : ''} disabled>Select an activity...</option>
+                                ${Object.entries(activities)
+                                    .sort((a, b) => a[1].name.localeCompare(b[1].name))
+                                    .map(([key, config]) => `
+                                        <option value="${key}" ${key === currentActivity ? 'selected' : ''}>
+                                            ${config.name}
+                                        </option>
+                                    `).join('')}
+                            </select>
+                            <button type="button" class="btn btn--secondary" id="createSessionBtn" title="Create new session">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="vertical-align: middle; margin-right: 4px;">
+                                    <path d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z"/>
+                                </svg>
+                                New teams
+                            </button>
+                        </div>
+                        <p class="form-help-text">
+                            Select an activity and click "New teams" to create a session. Activity changes will be applied when creating a new session.
+                        </p>
                     </div>
-                    <p class="form-help-text">
-                        Select an activity and click "New teams" to create a session. Activity changes will be applied when creating a new session.
-                    </p>
                 </div>
             </div>
         `;
