@@ -187,15 +187,19 @@ class Sidebar extends Component {
                 // Update selected activity
                 storage.set('selectedActivity', activityKey);
 
-                // Navigate to settings page to reload with new activity
-                router.navigate('/');
+                // Full page reload required when switching activities
+                // This ensures all services get the new activity config
+                toast.info(`Switching to ${activities[activityKey]?.name}...`, 1500);
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
             } else {
                 // Same activity, just emit state change
                 this.eventBus.emit('state:changed');
-            }
 
-            // Close mobile sidebar and backdrop after session switch
-            this.closeMobileSidebar();
+                // Close mobile sidebar and backdrop after session switch
+                this.closeMobileSidebar();
+            }
         }
     }
 

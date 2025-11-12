@@ -39,7 +39,12 @@ class ComparePage extends BasePage {
         this.on('player:added', () => this.update());
         this.on('player:removed', () => this.update());
         this.on('state:changed', () => this.update());
-        this.on('session:activated', () => this.update());
+        this.on('session:activated', () => {
+            // Reset comparison state when session changes
+            this.selectedPosition = '';
+            this.currentPair = null;
+            this.update();
+        });
     }
 
     onMount() {
