@@ -508,7 +508,7 @@ class Application {
                 // Prevent navigation if no activity selected and route is disabled
                 if (!currentActivity && disabledRoutes.includes(route)) {
                     e.preventDefault();
-                    toast.error('Please select an activity type first');
+                    toast.error('Please select an activity first');
                 }
             });
         });

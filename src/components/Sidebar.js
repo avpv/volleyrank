@@ -177,12 +177,6 @@ class Sidebar extends Component {
     handleSwitchSession(sessionId, activityKey) {
         const currentActivity = storage.get('selectedActivity', null);
 
-        // Check if activity is selected
-        if (!currentActivity) {
-            toast.error('Please select an activity first');
-            return;
-        }
-
         const result = this.sessionService.switchSession(activityKey, sessionId);
         if (result.success) {
             console.log('Switched to session:', sessionId);
