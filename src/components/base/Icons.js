@@ -53,8 +53,22 @@ export function getIcon(name, options = {}) {
         // Shuffle / Random
         shuffle: `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="round" class="${className}"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>`,
 
-        // Win-Win / Both winners
-        'win-win': `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="round" class="${className}"><path d="M12 2l2.5 7.5h7.5l-6 4.5 2.5 7.5-6-4.5-6 4.5 2.5-7.5-6-4.5h7.5z"></path></svg>`,
+        // Win-Win / Both winners / Handshake
+        'win-win': `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 -5.34 47.608 47.608" fill="none" stroke="${color}" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="${className}">
+<g transform="translate(-629.25 -210.949)">
+<path d="M665.8,233.227l2.18,2.181a2.215,2.215,0,0,1,0,3.134h0a2.215,2.215,0,0,1-3.134,0l-1.521-1.52" fill="none" stroke="${color}" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+<path d="M662.664,236.362l3.5,3.5a2.218,2.218,0,0,1,0,3.135h0a2.216,2.216,0,0,1-3.135,0l-3.5-3.5" fill="none" stroke="${color}" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+<path d="M658.65,238.617l3.72,3.72a2.218,2.218,0,0,1,0,3.135h0a2.218,2.218,0,0,1-3.135,0l-3.72-3.72" fill="none" stroke="${color}" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+<path d="M654.635,240.872l2.09,2.09a2.276,2.276,0,0,1-.083,3.217h0a2.277,2.277,0,0,1-3.217.082l-1.567-1.567" fill="none" stroke="${color}" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+<line x2="10.899" y2="10.899" transform="translate(654.9 222.328)" stroke-width="1" stroke="${color}" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+<path d="M639.061,231.9l-9.311-9.311,9.8-9.67,4.472,4.473a19.473,19.473,0,0,1,9.237.149" fill="none" stroke="${color}" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+<rect width="4.433" height="7.019" rx="2.127" transform="translate(649.376 247.176) rotate(-135)" stroke-width="1" stroke="${color}" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+<rect width="4.433" height="8.208" rx="2.127" transform="translate(645.741 244.026) rotate(-135)" stroke-width="1" stroke="${color}" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+<rect width="4.433" height="8.208" rx="2.127" transform="translate(639.472 237.756) rotate(-135)" stroke-width="1" stroke="${color}" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+<rect width="4.433" height="9.836" rx="2.127" transform="translate(642.031 241.467) rotate(-135)" stroke-width="1" stroke="${color}" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+<path d="M665.139,231.908l11.219-11.219-9.239-9.24-7.974,8.195s-5.307-3.658-8.277-1.348A39.55,39.55,0,0,1,646.879,221a2.512,2.512,0,0,0-.991,3.2h0a2.52,2.52,0,0,0,3.463,1.19l5.219-2.734" fill="none" stroke="${color}" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+</g>
+</svg>`,
 
         // Users / Team
         users: `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="round" class="${className}"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>`,
