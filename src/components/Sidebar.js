@@ -274,9 +274,9 @@ class Sidebar extends Component {
                         // Already on settings page, just reload to reset state
                         window.location.reload();
                     }
-                } else if (isDeletingActiveSession && remainingSessions.length === 0) {
-                    // Deleted the active session for current activity and no sessions left for this activity
-                    console.log('[Sidebar] Active session deleted and no sessions left for current activity - navigating to settings');
+                } else if (isDeletingActiveSession) {
+                    // Deleted the active session for current activity - always navigate to settings
+                    console.log('[Sidebar] Active session deleted - navigating to settings');
 
                     // Clear selected activity
                     storage.remove('selectedActivity');
@@ -293,7 +293,7 @@ class Sidebar extends Component {
                         window.location.reload();
                     }
                 } else {
-                    // Still have sessions, just update UI
+                    // Deleted non-active session, just update UI
                     this.eventBus.emit('state:changed');
                 }
             }
