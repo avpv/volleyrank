@@ -175,12 +175,24 @@ class Sidebar extends Component {
     }
 
     handleSwitchSession(sessionId, activityKey) {
+        const currentActivity = storage.get('selectedActivity', null);
+
         const result = this.sessionService.switchSession(activityKey, sessionId);
         if (result.success) {
             console.log('Switched to session:', sessionId);
-            // UI will update automatically via event listener
-            // Also trigger app-wide refresh
-            this.eventBus.emit('state:changed');
+
+            // Check if switching to a different activity
+            if (currentActivity !== activityKey) {
+                console.log('Switching from', currentActivity, 'to', activityKey);
+                // Update selected activity
+                storage.set('selectedActivity', activityKey);
+
+                // Navigate to teams page to reload with new activity
+                router.navigate('/teams/');
+            } else {
+                // Same activity, just emit state change
+                this.eventBus.emit('state:changed');
+            }
 
             // Close mobile sidebar and backdrop after session switch
             this.closeMobileSidebar();
