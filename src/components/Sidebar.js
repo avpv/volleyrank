@@ -12,6 +12,9 @@
 
 import Component from './base/Component.js';
 import { getIcon } from './base/Icons.js';
+import router from '../core/Router.js';
+import storage from '../core/StorageAdapter.js';
+import toast from './base/Toast.js';
 
 class Sidebar extends Component {
     constructor(container, props = {}) {
@@ -33,6 +36,11 @@ class Sidebar extends Component {
     }
 
     onMount() {
+        this.attachEventListeners();
+    }
+
+    onUpdate() {
+        // Re-attach event listeners after update
         this.attachEventListeners();
     }
 
@@ -209,9 +217,38 @@ class Sidebar extends Component {
             const result = this.sessionService.deleteSession(activityKey, sessionId);
             if (result.success) {
                 console.log('Session deleted:', sessionId);
-                // UI will update automatically via event listener
-                // Also trigger app-wide refresh
-                this.eventBus.emit('state:changed');
+
+                // Check if there are any remaining sessions for the current activity
+                const remainingSessions = this.sessionService.getAllSessions(activityKey);
+
+                // Check if this was the last session across all activities
+                const allActivities = this.sessionService.sessionRepository.stateManager.get('sessions') || {};
+                const totalSessionCount = Object.values(allActivities).reduce((count, sessions) => {
+                    return count + Object.keys(sessions || {}).length;
+                }, 0);
+
+                if (totalSessionCount === 0) {
+                    // No sessions left at all - navigate to settings page
+                    console.log('[Sidebar] All sessions deleted - navigating to settings');
+
+                    // Clear selected activity since there are no sessions
+                    storage.remove('selectedActivity');
+                    storage.remove('pendingActivity');
+
+                    // Show message
+                    toast.info('All sessions deleted. Please select an activity to continue.');
+
+                    // Navigate to settings if not already there
+                    if (router.currentRoute !== '/') {
+                        router.navigate('/');
+                    } else {
+                        // Already on settings page, just reload to reset state
+                        window.location.reload();
+                    }
+                } else {
+                    // Still have sessions, just update UI
+                    this.eventBus.emit('state:changed');
+                }
             }
         }
     }
