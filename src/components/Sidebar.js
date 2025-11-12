@@ -105,9 +105,6 @@ class Sidebar extends Component {
             <div class="session-item ${isActive ? 'session-item--active' : ''}"
                  data-session-id="${session.id}"
                  data-activity-key="${activityKey}">
-                <div class="session-item__indicator">
-                    ${isActive ? '●' : ''}
-                </div>
                 <div class="session-item__content">
                     <div class="session-item__header">
                         <span class="session-item__name">${activityName}</span>

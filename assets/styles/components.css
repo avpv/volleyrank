@@ -1597,15 +1597,6 @@ select.form-control {
     border-color: var(--color-brand-primary);
 }
 
-.session-item__indicator {
-    width: 12px;
-    flex-shrink: 0;
-    color: var(--color-brand-primary);
-    font-size: var(--font-size-lg);
-    line-height: 1;
-    padding-top: 2px;
-}
-
 .session-item__content {
     flex: 1;
     min-width: 0;
