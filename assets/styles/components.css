@@ -1580,7 +1580,6 @@ select.form-control {
     margin-bottom: var(--spacing-2);
     background-color: transparent;
     border: 1px solid transparent;
-    border-bottom: 1px solid var(--color-border-default);
     border-radius: var(--radius-md);
     cursor: pointer;
     transition: var(--transition-default);
