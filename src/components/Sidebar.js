@@ -181,7 +181,30 @@ class Sidebar extends Component {
             // UI will update automatically via event listener
             // Also trigger app-wide refresh
             this.eventBus.emit('state:changed');
+
+            // Close mobile sidebar and backdrop after session switch
+            this.closeMobileSidebar();
         }
+    }
+
+    closeMobileSidebar() {
+        const sidebar = document.getElementById('pageSidebar');
+        const backdrop = document.getElementById('sidebarBackdrop');
+
+        if (!sidebar || !backdrop) {
+            return;
+        }
+
+        sidebar.classList.remove('open');
+        backdrop.classList.remove('visible');
+        document.body.style.overflow = '';
+
+        // Wait for transition to complete before hiding
+        setTimeout(() => {
+            if (!backdrop.classList.contains('visible')) {
+                backdrop.style.display = 'none';
+            }
+        }, 300);
     }
 
     handleDeleteSession(sessionId, activityKey) {
