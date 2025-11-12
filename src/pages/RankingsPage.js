@@ -26,6 +26,7 @@ class RankingsPage extends BasePage {
         this.on('player:added', () => this.update());
         this.on('player:removed', () => this.update());
         this.on('player:reset', () => this.update());
+        this.on('state:changed', () => this.update());
     }
 
     onMount() {
