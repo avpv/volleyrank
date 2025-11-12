@@ -446,7 +446,6 @@ a:hover {
     color: var(--color-text-muted);
     opacity: 0.5;
     cursor: not-allowed;
-    pointer-events: none;
 }
 
 .nav-link.disabled:hover {
