@@ -64,6 +64,18 @@ class TeamsPage extends BasePage {
                 positionWeights: this.getInitialWeights()
             });
         });
+        this.on('state:changed', () => {
+            // When state changes (e.g., session switch within same activity), reload data
+            const savedSettings = this.loadSettings();
+            const savedTeams = this.loadTeams();
+            this.setState({
+                teams: savedTeams,
+                showEloRatings: savedSettings.showEloRatings ?? true,
+                teamCount: savedSettings.teamCount ?? 2,
+                composition: savedSettings.composition ?? this.activityConfig.defaultComposition,
+                positionWeights: this.getInitialWeights()
+            });
+        });
     }
 
     getInitialWeights() {

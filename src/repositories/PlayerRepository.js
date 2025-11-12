@@ -20,12 +20,22 @@ class PlayerRepository {
     /**
      * @param {StateManager} stateManager - State management service
      * @param {EventBus} eventBus - Event bus for notifications
-     * @param {string} activityKey - Current activity key (e.g., 'volleyball', 'basketball')
+     * @param {StorageAdapter} storageAdapter - Storage adapter for reading activity
      */
-    constructor(stateManager, eventBus, activityKey = 'volleyball') {
+    constructor(stateManager, eventBus, storageAdapter) {
         this.stateManager = stateManager;
         this.eventBus = eventBus;
-        this.activityKey = activityKey;
+        this.storageAdapter = storageAdapter;
+    }
+
+    /**
+     * Get current activity key dynamically from storage
+     * This ensures we always work with the correct activity after session switches
+     * @private
+     * @returns {string} Current activity key
+     */
+    _getActivityKey() {
+        return this.storageAdapter.get('selectedActivity', 'volleyball');
     }
 
     /**
@@ -34,15 +44,16 @@ class PlayerRepository {
      * @returns {Object|null} Active session or null
      */
     _getActiveSession() {
+        const activityKey = this._getActivityKey();
         const sessions = this.stateManager.get('sessions') || {};
         const activeSessions = this.stateManager.get('activeSessions') || {};
-        const activeSessionId = activeSessions[this.activityKey];
+        const activeSessionId = activeSessions[activityKey];
 
-        if (!activeSessionId || !sessions[this.activityKey]) {
+        if (!activeSessionId || !sessions[activityKey]) {
             return null;
         }
 
-        return sessions[this.activityKey][activeSessionId] || null;
+        return sessions[activityKey][activeSessionId] || null;
     }
 
     /**
@@ -51,8 +62,9 @@ class PlayerRepository {
      * @returns {string|null} Active session ID or null
      */
     _getActiveSessionId() {
+        const activityKey = this._getActivityKey();
         const activeSessions = this.stateManager.get('activeSessions') || {};
-        return activeSessions[this.activityKey] || null;
+        return activeSessions[activityKey] || null;
     }
 
     /**
@@ -61,6 +73,7 @@ class PlayerRepository {
      * @param {Object} updates - Session updates
      */
     _updateActiveSession(updates) {
+        const activityKey = this._getActivityKey();
         const sessionId = this._getActiveSessionId();
         if (!sessionId) {
             throw new Error('No active session found');
@@ -68,7 +81,7 @@ class PlayerRepository {
 
         const state = this.stateManager.getState();
         const sessions = state.sessions || {};
-        const activitySessions = sessions[this.activityKey] || {};
+        const activitySessions = sessions[activityKey] || {};
         const currentSession = activitySessions[sessionId] || {};
 
         const updatedSession = {
@@ -79,7 +92,7 @@ class PlayerRepository {
         this.stateManager.setState({
             sessions: {
                 ...sessions,
-                [this.activityKey]: {
+                [activityKey]: {
                     ...activitySessions,
                     [sessionId]: updatedSession
                 }

@@ -35,9 +35,10 @@ class ComparePage extends BasePage {
             }
             this.update();
         });
-        
+
         this.on('player:added', () => this.update());
         this.on('player:removed', () => this.update());
+        this.on('state:changed', () => this.update());
     }
 
     onMount() {

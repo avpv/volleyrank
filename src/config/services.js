@@ -119,19 +119,20 @@ export function createServiceConfig(activityConfig) {
         /**
          * Player Repository - Data access for players
          * Singleton: One repository instance
-         * Dependencies: stateManager, eventBus
+         * Dependencies: stateManager, eventBus, storageAdapter
          *
          * Purpose: Encapsulate all data access operations
          * Benefits: Loose coupling, easier testing, single source of truth
+         *
+         * Note: Uses storageAdapter to dynamically read current activity,
+         * ensuring data is always loaded from the correct session
          */
         playerRepository: {
             implementation: PlayerRepository,
             lifetime: ServiceLifetime.SINGLETON,
-            dependencies: ['stateManager', 'eventBus'],
+            dependencies: ['stateManager', 'eventBus', 'storageAdapter'],
             factory: (deps) => {
-                // Get the selected activity from storage
-                const selectedActivity = storage.get('selectedActivity', 'volleyball');
-                return new PlayerRepository(deps.stateManager, deps.eventBus, selectedActivity);
+                return new PlayerRepository(deps.stateManager, deps.eventBus, deps.storageAdapter);
             }
         },
 
