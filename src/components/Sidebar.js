@@ -113,13 +113,13 @@ class Sidebar extends Component {
                     </div>
                     <div class="session-item__meta">
                         <span class="session-item__date">${dateStr} ${timeStr}</span>
-                        <span class="session-item__players">${playerCount} игроков</span>
+                        <span class="session-item__players">${playerCount} players</span>
                     </div>
                 </div>
                 <button class="session-item__delete"
                         data-session-id="${session.id}"
                         data-activity-key="${activityKey}"
-                        title="Удалить сеанс">
+                        title="Delete session">
                     ${getIcon('trash')}
                 </button>
             </div>
@@ -208,9 +208,9 @@ class Sidebar extends Component {
         const session = this.sessionService.getSession(activityKey, sessionId);
         const playerCount = session?.players?.length || 0;
 
-        let confirmMessage = 'Удалить этот сеанс?';
+        let confirmMessage = 'Delete this session?';
         if (playerCount > 0) {
-            confirmMessage = `Удалить сеанс с ${playerCount} игроками?`;
+            confirmMessage = `Delete session with ${playerCount} players?`;
         }
 
         if (confirm(confirmMessage)) {
