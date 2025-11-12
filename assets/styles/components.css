@@ -1578,8 +1578,9 @@ select.form-control {
     gap: var(--spacing-3);
     padding: var(--spacing-3);
     margin-bottom: var(--spacing-2);
-    background-color: var(--color-bg-primary);
-    border: 1px solid var(--color-border);
+    background-color: transparent;
+    border: 1px solid transparent;
+    border-bottom: 1px solid var(--color-border-default);
     border-radius: var(--radius-md);
     cursor: pointer;
     transition: var(--transition-default);
@@ -1588,7 +1589,7 @@ select.form-control {
 
 .session-item:hover {
     background-color: var(--color-bg-hover);
-    border-color: var(--color-brand-primary);
+    border-color: var(--color-border-strong);
 }
 
 .session-item--active {
@@ -1608,6 +1609,7 @@ select.form-control {
 .session-item__content {
     flex: 1;
     min-width: 0;
+    padding: var(--spacing-1) 0;
 }
 
 .session-item__header {
@@ -1646,7 +1648,7 @@ select.form-control {
 
 .session-item__delete {
     flex-shrink: 0;
-    padding: var(--spacing-2);
+    padding: var(--spacing-1);
     background: transparent;
     border: none;
     color: var(--color-text-tertiary);
@@ -1654,6 +1656,16 @@ select.form-control {
     border-radius: var(--radius-sm);
     transition: var(--transition-default);
     opacity: 0;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.session-item__delete svg {
+    width: 14px;
+    height: 14px;
 }
 
 .session-item:hover .session-item__delete {
