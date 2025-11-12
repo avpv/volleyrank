@@ -37,6 +37,7 @@ class SettingsPage extends BasePage {
         this.on('players:reset-all-positions', () => this.update());
         this.on('state:changed', () => this.update());
         this.on('state:reset', () => this.update());
+        this.on('session:activated', () => this.update());
     }
 
     onMount() {
