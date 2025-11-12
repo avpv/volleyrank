@@ -30,6 +30,10 @@
     align-items: center;
 }
 
+.activity-selector-row .btn {
+    justify-self: start;
+}
+
 .activity-select {
     width: 100%;
     padding: var(--spacing-3);
