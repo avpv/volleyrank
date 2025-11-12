@@ -1,77 +1,158 @@
 // src/config/activities/index.js
 // Activity configurations for TeamBuilding
 
-import volleyball from './volleyball.js';
-import basketball from './basketball.js';
-import soccer from './soccer.js';
-import workProject from './work-project.js';
-import americanFootball from './american-football.js';
-import baseball from './baseball.js';
-import iceHockey from './ice-hockey.js';
-import handball from './handball.js';
-import rugby from './rugby.js';
-import waterPolo from './water-polo.js';
-import cricket from './cricket.js';
-import futsal from './futsal.js';
-import beachVolleyball from './beach-volleyball.js';
-import ultimateFrisbee from './ultimate-frisbee.js';
-import fieldHockey from './field-hockey.js';
-import lacrosse from './lacrosse.js';
-import softball from './softball.js';
-import netball from './netball.js';
-import general from './general.js';
-
 /**
- * Available activity configurations
- * Add your custom activity config here
+ * Activity file mappings
+ *
+ * To add a new activity:
+ * 1. Create a config file in src/config/activities/ (e.g., tennis.js)
+ * 2. Add the mapping below: 'tennis': 'tennis.js'
+ *
+ * That's it! No need to add imports or update the activities object.
  */
-export const activities = {
+const ACTIVITY_FILES = {
     // Original activities
-    volleyball,
-    basketball,
-    soccer,
-    workProject,
+    volleyball: 'volleyball.js',
+    basketball: 'basketball.js',
+    soccer: 'soccer.js',
+    workProject: 'work-project.js',
 
     // Team sports
-    americanFootball,
-    baseball,
-    iceHockey,
-    handball,
-    rugby,
-    waterPolo,
-    cricket,
-    futsal,
-    beachVolleyball,
-    ultimateFrisbee,
-    fieldHockey,
-    lacrosse,
-    softball,
-    netball,
+    americanFootball: 'american-football.js',
+    baseball: 'baseball.js',
+    iceHockey: 'ice-hockey.js',
+    handball: 'handball.js',
+    rugby: 'rugby.js',
+    waterPolo: 'water-polo.js',
+    cricket: 'cricket.js',
+    futsal: 'futsal.js',
+    beachVolleyball: 'beach-volleyball.js',
+    ultimateFrisbee: 'ultimate-frisbee.js',
+    fieldHockey: 'field-hockey.js',
+    lacrosse: 'lacrosse.js',
+    softball: 'softball.js',
+    netball: 'netball.js',
 
     // Universal
-    general
+    general: 'general.js'
 };
 
 /**
- * Get activity config by name
- * @param {string} activityName - Name of the activity (e.g., 'volleyball', 'basketball')
- * @returns {object} Activity configuration
+ * Cache for loaded activity modules
+ * @type {Object.<string, Object>}
+ */
+const activityCache = {};
+
+/**
+ * Load an activity configuration dynamically
+ * @param {string} activityName - Name of the activity (e.g., 'volleyball')
+ * @returns {Promise<Object>} Activity configuration
+ */
+async function loadActivity(activityName) {
+    // Return from cache if already loaded
+    if (activityCache[activityName]) {
+        return activityCache[activityName];
+    }
+
+    const fileName = ACTIVITY_FILES[activityName];
+    if (!fileName) {
+        throw new Error(
+            `Activity '${activityName}' not found. Available: ${Object.keys(ACTIVITY_FILES).join(', ')}`
+        );
+    }
+
+    try {
+        const module = await import(`./${fileName}`);
+        const config = module.default;
+        activityCache[activityName] = config;
+        return config;
+    } catch (error) {
+        throw new Error(`Failed to load activity '${activityName}': ${error.message}`);
+    }
+}
+
+/**
+ * Load all activities at once
+ * @returns {Promise<Object>} Object with all activity configurations
+ */
+async function loadAllActivities() {
+    const activityNames = Object.keys(ACTIVITY_FILES);
+    const configs = await Promise.all(
+        activityNames.map(name => loadActivity(name))
+    );
+
+    const activities = {};
+    activityNames.forEach((name, index) => {
+        activities[name] = configs[index];
+    });
+
+    return activities;
+}
+
+/**
+ * Get activity config by name (synchronous version)
+ * Throws if activity is not loaded yet
+ * @param {string} activityName - Name of the activity
+ * @returns {Object} Activity configuration
  */
 export function getActivityConfig(activityName) {
-    const config = activities[activityName];
+    const config = activityCache[activityName];
     if (!config) {
-        throw new Error(`Activity config '${activityName}' not found. Available: ${Object.keys(activities).join(', ')}`);
+        throw new Error(
+            `Activity '${activityName}' not loaded. Call loadActivity('${activityName}') first or use activities.${activityName} after initialization.`
+        );
     }
     return config;
 }
 
 /**
- * Default activity - can be changed based on preference
+ * Available activity configurations (loaded synchronously)
+ * This will be populated during app initialization
+ * Note: This is an object that gets populated, not reassigned
  */
-export const defaultActivity = volleyball;
+export const activities = {};
+
+/**
+ * Default activity reference - holds the default activity config
+ */
+export const defaultActivityRef = { current: null };
+
+/**
+ * Get default activity
+ * @returns {Object} Default activity configuration
+ */
+export function getDefaultActivity() {
+    return defaultActivityRef.current;
+}
+
+/**
+ * Initialize all activities
+ * This should be called once during app startup
+ * @returns {Promise<Object>} Loaded activities object
+ */
+export async function initializeActivities() {
+    const loadedActivities = await loadAllActivities();
+
+    // Populate the activities object (don't reassign, update in place)
+    Object.keys(loadedActivities).forEach(key => {
+        activities[key] = loadedActivities[key];
+    });
+
+    // Set default activity
+    defaultActivityRef.current = activities.volleyball;
+
+    return activities;
+}
+
+// Named exports for async loading
+export { loadActivity, loadAllActivities, ACTIVITY_FILES };
 
 export default {
     activities,
     getActivityConfig,
-    defaultActivity
+    defaultActivityRef,
+    getDefaultActivity,
+    loadActivity,
+    loadAllActivities,
+    initializeActivities
 };
