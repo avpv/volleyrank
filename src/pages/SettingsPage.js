@@ -134,7 +134,7 @@ class SettingsPage extends BasePage {
             <div class="activity-selector-section player-form">
                 <div class="form-group">
                     <label for="activitySelect">Activity Type</label>
-                    <div class="activity-selector-row form-row">
+                    <div class="activity-selector-row">
                         <select id="activitySelect" class="activity-select">
                             <option value="" ${!currentActivity ? 'selected' : ''} disabled>Select an activity...</option>
                             ${Object.entries(activities)
