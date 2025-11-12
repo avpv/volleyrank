@@ -233,6 +233,13 @@ class Sidebar extends Component {
         }
 
         if (confirm(confirmMessage)) {
+            // Check if this is the active session for the current activity
+            const isCurrentActivitySession = activityKey === this.activityKey;
+            const currentActiveSessionId = isCurrentActivitySession
+                ? this.sessionService.getActiveSessionId(this.activityKey)
+                : null;
+            const isDeletingActiveSession = isCurrentActivitySession && currentActiveSessionId === sessionId;
+
             const result = this.sessionService.deleteSession(activityKey, sessionId);
             if (result.success) {
                 console.log('Session deleted:', sessionId);
@@ -240,7 +247,7 @@ class Sidebar extends Component {
                 // Close mobile sidebar and backdrop after session deletion
                 this.closeMobileSidebar();
 
-                // Check if there are any remaining sessions for the current activity
+                // Check if there are any remaining sessions for the deleted session's activity
                 const remainingSessions = this.sessionService.getAllSessions(activityKey);
 
                 // Check if this was the last session across all activities
@@ -267,8 +274,26 @@ class Sidebar extends Component {
                         // Already on settings page, just reload to reset state
                         window.location.reload();
                     }
+                } else if (isDeletingActiveSession) {
+                    // Deleted the active session for current activity - always navigate to settings
+                    console.log('[Sidebar] Active session deleted - navigating to settings');
+
+                    // Clear selected activity
+                    storage.remove('selectedActivity');
+                    storage.remove('pendingActivity');
+
+                    // Show message
+                    toast.info('Session deleted. Please select an activity to continue.');
+
+                    // Navigate to settings
+                    if (router.currentRoute !== '/') {
+                        router.navigate('/');
+                    } else {
+                        // Already on settings page, just reload to reset state
+                        window.location.reload();
+                    }
                 } else {
-                    // Still have sessions, just update UI
+                    // Deleted non-active session, just update UI
                     this.eventBus.emit('state:changed');
                 }
             }
