@@ -1,7 +1,13 @@
+<div align="center">
+
+<img src="assets/images/logo.svg" alt="TeamBalance Logo" width="120" height="120">
+
 # TeamBalance
 
 Perfectly balanced teams.
 In minutes, not hours.
+
+</div>
 
 <div align="center">
 
