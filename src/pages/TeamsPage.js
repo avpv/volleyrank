@@ -80,6 +80,8 @@ class TeamsPage extends BasePage {
     }
 
     onUpdate() {
+        // Re-mount sidebar if container was re-rendered
+        this.mountSidebar();
         this.attachEventListeners();
     }
 
@@ -93,6 +95,18 @@ class TeamsPage extends BasePage {
     mountSidebar() {
         const sidebarContainer = document.getElementById('pageSidebar');
         if (!sidebarContainer) return;
+
+        // Check if sidebar already exists and is properly mounted
+        if (this.sidebar && sidebarContainer.children.length > 0) {
+            // Sidebar is already mounted, just update it
+            this.sidebar.update();
+            return;
+        }
+
+        // Destroy old sidebar if it exists but is not mounted
+        if (this.sidebar) {
+            this.sidebar.destroy();
+        }
 
         const selectedActivity = storage.get('selectedActivity', 'volleyball');
         const activityConfig = activities[selectedActivity];
