@@ -2,7 +2,7 @@
 
 <img src="assets/images/logo.svg" alt="TeamBalance Logo" width="120" height="120">
 
-# TeamBalance
+# [TeamBalance](https://avpv.github.io/team-balance/)
 
 Perfectly balanced teams.
 In minutes, not hours.
