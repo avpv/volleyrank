@@ -267,6 +267,9 @@ class Sidebar extends Component {
                     // Show message
                     toast.info('All sessions deleted. Please select an activity to continue.');
 
+                    // Force immediate save before navigation/reload to ensure deletion persists
+                    this.sessionService.sessionRepository.stateManager.save();
+
                     // Navigate to settings if not already there
                     if (router.currentRoute !== '/') {
                         router.navigate('/');
@@ -284,6 +287,9 @@ class Sidebar extends Component {
 
                     // Show message
                     toast.info('Session deleted. Please select an activity to continue.');
+
+                    // Force immediate save before navigation/reload to ensure deletion persists
+                    this.sessionService.sessionRepository.stateManager.save();
 
                     // Navigate to settings
                     if (router.currentRoute !== '/') {
