@@ -930,7 +930,7 @@
 
 .page-layout {
     display: flex;
-    height: 100%;
+    min-height: 0;
     gap: 0;
     overflow: hidden;
 }
