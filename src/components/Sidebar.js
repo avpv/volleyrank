@@ -144,12 +144,16 @@ class Sidebar extends Component {
 
     attachEventListeners() {
         // Session item clicks (switch session)
-        const sessionItems = this.container.querySelectorAll('.session-item__content');
+        const sessionItems = this.container.querySelectorAll('.session-item');
         sessionItems.forEach(item => {
             item.addEventListener('click', (e) => {
-                const sessionItem = e.target.closest('.session-item');
-                const sessionId = sessionItem?.dataset.sessionId;
-                const activityKey = sessionItem?.dataset.activityKey;
+                // Don't trigger if clicking on delete button
+                if (e.target.closest('.session-item__delete')) {
+                    return;
+                }
+
+                const sessionId = item.dataset.sessionId;
+                const activityKey = item.dataset.activityKey;
                 if (sessionId && activityKey) {
                     this.handleSwitchSession(sessionId, activityKey);
                 }
