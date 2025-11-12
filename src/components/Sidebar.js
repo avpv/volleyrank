@@ -187,8 +187,8 @@ class Sidebar extends Component {
                 // Update selected activity
                 storage.set('selectedActivity', activityKey);
 
-                // Navigate to teams page to reload with new activity
-                router.navigate('/teams/');
+                // Navigate to settings page to reload with new activity
+                router.navigate('/');
             } else {
                 // Same activity, just emit state change
                 this.eventBus.emit('state:changed');
