@@ -31,7 +31,7 @@
 }
 
 .activity-select {
-    flex: 0 0 200px;
+    width: 100%;
     padding: var(--spacing-3);
     font-family: inherit;
     font-size: var(--font-size-base);
