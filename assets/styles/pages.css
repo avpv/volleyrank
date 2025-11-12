@@ -28,7 +28,6 @@
     display: flex;
     gap: var(--spacing-3);
     align-items: center;
-    max-width: 600px;
 }
 
 .activity-select {

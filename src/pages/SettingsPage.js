@@ -131,7 +131,7 @@ class SettingsPage extends BasePage {
         const currentActivity = storage.get('selectedActivity', null);
 
         return `
-            <div class="activity-selector-section">
+            <div class="activity-selector-section player-form">
                 <div class="form-group">
                     <label for="activitySelect">Activity Type</label>
                     <div class="activity-selector-row">
