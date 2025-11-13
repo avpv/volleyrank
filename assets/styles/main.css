@@ -42,11 +42,17 @@
     --color-border-emphasis: #484f58;    /* Hover/emphasis states */
     --color-border-strong: #57606a;      /* Strong emphasis */
     --color-border-interactive: #58a6ff; /* Interactive elements */
+
+    /* Border Semantic Aliases */
+    --color-border-separator: var(--color-border-subtle);
+    --color-border-container: var(--color-border-default);
+    --color-border-hover: var(--color-border-emphasis);
+    --color-border-focus: var(--color-border-strong);
     
     /* Text Colors - Refined hierarchy */
     --color-text-primary: #e6edf3;
     --color-text-secondary: #adb5bd;
-    --color-text-tertiary: #868e96;
+    --color-text-tertiary: #8f959d;
     --color-text-disabled: #495057;
     --color-text-inverse: #0d1117;
     --color-text-link: #58a6ff;
@@ -91,9 +97,11 @@
     --font-size-xs: 0.75rem;      /* 12px - captions, labels */
     --font-size-sm: 0.875rem;     /* 14px - body small, UI */
     --font-size-base: 1rem;       /* 16px - body text */
+    --font-size-md: 1.0625rem;    /* 17px - body emphasis */
     --font-size-lg: 1.125rem;     /* 18px - subheadings */
     --font-size-xl: 1.25rem;      /* 20px - card titles */
     --font-size-2xl: 1.5rem;      /* 24px - section headings */
+    --font-size-2-5xl: 1.75rem;   /* 28px - subsection headers */
     --font-size-3xl: 2rem;        /* 32px - page titles */
     
     /* Font Weights */
@@ -176,6 +184,16 @@
                          color var(--duration-fast) var(--ease-smooth),
                          border-color var(--duration-fast) var(--ease-smooth);
     
+    /* ==========================================================================
+       Icon Sizes
+       ========================================================================== */
+
+    --icon-size-xs: 14px;    /* Inline text icons */
+    --icon-size-sm: 16px;    /* Button icons */
+    --icon-size-base: 20px;  /* Standard UI icons */
+    --icon-size-lg: 24px;    /* Headers, important actions */
+    --icon-size-xl: 32px;    /* Large feature icons */
+
     /* ==========================================================================
        Layout
        ========================================================================== */
@@ -496,13 +514,16 @@ a:hover {
 }
 
 .page-header {
-    margin-bottom: var(--spacing-4);
-    padding-bottom: var(--spacing-2);
+    margin-bottom: var(--spacing-6);
+    padding-bottom: var(--spacing-3);
 }
 
 .page-header h2 {
     margin-bottom: 0;
-    font-size: var(--font-size-lg);
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+    letter-spacing: -0.01em;
 }
 
 /* Footer */
@@ -553,8 +574,9 @@ a:hover {
 .loading-spinner {
     width: 2rem;
     height: 2rem;
-    border: 1px solid var(--color-border-default);
+    border: 2px solid var(--color-border-subtle);
     border-top-color: var(--color-brand-primary);
+    border-right-color: var(--color-brand-primary);
     border-radius: 50%;
     animation: spin 1s linear infinite;
     margin-bottom: var(--spacing-4);
@@ -567,7 +589,6 @@ a:hover {
 .empty-state {
     text-align: center;
     padding: var(--spacing-12) var(--spacing-8);
-    color: var(--color-text-tertiary);
     animation: fadeIn 0.3s ease-out;
 }
 
@@ -585,7 +606,29 @@ a:hover {
 .empty-icon {
     font-size: 4rem;
     margin-bottom: var(--spacing-4);
-    opacity: 0.5;
+    opacity: 0.4;
+    color: var(--color-text-secondary);
+}
+
+.empty-state__icon {
+    margin-bottom: var(--spacing-4);
+    opacity: 0.4;
+    color: var(--color-text-secondary);
+}
+
+.empty-state__title {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-primary);
+    margin-bottom: var(--spacing-2);
+}
+
+.empty-state__description {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-tertiary);
+    max-width: 50ch;
+    margin: 0 auto;
+    line-height: var(--line-height-relaxed);
 }
 
 .error-state {
@@ -645,15 +688,16 @@ a:hover {
    ============================================================================= */
 
 :focus-visible {
-    outline: 1px solid var(--color-brand-primary);
-    outline-offset: 1px;
+    outline: 2px solid var(--color-brand-primary);
+    outline-offset: 2px;
 }
 
-/* Minimal focus for buttons */
+/* Enhanced focus for buttons */
 button:focus-visible,
 .btn:focus-visible {
-    outline: 1px solid var(--color-brand-primary);
-    outline-offset: 1px;
+    outline: 2px solid var(--color-brand-primary);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px rgba(47, 129, 247, 0.1);
 }
 
 /* Form controls already have custom focus states */
