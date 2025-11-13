@@ -1364,6 +1364,7 @@ select.form-control {
     .accordion-header {
         padding: var(--spacing-3) var(--spacing-4);
         font-size: var(--font-size-sm);
+        background: var(--color-surface-raised);
     }
 
     .accordion-icon {
