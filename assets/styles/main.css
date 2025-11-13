@@ -32,15 +32,15 @@
     --color-surface-overlay: #30363d;
     --color-surface-interactive: #388bfd1a;
     
-    /* Borders */
+    /* Borders - Improved contrast */
     --color-border-subtle: #21262d;
-    --color-border-default: #30363d;
-    --color-border-strong: #484f58;
+    --color-border-default: #3d444d;
+    --color-border-strong: #525a65;
     --color-border-active: #58a6ff;
     
-    /* Text Colors */
+    /* Text Colors - Improved contrast */
     --color-text-primary: #e6edf3;
-    --color-text-secondary: #7d8590;
+    --color-text-secondary: #8c959f;
     --color-text-tertiary: #6e7681;
     --color-text-disabled: #484f58;
     --color-text-inverse: #0d1117;
@@ -54,9 +54,9 @@
     --color-brand-accent: #ff7b72;
     
     /* Semantic Colors */
-    --color-success: #3fb950;
-    --color-success-hover: #2ea043;
-    --color-success-light: rgba(46, 160, 67, 0.1);
+    --color-success: #4ade80;
+    --color-success-hover: #3fb950;
+    --color-success-light: rgba(74, 222, 128, 0.1);
     
     --color-warning: #d29922;
     --color-warning-hover: #bb8009;
@@ -70,13 +70,9 @@
     --color-info-hover: #58a6ff;
     --color-info-light: rgba(47, 129, 247, 0.1);
     
-    /* Gradients */
-    --gradient-primary: linear-gradient(135deg, #1f6feb 0%, #2ea043 100%);
+    /* Gradients - Simplified */
     --gradient-brand: linear-gradient(135deg, #2f81f7 0%, #1f6feb 100%);
-    --gradient-success: linear-gradient(135deg, #2ea043 0%, #3fb950 100%);
-    --gradient-warm: linear-gradient(135deg, #d29922 0%, #da3633 100%);
     --gradient-cool: linear-gradient(135deg, #2f81f7 0%, #a371f7 100%);
-    --gradient-dark: linear-gradient(135deg, #161b22 0%, #0d1117 100%);
     
     /* ==========================================================================
        Typography - Scale
@@ -148,10 +144,10 @@
        Shadows
        ========================================================================== */
     
-    --shadow-sm: 0 1px 0 rgba(1, 4, 9, 0.1);
-    --shadow-md: 0 3px 6px rgba(1, 4, 9, 0.15);
-    --shadow-lg: 0 8px 24px rgba(1, 4, 9, 0.2);
-    --shadow-xl: 0 16px 48px rgba(1, 4, 9, 0.3);
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.15);
+    --shadow-xl: 0 20px 60px rgba(0, 0, 0, 0.3);
     
     /* ==========================================================================
        Animation & Timing
@@ -202,6 +198,7 @@ body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
+    font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
 }
 
 /* Background pattern */
@@ -231,8 +228,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 h1 {
-    font-size: var(--font-size-2xl);
-    font-weight: var(--font-weight-semibold);
+    font-size: 2rem;
+    font-weight: var(--font-weight-bold);
 }
 
 h2 {
@@ -243,7 +240,7 @@ h2 {
 }
 
 h3 {
-    font-size: var(--font-size-xs);
+    font-size: var(--font-size-lg);
     font-weight: var(--font-weight-semibold);
 }
 
@@ -551,10 +548,22 @@ a:hover {
     text-align: center;
     padding: var(--spacing-12) var(--spacing-8);
     color: var(--color-text-tertiary);
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .empty-icon {
-    font-size: 3rem;
+    font-size: 4rem;
     margin-bottom: var(--spacing-4);
     opacity: 0.5;
 }

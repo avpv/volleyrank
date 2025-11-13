@@ -36,7 +36,7 @@
 
 .activity-select {
     width: 100%;
-    padding: var(--spacing-3);
+    padding: var(--spacing-4);
     font-family: inherit;
     font-size: var(--font-size-base);
     background-color: var(--color-bg-primary);
@@ -46,9 +46,9 @@
     cursor: pointer;
     transition: var(--transition-default);
     appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16' fill='%237d8590'%3E%3Cpath d='M4.427 7.427l3.396 3.396a.25.25 0 00.354 0l3.396-3.396A.25.25 0 0011.396 7H4.604a.25.25 0 00-.177.427z'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16' fill='%238c959f'%3E%3Cpath d='M4.427 7.427l3.396 3.396a.25.25 0 00.354 0l3.396-3.396A.25.25 0 0011.396 7H4.604a.25.25 0 00-.177.427z'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
-    background-position: right var(--spacing-3) center;
+    background-position: right var(--spacing-4) center;
     padding-right: var(--spacing-10);
 }
 
@@ -194,15 +194,15 @@
 
 .position-selector label {
     display: block;
-    font-size: var(--font-size-sm);
+    font-size: var(--font-size-base);
     font-weight: var(--font-weight-medium);
     color: var(--color-text-primary);
     margin-bottom: var(--spacing-3);
 }
 
-/* Progress Section - IMPROVED */
+/* Progress Section - IMPROVED with better hierarchy */
 .progress-section {
-    background-color: var(--color-surface-raised);
+    background-color: var(--color-bg-primary);
     border: 1px solid var(--color-border-default);
     border-radius: var(--radius-lg);
     padding: var(--spacing-6);
@@ -212,8 +212,8 @@
 .progress-section h3,
 .progress-section label {
     margin-bottom: var(--spacing-5);
-    font-size: var(--font-size-sm);
-    font-weight: var(--font-weight-medium);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
     color: var(--color-text-primary);
     display: block;
 }
@@ -228,11 +228,11 @@
     display: flex;
     flex-direction: column;
     gap: var(--spacing-2);
-    padding: var(--spacing-3) var(--spacing-4);
+    padding: var(--spacing-4) var(--spacing-4);
     background-color: var(--color-surface-base);
     border: 1px solid var(--color-border-default);
     border-radius: var(--radius-md);
-    transition: all 0.2s ease;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     cursor: default;
 }
 
@@ -288,17 +288,23 @@
 .progress-count {
     color: var(--color-text-secondary);
     font-weight: var(--font-weight-medium);
+    font-variant-numeric: tabular-nums;
 }
 
 .progress-percentage {
     color: var(--color-brand-primary);
     font-weight: var(--font-weight-semibold);
-    min-width: 40px;
+    min-width: 50px;
     text-align: right;
 }
 
 .progress-percentage.complete {
     color: var(--color-success);
+}
+
+.progress-percentage.complete::after {
+    content: ' ✓';
+    font-size: var(--font-size-sm);
 }
 
 .progress-status {
@@ -416,6 +422,7 @@
     color: var(--color-brand-primary);
     margin-top: var(--spacing-4);
     font-family: var(--font-family-mono);
+    font-variant-numeric: tabular-nums;
 }
 
 .player-comparisons {
@@ -451,11 +458,12 @@
     border: 1px solid var(--color-border-default);
     border-radius: var(--radius-lg);
     padding: var(--spacing-6);
-    transition: var(--transition-default);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .ranking-card:hover {
     border-color: var(--color-border-strong);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .ranking-title {
@@ -596,11 +604,12 @@
     border: 1px solid var(--color-border-default);
     border-radius: var(--radius-lg);
     padding: var(--spacing-6);
-    transition: var(--transition-default);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .team-card:hover {
     border-color: var(--color-border-strong);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .team-header {
@@ -622,6 +631,7 @@
     font-family: var(--font-family-mono);
     margin-bottom: var(--spacing-6);
     padding-top: var(--spacing-2);
+    font-variant-numeric: tabular-nums;
 }
 
 .team-players {
@@ -671,6 +681,7 @@
     font-weight: var(--font-weight-bold);
     color: var(--color-brand-primary);
     font-family: var(--font-family-mono);
+    font-variant-numeric: tabular-nums;
 }
 
 /* =============================================================================
