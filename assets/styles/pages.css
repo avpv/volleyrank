@@ -786,7 +786,7 @@
     .add-player-section,
     .team-builder,
     .comparison-area {
-        padding: var(--spacing-6);
+        padding: var(--spacing-4);
     }
 
     .players-grid {
@@ -803,36 +803,79 @@
 
     .comparison-cards {
         flex-direction: column;
-        gap: var(--spacing-6);
+        gap: var(--spacing-4);
     }
 
     .vs-divider {
         transform: rotate(90deg);
-        margin: var(--spacing-4) 0;
+        margin: var(--spacing-2) 0;
     }
 
     .player-card.clickable,
     .settings-player-card {
         max-width: 100%;
     }
-    
+
+    /* Compact player cards on mobile for Compare page */
+    .comparison-cards .player-card.clickable {
+        padding: var(--spacing-3);
+        min-height: auto;
+    }
+
+    .comparison-cards .player-avatar {
+        width: 48px;
+        height: 48px;
+        font-size: var(--font-size-lg);
+        margin: 0 auto var(--spacing-2);
+    }
+
+    .comparison-cards .player-name {
+        font-size: var(--font-size-base);
+        margin-bottom: var(--spacing-1);
+    }
+
+    .comparison-cards .player-position {
+        font-size: 0.65rem;
+        margin-bottom: var(--spacing-2);
+    }
+
+    .comparison-cards .player-rating {
+        font-size: var(--font-size-lg);
+        margin-top: var(--spacing-2);
+    }
+
+    .comparison-cards .player-comparisons {
+        font-size: var(--font-size-xs);
+        margin-top: var(--spacing-1);
+    }
+
+    .comparison-info {
+        margin-bottom: var(--spacing-4);
+        font-size: var(--font-size-sm);
+    }
+
+    .comparison-area {
+        min-height: auto;
+        padding: var(--spacing-4);
+    }
+
     .rankings-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .composition-grid {
         grid-template-columns: repeat(2, 1fr);
     }
-    
+
     .teams-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .result-header {
         flex-direction: column;
         align-items: flex-start;
     }
-    
+
     .result-controls {
         width: 100%;
         flex-direction: column;
@@ -864,19 +907,61 @@
     .add-player-section,
     .team-builder,
     .comparison-area {
-        padding: var(--spacing-4);
+        padding: var(--spacing-3);
         border-radius: var(--radius-md);
     }
 
     .comparison-area {
-        min-height: 350px;
-        padding: var(--spacing-6);
+        min-height: auto;
+        padding: var(--spacing-3);
     }
 
-    .player-avatar {
-        width: 56px;
-        height: 56px;
-        font-size: var(--font-size-xl);
+    .comparison-cards {
+        gap: var(--spacing-3);
+    }
+
+    .comparison-info {
+        margin-bottom: var(--spacing-3);
+    }
+
+    .vs-divider {
+        margin: var(--spacing-1) 0;
+    }
+
+    .draw-button {
+        padding: var(--spacing-1) var(--spacing-3);
+        font-size: var(--font-size-xs);
+    }
+
+    /* Extra compact player cards on very small screens */
+    .comparison-cards .player-card.clickable {
+        padding: var(--spacing-2);
+    }
+
+    .comparison-cards .player-avatar {
+        width: 40px;
+        height: 40px;
+        font-size: var(--font-size-base);
+        margin: 0 auto var(--spacing-1);
+    }
+
+    .comparison-cards .player-name {
+        font-size: var(--font-size-sm);
+    }
+
+    .comparison-cards .player-position {
+        font-size: 0.6rem;
+        margin-bottom: var(--spacing-1);
+    }
+
+    .comparison-cards .player-rating {
+        font-size: var(--font-size-base);
+        margin-top: var(--spacing-1);
+    }
+
+    .comparison-cards .player-comparisons {
+        font-size: 0.65rem;
+        margin-top: var(--spacing-1);
     }
 
     .composition-grid {
@@ -886,10 +971,6 @@
     .player-card.clickable,
     .settings-player-card {
         min-width: 100%;
-    }
-
-    .player-rating {
-        font-size: var(--font-size-xl);
     }
 }
 
