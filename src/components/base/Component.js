@@ -152,21 +152,21 @@ class Component {
     destroy() {
         if (this.isDestroyed) return;
 
-        // todo
+        // First unmount from DOM to stop rendering
         this.unmount();
-        
-        // todo
+
+        // Call lifecycle hook to allow cleanup in subclasses
         this.onDestroy();
-        
+
         // Unsubscribe from all events
         this.eventUnsubscribers.forEach(unsubscribe => unsubscribe());
         this.eventUnsubscribers = [];
-        
-        // todo
+
+        // Final cleanup: ensure container is empty
         if (this.container) {
             this.container.innerHTML = '';
         }
-        
+
         this.isDestroyed = true;
     }
 
