@@ -322,8 +322,8 @@ class SettingsPage extends BasePage {
         return `
             <div class="position-stats d-grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-4">
                 ${Object.entries(stats).map(([pos, data]) => `
-                    <div class="stat-card text-center transition-shadow hover:shadow-lg hover:-translate-y-1">
-                        <div class="stat-number text-2xl md:text-3xl font-bold mb-2">${data.count}</div>
+                    <div class="group stat-card text-center transition-shadow hover:shadow-lg hover:-translate-y-1 animate-fade-in">
+                        <div class="stat-number text-2xl md:text-3xl font-bold mb-2 group-hover:text-brand transition-colors group-hover:scale-110">${data.count}</div>
                         <div class="stat-label text-xs md:text-sm text-secondary">${data.name}s</div>
                     </div>
                 `).join('')}
@@ -356,13 +356,13 @@ class SettingsPage extends BasePage {
     }
 
     renderPlayerCard(player) {
-        const positions = player.positions.map(pos => {
+        const positions = player.positions.map((pos, index) => {
             const rating = Math.round(player.ratings[pos]);
             const comparisons = player.comparisons[pos];
             const name = this.playerService.positions[pos];
 
             return `
-                <div class="position-badge transition-colors">
+                <div class="position-badge transition-colors first:mt-0 last:mb-0">
                     <div class="badge-position font-medium">${name}</div>
                     <div class="badge-stats d-flex gap-2 text-xs">
                         <span class="badge-rating">${rating} ELO</span>
@@ -373,9 +373,9 @@ class SettingsPage extends BasePage {
         }).join('');
 
         return `
-            <div class="settings-player-card transition-shadow hover:shadow-lg hover:-translate-y-1" data-player-id="${player.id}">
+            <div class="group settings-player-card transition-shadow hover:shadow-lg hover:-translate-y-1 animate-fade-in" data-player-id="${player.id}">
                 <div class="player-header d-flex justify-between items-center mb-3">
-                    <h4 class="player-name font-semibold m-0">${this.escape(player.name)}</h4>
+                    <h4 class="player-name font-semibold m-0 group-hover:text-brand transition-colors">${this.escape(player.name)}</h4>
                     ${player.positions.length > 1 ?
                         '<span class="multi-badge text-xs">Multi-pos</span>' : ''
                     }
@@ -386,15 +386,15 @@ class SettingsPage extends BasePage {
                 </div>
 
                 <div class="player-actions d-flex gap-2">
-                    <button class="btn btn-sm btn-secondary transition-colors hover:bg-surface-overlay focus:ring-brand" data-action="edit" data-player-id="${player.id}">
+                    <button class="btn btn-sm btn-secondary transition-colors hover:bg-surface-overlay focus:ring-brand active:scale-95" data-action="edit" data-player-id="${player.id}">
                         ${getIcon('edit', { size: 14, className: 'btn-icon' })}
                         Edit
                     </button>
-                    <button class="btn btn-sm btn-secondary transition-colors hover:bg-surface-overlay focus:ring-brand" data-action="reset" data-player-id="${player.id}">
+                    <button class="btn btn-sm btn-secondary transition-colors hover:bg-surface-overlay focus:ring-brand active:scale-95" data-action="reset" data-player-id="${player.id}">
                         ${getIcon('refresh', { size: 14, className: 'btn-icon' })}
                         Reset
                     </button>
-                    <button class="btn btn-sm btn-secondary transition-colors hover:bg-surface-overlay focus:ring-brand" data-action="remove" data-player-id="${player.id}">
+                    <button class="btn btn-sm btn-secondary transition-colors hover:bg-surface-overlay focus:ring-brand active:scale-95" data-action="remove" data-player-id="${player.id}">
                         ${getIcon('trash', { size: 14, className: 'btn-icon' })}
                         Remove
                     </button>
