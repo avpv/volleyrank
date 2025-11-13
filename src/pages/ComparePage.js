@@ -110,7 +110,7 @@ class ComparePage extends BasePage {
     }
 
     renderPositionSelector() {
-        const positions = this.playerService.positions;
+        const positions = this.activityConfig.positions;
         
         return `
             <div class="position-selector">
@@ -129,7 +129,7 @@ class ComparePage extends BasePage {
 
     renderProgressBars() {
         const progress = this.comparisonService.getAllProgress();
-        const positions = this.playerService.positions;
+        const positions = this.activityConfig.positions;
 
         return `
             <div class="progress-section">
@@ -203,7 +203,7 @@ class ComparePage extends BasePage {
         }
         
         const [player1, player2] = pair;
-        
+
         // Validate player IDs exist
         if (player1.id === undefined || player2.id === undefined) {
             console.error('Player missing ID:', { player1, player2 });
@@ -213,8 +213,8 @@ class ComparePage extends BasePage {
                 </div>
             `;
         }
-        
-        const posName = this.playerService.positions[this.selectedPosition];
+
+        const posName = this.activityConfig.positions[this.selectedPosition];
 
         return `
             <div class="comparison-area">
@@ -260,7 +260,7 @@ class ComparePage extends BasePage {
         }
 
         const progress = this.comparisonService.getProgress(this.selectedPosition);
-        const posName = this.playerService.positions[this.selectedPosition];
+        const posName = this.activityConfig.positions[this.selectedPosition];
         const isComplete = progress.percentage === 100;
 
         return `

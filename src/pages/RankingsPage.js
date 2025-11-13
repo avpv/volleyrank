@@ -79,7 +79,7 @@ class RankingsPage extends BasePage {
 
     render() {
         const rankings = this.playerService.getRankings();
-        const positions = this.playerService.positions;
+        const positions = this.activityConfig.positions;
 
         return this.renderPageWithSidebar(`
             <div class="page-header">
