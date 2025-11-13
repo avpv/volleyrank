@@ -105,10 +105,10 @@ class RankingsPage extends BasePage {
         }
 
         return `
-            <div class="ranking-card">
-                <h3 class="ranking-title">${positionName}s</h3>
-                <div class="ranking-list">
-                    ${players.map((player, index) => 
+            <div class="ranking-card transition-shadow">
+                <h3 class="ranking-title mb-4 font-semibold">${positionName}s</h3>
+                <div class="ranking-list space-y-2 divide-y divide-subtle">
+                    ${players.map((player, index) =>
                         this.renderRankingItem(player, index, position)
                     ).join('')}
                 </div>
@@ -123,11 +123,11 @@ class RankingsPage extends BasePage {
         const comparisons = player.positionComparisons;
 
         return `
-            <div class="ranking-item">
-                <div class="rank-badge ${rankClass}">${rank}</div>
-                <div class="ranking-info">
-                    <div class="ranking-name">${this.escape(player.name)}</div>
-                    <div class="ranking-stats">
+            <div class="ranking-item d-flex items-center gap-3 transition-colors">
+                <div class="rank-badge ${rankClass} d-flex items-center justify-center font-bold">${rank}</div>
+                <div class="ranking-info flex-1">
+                    <div class="ranking-name font-medium mb-1">${this.escape(player.name)}</div>
+                    <div class="ranking-stats text-sm text-secondary">
                         ${rating} ELO • ${comparisons} comparisons
                     </div>
                 </div>

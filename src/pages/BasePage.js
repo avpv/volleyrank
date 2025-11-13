@@ -137,9 +137,9 @@ class BasePage extends Component {
      */
     renderLoading() {
         return `
-            <div class="loading">
-                <div class="loading-spinner"></div>
-                <p>Loading...</p>
+            <div class="loading d-flex flex-column items-center justify-center">
+                <div class="loading-spinner mb-4"></div>
+                <p class="text-secondary">Loading...</p>
             </div>
         `;
     }
@@ -149,9 +149,9 @@ class BasePage extends Component {
      */
     renderEmpty(message, icon = '') {
         return `
-            <div class="empty-state">
-                <div class="empty-icon">${getLogo({ size: 48 })}</div>
-                <p>${message}</p>
+            <div class="empty-state text-center">
+                <div class="empty-icon mb-4 opacity-50">${getLogo({ size: 48 })}</div>
+                <p class="text-tertiary">${message}</p>
             </div>
         `;
     }
@@ -161,9 +161,9 @@ class BasePage extends Component {
      */
     renderError(message) {
         return `
-            <div class="error-state">
-                <div class="error-icon">!</div>
-                <p>${this.escape(message)}</p>
+            <div class="error-state d-flex items-center gap-2">
+                <div class="error-icon d-flex items-center justify-center">!</div>
+                <p class="m-0">${this.escape(message)}</p>
             </div>
         `;
     }

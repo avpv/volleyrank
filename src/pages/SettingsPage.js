@@ -116,11 +116,11 @@ class SettingsPage extends BasePage {
 
     renderWelcomeGuide() {
         return `
-            <div class="welcome-guide">
-                <h3>Welcome to TeamBalance!</h3>
-                <p>Get started in 4 easy steps:</p>
-                <ol>
-                    <li><a href="#" class="guide-link" data-action="select-activity"><strong>Select Activity Type</strong></a> from the dropdown below</li>
+            <div class="welcome-guide transition-all">
+                <h3 class="mb-3 font-semibold">Welcome to TeamBalance!</h3>
+                <p class="mb-4 text-secondary">Get started in 4 easy steps:</p>
+                <ol class="space-y-2">
+                    <li><a href="#" class="guide-link transition-colors" data-action="select-activity"><strong>Select Activity Type</strong></a> from the dropdown below</li>
                     <li><strong>Add players</strong> with their positions</li>
                     <li><strong>Compare players</strong> to build accurate skill ratings</li>
                     <li><strong>Create balanced teams</strong> automatically</li>
@@ -320,11 +320,11 @@ class SettingsPage extends BasePage {
 
     renderPositionStats(stats) {
         return `
-            <div class="position-stats">
+            <div class="position-stats d-grid gap-4">
                 ${Object.entries(stats).map(([pos, data]) => `
-                    <div class="stat-card">
-                        <div class="stat-number">${data.count}</div>
-                        <div class="stat-label">${data.name}s</div>
+                    <div class="stat-card text-center transition-shadow">
+                        <div class="stat-number text-3xl font-bold mb-2">${data.count}</div>
+                        <div class="stat-label text-sm text-secondary">${data.name}s</div>
                     </div>
                 `).join('')}
             </div>
@@ -360,41 +360,41 @@ class SettingsPage extends BasePage {
             const rating = Math.round(player.ratings[pos]);
             const comparisons = player.comparisons[pos];
             const name = this.playerService.positions[pos];
-            
+
             return `
-                <div class="position-badge">
-                    <div class="badge-position">${name}</div>
-                    <div class="badge-stats">
+                <div class="position-badge transition-colors">
+                    <div class="badge-position font-medium">${name}</div>
+                    <div class="badge-stats d-flex gap-2 text-xs">
                         <span class="badge-rating">${rating} ELO</span>
-                        <span class="badge-comparisons">${comparisons} comp.</span>
+                        <span class="badge-comparisons text-tertiary">${comparisons} comp.</span>
                     </div>
                 </div>
             `;
         }).join('');
 
         return `
-            <div class="settings-player-card" data-player-id="${player.id}">
-                <div class="player-header">
-                    <h4 class="player-name">${this.escape(player.name)}</h4>
+            <div class="settings-player-card transition-shadow" data-player-id="${player.id}">
+                <div class="player-header d-flex justify-between items-center mb-3">
+                    <h4 class="player-name font-semibold m-0">${this.escape(player.name)}</h4>
                     ${player.positions.length > 1 ?
-                        '<span class="multi-badge">Multi-pos</span>' : ''
+                        '<span class="multi-badge text-xs">Multi-pos</span>' : ''
                     }
                 </div>
 
-                <div class="player-positions">
+                <div class="player-positions space-y-2 mb-4">
                     ${positions}
                 </div>
 
-                <div class="player-actions">
-                    <button class="btn btn-sm btn-secondary" data-action="edit" data-player-id="${player.id}">
+                <div class="player-actions d-flex gap-2">
+                    <button class="btn btn-sm btn-secondary transition-colors" data-action="edit" data-player-id="${player.id}">
                         ${getIcon('edit', { size: 14, className: 'btn-icon' })}
                         Edit
                     </button>
-                    <button class="btn btn-sm btn-secondary" data-action="reset" data-player-id="${player.id}">
+                    <button class="btn btn-sm btn-secondary transition-colors" data-action="reset" data-player-id="${player.id}">
                         ${getIcon('refresh', { size: 14, className: 'btn-icon' })}
                         Reset
                     </button>
-                    <button class="btn btn-sm btn-secondary" data-action="remove" data-player-id="${player.id}">
+                    <button class="btn btn-sm btn-secondary transition-colors" data-action="remove" data-player-id="${player.id}">
                         ${getIcon('trash', { size: 14, className: 'btn-icon' })}
                         Remove
                     </button>
