@@ -328,30 +328,38 @@ class TeamsPage extends BasePage {
 
         const { teams, balance, algorithm } = this.state.teams;
         const weightedBalance = this.calculateWeightedBalance(teams);
+        const quality = this.getBalanceQuality(weightedBalance);
 
         return `
             <div class="teams-result animate-slide-in-up">
                 <div class="result-header d-flex flex-column md:flex-row justify-between items-start md:items-center gap-4 mb-6">
                     <h3 class="text-xl md:text-2xl font-semibold m-0">Generated Teams</h3>
-                    <div class="result-controls d-flex flex-column sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
-                        <label class="toggle-label d-flex items-center gap-2 cursor-pointer hover:text-brand transition-colors">
+                    <div class="result-controls d-flex items-center gap-4">
+                        <label class="toggle-switch">
                             <input
                                 type="checkbox"
                                 id="showEloToggle"
                                 ${this.state.showEloRatings ? 'checked' : ''}
                             >
-                            <span class="text-sm">Show ELO Ratings</span>
+                            <span class="toggle-slider"></span>
+                            <span class="toggle-label">Show ELO Ratings</span>
                         </label>
-                        <button class="btn btn-secondary transition-colors hover:bg-surface-overlay focus:ring-brand active:scale-95" id="exportTeamsBtn">
+                        <div class="control-divider" style="width: 1px; height: 24px; background: var(--color-border-default);"></div>
+                        <button class="btn btn-primary btn-sm" id="exportTeamsBtn">
                             ${getIcon('arrow-up', { size: 16, className: 'btn-icon' })}
-                            Export Teams
+                            Export
                         </button>
                     </div>
                 </div>
 
-                <div class="result-info mb-6">
-                    <div class="info-badge ${weightedBalance <= 50 ? 'success' : 'warning'} transition-colors hover:scale-105">
-                        Balance: ${weightedBalance} weighted ELO difference
+                <div class="balance-indicator balance-indicator--${quality.class}">
+                    <span class="balance-emoji">${quality.emoji}</span>
+                    <div class="balance-content">
+                        <span class="balance-label">Team Balance: ${quality.label}</span>
+                        <span class="balance-value">${weightedBalance} ELO difference</span>
+                    </div>
+                    <div class="balance-explanation">
+                        Lower is better. Under 50 is ideal.
                     </div>
                 </div>
 
@@ -369,7 +377,15 @@ class TeamsPage extends BasePage {
         const maxRating = Math.max(...weightedRatings);
         const minRating = Math.min(...weightedRatings);
 
-        return maxRating - minRating;
+        return Math.round(maxRating - minRating);
+    }
+
+    getBalanceQuality(weightedBalance) {
+        if (weightedBalance <= 30) return { label: 'Excellent', class: 'excellent', emoji: '🎯' };
+        if (weightedBalance <= 50) return { label: 'Very Good', class: 'good', emoji: '✅' };
+        if (weightedBalance <= 100) return { label: 'Good', class: 'okay', emoji: '👍' };
+        if (weightedBalance <= 150) return { label: 'Fair', class: 'fair', emoji: '⚖️' };
+        return { label: 'Poor', class: 'poor', emoji: '⚠️' };
     }
 
     renderTeam(team, index) {

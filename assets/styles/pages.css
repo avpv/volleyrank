@@ -42,6 +42,7 @@
 
 .activity-select {
     width: 100%;
+    max-width: var(--input-width-medium);
     padding: var(--spacing-4);
     font-family: inherit;
     font-size: var(--font-size-base);
@@ -264,7 +265,7 @@
 .progress-item:hover {
     border-color: var(--color-border-strong);
     background-color: var(--color-surface-raised);
-    transform: translateX(2px);
+    transform: translateX(var(--hover-slide));
     box-shadow: var(--shadow-xs);
 }
 
@@ -369,14 +370,18 @@
 
 .progress-fill {
     height: 100%;
-    background: var(--color-brand-primary);
+    background: linear-gradient(90deg,
+        var(--color-brand-primary) 0%,
+        var(--color-brand-primary-hover) 100%);
     border-radius: var(--radius-sm);
     transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
 }
 
 .progress-fill.complete {
-    background: var(--color-success);
+    background: linear-gradient(90deg,
+        var(--color-success) 0%,
+        #10b981 100%);
 }
 
 /* Comparison Area */
@@ -513,7 +518,7 @@
 .ranking-card:hover {
     border-color: var(--color-border-strong);
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-    transform: translateY(-2px);
+    transform: translateY(var(--hover-lift-sm));
 }
 
 .ranking-title {
@@ -599,7 +604,7 @@
 .composition-item:hover {
     background-color: var(--color-surface-overlay);
     border-color: var(--color-border-strong);
-    transform: translateX(2px);
+    transform: translateX(var(--hover-slide));
     box-shadow: var(--shadow-xs);
 }
 
@@ -651,6 +656,79 @@
     flex-wrap: wrap;
 }
 
+/* Balance Quality Indicator */
+.balance-indicator {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-4);
+    padding: var(--spacing-5);
+    background: var(--color-surface-raised);
+    border: 2px solid;
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--spacing-6);
+    transition: var(--transition-default);
+}
+
+.balance-indicator:hover {
+    transform: translateX(var(--hover-slide));
+    box-shadow: var(--shadow-md);
+}
+
+.balance-indicator--excellent {
+    border-color: var(--color-success);
+    background: linear-gradient(135deg,
+        rgba(86, 211, 100, 0.1) 0%,
+        transparent 100%);
+}
+
+.balance-indicator--good {
+    border-color: var(--color-info);
+    background: linear-gradient(135deg,
+        rgba(88, 166, 255, 0.1) 0%,
+        transparent 100%);
+}
+
+.balance-indicator--okay,
+.balance-indicator--fair,
+.balance-indicator--poor {
+    border-color: var(--color-warning);
+    background: linear-gradient(135deg,
+        rgba(255, 193, 7, 0.1) 0%,
+        transparent 100%);
+}
+
+.balance-emoji {
+    font-size: 2.5rem;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.balance-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-1);
+}
+
+.balance-label {
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+}
+
+.balance-value {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    font-family: var(--font-family-mono);
+    font-variant-numeric: tabular-nums;
+}
+
+.balance-explanation {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-tertiary);
+    font-style: italic;
+}
+
 .teams-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -668,17 +746,17 @@
 .team-card:hover {
     border-color: var(--color-border-strong);
     box-shadow: var(--shadow-card-hover);
-    transform: translateY(-4px);
+    transform: translateY(var(--hover-lift-sm));
 }
 
 .team-header {
-    margin-bottom: var(--spacing-3);
-    padding-bottom: var(--spacing-3);
-    border-bottom: 1px solid var(--color-border-default);
+    margin-bottom: var(--spacing-6);
+    padding-bottom: var(--spacing-4);
+    border-bottom: 2px solid var(--color-border-default);
 }
 
 .team-header h4 {
-    font-size: var(--font-size-xl);
+    font-size: var(--font-size-2xl);
     font-weight: var(--font-weight-bold);
     color: var(--color-text-primary);
     margin: 0;
@@ -713,7 +791,7 @@
 .team-player:hover {
     border-color: var(--color-border-strong);
     background-color: var(--color-surface-raised);
-    transform: translateX(4px);
+    transform: translateX(var(--hover-slide));
 }
 
 .player-info {
@@ -731,10 +809,8 @@
 
 .player-info .player-position {
     font-size: var(--font-size-xs);
-    color: var(--color-text-tertiary);
+    color: var(--color-text-secondary);
     text-align: left;
-    text-transform: uppercase;
-    letter-spacing: var(--letter-spacing-wide);
 }
 
 .player-rating {
