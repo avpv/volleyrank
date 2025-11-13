@@ -350,7 +350,7 @@ class TeamsPage extends BasePage {
                 </div>
 
                 <div class="result-info mb-6">
-                    <div class="info-badge ${weightedBalance <= 50 ? 'success' : 'warning'} transition-colors hover:scale-105 animate-bounce">
+                    <div class="info-badge ${weightedBalance <= 50 ? 'success' : 'warning'} transition-colors hover:scale-105">
                         Balance: ${weightedBalance} weighted ELO difference
                     </div>
                 </div>

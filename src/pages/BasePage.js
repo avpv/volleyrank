@@ -150,7 +150,7 @@ class BasePage extends Component {
     renderEmpty(message, icon = '') {
         return `
             <div class="empty-state text-center animate-fade-in">
-                <div class="empty-icon mb-4 opacity-50 animate-bounce">${getLogo({ size: 48 })}</div>
+                <div class="empty-icon mb-4 opacity-50">${getLogo({ size: 48 })}</div>
                 <p class="text-tertiary">${message}</p>
             </div>
         `;
