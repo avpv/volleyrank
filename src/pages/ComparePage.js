@@ -141,7 +141,7 @@ class ComparePage extends BasePage {
                         
                         if (players.length < 2) {
                             return `
-                                <div class="progress-item disabled first:pt-0 last:pb-0">
+                                <div class="progress-item disabled">
                                     <div class="progress-header">
                                         <span>${name} (${key})</span>
                                         <span class="progress-status">${players.length} player${players.length !== 1 ? 's' : ''}</span>
@@ -154,7 +154,7 @@ class ComparePage extends BasePage {
                         const hasComparisons = prog.completed > 0;
 
                         return `
-                            <div class="progress-item ${this.selectedPosition === key ? 'current-position' : ''} transition-colors first:pt-0 last:pb-0 first:border-t-0 last:border-b-0">
+                            <div class="progress-item ${this.selectedPosition === key ? 'current-position' : ''} transition-colors">
                                 <div class="progress-header d-flex justify-between items-center mb-2">
                                     <span class="font-medium">${name} (${key})</span>
                                     <div class="progress-stats d-flex gap-3">
