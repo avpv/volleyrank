@@ -347,19 +347,19 @@ a:hover {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
-/* T - Team 1 (Blue gradient) */
+/* T - Team 1 (Blue) */
 .title-t {
-    background: linear-gradient(135deg, #2f81f7 0%, #1f6feb 100%);
+    background: #2f81f7;
 }
 
-/* B - Team 2 (Purple gradient) */
+/* B - Team 2 (Purple) */
 .title-b {
-    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+    background: #8b5cf6;
 }
 
 .title-t:hover,
 .title-b:hover {
-    transform: translateY(-2px);
+    background: var(--color-brand-primary);
 }
 
 .title-t:hover {
@@ -553,9 +553,9 @@ a:hover {
 .loading-spinner {
     width: 2rem;
     height: 2rem;
-    border: 2px solid var(--color-border-default);
+    border: 1px solid var(--color-border-default);
     border-top-color: var(--color-brand-primary);
-    border-radius: var(--radius-full);
+    border-radius: 50%;
     animation: spin 1s linear infinite;
     margin-bottom: var(--spacing-4);
 }
@@ -624,7 +624,7 @@ a:hover {
 
 ::-webkit-scrollbar-thumb {
     background: var(--color-border-default);
-    border-radius: var(--radius-full);
+    border-radius: 2px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
