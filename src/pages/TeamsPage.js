@@ -353,7 +353,9 @@ class TeamsPage extends BasePage {
                 </div>
 
                 <div class="balance-indicator balance-indicator--${quality.class}">
-                    <span class="balance-emoji">${quality.emoji}</span>
+                    <div class="balance-icon">
+                        ${getIcon(quality.icon, { size: 40, className: 'balance-icon-svg' })}
+                    </div>
                     <div class="balance-content">
                         <span class="balance-label">Team Balance: ${quality.label}</span>
                         <span class="balance-value">${weightedBalance} ELO difference</span>
@@ -381,11 +383,11 @@ class TeamsPage extends BasePage {
     }
 
     getBalanceQuality(weightedBalance) {
-        if (weightedBalance <= 30) return { label: 'Excellent', class: 'excellent', emoji: '🎯' };
-        if (weightedBalance <= 50) return { label: 'Very Good', class: 'good', emoji: '✅' };
-        if (weightedBalance <= 100) return { label: 'Good', class: 'okay', emoji: '👍' };
-        if (weightedBalance <= 150) return { label: 'Fair', class: 'fair', emoji: '⚖️' };
-        return { label: 'Poor', class: 'poor', emoji: '⚠️' };
+        if (weightedBalance <= 30) return { label: 'Excellent', class: 'excellent', icon: 'target' };
+        if (weightedBalance <= 50) return { label: 'Very Good', class: 'good', icon: 'award' };
+        if (weightedBalance <= 100) return { label: 'Good', class: 'okay', icon: 'thumbs-up' };
+        if (weightedBalance <= 150) return { label: 'Fair', class: 'fair', icon: 'scale' };
+        return { label: 'Poor', class: 'poor', icon: 'alert-triangle' };
     }
 
     renderTeam(team, index) {

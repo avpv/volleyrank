@@ -697,10 +697,53 @@
         transparent 100%);
 }
 
-.balance-emoji {
-    font-size: 2.5rem;
-    line-height: 1;
+.balance-icon {
     flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-md);
+    background: var(--color-surface-base);
+    transition: var(--transition-default);
+}
+
+.balance-icon-svg {
+    display: block;
+}
+
+/* Icon colors based on quality */
+.balance-indicator--excellent .balance-icon {
+    background: rgba(86, 211, 100, 0.15);
+}
+
+.balance-indicator--excellent .balance-icon-svg {
+    stroke: var(--color-success);
+}
+
+.balance-indicator--good .balance-icon {
+    background: rgba(88, 166, 255, 0.15);
+}
+
+.balance-indicator--good .balance-icon-svg {
+    stroke: var(--color-info);
+}
+
+.balance-indicator--okay .balance-icon,
+.balance-indicator--fair .balance-icon,
+.balance-indicator--poor .balance-icon {
+    background: rgba(255, 193, 7, 0.15);
+}
+
+.balance-indicator--okay .balance-icon-svg,
+.balance-indicator--fair .balance-icon-svg,
+.balance-indicator--poor .balance-icon-svg {
+    stroke: var(--color-warning);
+}
+
+.balance-indicator:hover .balance-icon {
+    transform: scale(1.1);
 }
 
 .balance-content {
