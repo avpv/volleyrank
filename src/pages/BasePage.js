@@ -137,9 +137,9 @@ class BasePage extends Component {
      */
     renderLoading() {
         return `
-            <div class="loading d-flex flex-column items-center justify-center">
-                <div class="loading-spinner mb-4"></div>
-                <p class="text-secondary">Loading...</p>
+            <div class="loading d-flex flex-column items-center justify-center animate-fade-in">
+                <div class="loading-spinner mb-4 animate-spin"></div>
+                <p class="text-secondary animate-pulse">Loading...</p>
             </div>
         `;
     }
@@ -149,8 +149,8 @@ class BasePage extends Component {
      */
     renderEmpty(message, icon = '') {
         return `
-            <div class="empty-state text-center">
-                <div class="empty-icon mb-4 opacity-50">${getLogo({ size: 48 })}</div>
+            <div class="empty-state text-center animate-fade-in">
+                <div class="empty-icon mb-4 opacity-50 animate-bounce">${getLogo({ size: 48 })}</div>
                 <p class="text-tertiary">${message}</p>
             </div>
         `;

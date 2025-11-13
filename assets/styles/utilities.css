@@ -1200,3 +1200,416 @@
     .xl\:h-auto { height: auto; }
     .xl\:h-full { height: 100%; }
 }
+
+/* =============================================================================
+   Dark Mode Support
+   ============================================================================= */
+
+/*
+ * Dark mode is applied using a .dark-mode class on the root element
+ * Usage: Add 'dark-mode' class to <html> or <body>
+ * Example: <html class="dark-mode">
+ */
+
+/* Background Colors - Dark Mode */
+.dark\:bg-primary:is(.dark-mode *) { background-color: var(--color-bg-primary-dark, #1a1a1a); }
+.dark\:bg-secondary:is(.dark-mode *) { background-color: var(--color-bg-secondary-dark, #2d2d2d); }
+.dark\:bg-tertiary:is(.dark-mode *) { background-color: var(--color-bg-tertiary-dark, #3a3a3a); }
+.dark\:bg-surface-base:is(.dark-mode *) { background-color: var(--color-surface-base-dark, #1a1a1a); }
+.dark\:bg-surface-raised:is(.dark-mode *) { background-color: var(--color-surface-raised-dark, #2d2d2d); }
+.dark\:bg-surface-overlay:is(.dark-mode *) { background-color: var(--color-surface-overlay-dark, #3a3a3a); }
+
+/* Text Colors - Dark Mode */
+.dark\:text-primary:is(.dark-mode *) { color: var(--color-text-primary-dark, #e0e0e0); }
+.dark\:text-secondary:is(.dark-mode *) { color: var(--color-text-secondary-dark, #b0b0b0); }
+.dark\:text-tertiary:is(.dark-mode *) { color: var(--color-text-tertiary-dark, #808080); }
+.dark\:text-white:is(.dark-mode *) { color: #ffffff; }
+.dark\:text-gray-100:is(.dark-mode *) { color: #f5f5f5; }
+.dark\:text-gray-200:is(.dark-mode *) { color: #e0e0e0; }
+.dark\:text-gray-300:is(.dark-mode *) { color: #d0d0d0; }
+.dark\:text-gray-400:is(.dark-mode *) { color: #a0a0a0; }
+
+/* Border Colors - Dark Mode */
+.dark\:border-default:is(.dark-mode *) { border-color: var(--color-border-default-dark, #404040); }
+.dark\:border-subtle:is(.dark-mode *) { border-color: var(--color-border-subtle-dark, #333333); }
+.dark\:border-strong:is(.dark-mode *) { border-color: var(--color-border-strong-dark, #606060); }
+
+/* Opacity for Dark Mode transitions */
+.dark\:opacity-80:is(.dark-mode *) { opacity: 0.8; }
+.dark\:opacity-90:is(.dark-mode *) { opacity: 0.9; }
+.dark\:opacity-100:is(.dark-mode *) { opacity: 1; }
+
+/* =============================================================================
+   Group & Peer Utilities (Parent-Child Interactions)
+   ============================================================================= */
+
+/*
+ * Group utilities allow child elements to respond to parent state
+ * Usage: Add 'group' class to parent, then use group-hover:, group-focus: on children
+ * Example: <div class="group"><span class="group-hover:text-brand">Text</span></div>
+ */
+
+/* Group Hover States */
+.group:hover .group-hover\:bg-primary { background-color: var(--color-bg-primary); }
+.group:hover .group-hover\:bg-secondary { background-color: var(--color-bg-secondary); }
+.group:hover .group-hover\:bg-surface-raised { background-color: var(--color-surface-raised); }
+.group:hover .group-hover\:bg-brand { background-color: var(--color-brand-primary-hover); }
+
+.group:hover .group-hover\:text-primary { color: var(--color-text-primary); }
+.group:hover .group-hover\:text-brand { color: var(--color-brand-primary-hover); }
+.group:hover .group-hover\:text-success { color: var(--color-success); }
+.group:hover .group-hover\:text-warning { color: var(--color-warning); }
+.group:hover .group-hover\:text-error { color: var(--color-error); }
+
+.group:hover .group-hover\:opacity-50 { opacity: 0.5; }
+.group:hover .group-hover\:opacity-75 { opacity: 0.75; }
+.group:hover .group-hover\:opacity-100 { opacity: 1; }
+
+.group:hover .group-hover\:scale-105 { transform: scale(1.05); }
+.group:hover .group-hover\:scale-110 { transform: scale(1.1); }
+.group:hover .group-hover\:-translate-y-1 { transform: translateY(calc(var(--spacing-1) * -1)); }
+.group:hover .group-hover\:-translate-y-2 { transform: translateY(calc(var(--spacing-2) * -1)); }
+.group:hover .group-hover\:translate-x-1 { transform: translateX(var(--spacing-1)); }
+.group:hover .group-hover\:translate-x-2 { transform: translateX(var(--spacing-2)); }
+
+.group:hover .group-hover\:visible { visibility: visible; }
+.group:hover .group-hover\:invisible { visibility: hidden; }
+
+.group:hover .group-hover\:shadow-md { box-shadow: var(--shadow-md); }
+.group:hover .group-hover\:shadow-lg { box-shadow: var(--shadow-lg); }
+
+/* Group Focus States */
+.group:focus .group-focus\:bg-surface-raised { background-color: var(--color-surface-raised); }
+.group:focus .group-focus\:text-brand { color: var(--color-brand-primary); }
+.group:focus .group-focus\:opacity-100 { opacity: 1; }
+
+/* Peer States (Sibling element interaction) */
+/*
+ * Peer utilities allow sibling elements to respond to each other's state
+ * Usage: Add 'peer' class to first element, then use peer-*: modifiers on siblings
+ * Example: <input class="peer" /><label class="peer-focus:text-brand">Label</label>
+ */
+
+.peer:hover ~ .peer-hover\:bg-surface-raised { background-color: var(--color-surface-raised); }
+.peer:hover ~ .peer-hover\:text-brand { color: var(--color-brand-primary-hover); }
+.peer:hover ~ .peer-hover\:opacity-100 { opacity: 1; }
+
+.peer:focus ~ .peer-focus\:bg-surface-raised { background-color: var(--color-surface-raised); }
+.peer:focus ~ .peer-focus\:text-brand { color: var(--color-brand-primary); }
+.peer:focus ~ .peer-focus\:opacity-100 { opacity: 1; }
+.peer:focus ~ .peer-focus\:ring-2 { box-shadow: 0 0 0 2px var(--ring-color, rgba(47, 129, 247, 0.5)); }
+
+.peer:checked ~ .peer-checked\:bg-brand { background-color: var(--color-brand-primary); }
+.peer:checked ~ .peer-checked\:text-brand { color: var(--color-brand-primary); }
+.peer:checked ~ .peer-checked\:opacity-100 { opacity: 1; }
+.peer:checked ~ .peer-checked\:visible { visibility: visible; }
+
+.peer:disabled ~ .peer-disabled\:opacity-50 { opacity: 0.5; }
+.peer:disabled ~ .peer-disabled\:cursor-not-allowed { cursor: not-allowed; }
+
+/* =============================================================================
+   Animations & Keyframes
+   ============================================================================= */
+
+/* Keyframe Definitions */
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes ping {
+    75%, 100% {
+        transform: scale(2);
+        opacity: 0;
+    }
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(-25%);
+        animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+    }
+    50% {
+        transform: translateY(0);
+        animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+    }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+@keyframes slideInUp {
+    from {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideInDown {
+    from {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideInLeft {
+    from {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Animation Utilities */
+.animate-none { animation: none; }
+
+.animate-spin {
+    animation: spin 1s linear infinite;
+}
+
+.animate-ping {
+    animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.animate-bounce {
+    animation: bounce 1s infinite;
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.3s ease-out;
+}
+
+.animate-fade-out {
+    animation: fadeOut 0.3s ease-out;
+}
+
+.animate-slide-in-up {
+    animation: slideInUp 0.3s ease-out;
+}
+
+.animate-slide-in-down {
+    animation: slideInDown 0.3s ease-out;
+}
+
+.animate-slide-in-left {
+    animation: slideInLeft 0.3s ease-out;
+}
+
+.animate-slide-in-right {
+    animation: slideInRight 0.3s ease-out;
+}
+
+/* =============================================================================
+   Accessibility - Motion Preferences
+   ============================================================================= */
+
+/*
+ * Respects user's motion preferences for accessibility
+ * Automatically disables animations for users who prefer reduced motion
+ */
+
+@media (prefers-reduced-motion: reduce) {
+    .motion-reduce\:transition-none {
+        transition-property: none !important;
+    }
+
+    .motion-reduce\:animate-none {
+        animation: none !important;
+    }
+
+    /* Disable all animations by default for reduced motion */
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* Motion-safe: Only apply animations when motion is safe */
+@media (prefers-reduced-motion: no-preference) {
+    .motion-safe\:animate-spin {
+        animation: spin 1s linear infinite;
+    }
+
+    .motion-safe\:animate-pulse {
+        animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    .motion-safe\:animate-bounce {
+        animation: bounce 1s infinite;
+    }
+
+    .motion-safe\:transition-all {
+        transition-property: all;
+        transition-timing-function: var(--ease-out);
+        transition-duration: var(--duration-default);
+    }
+}
+
+/* =============================================================================
+   Pseudo-class Utilities (First, Last, Odd, Even)
+   ============================================================================= */
+
+/*
+ * Utilities for styling based on element position in parent
+ * Useful for lists, tables, and repeating elements
+ */
+
+/* First Child */
+.first\:mt-0:first-child { margin-top: 0; }
+.first\:mb-0:first-child { margin-bottom: 0; }
+.first\:pt-0:first-child { padding-top: 0; }
+.first\:pb-0:first-child { padding-bottom: 0; }
+.first\:border-t-0:first-child { border-top-width: 0; }
+.first\:rounded-t-lg:first-child { border-top-left-radius: var(--radius-lg); border-top-right-radius: var(--radius-lg); }
+
+/* Last Child */
+.last\:mt-0:last-child { margin-top: 0; }
+.last\:mb-0:last-child { margin-bottom: 0; }
+.last\:pt-0:last-child { padding-top: 0; }
+.last\:pb-0:last-child { padding-bottom: 0; }
+.last\:border-b-0:last-child { border-bottom-width: 0; }
+.last\:rounded-b-lg:last-child { border-bottom-left-radius: var(--radius-lg); border-bottom-right-radius: var(--radius-lg); }
+
+/* Odd Children (Zebra striping) */
+.odd\:bg-primary:nth-child(odd) { background-color: var(--color-bg-primary); }
+.odd\:bg-secondary:nth-child(odd) { background-color: var(--color-bg-secondary); }
+.odd\:bg-surface-base:nth-child(odd) { background-color: var(--color-surface-base); }
+.odd\:bg-surface-raised:nth-child(odd) { background-color: var(--color-surface-raised); }
+
+/* Even Children (Zebra striping) */
+.even\:bg-primary:nth-child(even) { background-color: var(--color-bg-primary); }
+.even\:bg-secondary:nth-child(even) { background-color: var(--color-bg-secondary); }
+.even\:bg-surface-base:nth-child(even) { background-color: var(--color-surface-base); }
+.even\:bg-surface-raised:nth-child(even) { background-color: var(--color-surface-raised); }
+
+/* Only Child */
+.only\:rounded-lg:only-child { border-radius: var(--radius-lg); }
+.only\:border-0:only-child { border-width: 0; }
+
+/* Empty State */
+.empty\:hidden:empty { display: none; }
+.empty\:d-none:empty { display: none; }
+.empty\:d-block:empty { display: block; }
+
+/* Not Empty */
+.not-empty\:d-block:not(:empty) { display: block; }
+.not-empty\:d-none:not(:empty) { display: none; }
+
+/* =============================================================================
+   Placeholder & Selection Styling
+   ============================================================================= */
+
+/*
+ * Style input placeholder text and text selection
+ */
+
+/* Placeholder Colors */
+.placeholder\:text-primary::placeholder { color: var(--color-text-primary); }
+.placeholder\:text-secondary::placeholder { color: var(--color-text-secondary); }
+.placeholder\:text-tertiary::placeholder { color: var(--color-text-tertiary); }
+.placeholder\:text-disabled::placeholder { color: var(--color-text-disabled); }
+.placeholder\:text-gray-400::placeholder { color: #9ca3af; }
+.placeholder\:text-gray-500::placeholder { color: #6b7280; }
+
+/* Placeholder Opacity */
+.placeholder\:opacity-50::placeholder { opacity: 0.5; }
+.placeholder\:opacity-60::placeholder { opacity: 0.6; }
+.placeholder\:opacity-75::placeholder { opacity: 0.75; }
+.placeholder\:opacity-100::placeholder { opacity: 1; }
+
+/* Placeholder Styles */
+.placeholder\:italic::placeholder { font-style: italic; }
+.placeholder\:uppercase::placeholder { text-transform: uppercase; }
+
+/* Selection Styling */
+.selection\:bg-brand::selection {
+    background-color: var(--color-brand-primary);
+    color: white;
+}
+
+.selection\:bg-primary::selection {
+    background-color: var(--color-bg-primary);
+}
+
+.selection\:bg-success::selection {
+    background-color: var(--color-success);
+    color: white;
+}
+
+.selection\:text-primary::selection {
+    color: var(--color-text-primary);
+}
+
+.selection\:text-white::selection {
+    color: white;
+}
+
+/* Default Selection Styling for Better UX */
+::selection {
+    background-color: var(--color-brand-primary);
+    color: white;
+}
+
+/* =============================================================================
+   Print Utilities
+   ============================================================================= */
+
+/*
+ * Utilities for print media - hide/show elements when printing
+ */
+
+@media print {
+    .print\:hidden { display: none !important; }
+    .print\:d-none { display: none !important; }
+    .print\:d-block { display: block !important; }
+    .print\:d-inline { display: inline !important; }
+    .print\:d-inline-block { display: inline-block !important; }
+
+    .print\:text-black { color: #000 !important; }
+    .print\:bg-white { background-color: #fff !important; }
+
+    /* Remove shadows and effects for print */
+    .print\:shadow-none { box-shadow: none !important; }
+    .print\:border-0 { border-width: 0 !important; }
+}
