@@ -123,7 +123,7 @@ class RankingsPage extends BasePage {
         const comparisons = player.positionComparisons;
 
         return `
-            <div class="ranking-item d-flex items-center gap-3 py-2 transition-colors hover:bg-surface-raised first:pt-0 last:pb-0 first:border-t-0 last:border-b-0 odd:bg-surface-base">
+            <div class="ranking-item d-flex items-center gap-3 py-2 transition-colors hover:bg-surface-raised first:pt-0 last:pb-0 first:border-t-0 last:border-b-0">
                 <div class="rank-badge ${rankClass} d-flex items-center justify-center font-bold transition-transform hover:scale-110">${rank}</div>
                 <div class="ranking-info flex-1">
                     <div class="ranking-name font-medium mb-1">${this.escape(player.name)}</div>
