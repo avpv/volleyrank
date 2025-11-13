@@ -20,7 +20,7 @@
     align-items: center;
     justify-content: center;
     gap: var(--spacing-2);
-    padding: var(--spacing-3) var(--spacing-4);
+    padding: var(--spacing-3) var(--spacing-6);
     font-family: inherit;
     font-size: var(--font-size-sm);
     font-weight: var(--font-weight-medium);
@@ -32,7 +32,8 @@
     border-radius: var(--radius-md);
     cursor: pointer;
     user-select: none;
-    transition: var(--transition-default);
+    transition: all var(--duration-default) var(--ease-out),
+                transform var(--duration-fast) var(--ease-out);
     position: relative;
     overflow: hidden;
     min-height: 40px;
@@ -40,15 +41,17 @@
 
 /* Button Variants */
 .btn-primary {
-    background-color: var(--color-brand-primary);
+    background: linear-gradient(135deg, #2f81f7 0%, #1f6feb 100%);
     border-color: var(--color-brand-primary);
     color: white;
+    font-weight: var(--font-weight-semibold);
+    box-shadow: 0 2px 8px rgba(47, 129, 247, 0.25);
 }
 
 .btn-primary:hover:not(:disabled) {
-    background-color: var(--color-brand-primary-hover);
+    background: linear-gradient(135deg, #58a6ff 0%, #2f81f7 100%);
     border-color: var(--color-brand-primary-hover);
-    transform: translateY(-2px);
+    transform: translateY(-1px);
     box-shadow: var(--shadow-button-hover);
 }
 
@@ -66,8 +69,8 @@
 .btn-secondary:hover:not(:disabled) {
     background-color: var(--color-surface-overlay);
     border-color: var(--color-border-strong);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-sm);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
 }
 
 .btn-secondary:active:not(:disabled) {
@@ -91,8 +94,8 @@
 .btn-danger:hover:not(:disabled) {
     background-color: var(--color-error-hover);
     border-color: var(--color-error-hover);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 16px rgba(248, 81, 73, 0.35);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(255, 107, 107, 0.35), 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .btn-danger:active:not(:disabled) {
@@ -115,9 +118,10 @@
 
 /* Button States */
 .btn:disabled {
-    opacity: 0.5;
+    opacity: 0.6;
     cursor: not-allowed;
     transform: none !important;
+    filter: grayscale(20%);
 }
 
 /* Button Icons */
@@ -150,15 +154,17 @@
    ============================================================================= */
 
 .form-group {
-    margin-bottom: var(--spacing-6);
+    margin-bottom: var(--spacing-8);
 }
 
 .form-group label {
     display: block;
-    font-size: var(--font-size-base);
-    font-weight: var(--font-weight-medium);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
     color: var(--color-text-primary);
-    margin-bottom: var(--spacing-2);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: var(--spacing-3);
 }
 
 .form-group label.required::after {
@@ -187,21 +193,24 @@
 .form-control:focus {
     outline: none;
     border-color: var(--color-brand-primary);
-    box-shadow: 0 0 0 3px rgba(47, 129, 247, 0.15);
+    box-shadow: 0 0 0 4px rgba(47, 129, 247, 0.12);
     background-color: var(--color-bg-primary);
 }
 
 .form-control:disabled {
-    opacity: 0.5;
+    opacity: 0.6;
     cursor: not-allowed;
+    filter: grayscale(20%);
 }
 
 .form-control.error {
+    border-width: 2px;
     border-color: var(--color-error);
+    background-color: var(--color-error-light);
 }
 
 .form-control.error:focus {
-    box-shadow: 0 0 0 3px rgba(248, 81, 73, 0.1);
+    box-shadow: 0 0 0 4px rgba(255, 107, 107, 0.12);
 }
 
 /* Player Name Input */
@@ -545,13 +554,13 @@ select.form-control {
     background-color: var(--color-surface-raised);
     border: 1px solid var(--color-border-default);
     border-radius: var(--radius-lg);
-    padding: var(--spacing-6);
+    padding: var(--spacing-8);
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .card:hover {
     border-color: var(--color-border-strong);
-    box-shadow: var(--shadow-md);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
     transform: translateY(-2px);
 }
 
@@ -560,7 +569,7 @@ select.form-control {
     background-color: var(--color-surface-raised);
     border: 1px solid var(--color-border-default);
     border-radius: var(--radius-lg);
-    padding: var(--spacing-6);
+    padding: var(--spacing-8);
     position: relative;
     display: flex;
     flex-direction: column;
@@ -586,7 +595,7 @@ select.form-control {
     background-color: var(--color-surface-raised);
     border: 1px solid var(--color-border-default);
     border-radius: var(--radius-lg);
-    padding: var(--spacing-6);
+    padding: var(--spacing-8);
     position: relative;
     display: flex;
     flex-direction: column;
@@ -597,7 +606,7 @@ select.form-control {
 .settings-player-card:hover {
     border-color: var(--color-border-strong);
     transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
 }
 
 .player-header {
@@ -751,7 +760,7 @@ select.form-control {
 
 .stat-card {
     text-align: center;
-    padding: var(--spacing-3);
+    padding: var(--spacing-5);
     background-color: var(--color-surface-raised);
     border: 1px solid var(--color-border-default);
     border-radius: var(--radius-lg);
@@ -760,17 +769,19 @@ select.form-control {
 
 .stat-card:hover {
     border-color: var(--color-border-strong);
-    box-shadow: var(--shadow-md);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
     transform: translateY(-2px);
 }
 
 .stat-number {
-    font-size: var(--font-size-3xl);
+    font-size: var(--font-size-4xl);
     font-weight: var(--font-weight-bold);
     color: var(--color-brand-primary);
     line-height: var(--line-height-tight);
+    letter-spacing: -0.02em;
     margin-bottom: var(--spacing-2);
     font-variant-numeric: tabular-nums;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .stat-label {
@@ -782,11 +793,13 @@ select.form-control {
 }
 
 .stat-value {
-    font-size: var(--font-size-3xl);
+    font-size: var(--font-size-4xl);
     font-weight: var(--font-weight-bold);
     color: var(--color-text-primary);
     line-height: var(--line-height-tight);
+    letter-spacing: -0.02em;
     font-variant-numeric: tabular-nums;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .stat-detail {
@@ -881,6 +894,8 @@ select.form-control {
 .toast-close:hover {
     color: var(--color-text-primary);
     background-color: var(--color-surface-overlay);
+    transform: scale(1.1);
+    transition: transform 0.2s var(--ease-out);
 }
 
 /* Toast Variants */
@@ -1009,7 +1024,8 @@ select.form-control {
     background: var(--color-surface-overlay);
     border-color: var(--color-border-strong);
     color: var(--color-text-primary);
-    transform: scale(1.05);
+    transform: scale(1.1);
+    transition: transform 0.2s var(--ease-out);
 }
 
 .modal-close:active,
@@ -1359,36 +1375,40 @@ select.form-control {
         left: var(--spacing-4);
         max-width: none;
     }
-    
+
     .modal-dialog {
         width: 95%;
         max-height: 95vh;
     }
-    
+
     .modal-header,
     .modal-body,
     .modal-footer {
         padding: var(--spacing-4);
     }
-    
+
     .positions-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .form-actions,
     .form-actions-secondary,
     .form-actions-tertiary,
     .form-section-actions {
         flex-direction: column;
     }
-    
+
+    /* Ensure minimum touch target sizes */
     .btn:not(.btn-sm) {
         width: 100%;
+        min-height: 44px;
+        padding: var(--spacing-3) var(--spacing-5);
     }
 
     .player-card,
     .settings-player-card {
         min-height: auto;
+        padding: var(--spacing-6);
     }
 
     .player-actions {
@@ -1504,11 +1524,22 @@ select.form-control {
    Accessibility
    ============================================================================= */
 
+/* Stronger focus indicators for keyboard navigation */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+    outline: 3px solid var(--color-brand-primary);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+}
+
 @media (prefers-reduced-motion: reduce) {
     .progress-bar::after {
         animation: none;
     }
-    
+
     .modal-close:hover {
         transform: none;
     }

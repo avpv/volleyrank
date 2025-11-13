@@ -38,14 +38,14 @@
     
     /* Borders - Improved contrast */
     --color-border-subtle: #21262d;
-    --color-border-default: #3d444d;
-    --color-border-strong: #525a65;
+    --color-border-default: #444c56;
+    --color-border-strong: #5a6269;
     --color-border-active: #58a6ff;
     
     /* Text Colors - Improved contrast */
     --color-text-primary: #e6edf3;
-    --color-text-secondary: #8c959f;
-    --color-text-tertiary: #6e7681;
+    --color-text-secondary: #9ca3af;
+    --color-text-tertiary: #7a8291;
     --color-text-disabled: #484f58;
     --color-text-inverse: #0d1117;
     --color-text-link: #58a6ff;
@@ -58,17 +58,17 @@
     --color-brand-accent: #ff7b72;
     
     /* Semantic Colors */
-    --color-success: #4ade80;
+    --color-success: #56d364;
     --color-success-hover: #3fb950;
-    --color-success-light: rgba(74, 222, 128, 0.1);
-    
-    --color-warning: #d29922;
-    --color-warning-hover: #bb8009;
-    --color-warning-light: rgba(187, 128, 9, 0.1);
-    
-    --color-error: #f85149;
-    --color-error-hover: #da3633;
-    --color-error-light: rgba(248, 81, 73, 0.1);
+    --color-success-light: rgba(86, 211, 100, 0.1);
+
+    --color-warning: #e3b341;
+    --color-warning-hover: #d29922;
+    --color-warning-light: rgba(227, 179, 65, 0.1);
+
+    --color-error: #ff6b6b;
+    --color-error-hover: #f85149;
+    --color-error-light: rgba(255, 107, 107, 0.1);
     
     --color-info: #2f81f7;
     --color-info-hover: #58a6ff;
@@ -148,16 +148,16 @@
        Shadows - Enhanced depth system
        ========================================================================== */
 
-    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
-    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.06);
-    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.12);
-    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.18);
-    --shadow-xl: 0 20px 60px rgba(0, 0, 0, 0.35);
+    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.1);
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(0, 0, 0, 0.06);
+    --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.1), 0 8px 16px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.12), 0 16px 32px rgba(0, 0, 0, 0.08);
+    --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.2), 0 24px 60px rgba(0, 0, 0, 0.15);
     --shadow-2xl: 0 24px 80px rgba(0, 0, 0, 0.4);
 
     /* Interactive shadow states */
-    --shadow-card-hover: 0 8px 32px rgba(47, 129, 247, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
-    --shadow-button-hover: 0 4px 16px rgba(47, 129, 247, 0.24);
+    --shadow-card-hover: 0 12px 28px rgba(47, 129, 247, 0.15), 0 4px 12px rgba(0, 0, 0, 0.12);
+    --shadow-button-hover: 0 6px 20px rgba(47, 129, 247, 0.3), 0 2px 8px rgba(0, 0, 0, 0.1);
     --shadow-button-active: inset 0 2px 4px rgba(0, 0, 0, 0.2);
     
     /* ==========================================================================
@@ -165,13 +165,13 @@
        ========================================================================== */
 
     --duration-instant: 0.05s;
-    --duration-fast: 0.15s;
-    --duration-default: 0.25s;
-    --duration-slow: 0.35s;
-    --duration-slower: 0.5s;
+    --duration-fast: 0.2s;
+    --duration-default: 0.3s;
+    --duration-slow: 0.4s;
+    --duration-slower: 0.6s;
 
     --ease-smooth: cubic-bezier(0.4, 0.0, 0.2, 1);
-    --ease-out: cubic-bezier(0.0, 0.0, 0.2, 1);
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
     --ease-in: cubic-bezier(0.4, 0.0, 1, 1);
     --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
     --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
@@ -250,18 +250,21 @@ h1, h2, h3, h4, h5, h6 {
 h1 {
     font-size: 2rem;
     font-weight: var(--font-weight-bold);
+    letter-spacing: -0.02em;
 }
 
 h2 {
-    font-size: var(--font-size-2xl);
+    font-size: var(--font-size-3xl);
     font-weight: var(--font-weight-semibold);
     color: var(--color-text-primary);
-    margin-bottom: var(--spacing-6);
+    letter-spacing: -0.02em;
+    margin-bottom: var(--spacing-8);
 }
 
 h3 {
-    font-size: var(--font-size-lg);
+    font-size: var(--font-size-xl);
     font-weight: var(--font-weight-semibold);
+    margin-bottom: var(--spacing-5);
 }
 
 h4 {
@@ -272,7 +275,8 @@ h4 {
 p {
     margin-bottom: var(--spacing-4);
     color: var(--color-text-secondary);
-    line-height: var(--line-height-relaxed);
+    line-height: 1.7;
+    max-width: 65ch;
 }
 
 a {
@@ -645,7 +649,7 @@ a:hover {
    ============================================================================= */
 
 :focus-visible {
-    outline: 2px solid var(--color-brand-primary);
+    outline: 3px solid var(--color-brand-primary);
     outline-offset: 2px;
     border-radius: var(--radius-sm);
 }
