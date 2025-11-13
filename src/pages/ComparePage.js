@@ -222,8 +222,8 @@ class ComparePage extends BasePage {
                     Comparing at: <strong class="text-brand">${posName}</strong>
                 </div>
 
-                <div class="comparison-cards d-grid grid-cols-3 gap-4 items-center">
-                    <div class="player-card clickable transition-all duration-200 cursor-pointer" data-winner-id="${player1.id}" data-loser-id="${player2.id}">
+                <div class="comparison-cards d-grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 items-center">
+                    <div class="player-card clickable transition-all duration-200 cursor-pointer hover:shadow-lg hover:-translate-y-1 active:scale-95" data-winner-id="${player1.id}" data-loser-id="${player2.id}">
                         <div class="player-avatar blue d-flex items-center justify-center mb-3">
                             ${player1.name.charAt(0).toUpperCase()}
                         </div>
@@ -233,14 +233,14 @@ class ComparePage extends BasePage {
                         <div class="player-comparisons text-center text-xs text-tertiary">${player1.comparisons[this.selectedPosition]} comparisons</div>
                     </div>
 
-                    <div class="vs-divider d-flex flex-column items-center gap-4">
-                        <div class="vs-text font-bold text-2xl">VS</div>
-                        <button class="draw-button transition-all duration-200" id="drawButton" data-player1-id="${player1.id}" data-player2-id="${player2.id}">
+                    <div class="vs-divider d-flex flex-column items-center gap-4 my-4 md:my-0">
+                        <div class="vs-text font-bold text-2xl md:text-3xl">VS</div>
+                        <button class="draw-button transition-all duration-200 hover:bg-surface-overlay hover:scale-105 focus:ring-brand active:scale-95" id="drawButton" data-player1-id="${player1.id}" data-player2-id="${player2.id}">
                             Win-Win
                         </button>
                     </div>
 
-                    <div class="player-card clickable transition-all duration-200 cursor-pointer" data-winner-id="${player2.id}" data-loser-id="${player1.id}">
+                    <div class="player-card clickable transition-all duration-200 cursor-pointer hover:shadow-lg hover:-translate-y-1 active:scale-95" data-winner-id="${player2.id}" data-loser-id="${player1.id}">
                         <div class="player-avatar purple d-flex items-center justify-center mb-3">
                             ${player2.name.charAt(0).toUpperCase()}
                         </div>

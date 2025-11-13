@@ -331,10 +331,10 @@ class TeamsPage extends BasePage {
 
         return `
             <div class="teams-result">
-                <div class="result-header d-flex justify-between items-center mb-4">
-                    <h3 class="font-semibold m-0">Generated Teams</h3>
-                    <div class="result-controls d-flex items-center gap-4">
-                        <label class="toggle-label d-flex items-center gap-2 cursor-pointer">
+                <div class="result-header d-flex flex-column md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+                    <h3 class="text-xl md:text-2xl font-semibold m-0">Generated Teams</h3>
+                    <div class="result-controls d-flex flex-column sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
+                        <label class="toggle-label d-flex items-center gap-2 cursor-pointer hover:text-brand transition-colors">
                             <input
                                 type="checkbox"
                                 id="showEloToggle"
@@ -342,7 +342,7 @@ class TeamsPage extends BasePage {
                             >
                             <span class="text-sm">Show ELO Ratings</span>
                         </label>
-                        <button class="btn btn-secondary transition-colors" id="exportTeamsBtn">
+                        <button class="btn btn-secondary transition-colors hover:bg-surface-overlay focus:ring-brand" id="exportTeamsBtn">
                             ${getIcon('arrow-up', { size: 16, className: 'btn-icon' })}
                             Export Teams
                         </button>
@@ -350,12 +350,12 @@ class TeamsPage extends BasePage {
                 </div>
 
                 <div class="result-info mb-6">
-                    <div class="info-badge ${weightedBalance <= 50 ? 'success' : 'warning'} transition-colors">
+                    <div class="info-badge ${weightedBalance <= 50 ? 'success' : 'warning'} transition-colors hover:scale-105">
                         Balance: ${weightedBalance} weighted ELO difference
                     </div>
                 </div>
 
-                <div class="teams-grid d-grid gap-6">
+                <div class="teams-grid d-grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                     ${teams.map((team, index) => this.renderTeam(team, index)).join('')}
                 </div>
             </div>
@@ -378,9 +378,9 @@ class TeamsPage extends BasePage {
         const showElo = this.state.showEloRatings;
 
         return `
-            <div class="team-card transition-shadow">
+            <div class="team-card transition-shadow hover:shadow-lg hover:-translate-y-1">
                 <div class="team-header mb-4">
-                    <h4 class="font-semibold text-lg m-0">Team ${index + 1}</h4>
+                    <h4 class="font-semibold text-lg md:text-xl m-0">Team ${index + 1}</h4>
                 </div>
                 ${showElo ? `
                     <div class="team-rating text-sm text-secondary mb-4 pb-3 border-b border-subtle">
@@ -419,7 +419,7 @@ class TeamsPage extends BasePage {
         const posName = this.playerService.positions[position];
 
         return `
-            <div class="team-player d-flex justify-between items-center py-2 transition-colors">
+            <div class="team-player d-flex justify-between items-center py-2 transition-colors hover:bg-surface-raised">
                 <div class="player-info flex-1">
                     <div class="player-name font-medium mb-1">${this.escape(player.name)}</div>
                     <div class="player-position text-sm text-secondary">${posName}</div>

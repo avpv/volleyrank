@@ -320,11 +320,11 @@ class SettingsPage extends BasePage {
 
     renderPositionStats(stats) {
         return `
-            <div class="position-stats d-grid gap-4">
+            <div class="position-stats d-grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-4">
                 ${Object.entries(stats).map(([pos, data]) => `
-                    <div class="stat-card text-center transition-shadow">
-                        <div class="stat-number text-3xl font-bold mb-2">${data.count}</div>
-                        <div class="stat-label text-sm text-secondary">${data.name}s</div>
+                    <div class="stat-card text-center transition-shadow hover:shadow-lg hover:-translate-y-1">
+                        <div class="stat-number text-2xl md:text-3xl font-bold mb-2">${data.count}</div>
+                        <div class="stat-label text-xs md:text-sm text-secondary">${data.name}s</div>
                     </div>
                 `).join('')}
             </div>
@@ -347,8 +347,8 @@ class SettingsPage extends BasePage {
 
         return `
             <div class="players-section">
-                <h3>Current Players (${players.length})</h3>
-                <div class="players-grid">
+                <h3 class="text-xl font-semibold mb-4">Current Players (${players.length})</h3>
+                <div class="players-grid d-grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                     ${sorted.map(player => this.renderPlayerCard(player)).join('')}
                 </div>
             </div>
@@ -373,7 +373,7 @@ class SettingsPage extends BasePage {
         }).join('');
 
         return `
-            <div class="settings-player-card transition-shadow" data-player-id="${player.id}">
+            <div class="settings-player-card transition-shadow hover:shadow-lg hover:-translate-y-1" data-player-id="${player.id}">
                 <div class="player-header d-flex justify-between items-center mb-3">
                     <h4 class="player-name font-semibold m-0">${this.escape(player.name)}</h4>
                     ${player.positions.length > 1 ?
@@ -386,15 +386,15 @@ class SettingsPage extends BasePage {
                 </div>
 
                 <div class="player-actions d-flex gap-2">
-                    <button class="btn btn-sm btn-secondary transition-colors" data-action="edit" data-player-id="${player.id}">
+                    <button class="btn btn-sm btn-secondary transition-colors hover:bg-surface-overlay focus:ring-brand" data-action="edit" data-player-id="${player.id}">
                         ${getIcon('edit', { size: 14, className: 'btn-icon' })}
                         Edit
                     </button>
-                    <button class="btn btn-sm btn-secondary transition-colors" data-action="reset" data-player-id="${player.id}">
+                    <button class="btn btn-sm btn-secondary transition-colors hover:bg-surface-overlay focus:ring-brand" data-action="reset" data-player-id="${player.id}">
                         ${getIcon('refresh', { size: 14, className: 'btn-icon' })}
                         Reset
                     </button>
-                    <button class="btn btn-sm btn-secondary transition-colors" data-action="remove" data-player-id="${player.id}">
+                    <button class="btn btn-sm btn-secondary transition-colors hover:bg-surface-overlay focus:ring-brand" data-action="remove" data-player-id="${player.id}">
                         ${getIcon('trash', { size: 14, className: 'btn-icon' })}
                         Remove
                     </button>
