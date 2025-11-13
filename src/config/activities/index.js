@@ -33,6 +33,29 @@ const ACTIVITY_FILES = {
     softball: 'softball.js',
     netball: 'netball.js',
 
+    // Esports - MOBAs (5v5)
+    leagueOfLegends: 'league-of-legends.js',
+    dota2: 'dota2.js',
+    honorOfKings: 'honor-of-kings.js',
+    mobileLegends: 'mobile-legends.js',
+    wildRift: 'wild-rift.js',
+    smite: 'smite.js',
+
+    // Esports - FPS/Tactical Shooters (5v5)
+    valorant: 'valorant.js',
+    counterStrike2: 'counter-strike-2.js',
+    rainbowSixSiege: 'rainbow-six-siege.js',
+    overwatch2: 'overwatch-2.js',
+
+    // Esports - Battle Royale
+    pubgMobile: 'pubg-mobile.js',
+    pubgBattlegrounds: 'pubg-battlegrounds.js',
+    fortnite: 'fortnite.js',
+    apexLegends: 'apex-legends.js',
+
+    // Esports - Other
+    rocketLeague: 'rocket-league.js',
+
     // Universal
     general: 'general.js'
 };
