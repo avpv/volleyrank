@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="assets/images/logo.svg" alt="TeamBalance Logo" width="120" height="120">
+[<img src="assets/images/logo.svg" alt="TeamBalance Logo" width="120" height="120">](https://avpv.github.io/team-balance/)
 
 # [TeamBalance](https://avpv.github.io/team-balance/)
 
