@@ -204,8 +204,8 @@ class SessionRepository {
         const activeSessionId = activeSessions[activityKey];
 
         if (activeSessionId === sessionId) {
-            // Find another session to set as active
-            const newActiveSessionId = remainingSessions.length > 0 ? remainingSessions[0] : null;
+            // Don't auto-select another session - let user choose manually
+            const newActiveSessionId = null;
 
             this.stateManager.setState({
                 sessions: updatedSessions,
