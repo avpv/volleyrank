@@ -200,8 +200,6 @@ class StorageAdapter {
             for (let i = 0; i < removeCount; i++) {
                 localStorage.removeItem(entries[i].key);
             }
-            
-            console.log(`Cleared ${removeCount} old storage entries`);
         } catch (error) {
             console.error('Error clearing old entries:', error);
         }

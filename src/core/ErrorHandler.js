@@ -284,8 +284,6 @@ class ErrorHandlerService {
             console.error(prefix, error.message, error);
         } else if (error.severity === ErrorSeverity.WARNING) {
             console.warn(prefix, error.message, error);
-        } else {
-            console.log(prefix, error.message, error);
         }
     }
 

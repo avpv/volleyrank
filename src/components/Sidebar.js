@@ -179,11 +179,8 @@ class Sidebar extends Component {
 
         const result = this.sessionService.switchSession(activityKey, sessionId);
         if (result.success) {
-            console.log('Switched to session:', sessionId);
-
             // Check if switching to a different activity
             if (currentActivity !== activityKey) {
-                console.log('Switching from', currentActivity, 'to', activityKey);
                 // Update selected activity
                 storage.set('selectedActivity', activityKey);
 
@@ -242,8 +239,6 @@ class Sidebar extends Component {
 
             const result = this.sessionService.deleteSession(activityKey, sessionId);
             if (result.success) {
-                console.log('Session deleted:', sessionId);
-
                 // Close mobile sidebar and backdrop after session deletion
                 this.closeMobileSidebar();
 
@@ -258,8 +253,6 @@ class Sidebar extends Component {
 
                 if (totalSessionCount === 0) {
                     // No sessions left at all - navigate to settings page
-                    console.log('[Sidebar] All sessions deleted - navigating to settings');
-
                     // Clear selected activity since there are no sessions
                     storage.remove('selectedActivity');
                     storage.remove('pendingActivity');
@@ -279,8 +272,6 @@ class Sidebar extends Component {
                     }
                 } else if (isDeletingActiveSession) {
                     // Deleted the active session for current activity - always navigate to settings
-                    console.log('[Sidebar] Active session deleted - navigating to settings');
-
                     // Clear selected activity
                     storage.remove('selectedActivity');
                     storage.remove('pendingActivity');

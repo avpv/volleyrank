@@ -138,46 +138,30 @@ class Application {
      */
     async init() {
         try {
-            console.log(`[INIT] Initializing ${APP_CONFIG.NAME} v${APP_CONFIG.VERSION}...`);
-
             // Step 0: Initialize activities (load all activity configs)
-            console.log('[INIT] Loading activity configurations...');
             await initializeActivities();
-            console.log(`[OK] Loaded ${Object.keys(activities).length} activities`);
 
             // Reload activity config after activities are initialized
             // This ensures getDefaultActivity() returns a valid config
             this.activityConfig = this.loadActivityConfig();
 
             // Check if activity is selected
-            if (this.activityConfig) {
-                console.log(`[INIT] Activity: ${this.activityConfig.config.name}`);
-            } else {
-                console.log('[INIT] No activity selected yet');
-            }
 
             // Step 1: Initialize services with activity config (or default if none)
             const defaultActivity = getDefaultActivity();
             const configForServices = this.activityConfig ? this.activityConfig.config : defaultActivity;
             this.services = initializeServices(configForServices);
-            console.log('[OK] Services initialized');
 
             // Step 2: Handle GitHub Pages 404 redirect
             this.handleRedirect();
 
             // Step 3: Load persisted application state
             const loaded = stateManager.load();
-            if (loaded) {
-                console.log('[OK] State loaded from storage');
-            } else {
-                console.log('[OK] Starting with fresh state');
-            }
 
             // Step 3.1: Ensure active session exists for current activity (only if activity selected)
             if (this.activityConfig) {
                 const sessionService = this.services.resolve('sessionService');
                 const activeSession = sessionService.ensureActiveSession(this.activityConfig.key);
-                console.log('[OK] Active session ensured:', activeSession.id);
             }
 
             // Step 4: Setup global event listeners
@@ -200,8 +184,6 @@ class Application {
 
             // Step 7: Setup global error handlers
             this.setupErrorHandling();
-
-            console.log(`[OK] ${APP_CONFIG.NAME} initialized successfully`);
 
             // Step 8: Show welcome message for first-time users
             if (!loaded) {
@@ -248,10 +230,8 @@ class Application {
     handleRedirect() {
         // Method 1: Try to restore from sessionStorage (cleanest approach)
         const storedPath = redirectModule.restore();
-        
+
         if (storedPath) {
-            console.log('[REDIRECT] Restoring path from sessionStorage:', storedPath);
-            
             // Update browser URL to correct path (no query params)
             const fullPath = router.basePath + storedPath;
             window.history.replaceState(
@@ -262,18 +242,16 @@ class Application {
             
             // Store for router initialization
             this.initialPath = storedPath;
-            
-            console.log('[OK] Redirect handled via sessionStorage');
+
             return;
         }
         
         // Method 2: Fallback to query parameter (compatibility)
         const url = new URL(window.location);
-        
+
         if (url.searchParams.has('redirect')) {
             const redirectPath = url.searchParams.get('redirect');
-            console.log('[REDIRECT] Restoring path from query parameter:', redirectPath);
-            
+
             // Remove redirect parameter from URL
             url.searchParams.delete('redirect');
             
@@ -289,8 +267,6 @@ class Application {
             
             // Store for router initialization
             this.initialPath = redirectPath;
-            
-            console.log('[OK] Redirect handled via query parameter');
         }
     }
 
@@ -315,25 +291,21 @@ class Application {
     registerRoutes() {
         // Home/Settings page
         router.register('/', () => {
-            console.log('[ROUTE] Route: / (Settings)');
             this.renderPage('settings', SettingsPage);
         });
 
         // Player comparison page
         router.register('/compare/', () => {
-            console.log('[ROUTE] Route: /compare/');
             this.renderPage('compare', ComparePage);
         });
 
         // Player rankings page
         router.register('/rankings/', () => {
-            console.log('[ROUTE] Route: /rankings/');
             this.renderPage('rankings', RankingsPage);
         });
 
         // Team builder page
         router.register('/teams/', () => {
-            console.log('[ROUTE] Route: /teams/');
             this.renderPage('teams', TeamsPage);
         });
     }
@@ -365,11 +337,8 @@ class Application {
      * @returns {void}
      */
     renderPage(name, PageClass) {
-        console.log('[PAGE] Rendering page:', name);
-        
         // Step 1: Cleanup - Destroy current page
         if (this.currentPage) {
-            console.log('[CLEANUP] Destroying previous page');
             try {
                 this.currentPage.destroy();
             } catch (error) {
@@ -387,9 +356,8 @@ class Application {
         
         // Step 3: Clear container content
         container.innerHTML = '';
-        
+
         // Step 4: Create new page instance
-        console.log('[CREATE] Creating new page instance:', PageClass.name);
         let page;
 
         try {
@@ -418,10 +386,8 @@ class Application {
 
         // Step 5: Mount page to DOM
         try {
-            console.log('[MOUNT] Mounting page...');
             page.mount();
             this.currentPage = page;
-            console.log('[OK] Page mounted successfully');
         } catch (error) {
             console.error('[ERROR] Error mounting page:', error);
             container.innerHTML = `
@@ -548,11 +514,11 @@ class Application {
     setupEventListeners() {
         // State management events
         eventBus.on('state:loaded', () => {
-            console.log('[State] Loaded from storage');
+            // State loaded
         });
 
         eventBus.on('state:saved', () => {
-            console.log('[State] Saved to storage');
+            // State saved
         });
 
         eventBus.on('state:migrated', (data) => {
