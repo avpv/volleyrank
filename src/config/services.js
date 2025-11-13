@@ -265,8 +265,6 @@ export function initializeServices(activityConfig) {
         throw new Error('Activity configuration is required. Import from config/activities/');
     }
 
-    console.log(`[Services] Initializing with activity: ${activityConfig.name || 'Unknown'}`);
-
     const config = createServiceConfig(activityConfig);
     const registry = createRegistry(config);
 
@@ -279,16 +277,6 @@ export function initializeServices(activityConfig) {
 
     // Lock registry to prevent runtime modifications
     registry.lock();
-
-    console.log('[Services] Initialized successfully');
-    console.log('[Services] Available services:', registry.getServiceNames());
-
-    // Log architecture improvements
-    console.log('[Services] Architecture improvements:');
-    console.log('  ✓ Repository pattern for data access');
-    console.log('  ✓ Centralized validation service');
-    console.log('  ✓ Improved separation of concerns');
-    console.log('  ✓ Better testability and maintainability');
 
     return registry;
 }

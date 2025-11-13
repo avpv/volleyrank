@@ -121,9 +121,7 @@ const logger = {
      * @returns {void}
      */
     debug(message, ...args) {
-        if (REDIRECT_CONFIG.DEBUG) {
-            console.log(`[Redirect:Debug] ${message}`, ...args);
-        }
+        // Debug logging disabled
     }
 };
 

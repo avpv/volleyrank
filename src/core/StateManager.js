@@ -182,7 +182,6 @@ class StateManager {
 
         // Version 3.0 -> 4.0 migration
         if (version < '4.0') {
-            console.log('Migrating data from version', version, 'to 4.0');
 
             // Ensure players have correct structure
             if (data.players) {
@@ -227,7 +226,6 @@ class StateManager {
 
         // Version 4.0 -> 4.1 migration (players -> playersByActivity)
         if (version < '4.1') {
-            console.log('Migrating data from version', version, 'to 4.1');
 
             // Get the currently selected activity from storage
             const selectedActivity = storage.get('selectedActivity', 'volleyball');
@@ -246,8 +244,6 @@ class StateManager {
 
                 // Remove old players array
                 delete data.players;
-
-                console.log(`Migrated ${data.playersByActivity[selectedActivity].length} players to activity: ${selectedActivity}`);
             } else if (!data.playersByActivity) {
                 // Initialize empty playersByActivity if it doesn't exist
                 data.playersByActivity = {
@@ -269,7 +265,6 @@ class StateManager {
 
         // Version 4.1 -> 5.0 migration (playersByActivity -> sessions)
         if (version < '5.0') {
-            console.log('Migrating data from version', version, 'to 5.0');
 
             data.sessions = {};
             data.activeSessions = {};
@@ -302,7 +297,6 @@ class StateManager {
                         data.activeSessions[activityKey] = sessionId;
 
                         totalPlayersMigrated += players.length;
-                        console.log(`Migrated ${players.length} players for ${activityKey} to session ${sessionId}`);
                     } else {
                         // No players, initialize empty sessions object for this activity
                         data.sessions[activityKey] = {};
@@ -312,8 +306,6 @@ class StateManager {
 
                 // Remove old playersByActivity structure
                 delete data.playersByActivity;
-
-                console.log(`Total players migrated: ${totalPlayersMigrated}`);
             } else {
                 // No existing data, initialize empty structure
                 data.sessions = {};
