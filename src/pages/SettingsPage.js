@@ -38,6 +38,8 @@ class SettingsPage extends BasePage {
         this.on('state:changed', () => this.update());
         this.on('state:reset', () => this.update());
         this.on('session:activated', () => this.update());
+        // Handle scroll to activity selector request
+        this.on('scroll-to-activity-selector', () => this.handleGuideAction('select-activity'));
     }
 
     onMount() {
@@ -505,6 +507,8 @@ class SettingsPage extends BasePage {
 
         if (!targetActivity) {
             toast.error('Please select an activity first');
+            // Scroll to activity selector to help user
+            this.handleGuideAction('select-activity');
             return;
         }
 
