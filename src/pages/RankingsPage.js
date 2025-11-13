@@ -7,6 +7,7 @@ import BasePage from './BasePage.js';
 import Sidebar from '../components/Sidebar.js';
 import storage from '../core/StorageAdapter.js';
 import { activities } from '../config/activities/index.js';
+import { getIcon } from '../components/base/Icons.js';
 
 class RankingsPage extends BasePage {
     constructor(container, props = {}) {
@@ -96,10 +97,11 @@ class RankingsPage extends BasePage {
 
     renderPositionRankings(position, positionName, players) {
         if (!players || players.length === 0) {
+            const icon = getIcon('users-x', { size: 40, color: 'var(--color-text-secondary)' });
             return `
                 <div class="ranking-card">
                     <h3 class="ranking-title">${positionName}s</h3>
-                    ${this.renderEmpty('No players at this position')}
+                    ${this.renderEmpty('Add players with this position to see rankings.', icon)}
                 </div>
             `;
         }

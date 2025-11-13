@@ -145,13 +145,22 @@ class BasePage extends Component {
     }
 
     /**
-     * Render empty state
+     * Render empty state with improved structure
+     * @param {string} message - Main message or description
+     * @param {string} icon - Optional icon/SVG content
+     * @param {string} title - Optional title (if not provided, message is used as description)
      */
-    renderEmpty(message, icon = '') {
+    renderEmpty(message, icon = '', title = '') {
+        // If title is provided, treat message as description
+        const hasTitle = title !== '';
+        const titleText = hasTitle ? title : '';
+        const descriptionText = hasTitle ? message : message;
+
         return `
-            <div class="empty-state text-center animate-fade-in">
-                <div class="empty-icon mb-4 opacity-50">${getLogo({ size: 48 })}</div>
-                <p class="text-tertiary">${message}</p>
+            <div class="empty-state animate-fade-in">
+                ${icon ? `<div class="empty-state__icon">${icon}</div>` : ''}
+                ${hasTitle ? `<div class="empty-state__title">${this.escape(titleText)}</div>` : ''}
+                <div class="empty-state__description">${hasTitle ? this.escape(descriptionText) : this.escape(message)}</div>
             </div>
         `;
     }

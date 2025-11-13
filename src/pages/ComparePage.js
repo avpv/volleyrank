@@ -177,39 +177,43 @@ class ComparePage extends BasePage {
 
     renderComparisonArea() {
         if (!this.selectedPosition) {
-            return this.renderEmpty('Select a position to start comparing players');
+            const icon = getIcon('target', { size: 48, color: 'var(--color-text-secondary)' });
+            return this.renderEmpty('Choose a position from the dropdown above to begin rating players.', icon, 'Ready to Compare');
         }
 
         const status = this.comparisonService.checkStatus(this.selectedPosition);
-        
+
         if (!status.canCompare) {
+            const icon = getIcon('info', { size: 48, color: 'var(--color-text-secondary)' });
             return `
                 <div class="comparison-area">
-                    ${this.renderEmpty(status.reason)}
+                    ${this.renderEmpty(status.reason, icon)}
                 </div>
             `;
         }
 
         const pair = this.currentPair || status.nextPair;
-        
+
         // Validate pair exists and has both players
         if (!pair || !pair[0] || !pair[1]) {
             console.error('Invalid pair:', pair);
+            const icon = getIcon('alert-triangle', { size: 48, color: 'var(--color-warning)' });
             return `
                 <div class="comparison-area">
-                    ${this.renderEmpty('Error loading comparison pair')}
+                    ${this.renderEmpty('Unable to load the next comparison. Please try again.', icon, 'Loading Error')}
                 </div>
             `;
         }
-        
+
         const [player1, player2] = pair;
 
         // Validate player IDs exist
         if (player1.id === undefined || player2.id === undefined) {
             console.error('Player missing ID:', { player1, player2 });
+            const icon = getIcon('alert-triangle', { size: 48, color: 'var(--color-warning)' });
             return `
                 <div class="comparison-area">
-                    ${this.renderEmpty('Error: Player missing ID')}
+                    ${this.renderEmpty('Player data is incomplete. Please check your player list.', icon, 'Data Error')}
                 </div>
             `;
         }
