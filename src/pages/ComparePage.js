@@ -285,6 +285,11 @@ class ComparePage extends BasePage {
                 this.selectedPosition = e.target.value;
                 this.loadNextPair();
                 this.update();
+
+                // Scroll to comparison area if there are pairs to compare
+                if (this.currentPair) {
+                    this.scrollToComparisonArea();
+                }
             });
         }
 
@@ -337,6 +342,19 @@ class ComparePage extends BasePage {
 
         const status = this.comparisonService.checkStatus(this.selectedPosition);
         this.currentPair = status.canCompare ? status.nextPair : null;
+    }
+
+    scrollToComparisonArea() {
+        // Wait for DOM to update after this.update()
+        setTimeout(() => {
+            const comparisonArea = this.$('.comparison-area');
+            if (comparisonArea) {
+                comparisonArea.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        }, 0);
     }
 
     handleComparison(winnerId, loserId) {
