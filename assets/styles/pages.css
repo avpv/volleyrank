@@ -71,6 +71,12 @@
     .activity-selector-row .btn {
         width: 100%;
     }
+
+    #createSessionBtn:focus,
+    #createSessionBtn:focus-visible {
+        outline: none;
+        border-color: var(--color-border-default);
+    }
 }
 
 .form-help-text {
