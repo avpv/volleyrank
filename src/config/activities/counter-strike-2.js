@@ -23,13 +23,12 @@ export default {
     },
 
     // Position weights for team balancing
-    // Higher weight = more important position
     positionWeights: {
-        'ENTRY': 1.2,  // Entry Fragger - opening kills
-        'LURK': 1.15,  // Lurker - flanking and map control
-        'AWP': 1.3,    // AWPer - high impact weapon specialist
-        'IGL': 1.25,   // IGL - strategy and calling
-        'SUP': 1.15    // Support - utility and trade fragging
+        'ENTRY': 1.0,
+        'LURK': 1.0,
+        'AWP': 1.0,
+        'IGL': 1.0,
+        'SUP': 1.0
     },
 
     // Order in which positions should be displayed

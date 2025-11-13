@@ -22,12 +22,11 @@ export default {
     },
 
     // Position weights for team balancing
-    // Higher weight = more important position
     positionWeights: {
-        'IGL': 1.3,   // IGL - strategic caller and decision maker
-        'FRAG': 1.2,  // Fragger - main kill pressure
-        'SCOUT': 1.2, // Scout - information and positioning
-        'SUP': 1.15   // Support - utility and backup
+        'IGL': 1.0,
+        'FRAG': 1.0,
+        'SCOUT': 1.0,
+        'SUP': 1.0
     },
 
     // Order in which positions should be displayed

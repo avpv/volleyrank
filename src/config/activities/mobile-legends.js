@@ -23,13 +23,12 @@ export default {
     },
 
     // Position weights for team balancing
-    // Higher weight = more important position
     positionWeights: {
-        'GOLD': 1.2,  // Gold Lane - main damage dealer
-        'EXP': 1.15,  // EXP Lane - frontline and initiator
-        'MID': 1.2,   // Mid Lane - burst damage and wave clear
-        'JGL': 1.3,   // Jungle - objective control and ganking
-        'ROAM': 1.15  // Roam - vision and team support
+        'GOLD': 1.0,
+        'EXP': 1.0,
+        'MID': 1.0,
+        'JGL': 1.0,
+        'ROAM': 1.0
     },
 
     // Order in which positions should be displayed

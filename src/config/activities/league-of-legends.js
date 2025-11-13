@@ -23,13 +23,12 @@ export default {
     },
 
     // Position weights for team balancing
-    // Higher weight = more important position
     positionWeights: {
-        'TOP': 1.1,  // Top Lane - split pusher/team fighter
-        'JGL': 1.3,  // Jungle - map control and objective control
-        'MID': 1.2,  // Mid Lane - central carry position
-        'ADC': 1.2,  // ADC - main damage dealer
-        'SUP': 1.15  // Support - vision and utility
+        'TOP': 1.0,
+        'JGL': 1.0,
+        'MID': 1.0,
+        'ADC': 1.0,
+        'SUP': 1.0
     },
 
     // Order in which positions should be displayed

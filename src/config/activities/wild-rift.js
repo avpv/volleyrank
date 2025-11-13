@@ -23,13 +23,12 @@ export default {
     },
 
     // Position weights for team balancing
-    // Higher weight = more important position
     positionWeights: {
-        'BARON': 1.1,   // Baron Lane - split pusher and tank
-        'JGL': 1.3,     // Jungle - map control and objectives
-        'MID': 1.2,     // Mid Lane - burst and roaming
-        'DRAGON': 1.2,  // Dragon Lane - main carry
-        'SUP': 1.15     // Support - vision and utility
+        'BARON': 1.0,
+        'JGL': 1.0,
+        'MID': 1.0,
+        'DRAGON': 1.0,
+        'SUP': 1.0
     },
 
     // Order in which positions should be displayed

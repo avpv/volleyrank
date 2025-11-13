@@ -23,13 +23,12 @@ export default {
     },
 
     // Position weights for team balancing
-    // Higher weight = more important position
     positionWeights: {
-        'POS1': 1.2,  // Carry - late game win condition
-        'POS2': 1.25, // Mid - tempo and playmaker
-        'POS3': 1.15, // Offlane - space creator and initiator
-        'POS4': 1.2,  // Soft Support - roaming and vision
-        'POS5': 1.2   // Hard Support - lane babysitter and ward placer
+        'POS1': 1.0,
+        'POS2': 1.0,
+        'POS3': 1.0,
+        'POS4': 1.0,
+        'POS5': 1.0
     },
 
     // Order in which positions should be displayed

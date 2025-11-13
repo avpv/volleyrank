@@ -23,13 +23,12 @@ export default {
     },
 
     // Position weights for team balancing
-    // Higher weight = more important position
     positionWeights: {
-        'ENTRY': 1.2,   // Entry Fragger - first in
-        'BREACH': 1.25, // Hard Breacher - wall opener (critical)
-        'SUP': 1.15,    // Support - utility and intel
-        'FLEX': 1.2,    // Flex - adaptable to any role
-        'ANCHOR': 1.2   // Roamer/Anchor - site defense or flanking
+        'ENTRY': 1.0,
+        'BREACH': 1.0,
+        'SUP': 1.0,
+        'FLEX': 1.0,
+        'ANCHOR': 1.0
     },
 
     // Order in which positions should be displayed

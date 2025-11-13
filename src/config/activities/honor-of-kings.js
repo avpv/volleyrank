@@ -23,13 +23,12 @@ export default {
     },
 
     // Position weights for team balancing
-    // Higher weight = more important position
     positionWeights: {
-        'SOLO': 1.1,  // Solo Lane - frontline and tankiness
-        'JGL': 1.3,   // Jungle - objective and gank control
-        'MID': 1.2,   // Mid Lane - burst damage and rotation
-        'FARM': 1.2,  // Farm Lane - sustained damage dealer
-        'ROAM': 1.15  // Roam/Support - vision and initiation
+        'SOLO': 1.0,
+        'JGL': 1.0,
+        'MID': 1.0,
+        'FARM': 1.0,
+        'ROAM': 1.0
     },
 
     // Order in which positions should be displayed

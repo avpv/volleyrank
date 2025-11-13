@@ -23,13 +23,12 @@ export default {
     },
 
     // Position weights for team balancing
-    // Higher weight = more important position
     positionWeights: {
-        'DUEL': 1.2,  // Duelist - entry fragger
-        'INIT': 1.2,  // Initiator - information gatherer
-        'CTRL': 1.25, // Controller - map control (smoke)
-        'SENT': 1.15, // Sentinel - site anchor and defense
-        'FLEX': 1.2   // Flex/IGL - adaptable player/caller
+        'DUEL': 1.0,
+        'INIT': 1.0,
+        'CTRL': 1.0,
+        'SENT': 1.0,
+        'FLEX': 1.0
     },
 
     // Order in which positions should be displayed

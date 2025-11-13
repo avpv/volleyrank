@@ -23,13 +23,12 @@ export default {
     },
 
     // Position weights for team balancing
-    // Higher weight = more important position
     positionWeights: {
-        'TANK': 1.3,  // Tank - frontline and space creation (critical in 5v5)
-        'DPS1': 1.2,  // DPS 1 - primary damage dealer
-        'DPS2': 1.2,  // DPS 2 - secondary damage dealer
-        'SUP1': 1.2,  // Support 1 - healing and utility
-        'SUP2': 1.2   // Support 2 - healing and utility
+        'TANK': 1.0,
+        'DPS1': 1.0,
+        'DPS2': 1.0,
+        'SUP1': 1.0,
+        'SUP2': 1.0
     },
 
     // Order in which positions should be displayed

@@ -21,11 +21,10 @@ export default {
     },
 
     // Position weights for team balancing
-    // Higher weight = more important position
     positionWeights: {
-        'STR': 1.2,  // Striker - offensive plays and scoring
-        'MID': 1.25, // Midfielder - rotation and playmaking
-        'DEF': 1.2   // Defender/Goalie - last line of defense
+        'STR': 1.0,
+        'MID': 1.0,
+        'DEF': 1.0
     },
 
     // Order in which positions should be displayed

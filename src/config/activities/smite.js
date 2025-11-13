@@ -23,13 +23,12 @@ export default {
     },
 
     // Position weights for team balancing
-    // Higher weight = more important position
     positionWeights: {
-        'SOLO': 1.1,   // Solo Lane - frontline warrior
-        'JGL': 1.3,    // Jungle - ganking and objective control
-        'MID': 1.2,    // Mid Lane - burst mage
-        'CARRY': 1.2,  // Carry - main damage dealer
-        'SUP': 1.15    // Support - guardian and protection
+        'SOLO': 1.0,
+        'JGL': 1.0,
+        'MID': 1.0,
+        'CARRY': 1.0,
+        'SUP': 1.0
     },
 
     // Order in which positions should be displayed

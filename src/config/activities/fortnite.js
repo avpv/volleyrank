@@ -21,11 +21,10 @@ export default {
     },
 
     // Position weights for team balancing
-    // Higher weight = more important position
     positionWeights: {
-        'FRAG': 1.2,   // Fragger - aggressive player
-        'IGL': 1.25,   // IGL/Support - caller and support
-        'ANCHOR': 1.15 // Anchor - defensive and material management
+        'FRAG': 1.0,
+        'IGL': 1.0,
+        'ANCHOR': 1.0
     },
 
     // Order in which positions should be displayed

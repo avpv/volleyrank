@@ -21,11 +21,10 @@ export default {
     },
 
     // Position weights for team balancing
-    // Higher weight = more important position
     positionWeights: {
-        'IGL': 1.3,  // IGL/Recon - information and calling
-        'FRAG': 1.2, // Fragger/Assault - entry and damage
-        'SUP': 1.2   // Support/Controller - healing and positioning
+        'IGL': 1.0,
+        'FRAG': 1.0,
+        'SUP': 1.0
     },
 
     // Order in which positions should be displayed
