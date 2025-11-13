@@ -22,12 +22,11 @@
     border-radius: var(--radius-lg);
     padding: var(--spacing-4);
     margin-bottom: var(--spacing-4);
-    box-shadow: var(--shadow-xs);
-    transition: var(--transition-default);
+    transition: border-color var(--duration-fast) var(--ease-smooth);
 }
 
 .activity-selector-section:hover {
-    box-shadow: var(--shadow-sm);
+    border-color: var(--color-border-emphasis);
 }
 
 .activity-selector-row {
@@ -104,12 +103,11 @@
     background-color: var(--color-surface-raised);
     border: 1px solid var(--color-border-default);
     border-radius: var(--radius-md);
-    box-shadow: var(--shadow-xs);
-    transition: var(--transition-default);
+    transition: border-color var(--duration-fast) var(--ease-smooth);
 }
 
 .player-section:hover {
-    box-shadow: var(--shadow-sm);
+    border-color: var(--color-border-emphasis);
 }
 
 .player-section + .player-section {
@@ -203,12 +201,11 @@
     background-color: var(--color-surface-raised);
     border: 1px solid var(--color-border-default);
     border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-xs);
-    transition: var(--transition-default);
+    transition: border-color var(--duration-fast) var(--ease-smooth);
 }
 
 .position-selector:hover {
-    box-shadow: var(--shadow-sm);
+    border-color: var(--color-border-emphasis);
 }
 
 .position-selector label {
@@ -219,19 +216,18 @@
     margin-bottom: var(--spacing-3);
 }
 
-/* Progress Section - IMPROVED with better hierarchy */
+/* Progress Section */
 .progress-section {
     background-color: var(--color-bg-primary);
     border: 1px solid var(--color-border-default);
     border-radius: var(--radius-lg);
     padding: var(--spacing-6);
     margin-bottom: var(--spacing-8);
-    box-shadow: var(--shadow-xs);
-    transition: var(--transition-default);
+    transition: border-color var(--duration-fast) var(--ease-smooth);
 }
 
 .progress-section:hover {
-    box-shadow: var(--shadow-sm);
+    border-color: var(--color-border-emphasis);
 }
 
 .progress-section h3,
@@ -263,10 +259,8 @@
 }
 
 .progress-item:hover {
-    border-color: var(--color-border-strong);
+    border-color: var(--color-border-emphasis);
     background-color: var(--color-surface-raised);
-    transform: translateX(var(--hover-slide));
-    box-shadow: var(--shadow-xs);
 }
 
 .progress-item.disabled {
@@ -280,13 +274,9 @@
 }
 
 .progress-item.current-position {
-    background: linear-gradient(90deg,
-        var(--color-surface-interactive) 0%,
-        var(--color-surface-raised) 100%);
-    border-width: 2px;
+    background: var(--color-surface-interactive);
+    border-left: 2px solid var(--color-brand-primary);
     border-color: var(--color-brand-primary);
-    box-shadow: 0 0 0 4px rgba(47, 129, 247, 0.12),
-                0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .progress-item.current-position .progress-header span:first-child {
@@ -370,18 +360,14 @@
 
 .progress-fill {
     height: 100%;
-    background: linear-gradient(90deg,
-        var(--color-brand-primary) 0%,
-        var(--color-brand-primary-hover) 100%);
+    background: var(--color-brand-primary);
     border-radius: var(--radius-sm);
     transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
 }
 
 .progress-fill.complete {
-    background: linear-gradient(90deg,
-        var(--color-success) 0%,
-        #10b981 100%);
+    background: var(--color-success);
 }
 
 /* Comparison Area */
@@ -389,7 +375,7 @@
     background-color: var(--color-surface-raised);
     border: 1px solid var(--color-border-default);
     border-radius: var(--radius-lg);
-    padding: var(--spacing-8);
+    padding: var(--spacing-6);
     margin-bottom: var(--spacing-8);
     min-height: 400px;
     display: flex;
@@ -397,12 +383,11 @@
     align-items: center;
     justify-content: center;
     position: relative;
-    box-shadow: var(--shadow-xs);
-    transition: var(--transition-default);
+    transition: border-color var(--duration-fast) var(--ease-smooth);
 }
 
 .comparison-area:hover {
-    box-shadow: var(--shadow-sm);
+    border-color: var(--color-border-emphasis);
 }
 
 .comparison-info {
@@ -511,14 +496,12 @@
     background-color: var(--color-surface-raised);
     border: 1px solid var(--color-border-default);
     border-radius: var(--radius-lg);
-    padding: var(--spacing-8);
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: var(--spacing-6);
+    transition: border-color var(--duration-fast) var(--ease-smooth);
 }
 
 .ranking-card:hover {
-    border-color: var(--color-border-strong);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-    transform: translateY(var(--hover-lift-sm));
+    border-color: var(--color-border-emphasis);
 }
 
 .ranking-title {
@@ -549,12 +532,11 @@
     border-radius: var(--radius-lg);
     padding: var(--spacing-6);
     margin-bottom: var(--spacing-8);
-    box-shadow: var(--shadow-xs);
-    transition: var(--transition-default);
+    transition: border-color var(--duration-fast) var(--ease-smooth);
 }
 
 .team-builder:hover {
-    box-shadow: var(--shadow-sm);
+    border-color: var(--color-border-emphasis);
 }
 
 .builder-settings {
@@ -603,9 +585,7 @@
 
 .composition-item:hover {
     background-color: var(--color-surface-overlay);
-    border-color: var(--color-border-strong);
-    transform: translateX(var(--hover-slide));
-    box-shadow: var(--shadow-xs);
+    border-color: var(--color-border-emphasis);
 }
 
 .composition-item label {
@@ -663,38 +643,31 @@
     gap: var(--spacing-4);
     padding: var(--spacing-5);
     background: var(--color-surface-raised);
-    border: 2px solid;
+    border: 1px solid;
     border-radius: var(--radius-lg);
     margin-bottom: var(--spacing-6);
-    transition: var(--transition-default);
+    transition: border-color var(--duration-fast) var(--ease-smooth);
 }
 
 .balance-indicator:hover {
-    transform: translateX(var(--hover-slide));
-    box-shadow: var(--shadow-md);
+    border-color: var(--color-border-emphasis);
 }
 
 .balance-indicator--excellent {
     border-color: var(--color-success);
-    background: linear-gradient(135deg,
-        rgba(86, 211, 100, 0.1) 0%,
-        transparent 100%);
+    background: rgba(86, 211, 100, 0.08);
 }
 
 .balance-indicator--good {
     border-color: var(--color-info);
-    background: linear-gradient(135deg,
-        rgba(88, 166, 255, 0.1) 0%,
-        transparent 100%);
+    background: rgba(88, 166, 255, 0.08);
 }
 
 .balance-indicator--okay,
 .balance-indicator--fair,
 .balance-indicator--poor {
     border-color: var(--color-warning);
-    background: linear-gradient(135deg,
-        rgba(255, 193, 7, 0.1) 0%,
-        transparent 100%);
+    background: rgba(255, 193, 7, 0.08);
 }
 
 .balance-icon {
@@ -742,9 +715,7 @@
     stroke: var(--color-warning);
 }
 
-.balance-indicator:hover .balance-icon {
-    transform: scale(1.1);
-}
+/* Removed transform on hover - minimal aesthetic */
 
 .balance-content {
     flex: 1;
@@ -782,20 +753,18 @@
     background-color: var(--color-surface-raised);
     border: 1px solid var(--color-border-default);
     border-radius: var(--radius-lg);
-    padding: var(--spacing-8);
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: var(--spacing-6);
+    transition: border-color var(--duration-fast) var(--ease-smooth);
 }
 
 .team-card:hover {
-    border-color: var(--color-border-strong);
-    box-shadow: var(--shadow-card-hover);
-    transform: translateY(var(--hover-lift-sm));
+    border-color: var(--color-border-emphasis);
 }
 
 .team-header {
     margin-bottom: var(--spacing-6);
     padding-bottom: var(--spacing-4);
-    border-bottom: 2px solid var(--color-border-default);
+    border-bottom: 1px solid var(--color-border-default);
 }
 
 .team-header h4 {
@@ -832,9 +801,8 @@
 }
 
 .team-player:hover {
-    border-color: var(--color-border-strong);
+    border-color: var(--color-border-emphasis);
     background-color: var(--color-surface-raised);
-    transform: translateX(var(--hover-slide));
 }
 
 .player-info {
