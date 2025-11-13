@@ -149,11 +149,17 @@ class Router {
         // Intercept link clicks
         document.addEventListener('click', (e) => {
             const link = e.target.closest('a[href]');
-            
+
             if (!link) return;
-            
+
+            // Skip disabled links
+            if (link.classList.contains('disabled') || link.getAttribute('aria-disabled') === 'true') {
+                e.preventDefault();
+                return;
+            }
+
             let href = link.getAttribute('href');
-            
+
             // Skip external links, downloads, and targets
             if (
                 link.target ||
