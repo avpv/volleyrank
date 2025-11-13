@@ -133,8 +133,8 @@ class ComparePage extends BasePage {
 
         return `
             <div class="progress-section">
-                <label>Comparison Progress</label>
-                <div class="progress-bars">
+                <label class="mb-3">Comparison Progress</label>
+                <div class="progress-bars space-y-3">
                     ${Object.entries(positions).map(([key, name]) => {
                         const prog = progress[key];
                         const players = this.playerService.getByPosition(key);
@@ -154,17 +154,17 @@ class ComparePage extends BasePage {
                         const hasComparisons = prog.completed > 0;
                         
                         return `
-                            <div class="progress-item ${this.selectedPosition === key ? 'current-position' : ''}">
-                                <div class="progress-header">
-                                    <span>${name} (${key})</span>
-                                    <div class="progress-stats">
-                                        <span class="progress-count">${prog.completed}/${prog.total}</span>
-                                        <span class="progress-percentage ${isComplete ? 'complete' : ''}">${Math.round(prog.percentage)}%</span>
+                            <div class="progress-item ${this.selectedPosition === key ? 'current-position' : ''} transition-colors">
+                                <div class="progress-header d-flex justify-between items-center mb-2">
+                                    <span class="font-medium">${name} (${key})</span>
+                                    <div class="progress-stats d-flex gap-3">
+                                        <span class="progress-count text-sm">${prog.completed}/${prog.total}</span>
+                                        <span class="progress-percentage ${isComplete ? 'complete' : ''} text-sm font-semibold">${Math.round(prog.percentage)}%</span>
                                     </div>
                                 </div>
                                 ${hasComparisons ? `
                                     <div class="progress-bar">
-                                        <div class="progress-fill ${isComplete ? 'complete' : ''}" style="width: ${prog.percentage}%"></div>
+                                        <div class="progress-fill ${isComplete ? 'complete' : ''} transition-all duration-300" style="width: ${prog.percentage}%"></div>
                                     </div>
                                 ` : ''}
                             </div>
@@ -218,36 +218,36 @@ class ComparePage extends BasePage {
 
         return `
             <div class="comparison-area">
-                <div class="comparison-info">
-                    Comparing at: <strong>${posName}</strong>
+                <div class="comparison-info text-center mb-6">
+                    Comparing at: <strong class="text-brand">${posName}</strong>
                 </div>
 
-                <div class="comparison-cards">
-                    <div class="player-card clickable" data-winner-id="${player1.id}" data-loser-id="${player2.id}">
-                        <div class="player-avatar blue">
+                <div class="comparison-cards d-grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 items-center">
+                    <div class="player-card clickable transition-all duration-200 cursor-pointer hover:shadow-lg hover:-translate-y-1 active:scale-95" data-winner-id="${player1.id}" data-loser-id="${player2.id}">
+                        <div class="player-avatar blue d-flex items-center justify-center mb-3">
                             ${player1.name.charAt(0).toUpperCase()}
                         </div>
-                        <div class="player-name">${this.escape(player1.name)}</div>
-                        <div class="player-position">${posName}</div>
-                        <div class="player-rating">${Math.round(player1.ratings[this.selectedPosition])} ELO</div>
-                        <div class="player-comparisons">${player1.comparisons[this.selectedPosition]} comparisons</div>
+                        <div class="player-name text-center font-semibold mb-2">${this.escape(player1.name)}</div>
+                        <div class="player-position text-center text-sm text-secondary mb-2">${posName}</div>
+                        <div class="player-rating text-center font-medium mb-1">${Math.round(player1.ratings[this.selectedPosition])} ELO</div>
+                        <div class="player-comparisons text-center text-xs text-tertiary">${player1.comparisons[this.selectedPosition]} comparisons</div>
                     </div>
 
-                    <div class="vs-divider">
-                        <div class="vs-text">VS</div>
-                        <button class="draw-button" id="drawButton" data-player1-id="${player1.id}" data-player2-id="${player2.id}">
+                    <div class="vs-divider d-flex flex-column items-center gap-4 my-4 md:my-0">
+                        <div class="vs-text font-bold text-2xl md:text-3xl">VS</div>
+                        <button class="draw-button transition-all duration-200 hover:bg-surface-overlay hover:scale-105 focus:ring-brand active:scale-95" id="drawButton" data-player1-id="${player1.id}" data-player2-id="${player2.id}">
                             Win-Win
                         </button>
                     </div>
 
-                    <div class="player-card clickable" data-winner-id="${player2.id}" data-loser-id="${player1.id}">
-                        <div class="player-avatar purple">
+                    <div class="player-card clickable transition-all duration-200 cursor-pointer hover:shadow-lg hover:-translate-y-1 active:scale-95" data-winner-id="${player2.id}" data-loser-id="${player1.id}">
+                        <div class="player-avatar purple d-flex items-center justify-center mb-3">
                             ${player2.name.charAt(0).toUpperCase()}
                         </div>
-                        <div class="player-name">${this.escape(player2.name)}</div>
-                        <div class="player-position">${posName}</div>
-                        <div class="player-rating">${Math.round(player2.ratings[this.selectedPosition])} ELO</div>
-                        <div class="player-comparisons">${player2.comparisons[this.selectedPosition]} comparisons</div>
+                        <div class="player-name text-center font-semibold mb-2">${this.escape(player2.name)}</div>
+                        <div class="player-position text-center text-sm text-secondary mb-2">${posName}</div>
+                        <div class="player-rating text-center font-medium mb-1">${Math.round(player2.ratings[this.selectedPosition])} ELO</div>
+                        <div class="player-comparisons text-center text-xs text-tertiary">${player2.comparisons[this.selectedPosition]} comparisons</div>
                     </div>
                 </div>
             </div>
