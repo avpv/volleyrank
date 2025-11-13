@@ -583,6 +583,7 @@ select.form-control {
 
 .player-card.clickable {
     cursor: pointer;
+    border-width: 2px;
 }
 
 .player-card.clickable:hover {
@@ -1252,12 +1253,12 @@ select.form-control {
 }
 
 .draw-button {
-    padding: var(--spacing-2) var(--spacing-4);
+    padding: var(--spacing-3) var(--spacing-6);
     background-color: var(--color-surface-raised);
     border: 2px solid var(--color-border-default);
     border-radius: var(--radius-md);
     color: var(--color-text-secondary);
-    font-size: var(--font-size-sm);
+    font-size: var(--font-size-base);
     font-weight: var(--font-weight-semibold);
     cursor: pointer;
     transition: all var(--transition-default);
