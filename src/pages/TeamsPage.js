@@ -491,8 +491,10 @@ class TeamsPage extends BasePage {
             });
         }
 
-        // Initial update
-        updatePlayersPerTeam();
+        // Don't call updatePlayersPerTeam() here - it causes infinite loop
+        // by saving settings which triggers state:changed which triggers onUpdate()
+        // which calls attachEventListeners() again. Settings are already loaded
+        // from loadSettings() in the state:changed listener.
 
         // Optimize button
         const optimizeBtn = this.$('#optimizeBtn');
