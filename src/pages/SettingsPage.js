@@ -129,8 +129,57 @@ class SettingsPage extends BasePage {
         `;
     }
 
+    getRecentActivities() {
+        // Get all sessions from state
+        const allSessions = stateManager.get('sessions') || {};
+
+        // Collect all sessions with their activity keys and sort by creation date
+        const sessionsList = [];
+        Object.entries(allSessions).forEach(([activityKey, sessions]) => {
+            Object.values(sessions).forEach(session => {
+                sessionsList.push({
+                    activityKey,
+                    createdAt: session.createdAt
+                });
+            });
+        });
+
+        // Sort by creation date (newest first)
+        sessionsList.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+        // Get unique activity keys (up to 5)
+        const uniqueActivities = [];
+        const seen = new Set();
+
+        for (const session of sessionsList) {
+            if (!seen.has(session.activityKey)) {
+                seen.add(session.activityKey);
+                uniqueActivities.push(session.activityKey);
+
+                if (uniqueActivities.length >= 5) {
+                    break;
+                }
+            }
+        }
+
+        return uniqueActivities;
+    }
+
     renderActivitySelector() {
         const currentActivity = storage.get('selectedActivity', null);
+        const recentActivities = this.getRecentActivities();
+
+        // Separate recent and other activities
+        const allActivitiesEntries = Object.entries(activities);
+        const recentActivitySet = new Set(recentActivities);
+
+        const recentOptions = recentActivities
+            .map(key => [key, activities[key]])
+            .filter(([key, config]) => config); // Filter out any invalid activities
+
+        const otherOptions = allActivitiesEntries
+            .filter(([key]) => !recentActivitySet.has(key))
+            .sort((a, b) => a[1].name.localeCompare(b[1].name));
 
         return `
             <div class="activity-selector-section">
@@ -140,13 +189,24 @@ class SettingsPage extends BasePage {
                         <div class="activity-selector-row form-row">
                             <select id="activitySelect" class="activity-select">
                                 <option value="" ${!currentActivity ? 'selected' : ''} disabled>Select an activity...</option>
-                                ${Object.entries(activities)
-                                    .sort((a, b) => a[1].name.localeCompare(b[1].name))
-                                    .map(([key, config]) => `
-                                        <option value="${key}" ${key === currentActivity ? 'selected' : ''}>
-                                            ${config.name}
-                                        </option>
-                                    `).join('')}
+                                ${recentOptions.length > 0 ? `
+                                    <optgroup label="Recent Activities">
+                                        ${recentOptions.map(([key, config]) => `
+                                            <option value="${key}" ${key === currentActivity ? 'selected' : ''}>
+                                                ${config.name}
+                                            </option>
+                                        `).join('')}
+                                    </optgroup>
+                                ` : ''}
+                                ${otherOptions.length > 0 ? `
+                                    <optgroup label="All Activities">
+                                        ${otherOptions.map(([key, config]) => `
+                                            <option value="${key}" ${key === currentActivity ? 'selected' : ''}>
+                                                ${config.name}
+                                            </option>
+                                        `).join('')}
+                                    </optgroup>
+                                ` : ''}
                             </select>
                             <button type="button" class="btn btn--secondary" id="createSessionBtn" title="Create new session">
                                 <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="vertical-align: middle; margin-right: 4px;">
