@@ -1599,14 +1599,14 @@ select.form-control {
 .session-item__content {
     flex: 1;
     min-width: 0;
-    padding: var(--spacing-1) 0;
+    padding: 0;
 }
 
 .session-item__header {
     display: flex;
     align-items: center;
     gap: var(--spacing-2);
-    margin-bottom: var(--spacing-2);
+    margin-bottom: var(--spacing-1);
 }
 
 .session-item__icon {
@@ -1623,7 +1623,7 @@ select.form-control {
 .session-item__meta {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-1);
+    gap: 2px;
     font-size: var(--font-size-xs);
     color: var(--color-text-secondary);
 }
