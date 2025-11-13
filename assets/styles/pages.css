@@ -807,7 +807,7 @@
     }
 
     .vs-divider {
-        transform: rotate(90deg);
+        flex-direction: row;
         margin: var(--spacing-2) 0;
     }
 
