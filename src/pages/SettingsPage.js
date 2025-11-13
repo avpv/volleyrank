@@ -515,8 +515,7 @@ class SettingsPage extends BasePage {
                 storage.remove('pendingActivity');
 
                 const selectedActivity = activities[targetActivity];
-                const newSession = this.sessionService.createSession(targetActivity);
-                toast.success(`Switching to ${selectedActivity.name} and creating new session. Reloading...`, 2000);
+                toast.success(`Switching to ${selectedActivity.name}. Reloading...`, 2000);
 
                 setTimeout(() => {
                     window.location.reload();
