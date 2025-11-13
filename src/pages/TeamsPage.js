@@ -331,7 +331,7 @@ class TeamsPage extends BasePage {
         const quality = this.getBalanceQuality(weightedBalance);
 
         return `
-            <div class="teams-result animate-slide-in-up">
+            <div class="teams-result">
                 <div class="result-header d-flex flex-column md:flex-row justify-between items-start md:items-center gap-4 mb-6">
                     <h3 class="text-xl md:text-2xl font-semibold m-0">Generated Teams</h3>
                     <div class="result-controls d-flex items-center gap-4">
@@ -396,9 +396,9 @@ class TeamsPage extends BasePage {
         const showElo = this.state.showEloRatings;
 
         return `
-            <div class="group team-card transition-shadow hover:shadow-lg hover:-translate-y-1 animate-fade-in">
+            <div class="team-card">
                 <div class="team-header mb-4">
-                    <h4 class="font-semibold text-lg md:text-xl m-0 group-hover:text-brand transition-colors">Team ${index + 1}</h4>
+                    <h4 class="font-semibold text-lg md:text-xl m-0">Team ${index + 1}</h4>
                 </div>
                 ${showElo ? `
                     <div class="team-rating text-sm text-secondary mb-4 pb-3 border-b border-subtle">
@@ -437,7 +437,7 @@ class TeamsPage extends BasePage {
         const posName = this.playerService.positions[position];
 
         return `
-            <div class="team-player d-flex justify-between items-center py-2 transition-colors hover:bg-surface-raised first:pt-0 last:pb-0 first:border-t-0 last:border-b-0 odd:bg-surface-base">
+            <div class="team-player d-flex justify-between items-center py-2 first:pt-0 last:pb-0 first:border-t-0 last:border-b-0 odd:bg-surface-base">
                 <div class="player-info flex-1">
                     <div class="player-name font-medium mb-1">${this.escape(player.name)}</div>
                     <div class="player-position text-sm text-secondary">${posName}</div>

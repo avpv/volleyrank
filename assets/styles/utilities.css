@@ -441,7 +441,7 @@
 .rounded { border-radius: var(--radius-md); }
 .rounded-md { border-radius: var(--radius-md); }
 .rounded-lg { border-radius: var(--radius-lg); }
-.rounded-full { border-radius: var(--radius-full); }
+.rounded-full { border-radius: 50%; }
 
 /* Ring (Modern Focus Style - Tailwind approach) */
 .ring-0 { box-shadow: 0 0 0 0 rgba(0, 0, 0, 0); }
