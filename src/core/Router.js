@@ -188,10 +188,10 @@ class Router {
             this.navigate(href);
         });
 
-        // todo
+        // Get the current path from the URL on initialization
         const currentPath = this.getCurrentPath();
 
-        // todo
+        // Set initial history state to enable proper back/forward navigation
         const fullPath = this.basePath + currentPath;
         window.history.replaceState(
             { path: currentPath },
@@ -199,7 +199,7 @@ class Router {
             fullPath
         );
 
-        // todo
+        // Navigate to current path to trigger route handler without creating new history entry
         this.navigate(currentPath, false);
     }
 
