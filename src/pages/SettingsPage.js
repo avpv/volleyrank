@@ -12,6 +12,9 @@ import { getIcon } from '../components/base/Icons.js';
 import { activities } from '../config/activities/index.js';
 import Sidebar from '../components/Sidebar.js';
 import uiConfig from '../config/ui.js';
+import { STORAGE_KEYS } from '../utils/constants.js';
+
+const { ELEMENT_IDS, DATA_ATTRIBUTES, ANIMATION, TOAST } = uiConfig;
 
 class SettingsPage extends BasePage {
     constructor(container, props = {}) {
@@ -66,7 +69,7 @@ class SettingsPage extends BasePage {
     }
 
     mountSidebar() {
-        const sidebarContainer = document.getElementById('pageSidebar');
+        const sidebarContainer = document.getElementById(ELEMENT_IDS.SIDEBAR_CONTAINER);
         if (!sidebarContainer) return;
 
         // Check if sidebar already exists and is properly mounted
@@ -104,7 +107,7 @@ class SettingsPage extends BasePage {
     render() {
         const players = this.playerService.getAll();
         const stats = this.playerService.getPositionStats();
-        const currentActivity = storage.get('selectedActivity', null);
+        const currentActivity = storage.get(STORAGE_KEYS.SELECTED_ACTIVITY, null);
 
         return this.renderPageWithSidebar(`
             <div class="page-header">
@@ -126,7 +129,7 @@ class SettingsPage extends BasePage {
                 <h3 class="mb-3 font-semibold">Welcome to TeamBalance!</h3>
                 <p class="mb-4 text-secondary">Get started in 4 easy steps:</p>
                 <ol class="space-y-2">
-                    <li><a href="#" class="guide-link" data-action="select-activity"><strong>Select Activity Type</strong></a> from the dropdown below</li>
+                    <li><a href="#" class="guide-link" ${DATA_ATTRIBUTES.ACTION}="select-activity"><strong>Select Activity Type</strong></a> from the dropdown below</li>
                     <li><strong>Add players</strong> with their positions</li>
                     <li><strong>Compare players</strong> to build accurate skill ratings</li>
                     <li><strong>Create balanced teams</strong> automatically</li>
@@ -172,7 +175,7 @@ class SettingsPage extends BasePage {
     }
 
     renderActivitySelector() {
-        const currentActivity = storage.get('selectedActivity', null);
+        const currentActivity = storage.get(STORAGE_KEYS.SELECTED_ACTIVITY, null);
         const recentActivities = this.getRecentActivities();
 
         // Separate recent and other activities
@@ -191,9 +194,9 @@ class SettingsPage extends BasePage {
             <div class="activity-selector-section">
                 <div class="player-form">
                     <div class="form-group">
-                        <label for="activitySelect">Activity Type</label>
+                        <label :for="${ELEMENT_IDS.ACTIVITY_SELECT}">Activity Type</label>
                         <div class="activity-selector-row form-row">
-                            <select id="activitySelect" class="activity-select">
+                            <select id="${ELEMENT_IDS.ACTIVITY_SELECT}" class="activity-select">
                                 <option value="" ${!currentActivity ? 'selected' : ''} disabled>Select an activity...</option>
                                 ${recentOptions.length > 0 ? `
                                     <optgroup label="Recent Activities">
@@ -231,21 +234,21 @@ class SettingsPage extends BasePage {
     }
 
     renderAddPlayerForm() {
-        const currentActivity = storage.get('selectedActivity', null);
+        const currentActivity = storage.get(STORAGE_KEYS.SELECTED_ACTIVITY, null);
         const isOpen = !!currentActivity;
 
         return `
             <div class="accordion add-player-section">
-                <button type="button" class="accordion-header${!currentActivity ? ' disabled' : ''}" id="addPlayerAccordionHeader">
+                <button type="button" class="accordion-header${!currentActivity ? ' disabled' : ''}" id="${ELEMENT_IDS.ADD_PLAYER_ACCORDION_HEADER}">
                     <span>Add Players</span>
                     ${getIcon('chevron-down', { size: 16, className: `accordion-icon${isOpen ? ' open' : ''}` })}
                 </button>
-                <div class="accordion-content${isOpen ? ' open' : ''}" id="addPlayerAccordionContent">
+                <div class="accordion-content${isOpen ? ' open' : ''}" id="${ELEMENT_IDS.ADD_PLAYER_ACCORDION_CONTENT}">
                     <!-- Import Players Section -->
                     <div class="player-section import-section">
                         <h4 class="section-title">Import Players</h4>
                         <div class="section-content">
-                            <button type="button" class="btn btn-secondary" id="importBtn" ${!currentActivity ? 'disabled' : ''}>
+                            <button type="button" class="btn btn-secondary" id="${ELEMENT_IDS.IMPORT_BTN}" ${!currentActivity ? 'disabled' : ''}>
                                 ${getIcon('arrow-down', { size: 16, className: 'btn-icon' })}
                                 Import Players
                             </button>
@@ -255,13 +258,13 @@ class SettingsPage extends BasePage {
                     <!-- Manual Add Players Section -->
                     <div class="player-section manual-add-section">
                         <h4 class="section-title">Manual Add Players</h4>
-                        <form class="player-form" id="playerForm">
+                        <form class="player-form" id="${ELEMENT_IDS.PLAYER_FORM}">
                             <div class="form-row">
                                 <div class="form-group">
                                     <label>Player Name</label>
                                     <input
                                         type="text"
-                                        id="playerNameInput"
+                                        id="${ELEMENT_IDS.PLAYER_NAME_INPUT}"
                                         placeholder="Enter player name"
                                         required
                                         ${!currentActivity ? 'disabled' : ''}
@@ -290,11 +293,11 @@ class SettingsPage extends BasePage {
                         <h4 class="section-title">Reset & Delete</h4>
                         <div class="form-section danger-zone">
                             <div class="form-section-actions">
-                                <button type="button" class="btn btn-secondary" id="resetAllBtn" ${!currentActivity ? 'disabled' : ''}>
+                                <button type="button" class="btn btn-secondary" id="${ELEMENT_IDS.RESET_ALL_BTN}" ${!currentActivity ? 'disabled' : ''}>
                                     ${getIcon('refresh', { size: 16, className: 'btn-icon' })}
                                     Reset All Ratings
                                 </button>
-                                <button type="button" class="btn btn-secondary" id="clearAllBtn" ${!currentActivity ? 'disabled' : ''}>
+                                <button type="button" class="btn btn-secondary" id="${ELEMENT_IDS.CLEAR_ALL_BTN}" ${!currentActivity ? 'disabled' : ''}>
                                     ${getIcon('trash', { size: 16, className: 'btn-icon' })}
                                     Remove All Players
                                 </button>
@@ -392,15 +395,15 @@ class SettingsPage extends BasePage {
                 </div>
 
                 <div class="player-actions d-flex gap-2">
-                    <button class="btn btn-sm btn-secondary" data-action="edit" data-player-id="${player.id}">
+                    <button class="btn btn-sm btn-secondary" ${DATA_ATTRIBUTES.ACTION}="edit" ${DATA_ATTRIBUTES.PLAYER_ID}="${player.id}">
                         ${getIcon('edit', { size: 14, className: 'btn-icon' })}
                         Edit
                     </button>
-                    <button class="btn btn-sm btn-secondary" data-action="reset" data-player-id="${player.id}">
+                    <button class="btn btn-sm btn-secondary" ${DATA_ATTRIBUTES.ACTION}="reset" ${DATA_ATTRIBUTES.PLAYER_ID}="${player.id}">
                         ${getIcon('refresh', { size: 14, className: 'btn-icon' })}
                         Reset
                     </button>
-                    <button class="btn btn-sm btn-secondary" data-action="remove" data-player-id="${player.id}">
+                    <button class="btn btn-sm btn-secondary" ${DATA_ATTRIBUTES.ACTION}="remove" ${DATA_ATTRIBUTES.PLAYER_ID}="${player.id}">
                         ${getIcon('trash', { size: 14, className: 'btn-icon' })}
                         Remove
                     </button>
@@ -413,7 +416,7 @@ class SettingsPage extends BasePage {
         // Welcome guide links
         this.$$('.guide-link').forEach(link => {
             link.addEventListener('click', (e) => {
-                const action = link.getAttribute('data-action');
+                const action = link.getAttribute(DATA_ATTRIBUTES.ACTION);
                 if (action) {
                     e.preventDefault();
                     this.handleGuideAction(action);
@@ -422,7 +425,7 @@ class SettingsPage extends BasePage {
         });
 
         // Activity selector
-        const activitySelect = this.$('#activitySelect');
+        const activitySelect = this.$(`#${ELEMENT_IDS.ACTIVITY_SELECT}`);
         if (activitySelect) {
             activitySelect.addEventListener('change', (e) => {
                 this.handleActivityChange(e.target.value);
@@ -438,7 +441,7 @@ class SettingsPage extends BasePage {
         }
 
         // Accordion toggle
-        const accordionHeader = this.$('#addPlayerAccordionHeader');
+        const accordionHeader = this.$(`#${ELEMENT_IDS.ADD_PLAYER_ACCORDION_HEADER}`);
         if (accordionHeader) {
             accordionHeader.addEventListener('click', () => {
                 this.toggleAccordion();
@@ -446,7 +449,7 @@ class SettingsPage extends BasePage {
         }
 
         // Form submission
-        const form = this.$('#playerForm');
+        const form = this.$(`#${ELEMENT_IDS.PLAYER_FORM}`);
         if (form) {
             form.addEventListener('submit', (e) => {
                 e.preventDefault();
@@ -455,15 +458,15 @@ class SettingsPage extends BasePage {
         }
 
         // Import button
-        const importBtn = this.$('#importBtn');
+        const importBtn = this.$(`#${ELEMENT_IDS.IMPORT_BTN}`);
 
         if (importBtn) {
             importBtn.addEventListener('click', () => this.showImportModal());
         }
 
         // Reset/Clear buttons
-        const resetAllBtn = this.$('#resetAllBtn');
-        const clearAllBtn = this.$('#clearAllBtn');
+        const resetAllBtn = this.$(`#${ELEMENT_IDS.RESET_ALL_BTN}`);
+        const clearAllBtn = this.$(`#${ELEMENT_IDS.CLEAR_ALL_BTN}`);
 
         if (resetAllBtn) {
             resetAllBtn.addEventListener('click', () => this.showResetAllModal());
@@ -474,17 +477,17 @@ class SettingsPage extends BasePage {
         }
 
         // Player actions
-        this.$$('[data-action]').forEach(btn => {
+        this.$$(`[${DATA_ATTRIBUTES.ACTION}]`).forEach(btn => {
             btn.addEventListener('click', (e) => {
-                const action = btn.getAttribute('data-action');
-                const playerId = btn.getAttribute('data-player-id');
+                const action = btn.getAttribute(DATA_ATTRIBUTES.ACTION);
+                const playerId = btn.getAttribute(DATA_ATTRIBUTES.PLAYER_ID);
                 this.handlePlayerAction(action, playerId);
             });
         });
     }
 
     handleAddPlayer() {
-        const nameInput = this.$('#playerNameInput');
+        const nameInput = this.$(`#${ELEMENT_IDS.PLAYER_NAME_INPUT}`);
         const name = nameInput.value.trim();
 
         const checkedBoxes = this.$$('.position-input:checked');
@@ -508,7 +511,7 @@ class SettingsPage extends BasePage {
     }
 
     toggleAccordion() {
-        const currentActivity = storage.get('selectedActivity', null);
+        const currentActivity = storage.get(STORAGE_KEYS.SELECTED_ACTIVITY, null);
 
         // Prevent opening if no activity selected
         if (!currentActivity) {
@@ -516,7 +519,7 @@ class SettingsPage extends BasePage {
             return;
         }
 
-        const content = this.$('#addPlayerAccordionContent');
+        const content = this.$(`#${ELEMENT_IDS.ADD_PLAYER_ACCORDION_CONTENT}`);
         const icon = this.$('.accordion-icon');
 
         if (content && icon) {
@@ -529,22 +532,22 @@ class SettingsPage extends BasePage {
         switch (action) {
             case 'select-activity':
                 // Scroll to activity selector
-                const activitySelect = this.$('#activitySelect');
+                const activitySelect = this.$(`#${ELEMENT_IDS.ACTIVITY_SELECT}`);
                 if (activitySelect) {
                     activitySelect.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     // Focus the select to draw attention
-                    setTimeout(() => activitySelect.focus(), uiConfig.ANIMATION.STANDARD);
+                    setTimeout(() => activitySelect.focus(), ANIMATION.STANDARD);
                 }
                 break;
         }
     }
 
     handleActivityChange(activityKey) {
-        const currentActivity = storage.get('selectedActivity', null);
+        const currentActivity = storage.get(STORAGE_KEYS.SELECTED_ACTIVITY, null);
 
         // If empty selection, just clear pending activity
         if (!activityKey) {
-            storage.remove('pendingActivity');
+            storage.remove(STORAGE_KEYS.PENDING_ACTIVITY);
             return;
         }
 
@@ -555,7 +558,7 @@ class SettingsPage extends BasePage {
         }
 
         // Store pending activity selection
-        storage.set('pendingActivity', activityKey);
+        storage.set(STORAGE_KEYS.PENDING_ACTIVITY, activityKey);
 
         // Show info toast
         if (currentActivity !== activityKey) {
@@ -565,8 +568,8 @@ class SettingsPage extends BasePage {
 
     handleCreateSession() {
         // Check if there's a pending activity change
-        const pendingActivity = storage.get('pendingActivity', null);
-        const currentActivity = storage.get('selectedActivity', null);
+        const pendingActivity = storage.get(STORAGE_KEYS.PENDING_ACTIVITY, null);
+        const currentActivity = storage.get(STORAGE_KEYS.SELECTED_ACTIVITY, null);
 
         // Determine which activity to use (prefer pending if it exists)
         const targetActivity = pendingActivity || currentActivity;
@@ -581,21 +584,21 @@ class SettingsPage extends BasePage {
         try {
             // If activity is changing, apply it and reload
             if (pendingActivity && targetActivity !== currentActivity) {
-                storage.set('selectedActivity', targetActivity);
-                storage.remove('pendingActivity');
+                storage.set(STORAGE_KEYS.SELECTED_ACTIVITY, targetActivity);
+                storage.remove(STORAGE_KEYS.PENDING_ACTIVITY);
 
                 const selectedActivity = activities[targetActivity];
-                toast.success(`Switching to ${selectedActivity.name}. Reloading...`, uiConfig.TOAST.QUICK_DURATION);
+                toast.success(`Switching to ${selectedActivity.name}. Reloading...`, TOAST.QUICK_DURATION);
 
                 setTimeout(() => {
                     window.location.reload();
-                }, 2000);
+                }, ANIMATION.RELOAD_DELAY);
                 return;
             }
 
             // Same activity, just create a new session
             const newSession = this.sessionService.createSession(currentActivity);
-            storage.remove('pendingActivity');
+            storage.remove(STORAGE_KEYS.PENDING_ACTIVITY);
             toast.success('New session created');
             // Page will auto-update via event bus
         } catch (error) {
@@ -944,9 +947,9 @@ class SettingsPage extends BasePage {
 
                 <div class="form-group">
                     <label>Upload File (CSV or JSON)</label>
-                    <input 
-                        type="file" 
-                        id="importFileInput" 
+                    <input
+                        type="file"
+                        id="${ELEMENT_IDS.IMPORT_FILE_INPUT}"
                         accept=".csv,.json"
                         class="file-input"
                     >
@@ -954,22 +957,22 @@ class SettingsPage extends BasePage {
 
                 <div class="form-group">
                     <label>Or Paste Data</label>
-                    <textarea 
-                        id="importDataInput" 
+                    <textarea
+                        id="${ELEMENT_IDS.IMPORT_DATA_INPUT}"
                         rows="8"
                         placeholder="Paste CSV or JSON data here..."
                         class="import-textarea"
                     ></textarea>
                 </div>
 
-                <div id="importPreview"></div>
+                <div id="${ELEMENT_IDS.IMPORT_PREVIEW}"></div>
             </div>
         `;
     }
 
     attachImportModalListeners() {
-        const fileInput = document.getElementById('importFileInput');
-        const dataInput = document.getElementById('importDataInput');
+        const fileInput = document.getElementById(ELEMENT_IDS.IMPORT_FILE_INPUT);
+        const dataInput = document.getElementById(ELEMENT_IDS.IMPORT_DATA_INPUT);
 
         if (fileInput) {
             fileInput.addEventListener('change', (e) => {
@@ -990,7 +993,7 @@ class SettingsPage extends BasePage {
     async handleFileUpload(file) {
         try {
             const text = await file.text();
-            const dataInput = document.getElementById('importDataInput');
+            const dataInput = document.getElementById(ELEMENT_IDS.IMPORT_DATA_INPUT);
             if (dataInput) {
                 dataInput.value = text;
                 this.previewImportData(text);
@@ -1001,7 +1004,7 @@ class SettingsPage extends BasePage {
     }
 
     previewImportData(data) {
-        const preview = document.getElementById('importPreview');
+        const preview = document.getElementById(ELEMENT_IDS.IMPORT_PREVIEW);
         if (!preview) return;
 
         try {
@@ -1070,7 +1073,7 @@ class SettingsPage extends BasePage {
     }
 
     handleImportConfirm() {
-        const dataInput = document.getElementById('importDataInput');
+        const dataInput = document.getElementById(ELEMENT_IDS.IMPORT_DATA_INPUT);
         if (!dataInput || !dataInput.value.trim()) {
             toast.error('Please provide data to import');
             return false;

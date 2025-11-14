@@ -8,6 +8,9 @@ import Sidebar from '../components/Sidebar.js';
 import storage from '../core/StorageAdapter.js';
 import { activities } from '../config/activities/index.js';
 import { getIcon } from '../components/base/Icons.js';
+import uiConfig from '../config/ui.js';
+
+const { ELEMENT_IDS } = uiConfig;
 
 class RankingsPage extends BasePage {
     constructor(container, props = {}) {
@@ -48,7 +51,7 @@ class RankingsPage extends BasePage {
     }
 
     mountSidebar() {
-        const sidebarContainer = document.getElementById('pageSidebar');
+        const sidebarContainer = document.getElementById(ELEMENT_IDS.SIDEBAR_CONTAINER);
         if (!sidebarContainer) return;
 
         // Check if sidebar already exists and is properly mounted

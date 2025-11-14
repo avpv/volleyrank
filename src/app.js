@@ -34,6 +34,9 @@ import { initializeActivities, activities } from './config/activities/index.js';
 import { escapeHtml } from './utils/stringUtils.js';
 import { initializeServices } from './config/services.js';
 import storage from './core/StorageAdapter.js';
+import { STORAGE_KEYS } from './utils/constants.js';
+
+const { ELEMENT_IDS, DATA_ATTRIBUTES, ANIMATION, TOAST } = uiConfig;
 
 // Page imports
 import SettingsPage from './pages/SettingsPage.js';
@@ -99,7 +102,7 @@ class Application {
      * @returns {Object|null} Activity configuration with key, or null if no activity selected
      */
     loadActivityConfig() {
-        const selectedActivity = storage.get('selectedActivity', null);
+        const selectedActivity = storage.get(STORAGE_KEYS.SELECTED_ACTIVITY, null);
 
         // If no activity selected, return null
         if (!selectedActivity) {
@@ -344,7 +347,7 @@ class Application {
         }
 
         // Step 2: Get main container element
-        const container = document.getElementById('appMain');
+        const container = document.getElementById(ELEMENT_IDS.APP_MAIN);
         if (!container) {
             console.error('[ERROR] App container #appMain not found!');
             return;
@@ -431,11 +434,11 @@ class Application {
      */
     updateNavigation() {
         const links = document.querySelectorAll('.nav-link');
-        const currentActivity = storage.get('selectedActivity', null);
+        const currentActivity = storage.get(STORAGE_KEYS.SELECTED_ACTIVITY, null);
         const disabledRoutes = ['/compare/', '/rankings/', '/teams/'];
 
         links.forEach(link => {
-            const route = link.getAttribute('data-route');
+            const route = link.getAttribute(DATA_ATTRIBUTES.ROUTE);
 
             // Disable Compare, Rankings, Teams if no activity selected
             if (!currentActivity && disabledRoutes.includes(route)) {
@@ -470,8 +473,8 @@ class Application {
 
         links.forEach(link => {
             link.addEventListener('click', (e) => {
-                const route = link.getAttribute('data-route');
-                const currentActivity = storage.get('selectedActivity', null);
+                const route = link.getAttribute(DATA_ATTRIBUTES.ROUTE);
+                const currentActivity = storage.get(STORAGE_KEYS.SELECTED_ACTIVITY, null);
 
                 // Prevent navigation if no activity selected and route is disabled
                 if (!currentActivity && disabledRoutes.includes(route)) {
@@ -482,7 +485,7 @@ class Application {
                     // Use a small delay to ensure the page has loaded before scrolling
                     setTimeout(() => {
                         eventBus.emit('scroll-to-activity-selector');
-                    }, 100);
+                    }, ANIMATION.NAVIGATION_DELAY);
                 }
             });
         });
@@ -518,27 +521,27 @@ class Application {
         });
 
         eventBus.on('state:migrated', (data) => {
-            toast.success(`Data migrated to v${data.to}`, uiConfig.TOAST.DEFAULT_DURATION);
+            toast.success(`Data migrated to v${data.to}`, TOAST.DEFAULT_DURATION);
         });
 
         // Player management events
         eventBus.on('player:added', (player) => {
-            toast.success(`Player "${player.name}" added!`, uiConfig.TOAST.QUICK_DURATION);
+            toast.success(`Player "${player.name}" added!`, TOAST.QUICK_DURATION);
         });
 
         eventBus.on('player:removed', (player) => {
-            toast.info(`Player "${player.name}" removed`, uiConfig.TOAST.QUICK_DURATION);
+            toast.info(`Player "${player.name}" removed`, TOAST.QUICK_DURATION);
         });
 
         eventBus.on('player:updated', (player) => {
-            toast.success(`Player "${player.name}" updated`, uiConfig.TOAST.QUICK_DURATION);
+            toast.success(`Player "${player.name}" updated`, TOAST.QUICK_DURATION);
         });
 
         eventBus.on('player:reset', (data) => {
             const posNames = data.positions
                 .map(p => this.getPositionName(p))
                 .join(', ');
-            toast.success(`Reset ${posNames} for ${data.player.name}`, uiConfig.TOAST.MEDIUM_DURATION);
+            toast.success(`Reset ${posNames} for ${data.player.name}`, TOAST.MEDIUM_DURATION);
         });
 
         eventBus.on('players:reset-all-positions', (data) => {
@@ -546,8 +549,8 @@ class Application {
                 .map(p => this.getPositionName(p))
                 .join(', ');
             toast.success(
-                `Reset ${posNames} for ${data.playersAffected} players`, 
-                3000
+                `Reset ${posNames} for ${data.playersAffected} players`,
+                TOAST.DEFAULT_DURATION
             );
         });
 
@@ -556,7 +559,7 @@ class Application {
             const posName = this.getPositionName(data.position);
             toast.success(
                 `${data.winner.name} defeats ${data.loser.name} at ${posName}!`,
-                2500
+                TOAST.MEDIUM_DURATION
             );
         });
 
@@ -567,11 +570,11 @@ class Application {
 
         // Error events
         eventBus.on('state:save-error', () => {
-            toast.error('Failed to save data', uiConfig.TOAST.DEFAULT_DURATION);
+            toast.error('Failed to save data', TOAST.DEFAULT_DURATION);
         });
 
         eventBus.on('state:load-error', () => {
-            toast.error('Failed to load saved data', uiConfig.TOAST.DEFAULT_DURATION);
+            toast.error('Failed to load saved data', TOAST.DEFAULT_DURATION);
         });
 
         // Window lifecycle events
@@ -605,13 +608,13 @@ class Application {
         // Global synchronous error handler
         window.addEventListener('error', (event) => {
             console.error('[Global Error]', event.error);
-            toast.error('An unexpected error occurred', uiConfig.TOAST.DEFAULT_DURATION);
+            toast.error('An unexpected error occurred', TOAST.DEFAULT_DURATION);
         });
 
         // Unhandled promise rejection handler
         window.addEventListener('unhandledrejection', (event) => {
             console.error('[Unhandled Promise Rejection]', event.reason);
-            toast.error('An unexpected error occurred', uiConfig.TOAST.DEFAULT_DURATION);
+            toast.error('An unexpected error occurred', TOAST.DEFAULT_DURATION);
         });
     }
 
@@ -636,7 +639,7 @@ class Application {
      * @returns {void}
      */
     showFatalError(error) {
-        const container = document.getElementById('appMain');
+        const container = document.getElementById(ELEMENT_IDS.APP_MAIN);
         if (container) {
             container.innerHTML = `
                 <div class="error-container">

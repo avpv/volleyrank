@@ -16,6 +16,10 @@ import router from '../core/Router.js';
 import storage from '../core/StorageAdapter.js';
 import toast from './base/Toast.js';
 import { activities } from '../config/activities/index.js';
+import uiConfig from '../config/ui.js';
+import { STORAGE_KEYS } from '../utils/constants.js';
+
+const { ELEMENT_IDS, DATA_ATTRIBUTES, ANIMATION, UI_CLASSES } = uiConfig;
 
 class Sidebar extends Component {
     constructor(container, props = {}) {
@@ -103,8 +107,8 @@ class Sidebar extends Component {
 
         return `
             <div class="session-item ${isActive ? 'session-item--active' : ''}"
-                 data-session-id="${session.id}"
-                 data-activity-key="${activityKey}">
+                 ${DATA_ATTRIBUTES.SESSION_ID}="${session.id}"
+                 ${DATA_ATTRIBUTES.ACTIVITY_KEY}="${activityKey}">
                 <div class="session-item__content">
                     <div class="session-item__header">
                         <span class="session-item__name">${activityName}</span>
@@ -115,8 +119,8 @@ class Sidebar extends Component {
                     </div>
                 </div>
                 <button class="session-item__delete"
-                        data-session-id="${session.id}"
-                        data-activity-key="${activityKey}"
+                        ${DATA_ATTRIBUTES.SESSION_ID}="${session.id}"
+                        ${DATA_ATTRIBUTES.ACTIVITY_KEY}="${activityKey}"
                         title="Delete session">
                     ${getIcon('trash')}
                 </button>
@@ -175,21 +179,21 @@ class Sidebar extends Component {
     }
 
     handleSwitchSession(sessionId, activityKey) {
-        const currentActivity = storage.get('selectedActivity', null);
+        const currentActivity = storage.get(STORAGE_KEYS.SELECTED_ACTIVITY, null);
 
         const result = this.sessionService.switchSession(activityKey, sessionId);
         if (result.success) {
             // Check if switching to a different activity
             if (currentActivity !== activityKey) {
                 // Update selected activity
-                storage.set('selectedActivity', activityKey);
+                storage.set(STORAGE_KEYS.SELECTED_ACTIVITY, activityKey);
 
                 // Full page reload required when switching activities
                 // This ensures all services get the new activity config
                 toast.info(`Switching to ${activities[activityKey]?.name}...`, uiConfig.TOAST.SHORT_DURATION);
                 setTimeout(() => {
                     window.location.reload();
-                }, 1500);
+                }, ANIMATION.ACTIVITY_SWITCH_DELAY);
             } else {
                 // Same activity, just emit state change
                 this.eventBus.emit('state:changed');
@@ -201,8 +205,8 @@ class Sidebar extends Component {
     }
 
     closeMobileSidebar() {
-        const sidebar = document.getElementById('pageSidebar');
-        const backdrop = document.getElementById('sidebarBackdrop');
+        const sidebar = document.getElementById(ELEMENT_IDS.SIDEBAR_CONTAINER);
+        const backdrop = document.getElementById(ELEMENT_IDS.SIDEBAR_BACKDROP);
 
         if (!sidebar || !backdrop) {
             return;
@@ -254,8 +258,8 @@ class Sidebar extends Component {
                 if (totalSessionCount === 0) {
                     // No sessions left at all - navigate to settings page
                     // Clear selected activity since there are no sessions
-                    storage.remove('selectedActivity');
-                    storage.remove('pendingActivity');
+                    storage.remove(STORAGE_KEYS.SELECTED_ACTIVITY);
+                    storage.remove(STORAGE_KEYS.PENDING_ACTIVITY);
 
                     // Show message
                     toast.info('All sessions deleted. Please select an activity to continue.');
@@ -273,8 +277,8 @@ class Sidebar extends Component {
                 } else if (isDeletingActiveSession) {
                     // Deleted the active session for current activity - always navigate to settings
                     // Clear selected activity
-                    storage.remove('selectedActivity');
-                    storage.remove('pendingActivity');
+                    storage.remove(STORAGE_KEYS.SELECTED_ACTIVITY);
+                    storage.remove(STORAGE_KEYS.PENDING_ACTIVITY);
 
                     // Show message
                     toast.info('Session deleted. Please select an activity to continue.');
