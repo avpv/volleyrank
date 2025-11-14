@@ -426,6 +426,85 @@
     max-width: 280px;
     flex: 1;
     min-width: 250px;
+    position: relative;
+}
+
+/* Keyboard Hints */
+.keyboard-hint {
+    position: absolute;
+    top: var(--spacing-3);
+    right: var(--spacing-3);
+    width: 32px;
+    height: 32px;
+    background-color: var(--color-surface-base);
+    border: 2px solid var(--color-border-emphasis);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text-primary);
+    font-family: var(--font-family-mono);
+    transition: all var(--duration-fast) var(--ease-smooth);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+}
+
+.keyboard-hint-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    background-color: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-bold);
+    font-family: var(--font-family-mono);
+    margin-right: var(--spacing-2);
+    transition: all var(--duration-fast) var(--ease-smooth);
+}
+
+.player-card.clickable:hover .keyboard-hint {
+    border-color: var(--color-brand-primary);
+    background-color: var(--color-brand-primary);
+    color: white;
+    transform: scale(1.1);
+}
+
+.draw-button:hover .keyboard-hint-button {
+    background-color: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: scale(1.05);
+}
+
+/* Key Press Animation */
+.key-pressed {
+    animation: keyPressAnimation 0.2s ease-in-out;
+}
+
+@keyframes keyPressAnimation {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 4px rgba(47, 129, 247, 0.3);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.player-card.clickable.key-pressed {
+    border-color: var(--color-brand-primary);
+    background-color: var(--color-surface-interactive);
+}
+
+.draw-button.key-pressed {
+    transform: scale(0.95);
 }
 
 /* Comparison Progress Indicator */
@@ -1036,6 +1115,21 @@
         font-size: var(--font-size-sm);
     }
 
+    /* Smaller keyboard hints on mobile */
+    .keyboard-hint {
+        width: 24px;
+        height: 24px;
+        font-size: 0.65rem;
+        top: var(--spacing-2);
+        right: var(--spacing-2);
+    }
+
+    .keyboard-hint-button {
+        width: 20px;
+        height: 20px;
+        font-size: 0.6rem;
+    }
+
     .comparison-area {
         min-height: auto;
         padding: var(--spacing-4);
@@ -1144,6 +1238,21 @@
     .comparison-cards .player-comparisons {
         font-size: 0.65rem;
         margin-top: var(--spacing-1);
+    }
+
+    /* Even smaller keyboard hints on very small screens */
+    .keyboard-hint {
+        width: 20px;
+        height: 20px;
+        font-size: 0.6rem;
+        top: var(--spacing-1);
+        right: var(--spacing-1);
+    }
+
+    .keyboard-hint-button {
+        width: 18px;
+        height: 18px;
+        font-size: 0.55rem;
     }
 
     .composition-grid {
