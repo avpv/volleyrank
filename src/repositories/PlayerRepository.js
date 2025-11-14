@@ -16,7 +16,7 @@
  * - Reduces coupling between services and state management
  */
 
-import { getDefaultActivityKey } from '../config/activities/index.js';
+import { getFirstAvailableActivityKey } from '../config/activities/index.js';
 
 class PlayerRepository {
     /**
@@ -34,10 +34,12 @@ class PlayerRepository {
      * Get current activity key dynamically from storage
      * This ensures we always work with the correct activity after session switches
      * @private
-     * @returns {string} Current activity key
+     * @returns {string|null} Current activity key or null if not selected
      */
     _getActivityKey() {
-        return this.storageAdapter.get('selectedActivity', getDefaultActivityKey());
+        // Get selected activity, fallback to first available (for backward compatibility)
+        const selected = this.storageAdapter.get('selectedActivity', null);
+        return selected || getFirstAvailableActivityKey();
     }
 
     /**

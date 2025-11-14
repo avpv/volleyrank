@@ -136,29 +136,28 @@ export function getActivityConfig(activityName) {
 export const activities = {};
 
 /**
- * Default activity key - the first activity in the list
- */
-export const DEFAULT_ACTIVITY_KEY = Object.keys(ACTIVITY_FILES)[0];
-
-/**
  * Default activity reference - holds the default activity config
+ * Note: This is set during initialization, not a hardcoded default
  */
 export const defaultActivityRef = { current: null };
 
 /**
  * Get default activity
- * @returns {Object} Default activity configuration
+ * Returns the currently initialized default activity (first in the list)
+ * @returns {Object|null} Default activity configuration or null if not initialized
  */
 export function getDefaultActivity() {
     return defaultActivityRef.current;
 }
 
 /**
- * Get default activity key
- * @returns {string} Default activity key
+ * Get first available activity key (for fallback purposes only)
+ * Note: This is not a "default" - users should explicitly select an activity
+ * @returns {string|null} First activity key or null
  */
-export function getDefaultActivityKey() {
-    return DEFAULT_ACTIVITY_KEY;
+export function getFirstAvailableActivityKey() {
+    const keys = Object.keys(ACTIVITY_FILES);
+    return keys.length > 0 ? keys[0] : null;
 }
 
 /**
@@ -174,8 +173,11 @@ export async function initializeActivities() {
         activities[key] = loadedActivities[key];
     });
 
-    // Set default activity
-    defaultActivityRef.current = activities[DEFAULT_ACTIVITY_KEY];
+    // Set default activity reference to first available (for backward compatibility only)
+    const firstKey = getFirstAvailableActivityKey();
+    if (firstKey) {
+        defaultActivityRef.current = activities[firstKey];
+    }
 
     return activities;
 }
@@ -188,9 +190,8 @@ export default {
     getActivityConfig,
     defaultActivityRef,
     getDefaultActivity,
-    getDefaultActivityKey,
+    getFirstAvailableActivityKey,
     loadActivity,
     loadAllActivities,
-    initializeActivities,
-    DEFAULT_ACTIVITY_KEY
+    initializeActivities
 };

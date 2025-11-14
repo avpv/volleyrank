@@ -6,7 +6,7 @@
  */
 import eventBus from './EventBus.js';
 import storage from './StorageAdapter.js';
-import { getDefaultActivityKey, ACTIVITY_FILES } from '../config/activities/index.js';
+import { getFirstAvailableActivityKey, ACTIVITY_FILES } from '../config/activities/index.js';
 
 class StateManager {
     constructor() {
@@ -228,8 +228,8 @@ class StateManager {
         // Version 4.0 -> 4.1 migration (players -> playersByActivity)
         if (version < '4.1') {
 
-            // Get the currently selected activity from storage
-            const selectedActivity = storage.get('selectedActivity', getDefaultActivityKey());
+            // Get the currently selected activity from storage (fallback to first available for migration)
+            const selectedActivity = storage.get('selectedActivity', null) || getFirstAvailableActivityKey();
 
             // If old players array exists, move it to the selected activity
             if (data.players && Array.isArray(data.players)) {
@@ -391,7 +391,7 @@ class StateManager {
      * Get state statistics
      */
     getStats() {
-        const selectedActivity = storage.get('selectedActivity', getDefaultActivityKey());
+        const selectedActivity = storage.get('selectedActivity', null) || getFirstAvailableActivityKey();
         const sessions = this.state.sessions || {};
         const activeSessions = this.state.activeSessions || {};
         const activeSessionId = activeSessions[selectedActivity];
