@@ -1,5 +1,7 @@
 // src/services/PlayerService.js (Refactored)
 
+import ratingConfig from '../config/rating.js';
+
 /**
  * PlayerService - Player management business logic
  *
@@ -37,7 +39,7 @@ class PlayerService {
         this.eloService = eloService;
 
         this.positions = activityConfig?.positions || {};
-        this.DEFAULT_RATING = 1500;
+        this.DEFAULT_RATING = ratingConfig.RATING_CONSTANTS.DEFAULT;
     }
 
     /**

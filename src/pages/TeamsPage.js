@@ -9,6 +9,8 @@ import { getIcon } from '../components/base/Icons.js';
 import storage from '../core/StorageAdapter.js';
 import Sidebar from '../components/Sidebar.js';
 import { activities } from '../config/activities/index.js';
+import ratingConfig from '../config/rating.js';
+import uiConfig from '../config/ui.js';
 
 class TeamsPage extends BasePage {
     constructor(container, props = {}) {
@@ -249,8 +251,8 @@ class TeamsPage extends BasePage {
                             type="number"
                             id="teamCount"
                             value="${this.state.teamCount}"
-                            min="1"
-                            max="10"
+                            min="${uiConfig.INPUT_CONSTRAINTS.TEAM_COUNT.MIN}"
+                            max="${uiConfig.INPUT_CONSTRAINTS.TEAM_COUNT.MAX}"
                             class="team-count-input"
                         >
                     </div>
@@ -308,8 +310,8 @@ class TeamsPage extends BasePage {
                         type="number"
                         id="comp_${key}"
                         value="${this.state.composition[key]}"
-                        min="0"
-                        max="6"
+                        min="${uiConfig.INPUT_CONSTRAINTS.COMPOSITION.MIN}"
+                        max="${uiConfig.INPUT_CONSTRAINTS.COMPOSITION.MAX}"
                         class="composition-input"
                     >
                 </div>
@@ -318,9 +320,9 @@ class TeamsPage extends BasePage {
                         type="number"
                         id="weight_${key}"
                         value="${this.state.positionWeights[key]}"
-                        min="0.1"
-                        max="5.0"
-                        step="0.1"
+                        min="${uiConfig.INPUT_CONSTRAINTS.WEIGHT.MIN}"
+                        max="${uiConfig.INPUT_CONSTRAINTS.WEIGHT.MAX}"
+                        step="${uiConfig.INPUT_CONSTRAINTS.WEIGHT.STEP}"
                         class="weight-input"
                     >
                 </div>
@@ -388,10 +390,11 @@ class TeamsPage extends BasePage {
     }
 
     getBalanceQuality(weightedBalance) {
-        if (weightedBalance <= 30) return { label: 'Excellent', class: 'excellent', icon: 'target' };
-        if (weightedBalance <= 50) return { label: 'Very Good', class: 'good', icon: 'award' };
-        if (weightedBalance <= 100) return { label: 'Good', class: 'okay', icon: 'thumbs-up' };
-        if (weightedBalance <= 150) return { label: 'Fair', class: 'fair', icon: 'scale' };
+        const thresholds = ratingConfig.BALANCE_THRESHOLDS.QUALITY;
+        if (weightedBalance <= thresholds.EXCELLENT) return { label: 'Excellent', class: 'excellent', icon: 'target' };
+        if (weightedBalance <= thresholds.GOOD) return { label: 'Very Good', class: 'good', icon: 'award' };
+        if (weightedBalance <= thresholds.FAIR) return { label: 'Good', class: 'okay', icon: 'thumbs-up' };
+        if (weightedBalance <= thresholds.POOR) return { label: 'Fair', class: 'fair', icon: 'scale' };
         return { label: 'Poor', class: 'poor', icon: 'alert-triangle' };
     }
 
@@ -427,7 +430,7 @@ class TeamsPage extends BasePage {
             const position = player.assignedPosition || player.positions?.[0];
             const rating = position && player.ratings?.[position]
                 ? player.ratings[position]
-                : 1500; // DEFAULT_RATING
+                : ratingConfig.RATING_CONSTANTS.DEFAULT;
 
             const weight = this.state.positionWeights[position] || 1.0;
             weightedTotal += rating * weight;

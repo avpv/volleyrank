@@ -7,6 +7,8 @@
 import eventBus from './EventBus.js';
 import storage from './StorageAdapter.js';
 import { ACTIVITY_FILES } from '../config/activities/index.js';
+import ratingConfig from '../config/rating.js';
+import uiConfig from '../config/ui.js';
 
 class StateManager {
     constructor() {
@@ -117,7 +119,7 @@ class StateManager {
 
         this.saveTimeout = setTimeout(() => {
             this.save();
-        }, 500);
+        }, uiConfig.DEBOUNCE.SAVE);
     }
 
     /**
@@ -199,7 +201,7 @@ class StateManager {
                     const comparedWith = {};
 
                     positions.forEach(pos => {
-                        ratings[pos] = player.rating || 1500;
+                        ratings[pos] = player.rating || ratingConfig.RATING_CONSTANTS.DEFAULT;
                         comparisons[pos] = player.comparisons || 0;
                         comparedWith[pos] = player.comparedWith || [];
                     });

@@ -11,6 +11,7 @@ import Modal from '../components/base/Modal.js';
 import { getIcon } from '../components/base/Icons.js';
 import { activities } from '../config/activities/index.js';
 import Sidebar from '../components/Sidebar.js';
+import uiConfig from '../config/ui.js';
 
 class SettingsPage extends BasePage {
     constructor(container, props = {}) {
@@ -532,7 +533,7 @@ class SettingsPage extends BasePage {
                 if (activitySelect) {
                     activitySelect.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     // Focus the select to draw attention
-                    setTimeout(() => activitySelect.focus(), 300);
+                    setTimeout(() => activitySelect.focus(), uiConfig.ANIMATION.STANDARD);
                 }
                 break;
         }
@@ -865,7 +866,7 @@ class SettingsPage extends BasePage {
 
         setTimeout(() => {
             this.attachImportModalListeners();
-        }, 100);
+        }, uiConfig.ANIMATION.SHORT);
     }
 
     renderImportModalContent() {

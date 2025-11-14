@@ -8,40 +8,28 @@
 
 import { isEmpty } from './stringUtils.js';
 import ratingConfig from '../config/rating.js';
+import validationConfig from '../config/validation.js';
 import { activities } from '../config/activities/index.js';
 import storage from '../core/StorageAdapter.js';
 
 /**
  * Validation constants
  * Centralized limits and constraints
+ *
+ * NOTE: Now imported from config/validation.js for single source of truth
  */
 export const VALIDATION_LIMITS = {
     /** Player name constraints */
-    NAME: {
-        MIN_LENGTH: 1,
-        MAX_LENGTH: 50,
-        PATTERN: /^[a-zA-Z0-9\s\-_.'']+$/
-    },
+    NAME: validationConfig.NAME_VALIDATION,
 
     /** Player constraints */
-    PLAYER: {
-        MIN_POSITIONS: 1,
-        MAX_POSITIONS: 3
-    },
+    PLAYER: validationConfig.POSITION_VALIDATION,
 
     /** Comparison constraints */
-    COMPARISON: {
-        MIN_PLAYERS: 2,
-        MIN_POOL_SIZE: 1
-    },
+    COMPARISON: validationConfig.COMPARISON_VALIDATION,
 
     /** Team constraints */
-    TEAM: {
-        MIN_TEAMS: 1,
-        MAX_TEAMS: 10,
-        MIN_PLAYERS_PER_TEAM: 1,
-        MAX_PLAYERS_PER_TEAM: 20
-    },
+    TEAM: validationConfig.TEAM_VALIDATION,
 
     /** Rating constraints (from config) */
     RATING: {
