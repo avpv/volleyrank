@@ -508,6 +508,7 @@
     border-color: var(--color-brand-primary);
     color: white;
     box-shadow: 0 0 0 4px rgba(47, 129, 247, 0.5), 0 6px 16px rgba(47, 129, 247, 0.4);
+    transition: none; /* Disable transition during animation to prevent conflicts */
 }
 
 @keyframes keyboardHintFill {
@@ -539,6 +540,7 @@
     animation: keyboardHintButtonFill 0.4s ease-out forwards;
     border-color: rgba(255, 255, 255, 0.9);
     box-shadow: 0 0 16px rgba(255, 255, 255, 0.8);
+    transition: none; /* Disable transition during animation to prevent conflicts */
 }
 
 @keyframes keyboardHintButtonFill {
