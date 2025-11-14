@@ -16,8 +16,6 @@
  * - Reduces coupling between services and state management
  */
 
-import { getFirstAvailableActivityKey } from '../config/activities/index.js';
-
 class PlayerRepository {
     /**
      * @param {StateManager} stateManager - State management service
@@ -37,9 +35,7 @@ class PlayerRepository {
      * @returns {string|null} Current activity key or null if not selected
      */
     _getActivityKey() {
-        // Get selected activity, fallback to first available (for backward compatibility)
-        const selected = this.storageAdapter.get('selectedActivity', null);
-        return selected || getFirstAvailableActivityKey();
+        return this.storageAdapter.get('selectedActivity', null);
     }
 
     /**

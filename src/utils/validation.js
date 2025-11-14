@@ -1,6 +1,7 @@
 // src/utils/validation.js
 
-import { getDefaultActivity } from '../config/activities/index.js';
+import { activities } from '../config/activities/index.js';
+import storage from '../core/StorageAdapter.js';
 
 /**
  * Validation Utilities
@@ -14,16 +15,16 @@ export const VALIDATION_RULES = {
 };
 
 /**
- * Get valid positions from default activity config (single source of truth)
- * @returns {string[]} Array of valid position keys
+ * Get valid positions from currently selected activity
+ * @returns {string[]} Array of valid position keys, empty if no activity selected
  */
 export function getValidPositions() {
-    const defaultActivity = getDefaultActivity();
-    return defaultActivity ? Object.keys(defaultActivity.positions) : [];
+    const selectedActivity = storage.get('selectedActivity', null);
+    if (!selectedActivity || !activities[selectedActivity]) {
+        return [];
+    }
+    return Object.keys(activities[selectedActivity].positions);
 }
-
-// Backwards compatibility - deprecated, use getValidPositions() instead
-export const VALID_POSITIONS = getValidPositions();
 
 /**
  * Validate player name

@@ -29,7 +29,7 @@ import stateManager from './core/StateManager.js';
 import toast from './components/base/Toast.js';
 import redirectModule from './redirect.js';
 import { getIcon } from './components/base/Icons.js';
-import { initializeActivities, activities, getDefaultActivity, getFirstAvailableActivityKey } from './config/activities/index.js';
+import { initializeActivities, activities } from './config/activities/index.js';
 import { escapeHtml } from './utils/stringUtils.js';
 import { initializeServices } from './config/services.js';
 import storage from './core/StorageAdapter.js';
@@ -92,7 +92,7 @@ class Application {
     }
 
     /**
-     * Load activity configuration from localStorage or use default
+     * Load activity configuration from localStorage
      *
      * @private
      * @returns {Object|null} Activity configuration with key, or null if no activity selected
@@ -108,13 +108,8 @@ class Application {
         const activityConfig = activities[selectedActivity];
 
         if (!activityConfig) {
-            console.warn(`Activity '${selectedActivity}' not found, using first available activity`);
-            const firstKey = getFirstAvailableActivityKey();
-            if (!firstKey) {
-                console.error('No activities available');
-                return null;
-            }
-            return { key: firstKey, config: activities[firstKey] };
+            console.warn(`Activity '${selectedActivity}' not found`);
+            return null;
         }
 
         return { key: selectedActivity, config: activityConfig };
@@ -146,14 +141,10 @@ class Application {
             await initializeActivities();
 
             // Reload activity config after activities are initialized
-            // This ensures getDefaultActivity() returns a valid config
             this.activityConfig = this.loadActivityConfig();
 
-            // Check if activity is selected
-
-            // Step 1: Initialize services with activity config (or default if none)
-            const defaultActivity = getDefaultActivity();
-            const configForServices = this.activityConfig ? this.activityConfig.config : defaultActivity;
+            // Step 1: Initialize services with activity config (or null if none selected)
+            const configForServices = this.activityConfig ? this.activityConfig.config : null;
             this.services = initializeServices(configForServices);
 
             // Step 2: Handle GitHub Pages 404 redirect

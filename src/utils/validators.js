@@ -8,7 +8,8 @@
 
 import { isEmpty } from './stringUtils.js';
 import ratingConfig from '../config/rating.js';
-import { getDefaultActivity } from '../config/activities/index.js';
+import { activities } from '../config/activities/index.js';
+import storage from '../core/StorageAdapter.js';
 
 /**
  * Validation constants
@@ -156,8 +157,19 @@ export function validatePosition(position, options = {}) {
         return false;
     }
 
-    const defaultActivity = getDefaultActivity();
-    const validPositions = defaultActivity ? Object.keys(defaultActivity.positions) : [];
+    // Get currently selected activity
+    const selectedActivity = storage.get('selectedActivity', null);
+    if (!selectedActivity || !activities[selectedActivity]) {
+        const error = new ValidationError(
+            'No activity selected',
+            'position',
+            'NO_ACTIVITY_SELECTED'
+        );
+        if (throwError) throw error;
+        return false;
+    }
+
+    const validPositions = Object.keys(activities[selectedActivity].positions);
     if (!validPositions.includes(position)) {
         const error = new ValidationError(
             `Invalid position. Must be one of: ${validPositions.join(', ')}`,

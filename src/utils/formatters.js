@@ -1,6 +1,7 @@
 // src/utils/formatters.js
 
-import { getDefaultActivity } from '../config/activities/index.js';
+import { activities } from '../config/activities/index.js';
+import storage from '../core/StorageAdapter.js';
 
 /**
  * Data Formatting Utilities
@@ -55,12 +56,12 @@ export function formatPercentage(value, decimals = 0) {
 
 /**
  * Format position name
- * Uses positions from default activity config for consistency
+ * Uses positions from currently selected activity config
  */
 export function formatPosition(positionKey) {
-    const defaultActivity = getDefaultActivity();
-    if (defaultActivity && defaultActivity.positions) {
-        return defaultActivity.positions[positionKey] || positionKey;
+    const selectedActivity = storage.get('selectedActivity', null);
+    if (selectedActivity && activities[selectedActivity]) {
+        return activities[selectedActivity].positions[positionKey] || positionKey;
     }
     return positionKey;
 }

@@ -136,31 +136,6 @@ export function getActivityConfig(activityName) {
 export const activities = {};
 
 /**
- * Default activity reference - holds the default activity config
- * Note: This is set during initialization, not a hardcoded default
- */
-export const defaultActivityRef = { current: null };
-
-/**
- * Get default activity
- * Returns the currently initialized default activity (first in the list)
- * @returns {Object|null} Default activity configuration or null if not initialized
- */
-export function getDefaultActivity() {
-    return defaultActivityRef.current;
-}
-
-/**
- * Get first available activity key (for fallback purposes only)
- * Note: This is not a "default" - users should explicitly select an activity
- * @returns {string|null} First activity key or null
- */
-export function getFirstAvailableActivityKey() {
-    const keys = Object.keys(ACTIVITY_FILES);
-    return keys.length > 0 ? keys[0] : null;
-}
-
-/**
  * Initialize all activities
  * This should be called once during app startup
  * @returns {Promise<Object>} Loaded activities object
@@ -173,12 +148,6 @@ export async function initializeActivities() {
         activities[key] = loadedActivities[key];
     });
 
-    // Set default activity reference to first available (for backward compatibility only)
-    const firstKey = getFirstAvailableActivityKey();
-    if (firstKey) {
-        defaultActivityRef.current = activities[firstKey];
-    }
-
     return activities;
 }
 
@@ -188,9 +157,6 @@ export { loadActivity, loadAllActivities, ACTIVITY_FILES };
 export default {
     activities,
     getActivityConfig,
-    defaultActivityRef,
-    getDefaultActivity,
-    getFirstAvailableActivityKey,
     loadActivity,
     loadAllActivities,
     initializeActivities
