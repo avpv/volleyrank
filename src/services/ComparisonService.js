@@ -123,8 +123,9 @@ class ComparisonService {
         if (players.length < 2) {
             return {
                 canCompare: false,
-                reason: 'Need at least 2 players',
-                playerCount: players.length
+                reason: `Need at least 2 players for comparison. Currently ${players.length} player${players.length === 1 ? '' : 's'} at this position.`,
+                playerCount: players.length,
+                insufficientPlayers: true
             };
         }
 
@@ -133,7 +134,7 @@ class ComparisonService {
         if (!pair) {
             return {
                 canCompare: false,
-                reason: 'All pairs compared',
+                reason: 'All comparisons have been completed for this position.',
                 playerCount: players.length,
                 allPairsCompared: true
             };

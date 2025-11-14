@@ -296,6 +296,20 @@ class ComparePage extends BasePage {
                 this.loadNextPair();
                 this.update();
 
+                // Show notifications for position selection
+                if (this.selectedPosition) {
+                    const status = this.comparisonService.checkStatus(this.selectedPosition);
+                    const positionName = this.activityConfig.positions[this.selectedPosition];
+
+                    if (!status.canCompare) {
+                        if (status.insufficientPlayers) {
+                            toast.info(`${positionName}: Need at least 2 players for comparison. Currently ${status.playerCount} player${status.playerCount === 1 ? '' : 's'} at this position.`);
+                        } else if (status.allPairsCompared) {
+                            toast.success(`${positionName}: All comparisons have been completed for this position.`);
+                        }
+                    }
+                }
+
                 // Scroll to comparison area if there are pairs to compare
                 if (this.currentPair) {
                     this.scrollToComparisonArea();
