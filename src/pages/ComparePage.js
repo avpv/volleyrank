@@ -63,10 +63,25 @@ class ComparePage extends BasePage {
     }
 
     onDestroy() {
+        // Remove keyboard event listener
+        if (this.handleKeyboard) {
+            document.removeEventListener('keydown', this.handleKeyboard);
+        }
+
         if (this.sidebar) {
             this.sidebar.destroy();
             this.sidebar = null;
         }
+    }
+
+    animateKeyPress(element) {
+        // Add animation class
+        element.classList.add('key-pressed');
+
+        // Remove animation class after animation completes
+        setTimeout(() => {
+            element.classList.remove('key-pressed');
+        }, 200);
     }
 
     mountSidebar() {
@@ -233,7 +248,8 @@ class ComparePage extends BasePage {
                 </div>
 
                 <div class="comparison-cards d-grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 items-center">
-                    <div class="player-card clickable cursor-pointer" data-winner-id="${player1.id}" data-loser-id="${player2.id}">
+                    <div class="player-card clickable cursor-pointer" id="leftPlayerCard" data-winner-id="${player1.id}" data-loser-id="${player2.id}">
+                        <div class="keyboard-hint">A</div>
                         <div class="player-avatar blue d-flex items-center justify-center mb-3">
                             ${player1.name.charAt(0).toUpperCase()}
                         </div>
@@ -246,11 +262,13 @@ class ComparePage extends BasePage {
                     <div class="vs-divider d-flex flex-column items-center gap-4 my-4 md:my-0">
                         <div class="vs-text font-bold text-2xl md:text-3xl">VS</div>
                         <button class="draw-button" id="drawButton" data-player1-id="${player1.id}" data-player2-id="${player2.id}">
+                            <span class="keyboard-hint-button">W</span>
                             Win-Win
                         </button>
                     </div>
 
-                    <div class="player-card clickable cursor-pointer" data-winner-id="${player2.id}" data-loser-id="${player1.id}">
+                    <div class="player-card clickable cursor-pointer" id="rightPlayerCard" data-winner-id="${player2.id}" data-loser-id="${player1.id}">
+                        <div class="keyboard-hint">D</div>
                         <div class="player-avatar purple d-flex items-center justify-center mb-3">
                             ${player2.name.charAt(0).toUpperCase()}
                         </div>
@@ -288,6 +306,57 @@ class ComparePage extends BasePage {
     }
 
     attachEventListeners() {
+        // Keyboard shortcuts for comparison
+        this.handleKeyboard = (e) => {
+            // Only handle keyboard shortcuts if we have an active comparison
+            if (!this.currentPair) return;
+
+            // Don't handle shortcuts if user is typing in an input/textarea
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
+                return;
+            }
+
+            const key = e.key.toLowerCase();
+
+            if (key === 'a') {
+                e.preventDefault();
+                const leftCard = this.$('#leftPlayerCard');
+                if (leftCard) {
+                    this.animateKeyPress(leftCard);
+                    const winnerId = leftCard.getAttribute('data-winner-id');
+                    const loserId = leftCard.getAttribute('data-loser-id');
+                    if (winnerId && loserId) {
+                        this.handleComparison(winnerId, loserId);
+                    }
+                }
+            } else if (key === 'd') {
+                e.preventDefault();
+                const rightCard = this.$('#rightPlayerCard');
+                if (rightCard) {
+                    this.animateKeyPress(rightCard);
+                    const winnerId = rightCard.getAttribute('data-winner-id');
+                    const loserId = rightCard.getAttribute('data-loser-id');
+                    if (winnerId && loserId) {
+                        this.handleComparison(winnerId, loserId);
+                    }
+                }
+            } else if (key === 'w') {
+                e.preventDefault();
+                const drawButton = this.$('#drawButton');
+                if (drawButton) {
+                    this.animateKeyPress(drawButton);
+                    const player1Id = drawButton.getAttribute('data-player1-id');
+                    const player2Id = drawButton.getAttribute('data-player2-id');
+                    if (player1Id && player2Id) {
+                        this.handleDraw(player1Id, player2Id);
+                    }
+                }
+            }
+        };
+
+        // Add keyboard event listener
+        document.addEventListener('keydown', this.handleKeyboard);
+
         // Position selector
         const positionSelect = this.$('#positionSelect');
         if (positionSelect) {
