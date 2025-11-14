@@ -126,7 +126,7 @@ class SettingsPage extends BasePage {
             <div class="welcome-guide" role="complementary" aria-label="Getting started guide">
                 <h3 class="mb-3 font-semibold">👋 Welcome to TeamBalance!</h3>
                 <p class="mb-4 text-secondary">
-                    Create perfectly balanced teams using AI-powered ELO ratings. Get started in 4 simple steps:
+                    Create perfectly balanced teams. Get started in 4 simple steps:
                 </p>
                 <ol class="space-y-2">
                     <li>
