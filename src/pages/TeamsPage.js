@@ -124,19 +124,16 @@ class TeamsPage extends BasePage {
             this.sidebar.destroy();
         }
 
-        // Use the activityKey passed as prop instead of storage with hardcoded fallback
+        // Use the activityKey passed as prop (can be null if no activity selected)
         const activityKey = this.activityKey;
-        if (!activityKey) {
-            // No activity context, skip sidebar creation
-            return;
-        }
-        const activityConfig = activities[activityKey];
+        const activityConfig = activityKey ? activities[activityKey] : null;
 
+        // Always create sidebar - it will show all sessions from all activities
         this.sidebar = new Sidebar(sidebarContainer, {
             sessionService: this.sessionService,
             eventBus: this.eventBus,
-            activityKey: activityKey,
-            activityName: activityConfig?.name || 'Unknown'
+            activityKey: activityKey, // Can be null
+            activityName: activityConfig?.name || null
         });
 
         this.sidebar.mount();

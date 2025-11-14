@@ -275,15 +275,25 @@ class Sidebar extends Component {
                         window.location.reload();
                     }
                 } else if (isDeletingActiveSession) {
-                    // Deleted the active session for current activity - always navigate to settings
-                    // Clear selected activity
+                    // Deleted the active session for current activity
+                    // Clear selected activity so user can choose from remaining sessions
                     storage.remove(STORAGE_KEYS.SELECTED_ACTIVITY);
                     storage.remove(STORAGE_KEYS.PENDING_ACTIVITY);
 
-                    // Show message
-                    toast.info('Session deleted. Please select an activity to continue.');
+                    // Check if there are any remaining sessions at all
+                    const allActivities = this.sessionService.sessionRepository.stateManager.get('sessions') || {};
+                    const totalSessionCount = Object.values(allActivities).reduce((count, sessions) => {
+                        return count + Object.keys(sessions || {}).length;
+                    }, 0);
 
-                    // Force immediate save before navigation/reload to ensure deletion persists
+                    // Show appropriate message
+                    if (totalSessionCount > 0) {
+                        toast.info('Session deleted. Select a session from the sidebar to continue.');
+                    } else {
+                        toast.info('Session deleted. Please select an activity to continue.');
+                    }
+
+                    // Force immediate save before navigation/reload
                     this.sessionService.sessionRepository.stateManager.save();
 
                     // Navigate to settings
