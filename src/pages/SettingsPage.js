@@ -1110,13 +1110,17 @@ class SettingsPage extends BasePage {
     }
 
     handleClearAll() {
-        if (!confirm('Remove all players? This cannot be undone!')) return;
+        if (!confirm('Remove all players from the current session? This cannot be undone!')) return;
 
         try {
-            stateManager.reset({ clearStorage: true });
-            toast.success('All players removed');
-            // Force update UI after deleting all players
-            this.update();
+            const players = this.playerService.getAll();
+
+            // Remove each player from the current session
+            players.forEach(player => {
+                this.playerService.remove(player.id);
+            });
+
+            toast.success('All players removed from current session');
         } catch (error) {
             toast.error('Failed to remove players');
             console.error('Clear all error:', error);
