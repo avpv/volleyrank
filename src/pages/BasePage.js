@@ -138,17 +138,17 @@ class BasePage extends Component {
     /**
      * Render loading state
      */
-    renderLoading() {
+    renderLoading(message = 'Loading...') {
         return `
-            <div class="loading d-flex flex-column items-center justify-center animate-fade-in">
-                <div class="loading-spinner mb-4 animate-spin"></div>
-                <p class="text-secondary animate-pulse">Loading...</p>
+            <div class="loading d-flex flex-column items-center justify-center animate-fade-in" role="status" aria-live="polite">
+                <div class="loading-spinner mb-4 animate-spin" aria-hidden="true"></div>
+                <p class="text-secondary animate-pulse">${this.escape(message)}</p>
             </div>
         `;
     }
 
     /**
-     * Render empty state with improved structure
+     * Render empty state with improved structure and accessibility
      * @param {string} message - Main message or description
      * @param {string} icon - Optional icon/SVG content
      * @param {string} title - Optional title (if not provided, message is used as description)
@@ -160,22 +160,29 @@ class BasePage extends Component {
         const descriptionText = hasTitle ? message : message;
 
         return `
-            <div class="empty-state animate-fade-in">
-                ${icon ? `<div class="empty-state__icon">${icon}</div>` : ''}
-                ${hasTitle ? `<div class="empty-state__title">${this.escape(titleText)}</div>` : ''}
-                <div class="empty-state__description">${hasTitle ? this.escape(descriptionText) : this.escape(message)}</div>
+            <div class="empty-state animate-fade-in" role="status" aria-label="${hasTitle ? this.escape(titleText) : 'Empty state'}">
+                ${icon ? `<div class="empty-state__icon" aria-hidden="true">${icon}</div>` : ''}
+                ${hasTitle ? `<h3 class="empty-state__title">${this.escape(titleText)}</h3>` : ''}
+                <p class="empty-state__description">${hasTitle ? this.escape(descriptionText) : this.escape(message)}</p>
             </div>
         `;
     }
 
     /**
-     * Render error state
+     * Render error state with improved accessibility
      */
-    renderError(message) {
+    renderError(message, title = 'Error') {
         return `
-            <div class="error-state d-flex items-center gap-2">
-                <div class="error-icon d-flex items-center justify-center">!</div>
-                <p class="m-0">${this.escape(message)}</p>
+            <div class="error-state d-flex items-center gap-2" role="alert" aria-live="assertive">
+                <div class="error-icon d-flex items-center justify-center" aria-hidden="true">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zM7 4v5h2V4H7zm0 6v2h2v-2H7z"/>
+                    </svg>
+                </div>
+                <div>
+                    ${title ? `<strong class="error-title">${this.escape(title)}:</strong> ` : ''}
+                    <span>${this.escape(message)}</span>
+                </div>
             </div>
         `;
     }
