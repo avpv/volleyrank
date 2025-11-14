@@ -127,7 +127,19 @@ class TeamsPage extends BasePage {
         // Use the activityKey passed as prop instead of storage with hardcoded fallback
         const activityKey = this.activityKey;
         if (!activityKey) {
-            // No activity context, skip sidebar creation
+            // No activity context, show placeholder message
+            sidebarContainer.innerHTML = `
+                <div class="sidebar">
+                    <div class="sidebar__header">
+                        <h3 class="sidebar__title">Recents</h3>
+                    </div>
+                    <div class="sidebar__empty">
+                        <p>No sessions</p>
+                        <p class="text-muted">Create your first teams</p>
+                    </div>
+                </div>
+            `;
+            // Don't setup mobile sidebar toggle since there's no interactive sidebar
             return;
         }
         const activityConfig = activities[activityKey];
