@@ -23,6 +23,7 @@ class SettingsPage extends BasePage {
 
         // Get services from props
         this.activityConfig = props.activityConfig;
+        this.activityKey = props.activityKey; // Key like 'volleyball', 'basketball', etc.
         this.playerService = props.services?.resolve('playerService');
         this.sessionService = props.services?.resolve('sessionService');
         this.eventBus = props.services?.resolve('eventBus');

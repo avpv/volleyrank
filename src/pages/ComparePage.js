@@ -20,6 +20,7 @@ class ComparePage extends BasePage {
 
         // Get services from props
         this.activityConfig = props.activityConfig;
+        this.activityKey = props.activityKey; // Key like 'volleyball', 'basketball', etc.
         this.playerService = props.services?.resolve('playerService');
         this.comparisonService = props.services?.resolve('comparisonService');
         this.sessionService = props.services?.resolve('sessionService');
