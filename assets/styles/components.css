@@ -1374,10 +1374,6 @@ select.form-control {
     margin-bottom: 0;
 }
 
-.ranking-item:first-child {
-    border-bottom: 1px solid var(--color-border-default);
-}
-
 .ranking-item:last-child {
     border-bottom: none;
 }
@@ -1385,10 +1381,6 @@ select.form-control {
 .ranking-item:hover {
     background-color: var(--color-surface-overlay);
     border-bottom-color: var(--color-border-emphasis);
-}
-
-.ranking-item:first-child:hover {
-    border-bottom-color: var(--color-border-strong);
 }
 
 .rank-badge {
