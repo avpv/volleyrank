@@ -408,6 +408,8 @@ class ComparePage extends BasePage {
                         return;
                     }
 
+                    // Animate the card on click
+                    this.animateKeyPress(card);
                     this.handleComparison(winnerId, loserId);
                 });
             });
@@ -428,6 +430,8 @@ class ComparePage extends BasePage {
                     return;
                 }
 
+                // Animate the button on click
+                this.animateKeyPress(drawButton);
                 this.handleDraw(player1Id, player2Id);
             });
         }
