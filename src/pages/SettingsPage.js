@@ -80,13 +80,18 @@ class SettingsPage extends BasePage {
             this.sidebar.destroy();
         }
 
-        const selectedActivity = storage.get('selectedActivity', 'volleyball');
-        const activityConfig = activities[selectedActivity];
+        // Use the activityKey passed as prop instead of storage with hardcoded fallback
+        const activityKey = this.activityKey;
+        if (!activityKey) {
+            // No activity context, skip sidebar creation
+            return;
+        }
+        const activityConfig = activities[activityKey];
 
         this.sidebar = new Sidebar(sidebarContainer, {
             sessionService: this.sessionService,
             eventBus: this.eventBus,
-            activityKey: selectedActivity,
+            activityKey: activityKey,
             activityName: activityConfig?.name || 'Unknown'
         });
 
