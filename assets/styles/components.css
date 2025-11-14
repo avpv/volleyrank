@@ -1368,22 +1368,11 @@ select.form-control {
    ============================================================================= */
 
 .ranking-item {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-4);
-    padding: var(--spacing-4);
-    border-bottom: 1px solid var(--color-border-default);
     transition: var(--transition-default);
-    margin-bottom: 0;
-}
-
-.ranking-item:last-child {
-    border-bottom: none;
 }
 
 .ranking-item:hover {
     background-color: var(--color-surface-overlay);
-    border-bottom-color: var(--color-border-emphasis);
 }
 
 .rank-badge {
@@ -1653,11 +1642,6 @@ select.form-control {
         padding-top: 0;
     }
 
-    .ranking-item {
-        padding: var(--spacing-3);
-        gap: var(--spacing-3);
-    }
-    
     .welcome-guide {
         padding: var(--spacing-4);
     }
@@ -1736,10 +1720,6 @@ textarea:focus-visible {
 
     .progress-bar {
         background: var(--color-brand-primary);
-    }
-
-    .ranking-item {
-        border-bottom-width: 2px;
     }
 }
 
