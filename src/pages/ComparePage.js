@@ -81,7 +81,7 @@ class ComparePage extends BasePage {
         // Remove animation class after animation completes
         setTimeout(() => {
             element.classList.remove('key-pressed');
-        }, 200);
+        }, 400);
     }
 
     mountSidebar() {
