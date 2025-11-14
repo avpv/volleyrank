@@ -731,10 +731,11 @@ class SettingsPage extends BasePage {
                     <div class="positions-grid">
                         ${Object.entries(this.playerService.positions).map(([key, name]) => `
                             <label class="position-checkbox">
-                                <input 
-                                    type="checkbox" 
-                                    name="editPositions" 
+                                <input
+                                    type="checkbox"
+                                    name="editPositions"
                                     value="${key}"
+                                    class="position-input"
                                     ${player.positions.includes(key) ? 'checked' : ''}
                                 >
                                 <span class="position-label">${name} (${key})</span>
@@ -795,10 +796,11 @@ class SettingsPage extends BasePage {
                             const comparisons = player.comparisons[pos];
                             return `
                                 <label class="position-checkbox">
-                                    <input 
-                                        type="checkbox" 
-                                        name="resetPositions" 
+                                    <input
+                                        type="checkbox"
+                                        name="resetPositions"
                                         value="${pos}"
+                                        class="position-input"
                                         checked
                                     >
                                     <span class="position-label">
@@ -874,10 +876,11 @@ class SettingsPage extends BasePage {
                                     sum + (p.comparisons[pos] || 0), 0);
                                 return `
                                     <label class="position-checkbox">
-                                        <input 
-                                            type="checkbox" 
-                                            name="resetAllPositions" 
+                                        <input
+                                            type="checkbox"
+                                            name="resetAllPositions"
                                             value="${pos}"
+                                            class="position-input"
                                             checked
                                         >
                                         <span class="position-label">
