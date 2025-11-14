@@ -23,7 +23,7 @@
 
 class PlayerService {
     /**
-     * @param {Object} activityConfig - Activity configuration
+     * @param {Object|null} activityConfig - Activity configuration (null if no activity selected)
      * @param {PlayerRepository} playerRepository - Player data repository
      * @param {ValidationService} validationService - Validation service
      * @param {EventBus} eventBus - Event bus
@@ -36,7 +36,7 @@ class PlayerService {
         this.eventBus = eventBus;
         this.eloService = eloService;
 
-        this.positions = activityConfig.positions;
+        this.positions = activityConfig?.positions || {};
         this.DEFAULT_RATING = 1500;
     }
 
