@@ -437,7 +437,7 @@ class TeamsPage extends BasePage {
         const posName = this.playerService.positions[position];
 
         return `
-            <div class="team-player d-flex justify-between items-center py-2 first:pt-0 last:pb-0 first:border-t-0 last:border-b-0 odd:bg-surface-base">
+            <div class="team-player">
                 <div class="player-info flex-1">
                     <div class="player-name font-medium mb-1">${this.escape(player.name)}</div>
                     <div class="player-position text-sm text-secondary">${posName}</div>
