@@ -496,7 +496,7 @@ select.form-control {
     font-weight: var(--font-weight-medium);
     color: var(--color-text-primary);
     line-height: 20px;
-    display: flex;
+    display: inline-flex;
     align-items: center;
 }
 
