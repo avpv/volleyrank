@@ -131,7 +131,7 @@ class RankingsPage extends BasePage {
         const comparisons = player.positionComparisons;
 
         return `
-            <div class="ranking-item d-flex items-center gap-3 py-2 first:pt-0 last:pb-0 first:border-t-0 last:border-b-0">
+            <div class="ranking-item d-flex items-center gap-3 py-3">
                 <div class="rank-badge ${rankClass} d-flex items-center justify-center font-bold">${rank}</div>
                 <div class="ranking-info flex-1">
                     <div class="ranking-name font-medium mb-1">${this.escape(player.name)}</div>
