@@ -52,7 +52,7 @@
     /* Text Colors - Refined hierarchy */
     --color-text-primary: #e6edf3;
     --color-text-secondary: #adb5bd;
-    --color-text-tertiary: #8f959d;
+    --color-text-tertiary: #9da5ae;
     --color-text-disabled: #495057;
     --color-text-inverse: #0d1117;
     --color-text-link: #58a6ff;
@@ -94,6 +94,7 @@
     --font-family-mono: 'SFMono-Regular', 'Consolas', 'Liberation Mono', 'Menlo', monospace;
     
     /* Font Sizes - Refined scale */
+    --font-size-xxs: 0.625rem;    /* 10px - micro text, badges */
     --font-size-xs: 0.75rem;      /* 12px - captions, labels */
     --font-size-sm: 0.875rem;     /* 14px - body small, UI */
     --font-size-base: 1rem;       /* 16px - body text */
@@ -524,7 +525,7 @@ a:hover {
     font-size: var(--font-size-2xl);
     font-weight: var(--font-weight-semibold);
     color: var(--color-text-primary);
-    letter-spacing: -0.01em;
+    letter-spacing: -0.02em;
 }
 
 /* Footer */
