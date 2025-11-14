@@ -275,23 +275,63 @@ class Sidebar extends Component {
                         window.location.reload();
                     }
                 } else if (isDeletingActiveSession) {
-                    // Deleted the active session for current activity - always navigate to settings
-                    // Clear selected activity
-                    storage.remove(STORAGE_KEYS.SELECTED_ACTIVITY);
-                    storage.remove(STORAGE_KEYS.PENDING_ACTIVITY);
+                    // Deleted the active session for current activity
+                    // Check if there are other sessions from other activities we can switch to
+                    const allActivities = this.sessionService.sessionRepository.stateManager.get('sessions') || {};
 
-                    // Show message
-                    toast.info('Session deleted. Please select an activity to continue.');
+                    // Collect all remaining sessions with their activity keys
+                    const remainingSessionsWithActivity = [];
+                    for (const [actKey, sessions] of Object.entries(allActivities)) {
+                        if (sessions && typeof sessions === 'object') {
+                            Object.values(sessions).forEach(session => {
+                                remainingSessionsWithActivity.push({
+                                    session,
+                                    activityKey: actKey
+                                });
+                            });
+                        }
+                    }
 
-                    // Force immediate save before navigation/reload to ensure deletion persists
-                    this.sessionService.sessionRepository.stateManager.save();
+                    // Sort by creation date (newest first)
+                    remainingSessionsWithActivity.sort((a, b) =>
+                        new Date(b.session.createdAt) - new Date(a.session.createdAt)
+                    );
 
-                    // Navigate to settings
-                    if (router.currentRoute !== '/') {
-                        router.navigate('/');
-                    } else {
-                        // Already on settings page, just reload to reset state
+                    if (remainingSessionsWithActivity.length > 0) {
+                        // Auto-switch to the most recent session from another activity
+                        const mostRecent = remainingSessionsWithActivity[0];
+                        storage.set(STORAGE_KEYS.SELECTED_ACTIVITY, mostRecent.activityKey);
+                        storage.remove(STORAGE_KEYS.PENDING_ACTIVITY);
+
+                        // Switch to that session
+                        this.sessionService.switchSession(mostRecent.activityKey, mostRecent.session.id);
+
+                        // Show message about auto-switch
+                        toast.info(`Session deleted. Switched to ${activities[mostRecent.activityKey]?.name || 'another activity'}.`);
+
+                        // Force immediate save before reload
+                        this.sessionService.sessionRepository.stateManager.save();
+
+                        // Reload to apply new activity
                         window.location.reload();
+                    } else {
+                        // No sessions left at all - navigate to settings
+                        storage.remove(STORAGE_KEYS.SELECTED_ACTIVITY);
+                        storage.remove(STORAGE_KEYS.PENDING_ACTIVITY);
+
+                        // Show message
+                        toast.info('Session deleted. Please select an activity to continue.');
+
+                        // Force immediate save before navigation/reload
+                        this.sessionService.sessionRepository.stateManager.save();
+
+                        // Navigate to settings
+                        if (router.currentRoute !== '/') {
+                            router.navigate('/');
+                        } else {
+                            // Already on settings page, just reload to reset state
+                            window.location.reload();
+                        }
                     }
                 } else {
                     // Deleted non-active session, just update UI
