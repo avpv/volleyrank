@@ -878,6 +878,20 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
     gap: var(--spacing-6);
+    max-width: 100%;
+}
+
+/* Limit teams grid to max 3 columns to prevent horizontal scroll */
+@media (min-width: 768px) {
+    .teams-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .teams-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
 }
 
 .team-card {
