@@ -31,7 +31,9 @@ export const ROUTES = {
 
 export const STORAGE_KEYS = {
     STATE: 'app_state',
-    SETTINGS: 'app_settings'
+    SETTINGS: 'app_settings',
+    SELECTED_ACTIVITY: 'selectedActivity',
+    PENDING_ACTIVITY: 'pendingActivity'
 };
 
 export const EVENTS = {

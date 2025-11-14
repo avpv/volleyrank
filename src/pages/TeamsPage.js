@@ -12,6 +12,8 @@ import { activities } from '../config/activities/index.js';
 import ratingConfig from '../config/rating.js';
 import uiConfig from '../config/ui.js';
 
+const { ELEMENT_IDS } = uiConfig;
+
 class TeamsPage extends BasePage {
     constructor(container, props = {}) {
         super(container, props);
@@ -107,7 +109,7 @@ class TeamsPage extends BasePage {
     }
 
     mountSidebar() {
-        const sidebarContainer = document.getElementById('pageSidebar');
+        const sidebarContainer = document.getElementById(ELEMENT_IDS.SIDEBAR_CONTAINER);
         if (!sidebarContainer) return;
 
         // Check if sidebar already exists and is properly mounted

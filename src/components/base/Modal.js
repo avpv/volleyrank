@@ -5,6 +5,9 @@
  */
 import Component from './Component.js';
 import { getIcon } from './Icons.js';
+import uiConfig from '../../config/ui.js';
+
+const { UI_CLASSES } = uiConfig;
 
 class Modal extends Component {
     constructor(props = {}) {
@@ -94,8 +97,8 @@ class Modal extends Component {
         if (this.isOpen) return;
         
         // Add classes instead of inline styles
-        this.container.classList.add('modal-visible');
-        document.body.classList.add('modal-open');
+        this.container.classList.add(UI_CLASSES.MODAL_VISIBLE);
+        document.body.classList.add(UI_CLASSES.MODAL_OPEN);
         
         this.isOpen = true;
         
@@ -115,8 +118,8 @@ class Modal extends Component {
         if (!this.isOpen) return;
         
         // Remove classes instead of inline styles
-        this.container.classList.remove('modal-visible');
-        document.body.classList.remove('modal-open');
+        this.container.classList.remove(UI_CLASSES.MODAL_VISIBLE);
+        document.body.classList.remove(UI_CLASSES.MODAL_OPEN);
         
         this.isOpen = false;
         
@@ -166,7 +169,7 @@ class Modal extends Component {
      */
     onDestroy() {
         if (this.isOpen) {
-            document.body.classList.remove('modal-open');
+            document.body.classList.remove(UI_CLASSES.MODAL_OPEN);
         }
         
         if (this.container && this.container.parentNode) {

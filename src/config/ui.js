@@ -73,11 +73,23 @@ export const ANIMATION = {
     /** Short animation duration (ms) */
     SHORT: 100,
 
+    /** Navigation delay (ms) - delay before route transition */
+    NAVIGATION_DELAY: 100,
+
     /** Standard animation duration (ms) */
     STANDARD: 300,
 
+    /** Modal transition duration (ms) */
+    MODAL_TRANSITION: 300,
+
     /** Long animation duration (ms) */
-    LONG: 500
+    LONG: 500,
+
+    /** Activity switch delay (ms) - delay when switching activities */
+    ACTIVITY_SWITCH_DELAY: 1500,
+
+    /** Settings reload delay (ms) - delay before reloading after settings change */
+    RELOAD_DELAY: 2000
 };
 
 /**
@@ -146,6 +158,111 @@ export const LAYOUT = {
 };
 
 /**
+ * DOM Element IDs
+ * Centralized element identifiers used across the application
+ */
+export const ELEMENT_IDS = {
+    /** Main application container */
+    APP_MAIN: 'appMain',
+
+    /** Sidebar container element */
+    SIDEBAR_CONTAINER: 'pageSidebar',
+
+    /** Mobile sidebar toggle button */
+    SIDEBAR_TOGGLE: 'sidebarToggle',
+
+    /** Sidebar backdrop overlay */
+    SIDEBAR_BACKDROP: 'sidebarBackdrop',
+
+    /** Toast notification container */
+    TOAST_CONTAINER: 'toast-container',
+
+    /** Activity select dropdown */
+    ACTIVITY_SELECT: 'activitySelect',
+
+    /** Player form */
+    PLAYER_FORM: 'playerForm',
+
+    /** Player name input field */
+    PLAYER_NAME_INPUT: 'playerNameInput',
+
+    /** Import button */
+    IMPORT_BTN: 'importBtn',
+
+    /** Reset all button */
+    RESET_ALL_BTN: 'resetAllBtn',
+
+    /** Clear all button */
+    CLEAR_ALL_BTN: 'clearAllBtn',
+
+    /** Add player accordion header */
+    ADD_PLAYER_ACCORDION_HEADER: 'addPlayerAccordionHeader',
+
+    /** Add player accordion content */
+    ADD_PLAYER_ACCORDION_CONTENT: 'addPlayerAccordionContent',
+
+    /** Import file input */
+    IMPORT_FILE_INPUT: 'importFileInput',
+
+    /** Import data textarea */
+    IMPORT_DATA_INPUT: 'importDataInput',
+
+    /** Import preview container */
+    IMPORT_PREVIEW: 'importPreview'
+};
+
+/**
+ * CSS Class Names
+ * Centralized CSS classes for state management and styling
+ */
+export const UI_CLASSES = {
+    /** Modal open state on body element */
+    MODAL_OPEN: 'modal-open',
+
+    /** Modal visible state */
+    MODAL_VISIBLE: 'modal-visible',
+
+    /** Generic open state (sidebar, accordion, etc.) */
+    OPEN: 'open',
+
+    /** Generic visible state */
+    VISIBLE: 'visible',
+
+    /** Disabled state */
+    DISABLED: 'disabled',
+
+    /** Active state (navigation, tabs, etc.) */
+    ACTIVE: 'active',
+
+    /** Show animation state */
+    SHOW: 'show',
+
+    /** Hide animation state */
+    HIDE: 'hide'
+};
+
+/**
+ * Data Attributes
+ * Centralized data-* attribute names
+ */
+export const DATA_ATTRIBUTES = {
+    /** Route identifier attribute */
+    ROUTE: 'data-route',
+
+    /** Action identifier attribute */
+    ACTION: 'data-action',
+
+    /** Player ID attribute */
+    PLAYER_ID: 'data-player-id',
+
+    /** Session ID attribute */
+    SESSION_ID: 'data-session-id',
+
+    /** Activity key attribute */
+    ACTIVITY_KEY: 'data-activity-key'
+};
+
+/**
  * Export default configuration object
  */
 export default {
@@ -155,5 +272,8 @@ export default {
     DEBOUNCE,
     TOAST,
     MODAL,
-    LAYOUT
+    LAYOUT,
+    ELEMENT_IDS,
+    UI_CLASSES,
+    DATA_ATTRIBUTES
 };

@@ -4,6 +4,8 @@ import { getIcon } from './Icons.js';
 import { escapeHtml } from '../../utils/stringUtils.js';
 import uiConfig from '../../config/ui.js';
 
+const { ELEMENT_IDS, UI_CLASSES, ANIMATION, TOAST } = uiConfig;
+
 /**
  * Toast - Notification component
  * Displays temporary messages to the user
@@ -17,11 +19,11 @@ class Toast {
 
     init() {
         // Create container if it doesn't exist
-        let container = document.getElementById('toast-container');
-        
+        let container = document.getElementById(ELEMENT_IDS.TOAST_CONTAINER);
+
         if (!container) {
             container = document.createElement('div');
-            container.id = 'toast-container';
+            container.id = ELEMENT_IDS.TOAST_CONTAINER;
             container.className = 'toast-container';
             document.body.appendChild(container);
         }
@@ -32,15 +34,15 @@ class Toast {
     /**
      * Show a toast notification
      */
-    show(message, type = 'info', duration = uiConfig.TOAST.DEFAULT_DURATION) {
+    show(message, type = 'info', duration = TOAST.DEFAULT_DURATION) {
         const toast = this.createToast(message, type);
         this.container.appendChild(toast);
         this.toasts.push(toast);
 
         // Trigger animation
         setTimeout(() => {
-            toast.classList.add('show');
-        }, 10);
+            toast.classList.add(UI_CLASSES.SHOW);
+        }, ANIMATION.IMMEDIATE);
 
         // Auto-remove
         if (duration > 0) {
@@ -94,8 +96,8 @@ class Toast {
     remove(toast) {
         if (!toast || !toast.parentNode) return;
 
-        toast.classList.remove('show');
-        toast.classList.add('hide');
+        toast.classList.remove(UI_CLASSES.SHOW);
+        toast.classList.add(UI_CLASSES.HIDE);
 
         setTimeout(() => {
             if (toast.parentNode) {
@@ -106,7 +108,7 @@ class Toast {
             if (index > -1) {
                 this.toasts.splice(index, 1);
             }
-        }, 300);
+        }, ANIMATION.STANDARD);
     }
 
     /**

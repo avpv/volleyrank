@@ -8,6 +8,8 @@ import Component from '../components/base/Component.js';
 import { getLogo } from '../components/base/Icons.js';
 import uiConfig from '../config/ui.js';
 
+const { ELEMENT_IDS, UI_CLASSES, ANIMATION } = uiConfig;
+
 class BasePage extends Component {
     constructor(container, props = {}) {
         super(container, props);
@@ -36,36 +38,36 @@ class BasePage extends Component {
      * Call this after mounting sidebar on pages with sidebar layout
      */
     setupMobileSidebarToggle() {
-        const toggleBtn = document.getElementById('sidebarToggle');
-        const backdrop = document.getElementById('sidebarBackdrop');
-        const sidebar = document.getElementById('pageSidebar');
+        const toggleBtn = document.getElementById(ELEMENT_IDS.SIDEBAR_TOGGLE);
+        const backdrop = document.getElementById(ELEMENT_IDS.SIDEBAR_BACKDROP);
+        const sidebar = document.getElementById(ELEMENT_IDS.SIDEBAR_CONTAINER);
 
         if (!toggleBtn || !backdrop || !sidebar) {
             return;
         }
 
         const openSidebar = () => {
-            sidebar.classList.add('open');
+            sidebar.classList.add(UI_CLASSES.OPEN);
             backdrop.style.display = 'block';
             // Use setTimeout to ensure display change happens before opacity transition
-            setTimeout(() => backdrop.classList.add('visible'), uiConfig.ANIMATION.IMMEDIATE);
+            setTimeout(() => backdrop.classList.add(UI_CLASSES.VISIBLE), ANIMATION.IMMEDIATE);
             document.body.style.overflow = 'hidden';
         };
 
         const closeSidebar = () => {
-            sidebar.classList.remove('open');
-            backdrop.classList.remove('visible');
+            sidebar.classList.remove(UI_CLASSES.OPEN);
+            backdrop.classList.remove(UI_CLASSES.VISIBLE);
             document.body.style.overflow = '';
             // Wait for transition to complete before hiding
             setTimeout(() => {
-                if (!backdrop.classList.contains('visible')) {
+                if (!backdrop.classList.contains(UI_CLASSES.VISIBLE)) {
                     backdrop.style.display = 'none';
                 }
-            }, 300);
+            }, ANIMATION.STANDARD);
         };
 
         const toggleSidebar = () => {
-            if (sidebar.classList.contains('open')) {
+            if (sidebar.classList.contains(UI_CLASSES.OPEN)) {
                 closeSidebar();
             } else {
                 openSidebar();
@@ -125,7 +127,7 @@ class BasePage extends Component {
     renderPageWithSidebar(content) {
         return `
             <div class="page-layout">
-                <div class="page-layout__sidebar" id="pageSidebar"></div>
+                <div class="page-layout__sidebar" id="${ELEMENT_IDS.SIDEBAR_CONTAINER}"></div>
                 <div class="page-layout__content">
                     ${content}
                 </div>
