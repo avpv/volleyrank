@@ -13,6 +13,7 @@
  */
 
 import { ServiceLifetime, createRegistry } from '../core/ServiceRegistry.js';
+import { activities } from './activities/index.js';
 
 // Core services
 import EventBus from '../core/EventBus.js';
@@ -261,8 +262,18 @@ export const serviceConfig = {};
  * @returns {ServiceRegistry} Configured registry
  */
 export function initializeServices(activityConfig) {
+    // If no activity config provided, use first available activity as fallback
     if (!activityConfig) {
-        throw new Error('Activity configuration is required. Import from config/activities/');
+        const availableActivities = Object.keys(activities);
+
+        if (availableActivities.length === 0) {
+            throw new Error('No activities available. Activities must be initialized first.');
+        }
+
+        const fallbackKey = availableActivities[0];
+        activityConfig = activities[fallbackKey];
+
+        console.warn(`[Services] No activity selected, using '${fallbackKey}' as fallback`);
     }
 
     const config = createServiceConfig(activityConfig);
