@@ -231,6 +231,7 @@ class TeamsPage extends BasePage {
         return this.renderPageWithSidebar(`
             <div class="page-header">
                 <h2>Create Balanced Teams</h2>
+                <p class="text-secondary mt-2">Configure team composition and weights, then generate optimally balanced teams using AI-powered algorithms</p>
             </div>
 
             ${this.renderTeamBuilder()}
@@ -242,10 +243,10 @@ class TeamsPage extends BasePage {
         const players = this.playerService.getAll();
 
         return `
-            <div class="team-builder">
+            <div class="team-builder" role="region" aria-label="Team builder configuration">
                 <div class="builder-settings">
                     <div class="form-group">
-                        <label>Number of Teams</label>
+                        <label for="teamCount">Number of Teams</label>
                         <input
                             type="number"
                             id="teamCount"
@@ -253,30 +254,38 @@ class TeamsPage extends BasePage {
                             min="${uiConfig.INPUT_CONSTRAINTS.TEAM_COUNT.MIN}"
                             max="${uiConfig.INPUT_CONSTRAINTS.TEAM_COUNT.MAX}"
                             class="team-count-input"
+                            aria-label="Number of teams to create"
+                            aria-describedby="team-count-help"
                         >
+                        <p class="form-help-text" id="team-count-help">
+                            Choose how many teams to create (${uiConfig.INPUT_CONSTRAINTS.TEAM_COUNT.MIN}-${uiConfig.INPUT_CONSTRAINTS.TEAM_COUNT.MAX})
+                        </p>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label>Team Composition</label>
-                    <div class="composition-table">
-                        <div class="composition-table-header">
-                            <div class="composition-header-cell position-cell">Position</div>
-                            <div class="composition-header-cell">
+                    <label>Team Composition & Weights</label>
+                    <p class="form-help-text mb-3">
+                        Set how many players per position and their importance weight (higher weight = more important for balance)
+                    </p>
+                    <div class="composition-table" role="table" aria-label="Team composition configuration">
+                        <div class="composition-table-header" role="row">
+                            <div class="composition-header-cell position-cell" role="columnheader">Position</div>
+                            <div class="composition-header-cell" role="columnheader">
                                 <span class="tooltip-wrapper">
                                     Count
-                                    <span class="tooltip-icon">
+                                    <span class="tooltip-icon" role="tooltip">
                                         ${getIcon('info', { size: 14 })}
-                                        <span class="tooltip-content">Number of players per position</span>
+                                        <span class="tooltip-content">Players per team at this position</span>
                                     </span>
                                 </span>
                             </div>
-                            <div class="composition-header-cell">
+                            <div class="composition-header-cell" role="columnheader">
                                 <span class="tooltip-wrapper">
                                     Weight
-                                    <span class="tooltip-icon">
+                                    <span class="tooltip-icon" role="tooltip">
                                         ${getIcon('info', { size: 14 })}
-                                        <span class="tooltip-content">Position importance multiplier</span>
+                                        <span class="tooltip-content">Balance priority (1.0-3.0, higher = more important)</span>
                                     </span>
                                 </span>
                             </div>
@@ -290,10 +299,16 @@ class TeamsPage extends BasePage {
                         class="btn btn-primary btn-large"
                         id="optimizeBtn"
                         ${players.length < 2 ? 'disabled' : ''}
-                    >
+                        aria-label="${this.state.isOptimizing ? 'Optimizing teams...' : 'Generate balanced teams'}"
+                        ${this.state.isOptimizing ? 'aria-busy="true"' : ''}>
                         ${getIcon('users', { size: 18, className: 'btn-icon' })}
-                        ${this.state.isOptimizing ? 'Optimizing...' : 'Create Teams'}
+                        ${this.state.isOptimizing ? 'Generating Teams...' : 'Generate Balanced Teams'}
                     </button>
+                    ${players.length < 2 ? `
+                        <p class="form-help-text text-warning mt-3">
+                            ⚠️ Add at least 2 players on the Settings page to create teams
+                        </p>
+                    ` : ''}
                 </div>
             </div>
         `;
@@ -302,9 +317,9 @@ class TeamsPage extends BasePage {
     renderCompositionWithWeights() {
         // Render both composition count and weight inputs for each position
         return Object.entries(this.activityConfig.positions).map(([key, name]) => `
-            <div class="composition-row">
-                <div class="composition-cell position-name">${name}</div>
-                <div class="composition-cell">
+            <div class="composition-row" role="row">
+                <div class="composition-cell position-name" role="cell">${name}</div>
+                <div class="composition-cell" role="cell">
                     <input
                         type="number"
                         id="comp_${key}"
@@ -312,9 +327,11 @@ class TeamsPage extends BasePage {
                         min="${uiConfig.INPUT_CONSTRAINTS.COMPOSITION.MIN}"
                         max="${uiConfig.INPUT_CONSTRAINTS.COMPOSITION.MAX}"
                         class="composition-input"
+                        aria-label="Number of ${name}s per team"
+                        title="${name} count"
                     >
                 </div>
-                <div class="composition-cell">
+                <div class="composition-cell" role="cell">
                     <input
                         type="number"
                         id="weight_${key}"
@@ -323,6 +340,8 @@ class TeamsPage extends BasePage {
                         max="${uiConfig.INPUT_CONSTRAINTS.WEIGHT.MAX}"
                         step="${uiConfig.INPUT_CONSTRAINTS.WEIGHT.STEP}"
                         class="weight-input"
+                        aria-label="${name} position weight"
+                        title="${name} importance weight"
                     >
                 </div>
             </div>
@@ -337,37 +356,45 @@ class TeamsPage extends BasePage {
         const quality = this.getBalanceQuality(weightedBalance);
 
         return `
-            <div class="teams-result">
+            <div class="teams-result" role="region" aria-label="Generated teams results">
                 <div class="result-header d-flex flex-column md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-                    <h3 class="text-xl md:text-2xl font-semibold m-0">Generated Teams</h3>
+                    <div>
+                        <h3 class="text-xl md:text-2xl font-semibold m-0">Your Balanced Teams</h3>
+                        <p class="text-secondary text-sm mt-1">${teams.length} teams generated</p>
+                    </div>
                     <div class="result-controls d-flex items-center gap-4">
                         <label class="toggle-switch">
                             <input
                                 type="checkbox"
                                 id="showEloToggle"
                                 ${this.state.showEloRatings ? 'checked' : ''}
+                                aria-label="Toggle ELO ratings visibility"
                             >
                             <span class="toggle-slider"></span>
                             <span class="toggle-label">Show ELO Ratings</span>
                         </label>
-                        <div class="control-divider" style="width: 1px; height: 24px; background: var(--color-border-default);"></div>
-                        <button class="btn btn-primary btn-sm" id="exportTeamsBtn">
+                        <div class="control-divider" style="width: 1px; height: 24px; background: var(--color-border-default);" aria-hidden="true"></div>
+                        <button
+                            class="btn btn-primary btn-sm"
+                            id="exportTeamsBtn"
+                            aria-label="Export teams to file">
                             ${getIcon('arrow-up', { size: 16, className: 'btn-icon' })}
                             Export
                         </button>
                     </div>
                 </div>
 
-                <div class="balance-indicator balance-indicator--${quality.class}">
-                    <div class="balance-icon">
+                <div class="balance-indicator balance-indicator--${quality.class}" role="status" aria-live="polite">
+                    <div class="balance-icon" aria-hidden="true">
                         ${getIcon(quality.icon, { size: 40, className: 'balance-icon-svg' })}
                     </div>
                     <div class="balance-content">
-                        <span class="balance-label">Team Balance: ${quality.label}</span>
-                        <span class="balance-value">${weightedBalance} ELO difference</span>
+                        <span class="balance-label">Team Balance Quality: ${quality.label}</span>
+                        <span class="balance-value">${weightedBalance} ELO average difference</span>
                     </div>
                     <div class="balance-explanation">
-                        Lower is better. Under 50 is ideal.
+                        ${weightedBalance < 50 ? '✅ Excellent balance!' : weightedBalance < 100 ? '👍 Good balance' : '⚠️ Consider re-generating for better balance'}
+                        Lower difference means more even teams.
                     </div>
                 </div>
 

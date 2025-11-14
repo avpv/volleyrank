@@ -132,18 +132,25 @@ class ComparePage extends BasePage {
 
     renderPositionSelector() {
         const positions = this.activityConfig.positions;
-        
+
         return `
-            <div class="position-selector">
-                <label>Select Position to Compare:</label>
-                <select id="positionSelect" class="position-select">
-                    <option value="">Choose a position...</option>
+            <div class="position-selector" role="region" aria-label="Position selection">
+                <label for="positionSelect">Select Position to Compare</label>
+                <select
+                    id="positionSelect"
+                    class="position-select"
+                    aria-label="Choose a position for player comparison"
+                    aria-describedby="position-help">
+                    <option value="">Choose a position to start rating...</option>
                     ${Object.entries(positions).map(([key, name]) => `
                         <option value="${key}" ${this.selectedPosition === key ? 'selected' : ''}>
                             ${name} (${key})
                         </option>
                     `).join('')}
                 </select>
+                <p class="form-help-text" id="position-help">
+                    Select a position to begin head-to-head player comparisons. Use keyboard shortcuts: <kbd>A</kbd> (left), <kbd>D</kbd> (right), <kbd>W</kbd> (draw)
+                </p>
             </div>
         `;
     }
@@ -153,8 +160,9 @@ class ComparePage extends BasePage {
         const positions = this.activityConfig.positions;
 
         return `
-            <div class="progress-section">
-                <label class="mb-3">Comparison Progress</label>
+            <div class="progress-section" role="region" aria-label="Comparison progress by position">
+                <h3 class="mb-3 font-semibold">Comparison Progress</h3>
+                <p class="form-help-text mb-4">Track your rating progress for each position. Click a position above to start comparing.</p>
                 <div class="progress-bars space-y-3 divide-y divide-subtle">
                     ${Object.entries(positions).map(([key, name]) => {
                         const prog = progress[key];
@@ -162,10 +170,12 @@ class ComparePage extends BasePage {
                         
                         if (players.length < 2) {
                             return `
-                                <div class="progress-item disabled">
+                                <div class="progress-item disabled" role="status">
                                     <div class="progress-header">
                                         <span>${name} (${key})</span>
-                                        <span class="progress-status">${players.length} player${players.length !== 1 ? 's' : ''}</span>
+                                        <span class="progress-status" title="At least 2 players needed">
+                                            ${players.length} player${players.length !== 1 ? 's' : ''} · Need ${2 - players.length} more
+                                        </span>
                                     </div>
                                 </div>
                             `;
@@ -199,7 +209,11 @@ class ComparePage extends BasePage {
     renderComparisonArea() {
         if (!this.selectedPosition) {
             const icon = getIcon('target', { size: 48, color: 'var(--color-text-secondary)' });
-            return this.renderEmpty('Choose a position from the dropdown above to begin rating players.', icon, 'Ready to Compare');
+            return this.renderEmpty(
+                'Choose a position from the dropdown above to begin head-to-head player comparisons. The more comparisons you complete, the more accurate your team balance will be.',
+                icon,
+                'Ready to Compare Players'
+            );
         }
 
         const status = this.comparisonService.checkStatus(this.selectedPosition);
@@ -242,41 +256,68 @@ class ComparePage extends BasePage {
         const posName = this.activityConfig.positions[this.selectedPosition];
 
         return `
-            <div class="comparison-area">
+            <div class="comparison-area" role="region" aria-label="Player comparison">
                 <div class="comparison-info text-center mb-6">
-                    Comparing at: <strong class="text-brand">${posName}</strong>
+                    <p class="text-secondary mb-2">Who is better at:</p>
+                    <h3 class="text-xl font-semibold text-brand">${posName} position</h3>
                 </div>
 
-                <div class="comparison-cards d-grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 items-center">
-                    <div class="player-card clickable cursor-pointer" id="leftPlayerCard" data-winner-id="${player1.id}" data-loser-id="${player2.id}">
-                        <div class="keyboard-hint">A</div>
+                <div class="comparison-cards d-grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 items-center" role="group" aria-label="Choose the better player">
+                    <button
+                        class="player-card clickable cursor-pointer"
+                        id="leftPlayerCard"
+                        data-winner-id="${player1.id}"
+                        data-loser-id="${player2.id}"
+                        aria-label="Select ${this.escape(player1.name)} as better player (keyboard: A)"
+                        role="button">
+                        <div class="keyboard-hint" aria-hidden="true">A</div>
                         <div class="player-avatar blue d-flex items-center justify-center mb-3">
                             ${player1.name.charAt(0).toUpperCase()}
                         </div>
                         <div class="player-name text-center font-semibold mb-2">${this.escape(player1.name)}</div>
                         <div class="player-position text-center text-sm text-secondary mb-2">${posName}</div>
-                        <div class="player-rating text-center font-medium mb-1">${Math.round(player1.ratings[this.selectedPosition])} ELO</div>
-                        <div class="player-comparisons text-center text-xs text-tertiary">${player1.comparisons[this.selectedPosition]} comparisons</div>
-                    </div>
+                        <div class="player-rating text-center font-medium mb-1" aria-label="Current rating">
+                            ${Math.round(player1.ratings[this.selectedPosition])} <span class="text-tertiary text-xs">ELO</span>
+                        </div>
+                        <div class="player-comparisons text-center text-xs text-tertiary" aria-label="Number of comparisons">
+                            ${player1.comparisons[this.selectedPosition]} comparison${player1.comparisons[this.selectedPosition] !== 1 ? 's' : ''}
+                        </div>
+                    </button>
 
-                    <div class="vs-divider d-flex flex-column items-center gap-4 my-4 md:my-0">
+                    <div class="vs-divider d-flex flex-column items-center gap-4 my-4 md:my-0" aria-hidden="true">
                         <div class="vs-text font-bold text-2xl md:text-3xl">VS</div>
-                        <button class="draw-button" id="drawButton" data-player1-id="${player1.id}" data-player2-id="${player2.id}">
-                            <span class="keyboard-hint-button">W</span>
-                            Win-Win
+                        <button
+                            class="draw-button"
+                            id="drawButton"
+                            data-player1-id="${player1.id}"
+                            data-player2-id="${player2.id}"
+                            aria-label="Mark as equal skill level (keyboard: W)"
+                            title="Both players have equal skill">
+                            <span class="keyboard-hint-button" aria-hidden="true">W</span>
+                            Equal Skill
                         </button>
                     </div>
 
-                    <div class="player-card clickable cursor-pointer" id="rightPlayerCard" data-winner-id="${player2.id}" data-loser-id="${player1.id}">
-                        <div class="keyboard-hint">D</div>
+                    <button
+                        class="player-card clickable cursor-pointer"
+                        id="rightPlayerCard"
+                        data-winner-id="${player2.id}"
+                        data-loser-id="${player1.id}"
+                        aria-label="Select ${this.escape(player2.name)} as better player (keyboard: D)"
+                        role="button">
+                        <div class="keyboard-hint" aria-hidden="true">D</div>
                         <div class="player-avatar purple d-flex items-center justify-center mb-3">
                             ${player2.name.charAt(0).toUpperCase()}
                         </div>
                         <div class="player-name text-center font-semibold mb-2">${this.escape(player2.name)}</div>
                         <div class="player-position text-center text-sm text-secondary mb-2">${posName}</div>
-                        <div class="player-rating text-center font-medium mb-1">${Math.round(player2.ratings[this.selectedPosition])} ELO</div>
-                        <div class="player-comparisons text-center text-xs text-tertiary">${player2.comparisons[this.selectedPosition]} comparisons</div>
-                    </div>
+                        <div class="player-rating text-center font-medium mb-1" aria-label="Current rating">
+                            ${Math.round(player2.ratings[this.selectedPosition])} <span class="text-tertiary text-xs">ELO</span>
+                        </div>
+                        <div class="player-comparisons text-center text-xs text-tertiary" aria-label="Number of comparisons">
+                            ${player2.comparisons[this.selectedPosition]} comparison${player2.comparisons[this.selectedPosition] !== 1 ? 's' : ''}
+                        </div>
+                    </button>
                 </div>
             </div>
         `;

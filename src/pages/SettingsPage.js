@@ -123,14 +123,20 @@ class SettingsPage extends BasePage {
 
     renderWelcomeGuide() {
         return `
-            <div class="welcome-guide">
-                <h3 class="mb-3 font-semibold">Welcome to TeamBalance!</h3>
-                <p class="mb-4 text-secondary">Get started in 4 easy steps:</p>
+            <div class="welcome-guide" role="complementary" aria-label="Getting started guide">
+                <h3 class="mb-3 font-semibold">👋 Welcome to TeamBalance!</h3>
+                <p class="mb-4 text-secondary">
+                    Create perfectly balanced teams using AI-powered ELO ratings. Get started in 4 simple steps:
+                </p>
                 <ol class="space-y-2">
-                    <li><a href="#" class="guide-link" ${DATA_ATTRIBUTES.ACTION}="select-activity"><strong>Select Activity Type</strong></a> from the dropdown below</li>
-                    <li><strong>Add players</strong> with their positions</li>
-                    <li><strong>Compare players</strong> to build accurate skill ratings</li>
-                    <li><strong>Create balanced teams</strong> automatically</li>
+                    <li>
+                        <a href="#" class="guide-link" ${DATA_ATTRIBUTES.ACTION}="select-activity">
+                            <strong>Select your sport or activity</strong>
+                        </a> from the dropdown below to begin
+                    </li>
+                    <li><strong>Add your players</strong> and assign their positions</li>
+                    <li><strong>Compare players head-to-head</strong> to build accurate skill ratings</li>
+                    <li><strong>Generate balanced teams automatically</strong> with one click</li>
                 </ol>
             </div>
         `;
@@ -189,13 +195,17 @@ class SettingsPage extends BasePage {
             .sort((a, b) => a[1].name.localeCompare(b[1].name));
 
         return `
-            <div class="activity-selector-section">
+            <div class="activity-selector-section" role="region" aria-label="Activity selection">
                 <div class="player-form">
                     <div class="form-group">
-                        <label :for="${ELEMENT_IDS.ACTIVITY_SELECT}">Activity Type</label>
+                        <label for="${ELEMENT_IDS.ACTIVITY_SELECT}">Activity Type</label>
                         <div class="activity-selector-row form-row">
-                            <select id="${ELEMENT_IDS.ACTIVITY_SELECT}" class="activity-select">
-                                <option value="" ${!currentActivity ? 'selected' : ''} disabled>Select an activity...</option>
+                            <select
+                                id="${ELEMENT_IDS.ACTIVITY_SELECT}"
+                                class="activity-select"
+                                aria-label="Select activity type"
+                                aria-describedby="activity-help-text">
+                                <option value="" ${!currentActivity ? 'selected' : ''} disabled>Select a sport or activity...</option>
                                 ${recentOptions.length > 0 ? `
                                     <optgroup label="Recent Activities">
                                         ${recentOptions.map(([key, config]) => `
@@ -215,15 +225,21 @@ class SettingsPage extends BasePage {
                                     </optgroup>
                                 ` : ''}
                             </select>
-                            <button type="button" class="btn btn--secondary" id="createSessionBtn" title="Create new session">
-                                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="vertical-align: middle; margin-right: 4px;">
+                            <button
+                                type="button"
+                                class="btn btn--secondary"
+                                id="createSessionBtn"
+                                title="Create a new team session"
+                                aria-label="Create new team session">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="vertical-align: middle; margin-right: 4px;" aria-hidden="true">
                                     <path d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z"/>
                                 </svg>
-                                New teams
+                                New Session
                             </button>
                         </div>
-                        <p class="form-help-text">
-                            Select an activity and click "New teams" to create a session. Activity changes will be applied when creating a new session.
+                        <p class="form-help-text" id="activity-help-text">
+                            Choose your sport or activity, then click "New Session" to start building teams.
+                            Your previous sessions are saved in the sidebar.
                         </p>
                     </div>
                 </div>
@@ -236,49 +252,79 @@ class SettingsPage extends BasePage {
         const isOpen = !!currentActivity;
 
         return `
-            <div class="accordion add-player-section">
-                <button type="button" class="accordion-header${!currentActivity ? ' disabled' : ''}" id="${ELEMENT_IDS.ADD_PLAYER_ACCORDION_HEADER}">
+            <div class="accordion add-player-section" role="region" aria-label="Add players">
+                <button
+                    type="button"
+                    class="accordion-header${!currentActivity ? ' disabled' : ''}"
+                    id="${ELEMENT_IDS.ADD_PLAYER_ACCORDION_HEADER}"
+                    aria-expanded="${isOpen}"
+                    aria-controls="${ELEMENT_IDS.ADD_PLAYER_ACCORDION_CONTENT}"
+                    ${!currentActivity ? 'aria-disabled="true"' : ''}>
                     <span>Add Players</span>
                     ${getIcon('chevron-down', { size: 16, className: `accordion-icon${isOpen ? ' open' : ''}` })}
                 </button>
-                <div class="accordion-content${isOpen ? ' open' : ''}" id="${ELEMENT_IDS.ADD_PLAYER_ACCORDION_CONTENT}">
+                <div
+                    class="accordion-content${isOpen ? ' open' : ''}"
+                    id="${ELEMENT_IDS.ADD_PLAYER_ACCORDION_CONTENT}"
+                    role="region"
+                    aria-hidden="${!isOpen}">
                     <!-- Import Players Section -->
                     <div class="player-section import-section">
-                        <h4 class="section-title">Import Players</h4>
+                        <h4 class="section-title">Import Players from File</h4>
                         <div class="section-content">
-                            <button type="button" class="btn btn-secondary" id="${ELEMENT_IDS.IMPORT_BTN}" ${!currentActivity ? 'disabled' : ''}>
+                            <button
+                                type="button"
+                                class="btn btn-secondary"
+                                id="${ELEMENT_IDS.IMPORT_BTN}"
+                                ${!currentActivity ? 'disabled' : ''}
+                                aria-label="Import players from CSV or JSON file">
                                 ${getIcon('arrow-down', { size: 16, className: 'btn-icon' })}
-                                Import Players
+                                Import from File
                             </button>
+                            <p class="form-help-text mt-2">
+                                Upload a CSV or JSON file with your players' names and positions
+                            </p>
                         </div>
                     </div>
 
                     <!-- Manual Add Players Section -->
                     <div class="player-section manual-add-section">
-                        <h4 class="section-title">Manual Add Players</h4>
-                        <form class="player-form" id="${ELEMENT_IDS.PLAYER_FORM}">
+                        <h4 class="section-title">Add Individual Players</h4>
+                        <form class="player-form" id="${ELEMENT_IDS.PLAYER_FORM}" aria-label="Add new player form">
                             <div class="form-row">
                                 <div class="form-group">
-                                    <label>Player Name</label>
+                                    <label for="${ELEMENT_IDS.PLAYER_NAME_INPUT}">Player Name</label>
                                     <input
                                         type="text"
                                         id="${ELEMENT_IDS.PLAYER_NAME_INPUT}"
-                                        placeholder="Enter player name"
+                                        class="form-control"
+                                        placeholder="e.g., John Smith"
                                         required
+                                        autocomplete="off"
                                         ${!currentActivity ? 'disabled' : ''}
+                                        aria-required="true"
+                                        aria-describedby="player-name-help"
                                     >
+                                    <p class="form-help" id="player-name-help">Enter the full name of the player</p>
                                 </div>
                             </div>
 
                             <div class="form-group">
-                                <label>Positions (select all applicable)</label>
-                                <div class="positions-grid" id="positionsGrid">
+                                <label>Positions
+                                    <span class="text-tertiary">(select all that apply)</span>
+                                </label>
+                                <div class="positions-grid" id="positionsGrid" role="group" aria-label="Player positions">
                                     ${this.renderPositionCheckboxes()}
                                 </div>
+                                <p class="form-help">Select one or more positions this player can fill</p>
                             </div>
 
                             <div class="form-actions">
-                                <button type="submit" class="btn btn-primary" ${!currentActivity ? 'disabled' : ''}>
+                                <button
+                                    type="submit"
+                                    class="btn btn-primary"
+                                    ${!currentActivity ? 'disabled' : ''}
+                                    aria-label="Add player to roster">
                                     ${getIcon('plus', { size: 16, className: 'btn-icon' })}
                                     Add Player
                                 </button>
@@ -288,18 +334,31 @@ class SettingsPage extends BasePage {
 
                     <!-- Danger Zone Section -->
                     <div class="player-section danger-zone-section">
-                        <h4 class="section-title">Reset & Delete</h4>
+                        <h4 class="section-title">Bulk Actions</h4>
                         <div class="form-section danger-zone">
                             <div class="form-section-actions">
-                                <button type="button" class="btn btn-secondary" id="${ELEMENT_IDS.RESET_ALL_BTN}" ${!currentActivity ? 'disabled' : ''}>
+                                <button
+                                    type="button"
+                                    class="btn btn-secondary"
+                                    id="${ELEMENT_IDS.RESET_ALL_BTN}"
+                                    ${!currentActivity ? 'disabled' : ''}
+                                    aria-label="Reset all player ratings to default">
                                     ${getIcon('refresh', { size: 16, className: 'btn-icon' })}
                                     Reset All Ratings
                                 </button>
-                                <button type="button" class="btn btn-secondary" id="${ELEMENT_IDS.CLEAR_ALL_BTN}" ${!currentActivity ? 'disabled' : ''}>
+                                <button
+                                    type="button"
+                                    class="btn btn-secondary"
+                                    id="${ELEMENT_IDS.CLEAR_ALL_BTN}"
+                                    ${!currentActivity ? 'disabled' : ''}
+                                    aria-label="Remove all players from current session">
                                     ${getIcon('trash', { size: 16, className: 'btn-icon' })}
                                     Remove All Players
                                 </button>
                             </div>
+                            <p class="form-help-text mt-3 text-tertiary">
+                                ⚠️ These actions cannot be undone. Use with caution.
+                            </p>
                         </div>
                     </div>
                 </div>
