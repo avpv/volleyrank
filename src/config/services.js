@@ -10,6 +10,7 @@
  * - Added ValidationService for centralized validation
  * - Updated service dependencies to use repository pattern
  * - Cleaner separation of concerns
+ * - Support for initializing without activity config (core services only)
  */
 
 import { ServiceLifetime, createRegistry } from '../core/ServiceRegistry.js';
@@ -35,13 +36,12 @@ import TeamOptimizerService from '../services/TeamOptimizerService.js';
 import SessionService from '../services/SessionService.js';
 
 /**
- * Service configuration factory
- * Defines how each service should be registered
+ * Core service configuration (no activity required)
+ * These services can work without activity config
  *
- * @param {Object} activityConfig - Activity configuration (positions, weights, etc.)
- * @returns {Object} Service configuration
+ * @returns {Object} Core service configuration
  */
-export function createServiceConfig(activityConfig) {
+export function createCoreServiceConfig() {
     return {
         // ===== Core Services =====
 
@@ -97,7 +97,7 @@ export function createServiceConfig(activityConfig) {
             dependencies: []
         },
 
-        // ===== Repository Layer (NEW) =====
+        // ===== Repository Layer =====
 
         /**
          * Session Repository - Data access for sessions
@@ -115,6 +115,41 @@ export function createServiceConfig(activityConfig) {
                 return new SessionRepository(deps.stateManager, deps.eventBus);
             }
         },
+
+        /**
+         * Session Service - Session management
+         * Singleton: One session service
+         * Dependencies: sessionRepository, eventBus
+         *
+         * Purpose: Manage session lifecycle (create, switch, delete)
+         * Benefits: Centralized session operations, automatic active session management
+         */
+        sessionService: {
+            implementation: SessionService,
+            lifetime: ServiceLifetime.SINGLETON,
+            dependencies: ['sessionRepository', 'eventBus'],
+            factory: (deps) => new SessionService(
+                deps.sessionRepository,
+                deps.eventBus
+            )
+        }
+    };
+}
+
+/**
+ * Full service configuration factory (requires activity)
+ * Defines how each service should be registered
+ *
+ * @param {Object} activityConfig - Activity configuration (positions, weights, etc.)
+ * @returns {Object} Service configuration
+ */
+export function createServiceConfig(activityConfig) {
+    // Start with core services
+    const config = createCoreServiceConfig();
+
+    // Add activity-dependent services
+    return {
+        ...config,
 
         /**
          * Player Repository - Data access for players
@@ -136,7 +171,7 @@ export function createServiceConfig(activityConfig) {
             }
         },
 
-        // ===== Validation Layer (NEW) =====
+        // ===== Validation Layer =====
 
         /**
          * Validation Service - Centralized validation
@@ -227,24 +262,6 @@ export function createServiceConfig(activityConfig) {
                 activityConfig,
                 deps.eloService
             )
-        },
-
-        /**
-         * Session Service - Session management
-         * Singleton: One session service
-         * Dependencies: sessionRepository, eventBus
-         *
-         * Purpose: Manage session lifecycle (create, switch, delete)
-         * Benefits: Centralized session operations, automatic active session management
-         */
-        sessionService: {
-            implementation: SessionService,
-            lifetime: ServiceLifetime.SINGLETON,
-            dependencies: ['sessionRepository', 'eventBus'],
-            factory: (deps) => new SessionService(
-                deps.sessionRepository,
-                deps.eventBus
-            )
         }
     };
 }
@@ -257,15 +274,15 @@ export const serviceConfig = {};
  * Initialize service registry
  * Creates and configures the global service registry
  *
- * @param {Object} activityConfig - Activity configuration (positions, weights, etc.)
+ * @param {Object|null} activityConfig - Activity configuration (positions, weights, etc.), or null for core services only
  * @returns {ServiceRegistry} Configured registry
  */
 export function initializeServices(activityConfig) {
-    if (!activityConfig) {
-        throw new Error('Activity configuration is required. Import from config/activities/');
-    }
+    // If no activity config provided, initialize only core services
+    const config = activityConfig
+        ? createServiceConfig(activityConfig)
+        : createCoreServiceConfig();
 
-    const config = createServiceConfig(activityConfig);
     const registry = createRegistry(config);
 
     // Validate configuration
@@ -294,6 +311,7 @@ export function getServiceGraph(registry) {
 
 export default {
     serviceConfig,
+    createCoreServiceConfig,
     createServiceConfig,
     initializeServices,
     getServiceGraph
