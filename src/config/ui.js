@@ -29,8 +29,11 @@ export const INPUT_CONSTRAINTS = {
         MIN: 0.1,
         MAX: 5.0,
         STEP: 0.1,
-        DEFAULT: 1.0
+        DEFAULT: 1.0  // Default position weight
     },
+
+    /** Position composition default value */
+    COMPOSITION_DEFAULT: 0,
 
     /** Text truncation */
     TEXT_TRUNCATE: {

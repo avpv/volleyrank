@@ -31,7 +31,7 @@ class TeamsPage extends BasePage {
         // Initialize position weights from config
         const initialWeights = {};
         Object.keys(this.activityConfig.positions).forEach(pos => {
-            initialWeights[pos] = this.activityConfig.positionWeights[pos] || 1.0;
+            initialWeights[pos] = this.activityConfig.positionWeights[pos] || uiConfig.INPUT_CONSTRAINTS.WEIGHT.DEFAULT;
         });
 
         // Load saved settings and teams from active session
@@ -83,7 +83,7 @@ class TeamsPage extends BasePage {
     getInitialWeights() {
         const initialWeights = {};
         Object.keys(this.activityConfig.positions).forEach(pos => {
-            initialWeights[pos] = this.activityConfig.positionWeights[pos] || 1.0;
+            initialWeights[pos] = this.activityConfig.positionWeights[pos] || uiConfig.INPUT_CONSTRAINTS.WEIGHT.DEFAULT;
         });
         return initialWeights;
     }
@@ -432,7 +432,7 @@ class TeamsPage extends BasePage {
                 ? player.ratings[position]
                 : ratingConfig.RATING_CONSTANTS.DEFAULT;
 
-            const weight = this.state.positionWeights[position] || 1.0;
+            const weight = this.state.positionWeights[position] || uiConfig.INPUT_CONSTRAINTS.WEIGHT.DEFAULT;
             weightedTotal += rating * weight;
         });
 
@@ -491,7 +491,7 @@ class TeamsPage extends BasePage {
 
                 newInput.addEventListener('input', (e) => {
                     const pos = newInput.id.replace('comp_', '');
-                    const value = parseInt(e.target.value) || 0;
+                    const value = parseInt(e.target.value) || uiConfig.INPUT_CONSTRAINTS.COMPOSITION_DEFAULT;
                     this.state.composition[pos] = value;
                     updatePlayersPerTeam();
                 });
@@ -508,7 +508,7 @@ class TeamsPage extends BasePage {
 
                 newInput.addEventListener('input', (e) => {
                     const pos = newInput.id.replace('weight_', '');
-                    const value = parseFloat(e.target.value) || 1.0;
+                    const value = parseFloat(e.target.value) || uiConfig.INPUT_CONSTRAINTS.WEIGHT.DEFAULT;
                     this.state.positionWeights[pos] = value;
 
                     // Save settings to localStorage
@@ -552,7 +552,7 @@ class TeamsPage extends BasePage {
 
         positions.forEach(pos => {
             const input = this.$(`#comp_${pos}`);
-            composition[pos] = parseInt(input?.value) || 0;
+            composition[pos] = parseInt(input?.value) || uiConfig.INPUT_CONSTRAINTS.COMPOSITION_DEFAULT;
         });
 
         return composition;

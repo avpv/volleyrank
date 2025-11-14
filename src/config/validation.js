@@ -63,6 +63,23 @@ export const COMPARISON_VALIDATION = {
 };
 
 /**
+ * Default Values for Statistics and Counters
+ */
+export const DEFAULT_VALUES = {
+    /** Initial comparison count */
+    COMPARISONS: 0,
+
+    /** Initial player count */
+    PLAYER_COUNT: 0,
+
+    /** Default empty array for comparedWith */
+    COMPARED_WITH: [],
+
+    /** Default position weight */
+    POSITION_WEIGHT: 1.0
+};
+
+/**
  * Combined Validation Limits
  * All validation limits in one object for convenience
  */
@@ -81,5 +98,6 @@ export default {
     POSITION_VALIDATION,
     TEAM_VALIDATION,
     COMPARISON_VALIDATION,
+    DEFAULT_VALUES,
     VALIDATION_LIMITS
 };

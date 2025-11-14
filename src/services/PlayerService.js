@@ -1,6 +1,7 @@
 // src/services/PlayerService.js (Refactored)
 
 import ratingConfig from '../config/rating.js';
+import validationConfig from '../config/validation.js';
 
 /**
  * PlayerService - Player management business logic
@@ -142,8 +143,8 @@ class PlayerService {
 
         newPositions.forEach(pos => {
             newRatings[pos] = player.ratings[pos] || this.DEFAULT_RATING;
-            newComparisons[pos] = player.comparisons[pos] || 0;
-            newComparedWith[pos] = player.comparedWith[pos] || [];
+            newComparisons[pos] = player.comparisons[pos] || validationConfig.DEFAULT_VALUES.COMPARISONS;
+            newComparedWith[pos] = player.comparedWith[pos] || validationConfig.DEFAULT_VALUES.COMPARED_WITH;
         });
 
         // Update through repository
