@@ -32,10 +32,10 @@ class PlayerRepository {
      * Get current activity key dynamically from storage
      * This ensures we always work with the correct activity after session switches
      * @private
-     * @returns {string} Current activity key
+     * @returns {string|null} Current activity key or null if not selected
      */
     _getActivityKey() {
-        return this.storageAdapter.get('selectedActivity', 'volleyball');
+        return this.storageAdapter.get('selectedActivity', null);
     }
 
     /**

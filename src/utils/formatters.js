@@ -1,6 +1,7 @@
 // src/utils/formatters.js
 
-import volleyballConfig from '../config/volleyball.js';
+import { activities } from '../config/activities/index.js';
+import storage from '../core/StorageAdapter.js';
 
 /**
  * Data Formatting Utilities
@@ -55,10 +56,14 @@ export function formatPercentage(value, decimals = 0) {
 
 /**
  * Format position name
- * Uses positions from team-optimizer for consistency
+ * Uses positions from currently selected activity config
  */
 export function formatPosition(positionKey) {
-    return volleyballConfig.positions[positionKey] || positionKey;
+    const selectedActivity = storage.get('selectedActivity', null);
+    if (selectedActivity && activities[selectedActivity]) {
+        return activities[selectedActivity].positions[positionKey] || positionKey;
+    }
+    return positionKey;
 }
 
 /**

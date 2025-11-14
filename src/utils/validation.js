@@ -1,6 +1,7 @@
 // src/utils/validation.js
 
-import volleyballConfig from '../config/volleyball.js';
+import { activities } from '../config/activities/index.js';
+import storage from '../core/StorageAdapter.js';
 
 /**
  * Validation Utilities
@@ -13,8 +14,17 @@ export const VALIDATION_RULES = {
     MIN_POSITIONS: 1
 };
 
-// Get valid positions from volleyball config (single source of truth)
-export const VALID_POSITIONS = Object.keys(volleyballConfig.positions);
+/**
+ * Get valid positions from currently selected activity
+ * @returns {string[]} Array of valid position keys, empty if no activity selected
+ */
+export function getValidPositions() {
+    const selectedActivity = storage.get('selectedActivity', null);
+    if (!selectedActivity || !activities[selectedActivity]) {
+        return [];
+    }
+    return Object.keys(activities[selectedActivity].positions);
+}
 
 /**
  * Validate player name
@@ -53,30 +63,32 @@ export function validateName(name) {
  */
 export function validatePositions(positions) {
     const errors = [];
-    
+
     if (!Array.isArray(positions)) {
         errors.push('Positions must be an array');
         return { isValid: false, errors };
     }
-    
+
     if (positions.length < VALIDATION_RULES.MIN_POSITIONS) {
         errors.push('At least one position required');
     }
-    
+
     if (positions.length > VALIDATION_RULES.MAX_POSITIONS) {
         errors.push(`Maximum ${VALIDATION_RULES.MAX_POSITIONS} positions allowed`);
     }
-    
-    const invalid = positions.filter(pos => !VALID_POSITIONS.includes(pos));
+
+    // Get valid positions dynamically
+    const validPositions = getValidPositions();
+    const invalid = positions.filter(pos => !validPositions.includes(pos));
     if (invalid.length > 0) {
         errors.push(`Invalid positions: ${invalid.join(', ')}`);
     }
-    
+
     const unique = [...new Set(positions)];
     if (unique.length !== positions.length) {
         errors.push('Duplicate positions not allowed');
     }
-    
+
     return {
         isValid: errors.length === 0,
         errors,
@@ -183,6 +195,7 @@ export default {
     sanitizeHTML,
     validateEmail,
     validateNumberInRange,
+    getValidPositions,
     VALIDATION_RULES,
     VALID_POSITIONS
 };

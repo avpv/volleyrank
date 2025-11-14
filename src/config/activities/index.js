@@ -136,19 +136,6 @@ export function getActivityConfig(activityName) {
 export const activities = {};
 
 /**
- * Default activity reference - holds the default activity config
- */
-export const defaultActivityRef = { current: null };
-
-/**
- * Get default activity
- * @returns {Object} Default activity configuration
- */
-export function getDefaultActivity() {
-    return defaultActivityRef.current;
-}
-
-/**
  * Initialize all activities
  * This should be called once during app startup
  * @returns {Promise<Object>} Loaded activities object
@@ -161,9 +148,6 @@ export async function initializeActivities() {
         activities[key] = loadedActivities[key];
     });
 
-    // Set default activity
-    defaultActivityRef.current = activities.volleyball;
-
     return activities;
 }
 
@@ -173,8 +157,6 @@ export { loadActivity, loadAllActivities, ACTIVITY_FILES };
 export default {
     activities,
     getActivityConfig,
-    defaultActivityRef,
-    getDefaultActivity,
     loadActivity,
     loadAllActivities,
     initializeActivities
