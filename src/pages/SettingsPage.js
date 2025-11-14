@@ -805,7 +805,7 @@ class SettingsPage extends BasePage {
                                     >
                                     <span class="position-label">
                                         ${this.playerService.positions[pos]}
-                                        <span class="position-stats-inline">(${rating} ELO, ${comparisons} comp.)</span>
+                                        <span>(${rating} ELO, ${comparisons} comp.)</span>
                                     </span>
                                 </label>
                             `;
@@ -885,7 +885,7 @@ class SettingsPage extends BasePage {
                                         >
                                         <span class="position-label">
                                             ${name}
-                                            <span class="position-stats-inline">
+                                            <span>
                                                 (${posStats.count} players, ${Math.floor(totalComps / 2)} comp.)
                                             </span>
                                         </span>
