@@ -8,7 +8,7 @@
 
 import { isEmpty } from './stringUtils.js';
 import ratingConfig from '../config/rating.js';
-import volleyballConfig from '../config/volleyball.js';
+import { getDefaultActivity } from '../config/activities/index.js';
 
 /**
  * Validation constants
@@ -156,7 +156,8 @@ export function validatePosition(position, options = {}) {
         return false;
     }
 
-    const validPositions = Object.keys(volleyballConfig.positions);
+    const defaultActivity = getDefaultActivity();
+    const validPositions = defaultActivity ? Object.keys(defaultActivity.positions) : [];
     if (!validPositions.includes(position)) {
         const error = new ValidationError(
             `Invalid position. Must be one of: ${validPositions.join(', ')}`,

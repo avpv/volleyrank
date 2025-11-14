@@ -1,6 +1,6 @@
 // src/utils/validation.js
 
-import volleyballConfig from '../config/volleyball.js';
+import { getDefaultActivity } from '../config/activities/index.js';
 
 /**
  * Validation Utilities
@@ -13,8 +13,17 @@ export const VALIDATION_RULES = {
     MIN_POSITIONS: 1
 };
 
-// Get valid positions from volleyball config (single source of truth)
-export const VALID_POSITIONS = Object.keys(volleyballConfig.positions);
+/**
+ * Get valid positions from default activity config (single source of truth)
+ * @returns {string[]} Array of valid position keys
+ */
+export function getValidPositions() {
+    const defaultActivity = getDefaultActivity();
+    return defaultActivity ? Object.keys(defaultActivity.positions) : [];
+}
+
+// Backwards compatibility - deprecated, use getValidPositions() instead
+export const VALID_POSITIONS = getValidPositions();
 
 /**
  * Validate player name
@@ -53,30 +62,32 @@ export function validateName(name) {
  */
 export function validatePositions(positions) {
     const errors = [];
-    
+
     if (!Array.isArray(positions)) {
         errors.push('Positions must be an array');
         return { isValid: false, errors };
     }
-    
+
     if (positions.length < VALIDATION_RULES.MIN_POSITIONS) {
         errors.push('At least one position required');
     }
-    
+
     if (positions.length > VALIDATION_RULES.MAX_POSITIONS) {
         errors.push(`Maximum ${VALIDATION_RULES.MAX_POSITIONS} positions allowed`);
     }
-    
-    const invalid = positions.filter(pos => !VALID_POSITIONS.includes(pos));
+
+    // Get valid positions dynamically
+    const validPositions = getValidPositions();
+    const invalid = positions.filter(pos => !validPositions.includes(pos));
     if (invalid.length > 0) {
         errors.push(`Invalid positions: ${invalid.join(', ')}`);
     }
-    
+
     const unique = [...new Set(positions)];
     if (unique.length !== positions.length) {
         errors.push('Duplicate positions not allowed');
     }
-    
+
     return {
         isValid: errors.length === 0,
         errors,
@@ -183,6 +194,7 @@ export default {
     sanitizeHTML,
     validateEmail,
     validateNumberInRange,
+    getValidPositions,
     VALIDATION_RULES,
     VALID_POSITIONS
 };

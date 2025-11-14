@@ -1,6 +1,6 @@
 // src/utils/formatters.js
 
-import volleyballConfig from '../config/volleyball.js';
+import { getDefaultActivity } from '../config/activities/index.js';
 
 /**
  * Data Formatting Utilities
@@ -55,10 +55,14 @@ export function formatPercentage(value, decimals = 0) {
 
 /**
  * Format position name
- * Uses positions from team-optimizer for consistency
+ * Uses positions from default activity config for consistency
  */
 export function formatPosition(positionKey) {
-    return volleyballConfig.positions[positionKey] || positionKey;
+    const defaultActivity = getDefaultActivity();
+    if (defaultActivity && defaultActivity.positions) {
+        return defaultActivity.positions[positionKey] || positionKey;
+    }
+    return positionKey;
 }
 
 /**

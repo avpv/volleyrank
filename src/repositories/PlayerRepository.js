@@ -16,6 +16,8 @@
  * - Reduces coupling between services and state management
  */
 
+import { getDefaultActivityKey } from '../config/activities/index.js';
+
 class PlayerRepository {
     /**
      * @param {StateManager} stateManager - State management service
@@ -35,7 +37,7 @@ class PlayerRepository {
      * @returns {string} Current activity key
      */
     _getActivityKey() {
-        return this.storageAdapter.get('selectedActivity', 'volleyball');
+        return this.storageAdapter.get('selectedActivity', getDefaultActivityKey());
     }
 
     /**

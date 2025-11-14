@@ -29,7 +29,7 @@ import stateManager from './core/StateManager.js';
 import toast from './components/base/Toast.js';
 import redirectModule from './redirect.js';
 import { getIcon } from './components/base/Icons.js';
-import { initializeActivities, activities, getDefaultActivity } from './config/activities/index.js';
+import { initializeActivities, activities, getDefaultActivity, getDefaultActivityKey } from './config/activities/index.js';
 import { escapeHtml } from './utils/stringUtils.js';
 import { initializeServices } from './config/services.js';
 import storage from './core/StorageAdapter.js';
@@ -110,7 +110,7 @@ class Application {
         if (!activityConfig) {
             console.warn(`Activity '${selectedActivity}' not found, using default`);
             const defaultActivity = getDefaultActivity();
-            return { key: 'volleyball', config: defaultActivity };
+            return { key: getDefaultActivityKey(), config: defaultActivity };
         }
 
         return { key: selectedActivity, config: activityConfig };

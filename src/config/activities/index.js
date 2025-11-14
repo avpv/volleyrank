@@ -136,6 +136,11 @@ export function getActivityConfig(activityName) {
 export const activities = {};
 
 /**
+ * Default activity key - the first activity in the list
+ */
+export const DEFAULT_ACTIVITY_KEY = Object.keys(ACTIVITY_FILES)[0];
+
+/**
  * Default activity reference - holds the default activity config
  */
 export const defaultActivityRef = { current: null };
@@ -146,6 +151,14 @@ export const defaultActivityRef = { current: null };
  */
 export function getDefaultActivity() {
     return defaultActivityRef.current;
+}
+
+/**
+ * Get default activity key
+ * @returns {string} Default activity key
+ */
+export function getDefaultActivityKey() {
+    return DEFAULT_ACTIVITY_KEY;
 }
 
 /**
@@ -162,7 +175,7 @@ export async function initializeActivities() {
     });
 
     // Set default activity
-    defaultActivityRef.current = activities.volleyball;
+    defaultActivityRef.current = activities[DEFAULT_ACTIVITY_KEY];
 
     return activities;
 }
@@ -175,7 +188,9 @@ export default {
     getActivityConfig,
     defaultActivityRef,
     getDefaultActivity,
+    getDefaultActivityKey,
     loadActivity,
     loadAllActivities,
-    initializeActivities
+    initializeActivities,
+    DEFAULT_ACTIVITY_KEY
 };

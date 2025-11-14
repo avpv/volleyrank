@@ -6,6 +6,7 @@
  */
 import eventBus from './EventBus.js';
 import storage from './StorageAdapter.js';
+import { getDefaultActivityKey, ACTIVITY_FILES } from '../config/activities/index.js';
 
 class StateManager {
     constructor() {
@@ -228,16 +229,15 @@ class StateManager {
         if (version < '4.1') {
 
             // Get the currently selected activity from storage
-            const selectedActivity = storage.get('selectedActivity', 'volleyball');
+            const selectedActivity = storage.get('selectedActivity', getDefaultActivityKey());
 
             // If old players array exists, move it to the selected activity
             if (data.players && Array.isArray(data.players)) {
-                data.playersByActivity = {
-                    volleyball: [],
-                    basketball: [],
-                    soccer: [],
-                    'work-project': []
-                };
+                // Initialize playersByActivity with all available activities
+                data.playersByActivity = Object.keys(ACTIVITY_FILES).reduce((acc, key) => {
+                    acc[key] = [];
+                    return acc;
+                }, {});
 
                 // Place existing players under the currently selected activity
                 data.playersByActivity[selectedActivity] = data.players;
@@ -246,12 +246,10 @@ class StateManager {
                 delete data.players;
             } else if (!data.playersByActivity) {
                 // Initialize empty playersByActivity if it doesn't exist
-                data.playersByActivity = {
-                    volleyball: [],
-                    basketball: [],
-                    soccer: [],
-                    'work-project': []
-                };
+                data.playersByActivity = Object.keys(ACTIVITY_FILES).reduce((acc, key) => {
+                    acc[key] = [];
+                    return acc;
+                }, {});
             }
 
             data.version = '4.1';
@@ -393,7 +391,7 @@ class StateManager {
      * Get state statistics
      */
     getStats() {
-        const selectedActivity = storage.get('selectedActivity', 'volleyball');
+        const selectedActivity = storage.get('selectedActivity', getDefaultActivityKey());
         const sessions = this.state.sessions || {};
         const activeSessions = this.state.activeSessions || {};
         const activeSessionId = activeSessions[selectedActivity];
