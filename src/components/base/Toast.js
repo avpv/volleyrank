@@ -2,6 +2,7 @@
 
 import { getIcon } from './Icons.js';
 import { escapeHtml } from '../../utils/stringUtils.js';
+import uiConfig from '../../config/ui.js';
 
 /**
  * Toast - Notification component
@@ -31,7 +32,7 @@ class Toast {
     /**
      * Show a toast notification
      */
-    show(message, type = 'info', duration = 3000) {
+    show(message, type = 'info', duration = uiConfig.TOAST.DEFAULT_DURATION) {
         const toast = this.createToast(message, type);
         this.container.appendChild(toast);
         this.toasts.push(toast);

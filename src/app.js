@@ -27,6 +27,7 @@ import router from './core/Router.js';
 import eventBus from './core/EventBus.js';
 import stateManager from './core/StateManager.js';
 import toast from './components/base/Toast.js';
+import uiConfig from './config/ui.js';
 import redirectModule from './redirect.js';
 import { getIcon } from './components/base/Icons.js';
 import { initializeActivities, activities } from './config/activities/index.js';
@@ -517,27 +518,27 @@ class Application {
         });
 
         eventBus.on('state:migrated', (data) => {
-            toast.success(`Data migrated to v${data.to}`, 3000);
+            toast.success(`Data migrated to v${data.to}`, uiConfig.TOAST.DEFAULT_DURATION);
         });
 
         // Player management events
         eventBus.on('player:added', (player) => {
-            toast.success(`Player "${player.name}" added!`, 2000);
+            toast.success(`Player "${player.name}" added!`, uiConfig.TOAST.QUICK_DURATION);
         });
 
         eventBus.on('player:removed', (player) => {
-            toast.info(`Player "${player.name}" removed`, 2000);
+            toast.info(`Player "${player.name}" removed`, uiConfig.TOAST.QUICK_DURATION);
         });
 
         eventBus.on('player:updated', (player) => {
-            toast.success(`Player "${player.name}" updated`, 2000);
+            toast.success(`Player "${player.name}" updated`, uiConfig.TOAST.QUICK_DURATION);
         });
 
         eventBus.on('player:reset', (data) => {
             const posNames = data.positions
                 .map(p => this.getPositionName(p))
                 .join(', ');
-            toast.success(`Reset ${posNames} for ${data.player.name}`, 2500);
+            toast.success(`Reset ${posNames} for ${data.player.name}`, uiConfig.TOAST.MEDIUM_DURATION);
         });
 
         eventBus.on('players:reset-all-positions', (data) => {
@@ -566,11 +567,11 @@ class Application {
 
         // Error events
         eventBus.on('state:save-error', () => {
-            toast.error('Failed to save data', 3000);
+            toast.error('Failed to save data', uiConfig.TOAST.DEFAULT_DURATION);
         });
 
         eventBus.on('state:load-error', () => {
-            toast.error('Failed to load saved data', 3000);
+            toast.error('Failed to load saved data', uiConfig.TOAST.DEFAULT_DURATION);
         });
 
         // Window lifecycle events
@@ -604,13 +605,13 @@ class Application {
         // Global synchronous error handler
         window.addEventListener('error', (event) => {
             console.error('[Global Error]', event.error);
-            toast.error('An unexpected error occurred', 3000);
+            toast.error('An unexpected error occurred', uiConfig.TOAST.DEFAULT_DURATION);
         });
 
         // Unhandled promise rejection handler
         window.addEventListener('unhandledrejection', (event) => {
             console.error('[Unhandled Promise Rejection]', event.reason);
-            toast.error('An unexpected error occurred', 3000);
+            toast.error('An unexpected error occurred', uiConfig.TOAST.DEFAULT_DURATION);
         });
     }
 

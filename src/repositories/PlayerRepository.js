@@ -1,5 +1,7 @@
 // src/repositories/PlayerRepository.js
 
+import ratingConfig from '../config/rating.js';
+
 /**
  * PlayerRepository - Data Access Layer for Player entities
  *
@@ -252,7 +254,7 @@ class PlayerRepository {
      * @param {number} defaultRating - Default rating value
      * @returns {Object} Updated player
      */
-    resetPlayerPositions(playerId, positions, defaultRating = 1500) {
+    resetPlayerPositions(playerId, positions, defaultRating = ratingConfig.RATING_CONSTANTS.DEFAULT) {
         const player = this.getById(playerId);
         if (!player) {
             throw new Error('Player not found');
@@ -283,7 +285,7 @@ class PlayerRepository {
      * @param {number} defaultRating - Default rating value
      * @returns {Array<Object>} Updated players
      */
-    resetAllPositions(positions, defaultRating = 1500) {
+    resetAllPositions(positions, defaultRating = ratingConfig.RATING_CONSTANTS.DEFAULT) {
         const players = this.getAll();
 
         const updates = players.map(player => {

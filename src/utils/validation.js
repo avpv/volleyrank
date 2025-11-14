@@ -1,17 +1,20 @@
 // src/utils/validation.js
 
 import { activities } from '../config/activities/index.js';
+import validationConfig from '../config/validation.js';
 import storage from '../core/StorageAdapter.js';
 
 /**
  * Validation Utilities
+ *
+ * NOTE: Constants now imported from config/validation.js for single source of truth
  */
 
 export const VALIDATION_RULES = {
-    MAX_NAME_LENGTH: 50,
-    MIN_NAME_LENGTH: 1,
-    MAX_POSITIONS: 5,
-    MIN_POSITIONS: 1
+    MAX_NAME_LENGTH: validationConfig.NAME_VALIDATION.MAX_LENGTH,
+    MIN_NAME_LENGTH: validationConfig.NAME_VALIDATION.MIN_LENGTH,
+    MAX_POSITIONS: validationConfig.POSITION_VALIDATION.MAX_POSITIONS,
+    MIN_POSITIONS: validationConfig.POSITION_VALIDATION.MIN_POSITIONS
 };
 
 /**
@@ -101,15 +104,15 @@ export function validatePositions(positions) {
  */
 export function validateTeamCount(count) {
     const num = parseInt(count);
-    
-    if (isNaN(num) || num < 1) {
-        return { isValid: false, error: 'Team count must be at least 1' };
+
+    if (isNaN(num) || num < validationConfig.TEAM_VALIDATION.MIN_TEAMS) {
+        return { isValid: false, error: `Team count must be at least ${validationConfig.TEAM_VALIDATION.MIN_TEAMS}` };
     }
-    
-    if (num > 10) {
-        return { isValid: false, error: 'Maximum 10 teams allowed' };
+
+    if (num > validationConfig.TEAM_VALIDATION.MAX_TEAMS) {
+        return { isValid: false, error: `Maximum ${validationConfig.TEAM_VALIDATION.MAX_TEAMS} teams allowed` };
     }
-    
+
     return { isValid: true, value: num };
 }
 
@@ -118,21 +121,21 @@ export function validateTeamCount(count) {
  */
 export function validateComposition(composition) {
     const errors = [];
-    
+
     if (!composition || typeof composition !== 'object') {
         return { isValid: false, errors: ['Invalid composition format'] };
     }
-    
+
     const total = Object.values(composition).reduce((sum, val) => sum + (parseInt(val) || 0), 0);
-    
+
     if (total === 0) {
         errors.push('At least one player per team required');
     }
-    
-    if (total > 12) {
-        errors.push('Maximum 12 players per team');
+
+    if (total > validationConfig.TEAM_VALIDATION.MAX_PLAYERS_PER_TEAM) {
+        errors.push(`Maximum ${validationConfig.TEAM_VALIDATION.MAX_PLAYERS_PER_TEAM} players per team`);
     }
-    
+
     return {
         isValid: errors.length === 0,
         errors,

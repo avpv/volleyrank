@@ -2,6 +2,8 @@
 
 import { activities } from '../config/activities/index.js';
 import storage from '../core/StorageAdapter.js';
+import ratingConfig from '../config/rating.js';
+import uiConfig from '../config/ui.js';
 
 /**
  * Data Formatting Utilities
@@ -121,7 +123,7 @@ export function formatDuration(ms) {
 /**
  * Truncate text
  */
-export function truncate(text, maxLength = 50, suffix = '...') {
+export function truncate(text, maxLength = uiConfig.INPUT_CONSTRAINTS.TEXT_TRUNCATE.DEFAULT_MAX_LENGTH, suffix = '...') {
     if (!text || text.length <= maxLength) {
         return text;
     }
@@ -158,12 +160,14 @@ export function formatComparisonCount(count) {
 
 /**
  * Format team balance
+ * Uses thresholds from rating.js for consistency
  */
 export function formatBalance(difference) {
-    if (difference < 100) return 'Excellent';
-    if (difference < 200) return 'Very Good';
-    if (difference < 300) return 'Good';
-    if (difference < 500) return 'Fair';
+    const thresholds = ratingConfig.BALANCE_THRESHOLDS.QUALITY;
+    if (difference < thresholds.EXCELLENT) return 'Excellent';
+    if (difference < thresholds.GOOD) return 'Very Good';
+    if (difference < thresholds.FAIR) return 'Good';
+    if (difference < thresholds.POOR) return 'Fair';
     return 'Poor';
 }
 

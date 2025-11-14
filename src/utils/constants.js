@@ -4,10 +4,13 @@
  * Application Constants
  *
  * IMPORTANT: Rating-related constants are in config/rating.js
+ * IMPORTANT: Validation constants are in config/validation.js
+ * IMPORTANT: UI constants (timing, animation, input constraints) are in config/ui.js
  * IMPORTANT: Activity-specific constants (positions, etc.) are in config/activities/
  */
 
 import ratingConfig from '../config/rating.js';
+import validationConfig from '../config/validation.js';
 
 export const APP_VERSION = '4.0.0';
 export const APP_NAME = 'TeamBalance';
@@ -56,12 +59,14 @@ export const EVENTS = {
     ROUTE_ERROR: 'route:error'
 };
 
+// DEPRECATED: Import directly from config/validation.js instead
+// Kept for backward compatibility only
 export const VALIDATION = {
-    MAX_NAME_LENGTH: 50,
-    MAX_POSITIONS_PER_PLAYER: 3,
-    MIN_PLAYERS_FOR_COMPARISON: 2,
-    MIN_TEAMS: 1,
-    MAX_TEAMS: 10
+    MAX_NAME_LENGTH: validationConfig.NAME_VALIDATION.MAX_LENGTH,
+    MAX_POSITIONS_PER_PLAYER: validationConfig.POSITION_VALIDATION.MAX_POSITIONS,
+    MIN_PLAYERS_FOR_COMPARISON: validationConfig.COMPARISON_VALIDATION.MIN_PLAYERS,
+    MIN_TEAMS: validationConfig.TEAM_VALIDATION.MIN_TEAMS,
+    MAX_TEAMS: validationConfig.TEAM_VALIDATION.MAX_TEAMS
 };
 
 export default {

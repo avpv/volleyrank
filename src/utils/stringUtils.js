@@ -6,6 +6,8 @@
  * eliminating code duplication and ensuring consistent behavior.
  */
 
+import uiConfig from '../config/ui.js';
+
 /**
  * HTML escape map for security
  * Maps dangerous characters to their HTML entity equivalents
@@ -70,7 +72,7 @@ export function escapeHtml(str) {
  * sanitizeName('A'.repeat(100), 10)
  * // Returns: 'AAAAAAAAAA' (truncated to 10 chars)
  */
-export function sanitizeName(name, maxLength = 50) {
+export function sanitizeName(name, maxLength = uiConfig.INPUT_CONSTRAINTS.TEXT_TRUNCATE.DEFAULT_MAX_LENGTH) {
     if (typeof name !== 'string') {
         return '';
     }
