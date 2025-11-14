@@ -15,17 +15,17 @@ class TeamOptimizerServiceWrapper {
         this.activityConfig = activityConfig;
         this.eloService = eloService;
 
-        // Initialize optimizer with activity config
+        // Initialize optimizer with activity config (only if config provided)
         // No custom evaluation needed - EvaluationService uses the same player.ratings[position] data
-        this.optimizer = new LibraryTeamOptimizer(activityConfig);
+        this.optimizer = activityConfig ? new LibraryTeamOptimizer(activityConfig) : null;
 
         // Expose positions for backward compatibility
-        this.positions = activityConfig.positions;
-        this.positionOrder = activityConfig.positionOrder;
+        this.positions = activityConfig?.positions || {};
+        this.positionOrder = activityConfig?.positionOrder || [];
 
         // Expose config for external access
-        this.config = this.optimizer.config;
-        this.algorithmConfigs = this.optimizer.algorithmConfigs;
+        this.config = this.optimizer?.config || null;
+        this.algorithmConfigs = this.optimizer?.algorithmConfigs || null;
     }
 
     /**

@@ -39,9 +39,10 @@ import SessionService from '../services/SessionService.js';
  * Core service configuration (no activity required)
  * These services can work without activity config
  *
+ * @param {Object|null} activityConfig - Optional activity configuration
  * @returns {Object} Core service configuration
  */
-export function createCoreServiceConfig() {
+export function createCoreServiceConfig(activityConfig = null) {
     return {
         // ===== Core Services =====
 
@@ -100,6 +101,27 @@ export function createCoreServiceConfig() {
         // ===== Repository Layer =====
 
         /**
+         * Player Repository - Data access for players
+         * Singleton: One repository instance
+         * Dependencies: stateManager, eventBus, storageAdapter
+         *
+         * Purpose: Encapsulate all data access operations
+         * Benefits: Loose coupling, easier testing, single source of truth
+         *
+         * Note: Uses storageAdapter to dynamically read current activity,
+         * ensuring data is always loaded from the correct session.
+         * Can be initialized without activity config.
+         */
+        playerRepository: {
+            implementation: PlayerRepository,
+            lifetime: ServiceLifetime.SINGLETON,
+            dependencies: ['stateManager', 'eventBus', 'storageAdapter'],
+            factory: (deps) => {
+                return new PlayerRepository(deps.stateManager, deps.eventBus, deps.storageAdapter);
+            }
+        },
+
+        /**
          * Session Repository - Data access for sessions
          * Singleton: One repository instance
          * Dependencies: stateManager, eventBus
@@ -132,43 +154,6 @@ export function createCoreServiceConfig() {
                 deps.sessionRepository,
                 deps.eventBus
             )
-        }
-    };
-}
-
-/**
- * Full service configuration factory (requires activity)
- * Defines how each service should be registered
- *
- * @param {Object} activityConfig - Activity configuration (positions, weights, etc.)
- * @returns {Object} Service configuration
- */
-export function createServiceConfig(activityConfig) {
-    // Start with core services
-    const config = createCoreServiceConfig();
-
-    // Add activity-dependent services
-    return {
-        ...config,
-
-        /**
-         * Player Repository - Data access for players
-         * Singleton: One repository instance
-         * Dependencies: stateManager, eventBus, storageAdapter
-         *
-         * Purpose: Encapsulate all data access operations
-         * Benefits: Loose coupling, easier testing, single source of truth
-         *
-         * Note: Uses storageAdapter to dynamically read current activity,
-         * ensuring data is always loaded from the correct session
-         */
-        playerRepository: {
-            implementation: PlayerRepository,
-            lifetime: ServiceLifetime.SINGLETON,
-            dependencies: ['stateManager', 'eventBus', 'storageAdapter'],
-            factory: (deps) => {
-                return new PlayerRepository(deps.stateManager, deps.eventBus, deps.storageAdapter);
-            }
         },
 
         // ===== Validation Layer =====
@@ -176,10 +161,12 @@ export function createServiceConfig(activityConfig) {
         /**
          * Validation Service - Centralized validation
          * Singleton: Stateless service
-         * Dependencies: activityConfig
+         * Dependencies: activityConfig (optional)
          *
          * Purpose: Centralize all validation logic
          * Benefits: Reusability, consistency, easier testing
+         *
+         * Note: Can work with null activityConfig in limited mode
          */
         validationService: {
             implementation: ValidationService,
@@ -193,7 +180,9 @@ export function createServiceConfig(activityConfig) {
         /**
          * ELO Service - Rating calculations
          * Singleton: Stateless service
-         * Dependencies: activityConfig (for position weights)
+         * Dependencies: activityConfig (optional)
+         *
+         * Note: Can work with null activityConfig for basic operations
          */
         eloService: {
             implementation: EloService,
@@ -205,12 +194,13 @@ export function createServiceConfig(activityConfig) {
         /**
          * Player Service - Player management (REFACTORED)
          * Singleton: One player service
-         * Dependencies: activityConfig, playerRepository, validationService, eventBus, eloService
+         * Dependencies: activityConfig (optional), playerRepository, validationService, eventBus, eloService
          *
          * Changes:
          * - Now uses PlayerRepository instead of StateManager
          * - Now uses ValidationService instead of internal validation
          * - Focused on business logic only
+         * - Can be initialized with null activityConfig
          */
         playerService: {
             implementation: PlayerService,
@@ -228,13 +218,14 @@ export function createServiceConfig(activityConfig) {
         /**
          * Comparison Service - Player comparisons (REFACTORED)
          * Singleton: One comparison service
-         * Dependencies: activityConfig, playerRepository, validationService, eloService, eventBus
+         * Dependencies: activityConfig (optional), playerRepository, validationService, eloService, eventBus
          *
          * Changes:
          * - Now uses PlayerRepository instead of StateManager
          * - Now uses ValidationService for input validation
          * - Split long methods into smaller focused methods
          * - Better separation of concerns
+         * - Can be initialized with null activityConfig
          */
         comparisonService: {
             implementation: ComparisonService,
@@ -252,7 +243,9 @@ export function createServiceConfig(activityConfig) {
         /**
          * Team Optimizer Service - Team generation
          * Singleton: Stateless service
-         * Dependencies: activityConfig, eloService
+         * Dependencies: activityConfig (optional), eloService
+         *
+         * Note: Can be initialized with null activityConfig
          */
         teamOptimizerService: {
             implementation: TeamOptimizerService,
@@ -266,6 +259,19 @@ export function createServiceConfig(activityConfig) {
     };
 }
 
+/**
+ * Full service configuration factory
+ * Note: Now delegates to createCoreServiceConfig which handles all services
+ *
+ * @param {Object} activityConfig - Activity configuration (positions, weights, etc.)
+ * @returns {Object} Service configuration
+ * @deprecated Use createCoreServiceConfig directly
+ */
+export function createServiceConfig(activityConfig) {
+    // Delegate to core config which now handles all services
+    return createCoreServiceConfig(activityConfig);
+}
+
 // Backwards compatibility: export serviceConfig as empty object
 // Applications should now call createServiceConfig(activityConfig)
 export const serviceConfig = {};
@@ -274,14 +280,13 @@ export const serviceConfig = {};
  * Initialize service registry
  * Creates and configures the global service registry
  *
- * @param {Object|null} activityConfig - Activity configuration (positions, weights, etc.), or null for core services only
+ * @param {Object|null} activityConfig - Activity configuration (positions, weights, etc.), or null for limited mode
  * @returns {ServiceRegistry} Configured registry
  */
-export function initializeServices(activityConfig) {
-    // If no activity config provided, initialize only core services
-    const config = activityConfig
-        ? createServiceConfig(activityConfig)
-        : createCoreServiceConfig();
+export function initializeServices(activityConfig = null) {
+    // Create service config with activityConfig (can be null)
+    // All services are now registered regardless of activity config
+    const config = createCoreServiceConfig(activityConfig);
 
     const registry = createRegistry(config);
 

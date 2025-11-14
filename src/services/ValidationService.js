@@ -18,11 +18,11 @@
 
 class ValidationService {
     /**
-     * @param {Object} activityConfig - Activity configuration
+     * @param {Object|null} activityConfig - Activity configuration (null if no activity selected)
      */
     constructor(activityConfig) {
         this.config = activityConfig;
-        this.positions = activityConfig.positions;
+        this.positions = activityConfig?.positions || {};
 
         // Validation rules
         this.rules = {
