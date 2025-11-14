@@ -472,7 +472,6 @@ select.form-control {
     transition: var(--transition-default);
     position: relative;
     flex-shrink: 0;
-    align-self: center;
 }
 
 .position-checkbox input[type="checkbox"]:checked {
@@ -496,10 +495,9 @@ select.form-control {
     font-size: var(--font-size-sm);
     font-weight: var(--font-weight-medium);
     color: var(--color-text-primary);
-    line-height: 1;
+    line-height: 1.5;
     display: inline-flex;
     align-items: center;
-    padding: 2px 0;
 }
 
 /* Form Actions - Better alignment */
