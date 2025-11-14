@@ -276,62 +276,32 @@ class Sidebar extends Component {
                     }
                 } else if (isDeletingActiveSession) {
                     // Deleted the active session for current activity
-                    // Check if there are other sessions from other activities we can switch to
-                    const allActivities = this.sessionService.sessionRepository.stateManager.get('sessions') || {};
+                    // Clear selected activity so user can choose from remaining sessions
+                    storage.remove(STORAGE_KEYS.SELECTED_ACTIVITY);
+                    storage.remove(STORAGE_KEYS.PENDING_ACTIVITY);
 
-                    // Collect all remaining sessions with their activity keys
-                    const remainingSessionsWithActivity = [];
-                    for (const [actKey, sessions] of Object.entries(allActivities)) {
-                        if (sessions && typeof sessions === 'object') {
-                            Object.values(sessions).forEach(session => {
-                                remainingSessionsWithActivity.push({
-                                    session,
-                                    activityKey: actKey
-                                });
-                            });
-                        }
+                    // Check if there are any remaining sessions at all
+                    const allActivities = this.sessionService.sessionRepository.stateManager.get('sessions') || {};
+                    const totalSessionCount = Object.values(allActivities).reduce((count, sessions) => {
+                        return count + Object.keys(sessions || {}).length;
+                    }, 0);
+
+                    // Show appropriate message
+                    if (totalSessionCount > 0) {
+                        toast.info('Session deleted. Select a session from the sidebar to continue.');
+                    } else {
+                        toast.info('Session deleted. Please select an activity to continue.');
                     }
 
-                    // Sort by creation date (newest first)
-                    remainingSessionsWithActivity.sort((a, b) =>
-                        new Date(b.session.createdAt) - new Date(a.session.createdAt)
-                    );
+                    // Force immediate save before navigation/reload
+                    this.sessionService.sessionRepository.stateManager.save();
 
-                    if (remainingSessionsWithActivity.length > 0) {
-                        // Auto-switch to the most recent session from another activity
-                        const mostRecent = remainingSessionsWithActivity[0];
-                        storage.set(STORAGE_KEYS.SELECTED_ACTIVITY, mostRecent.activityKey);
-                        storage.remove(STORAGE_KEYS.PENDING_ACTIVITY);
-
-                        // Switch to that session
-                        this.sessionService.switchSession(mostRecent.activityKey, mostRecent.session.id);
-
-                        // Show message about auto-switch
-                        toast.info(`Session deleted. Switched to ${activities[mostRecent.activityKey]?.name || 'another activity'}.`);
-
-                        // Force immediate save before reload
-                        this.sessionService.sessionRepository.stateManager.save();
-
-                        // Reload to apply new activity
-                        window.location.reload();
+                    // Navigate to settings
+                    if (router.currentRoute !== '/') {
+                        router.navigate('/');
                     } else {
-                        // No sessions left at all - navigate to settings
-                        storage.remove(STORAGE_KEYS.SELECTED_ACTIVITY);
-                        storage.remove(STORAGE_KEYS.PENDING_ACTIVITY);
-
-                        // Show message
-                        toast.info('Session deleted. Please select an activity to continue.');
-
-                        // Force immediate save before navigation/reload
-                        this.sessionService.sessionRepository.stateManager.save();
-
-                        // Navigate to settings
-                        if (router.currentRoute !== '/') {
-                            router.navigate('/');
-                        } else {
-                            // Already on settings page, just reload to reset state
-                            window.location.reload();
-                        }
+                        // Already on settings page, just reload to reset state
+                        window.location.reload();
                     }
                 } else {
                     // Deleted non-active session, just update UI

@@ -67,31 +67,16 @@ class RankingsPage extends BasePage {
             this.sidebar.destroy();
         }
 
-        // Use the activityKey passed as prop instead of storage with hardcoded fallback
+        // Use the activityKey passed as prop (can be null if no activity selected)
         const activityKey = this.activityKey;
-        if (!activityKey) {
-            // No activity context, show placeholder message
-            sidebarContainer.innerHTML = `
-                <div class="sidebar">
-                    <div class="sidebar__header">
-                        <h3 class="sidebar__title">Recents</h3>
-                    </div>
-                    <div class="sidebar__empty">
-                        <p>No sessions</p>
-                        <p class="text-muted">Create your first teams</p>
-                    </div>
-                </div>
-            `;
-            // Don't setup mobile sidebar toggle since there's no interactive sidebar
-            return;
-        }
-        const activityConfig = activities[activityKey];
+        const activityConfig = activityKey ? activities[activityKey] : null;
 
+        // Always create sidebar - it will show all sessions from all activities
         this.sidebar = new Sidebar(sidebarContainer, {
             sessionService: this.sessionService,
             eventBus: this.eventBus,
-            activityKey: activityKey,
-            activityName: activityConfig?.name || 'Unknown'
+            activityKey: activityKey, // Can be null
+            activityName: activityConfig?.name || null
         });
 
         this.sidebar.mount();
