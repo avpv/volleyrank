@@ -6,6 +6,7 @@
  */
 import Component from '../components/base/Component.js';
 import { getLogo } from '../components/base/Icons.js';
+import uiConfig from '../config/ui.js';
 
 class BasePage extends Component {
     constructor(container, props = {}) {
@@ -47,7 +48,7 @@ class BasePage extends Component {
             sidebar.classList.add('open');
             backdrop.style.display = 'block';
             // Use setTimeout to ensure display change happens before opacity transition
-            setTimeout(() => backdrop.classList.add('visible'), 10);
+            setTimeout(() => backdrop.classList.add('visible'), uiConfig.ANIMATION.IMMEDIATE);
             document.body.style.overflow = 'hidden';
         };
 

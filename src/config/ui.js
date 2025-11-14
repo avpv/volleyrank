@@ -67,6 +67,9 @@ export const BALANCE_DISPLAY = {
  * Animation and Transition Settings
  */
 export const ANIMATION = {
+    /** Immediate/instant delay for display changes (ms) */
+    IMMEDIATE: 10,
+
     /** Short animation duration (ms) */
     SHORT: 100,
 
@@ -101,11 +104,23 @@ export const TOAST = {
     /** Toast animation duration (ms) */
     ANIMATION_DURATION: 300,
 
-    /** Default toast display duration (ms) */
+    /** Very short toast duration (ms) - for quick confirmations */
+    SHORT_DURATION: 1500,
+
+    /** Quick toast duration (ms) - for simple actions */
+    QUICK_DURATION: 2000,
+
+    /** Medium toast duration (ms) - for important info */
+    MEDIUM_DURATION: 2500,
+
+    /** Default toast display duration (ms) - standard notifications */
     DEFAULT_DURATION: 3000,
 
-    /** Error toast display duration (ms) */
-    ERROR_DURATION: 5000
+    /** Error toast display duration (ms) - errors need more time */
+    ERROR_DURATION: 5000,
+
+    /** Long toast duration (ms) - for processes that take time */
+    LONG_DURATION: 10000
 };
 
 /**

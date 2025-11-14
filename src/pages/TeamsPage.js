@@ -576,7 +576,7 @@ class TeamsPage extends BasePage {
             }
 
             // Show optimizing message
-            toast.info('Optimizing teams... This may take a moment', 10000);
+            toast.info('Optimizing teams... This may take a moment', uiConfig.TOAST.LONG_DURATION);
 
             // Apply custom position weights temporarily for optimization
             const originalWeights = { ...this.activityConfig.positionWeights };

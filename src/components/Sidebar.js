@@ -186,7 +186,7 @@ class Sidebar extends Component {
 
                 // Full page reload required when switching activities
                 // This ensures all services get the new activity config
-                toast.info(`Switching to ${activities[activityKey]?.name}...`, 1500);
+                toast.info(`Switching to ${activities[activityKey]?.name}...`, uiConfig.TOAST.SHORT_DURATION);
                 setTimeout(() => {
                     window.location.reload();
                 }, 1500);

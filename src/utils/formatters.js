@@ -3,6 +3,7 @@
 import { activities } from '../config/activities/index.js';
 import storage from '../core/StorageAdapter.js';
 import ratingConfig from '../config/rating.js';
+import uiConfig from '../config/ui.js';
 
 /**
  * Data Formatting Utilities
@@ -122,7 +123,7 @@ export function formatDuration(ms) {
 /**
  * Truncate text
  */
-export function truncate(text, maxLength = 50, suffix = '...') {
+export function truncate(text, maxLength = uiConfig.INPUT_CONSTRAINTS.TEXT_TRUNCATE.DEFAULT_MAX_LENGTH, suffix = '...') {
     if (!text || text.length <= maxLength) {
         return text;
     }

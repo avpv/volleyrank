@@ -9,6 +9,7 @@ import { getIcon } from '../components/base/Icons.js';
 import Sidebar from '../components/Sidebar.js';
 import storage from '../core/StorageAdapter.js';
 import { activities } from '../config/activities/index.js';
+import uiConfig from '../config/ui.js';
 
 class ComparePage extends BasePage {
     constructor(container, props = {}) {
@@ -377,7 +378,7 @@ class ComparePage extends BasePage {
     handleDraw(player1Id, player2Id) {
         try {
             this.comparisonService.processDraw(player1Id, player2Id, this.selectedPosition);
-            toast.success('Win-Win recorded', 2000);
+            toast.success('Win-Win recorded', uiConfig.TOAST.QUICK_DURATION);
         } catch (error) {
             toast.error(error.message);
         }

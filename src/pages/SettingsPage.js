@@ -585,7 +585,7 @@ class SettingsPage extends BasePage {
                 storage.remove('pendingActivity');
 
                 const selectedActivity = activities[targetActivity];
-                toast.success(`Switching to ${selectedActivity.name}. Reloading...`, 2000);
+                toast.success(`Switching to ${selectedActivity.name}. Reloading...`, uiConfig.TOAST.QUICK_DURATION);
 
                 setTimeout(() => {
                     window.location.reload();
