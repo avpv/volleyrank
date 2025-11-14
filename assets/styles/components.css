@@ -465,7 +465,6 @@ select.form-control {
     width: 20px;
     height: 20px;
     margin: 0;
-    margin-top: 1px;
     border: 1px solid var(--color-border-default);
     border-radius: var(--radius-sm);
     background: var(--color-bg-primary);
@@ -473,6 +472,7 @@ select.form-control {
     transition: var(--transition-default);
     position: relative;
     flex-shrink: 0;
+    align-self: center;
 }
 
 .position-checkbox input[type="checkbox"]:checked {
@@ -496,10 +496,10 @@ select.form-control {
     font-size: var(--font-size-sm);
     font-weight: var(--font-weight-medium);
     color: var(--color-text-primary);
-    line-height: 20px;
+    line-height: 1;
     display: inline-flex;
     align-items: center;
-    margin-top: -1px;
+    padding: 2px 0;
 }
 
 /* Form Actions - Better alignment */
