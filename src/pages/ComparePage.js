@@ -306,6 +306,12 @@ class ComparePage extends BasePage {
     }
 
     attachEventListeners() {
+        // Remove old keyboard event listener before adding a new one
+        // This prevents multiple listeners from being registered on page updates
+        if (this.handleKeyboard) {
+            document.removeEventListener('keydown', this.handleKeyboard);
+        }
+
         // Keyboard shortcuts for comparison
         this.handleKeyboard = (e) => {
             // Only handle keyboard shortcuts if we have an active comparison
