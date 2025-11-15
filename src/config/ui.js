@@ -208,7 +208,28 @@ export const ELEMENT_IDS = {
     IMPORT_DATA_INPUT: 'importDataInput',
 
     /** Import preview container */
-    IMPORT_PREVIEW: 'importPreview'
+    IMPORT_PREVIEW: 'importPreview',
+
+    /** Google Sheets integration section */
+    GOOGLE_SHEETS_SECTION: 'googleSheetsSection',
+
+    /** Google Sheets connect button */
+    GOOGLE_SHEETS_CONNECT_BTN: 'googleSheetsConnectBtn',
+
+    /** Google Sheets disconnect button */
+    GOOGLE_SHEETS_DISCONNECT_BTN: 'googleSheetsDisconnectBtn',
+
+    /** Google Sheets export button */
+    GOOGLE_SHEETS_EXPORT_BTN: 'googleSheetsExportBtn',
+
+    /** Google Sheets import button */
+    GOOGLE_SHEETS_IMPORT_BTN: 'googleSheetsImportBtn',
+
+    /** Google Sheets spreadsheet ID input */
+    GOOGLE_SHEETS_SPREADSHEET_ID: 'googleSheetsSpreadsheetId',
+
+    /** Google Sheets status indicator */
+    GOOGLE_SHEETS_STATUS: 'googleSheetsStatus'
 };
 
 /**
