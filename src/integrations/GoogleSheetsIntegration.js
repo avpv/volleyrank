@@ -4,16 +4,23 @@
  * Google Sheets Integration
  *
  * Provides export and import functionality for player data using Google Sheets API v4.
- * Uses OAuth 2.0 for client-side authentication (no backend required).
+ * Uses Google Identity Services (GIS) for client-side OAuth 2.0 authentication (no backend required).
  *
  * Setup Instructions:
  * 1. Go to https://console.cloud.google.com/
  * 2. Create a new project or select an existing one
  * 3. Enable Google Sheets API
  * 4. Create OAuth 2.0 Client ID (Web application)
- * 5. Add authorized JavaScript origins (e.g., https://yourdomain.github.io)
- * 6. Add authorized redirect URIs
- * 7. Copy the Client ID and update the configuration
+ * 5. **CRITICAL**: Add authorized JavaScript origins (e.g., https://yourdomain.github.io)
+ *    - This is REQUIRED for GIS to work
+ *    - Use only the origin (protocol + domain), NOT paths
+ *    - Example: https://avpv.github.io (not https://avpv.github.io/team-balance)
+ * 6. Configure OAuth consent screen
+ * 7. Copy the Client ID and update the configuration in src/config/integrations.js
+ *
+ * Troubleshooting:
+ * - If you get "403: access_denied" error, see docs/TROUBLESHOOTING_GOOGLE_OAUTH.md
+ * - The error usually means JavaScript origins are not configured correctly
  */
 
 class GoogleSheetsIntegration {
@@ -113,7 +120,7 @@ class GoogleSheetsIntegration {
             scope: this.apiScopes,
             callback: (response) => {
                 if (response.error !== undefined) {
-                    throw new Error(response.error);
+                    throw new Error(this.formatOAuthError(response.error));
                 }
                 this.accessToken = response.access_token;
                 this.isAuthorized = true;
@@ -132,7 +139,9 @@ class GoogleSheetsIntegration {
         return new Promise((resolve, reject) => {
             this.tokenClient.callback = async (response) => {
                 if (response.error !== undefined) {
-                    reject(new Error(response.error));
+                    const errorMessage = this.formatOAuthError(response.error);
+                    console.error('OAuth error:', response.error, errorMessage);
+                    reject(new Error(errorMessage));
                     return;
                 }
                 this.accessToken = response.access_token;
@@ -140,13 +149,20 @@ class GoogleSheetsIntegration {
                 resolve(true);
             };
 
-            // Request access token
-            if (this.accessToken === null) {
-                // Prompt the user to select a Google Account and ask for consent
-                this.tokenClient.requestAccessToken({ prompt: 'consent' });
-            } else {
-                // Skip display of account chooser and consent dialog
-                this.tokenClient.requestAccessToken({ prompt: '' });
+            try {
+                // Log current origin for debugging
+                console.log('Requesting OAuth token from origin:', window.location.origin);
+
+                // Request access token
+                if (this.accessToken === null) {
+                    // Prompt the user to select a Google Account and ask for consent
+                    this.tokenClient.requestAccessToken({ prompt: 'consent' });
+                } else {
+                    // Skip display of account chooser and consent dialog
+                    this.tokenClient.requestAccessToken({ prompt: '' });
+                }
+            } catch (error) {
+                reject(new Error(this.formatOAuthError(error.message || 'unknown_error')));
             }
         });
     }
@@ -487,6 +503,51 @@ class GoogleSheetsIntegration {
     extractSpreadsheetId(url) {
         const match = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
         return match ? match[1] : null;
+    }
+
+    /**
+     * Format OAuth error messages with helpful troubleshooting info
+     */
+    formatOAuthError(errorCode) {
+        const origin = window.location.origin;
+
+        const errorMessages = {
+            'access_denied': `OAuth access denied (403). This usually means the Authorized JavaScript Origins are not configured correctly in Google Cloud Console.\n\n` +
+                `Please ensure "${origin}" is added to Authorized JavaScript Origins (NOT redirect URIs).\n\n` +
+                `Steps to fix:\n` +
+                `1. Go to https://console.cloud.google.com/\n` +
+                `2. Select your project → APIs & Services → Credentials\n` +
+                `3. Edit your OAuth 2.0 Client ID\n` +
+                `4. Add "${origin}" to "Authorized JavaScript origins"\n` +
+                `5. Save and wait 5-10 minutes for changes to propagate\n\n` +
+                `See docs/TROUBLESHOOTING_GOOGLE_OAUTH.md for detailed instructions.`,
+
+            'popup_closed_by_user': 'OAuth popup was closed before completing authorization. Please try again.',
+
+            'popup_blocked': 'OAuth popup was blocked by your browser. Please allow popups for this site and try again.',
+
+            'invalid_client': `Invalid OAuth client configuration. Please verify that the Client ID in src/config/integrations.js matches your Google Cloud Console configuration.`,
+
+            'unauthorized_client': `This client is not authorized. Please check:\n` +
+                `1. Google Sheets API is enabled\n` +
+                `2. OAuth consent screen is configured\n` +
+                `3. For testing mode: your email is added as a test user`,
+
+            'org_internal': 'This OAuth client is restricted to internal users only. Please contact your Google Workspace administrator.',
+
+            'invalid_request': 'Invalid OAuth request. This may indicate a configuration error. Check browser console for details.'
+        };
+
+        const message = errorMessages[errorCode];
+        if (message) {
+            return message;
+        }
+
+        // Generic error message for unknown errors
+        return `OAuth error: ${errorCode}\n\n` +
+            `Current origin: ${origin}\n` +
+            `Please ensure this origin is added to "Authorized JavaScript origins" in Google Cloud Console.\n\n` +
+            `See docs/TROUBLESHOOTING_GOOGLE_OAUTH.md for help.`;
     }
 }
 
