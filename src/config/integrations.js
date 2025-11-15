@@ -17,8 +17,13 @@ const integrationsConfig = {
         // 5. Choose "Web application"
         // 6. Add your authorized JavaScript origins:
         //    - http://localhost:8080 (for local development)
-        //    - https://yourdomain.github.io (for production)
-        // 7. Copy the Client ID and paste it here
+        //    - https://avpv.github.io (for this production deployment)
+        // 7. Add your authorized redirect URIs (IMPORTANT to avoid redirect_uri_mismatch):
+        //    - http://localhost:8080 (for local development)
+        //    - https://avpv.github.io (for production)
+        //    - https://avpv.github.io/team-balance (with path)
+        //    - https://avpv.github.io/team-balance/ (with trailing slash)
+        // 8. Copy the Client ID and paste it here
         clientId: '793407683980-60nn9nngdghn7chf1bb5dnigl1i8aiht.apps.googleusercontent.com',
 
         // Whether Google Sheets integration is enabled
