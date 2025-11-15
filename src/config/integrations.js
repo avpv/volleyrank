@@ -19,10 +19,10 @@ const integrationsConfig = {
         //    - http://localhost:8080 (for local development)
         //    - https://yourdomain.github.io (for production)
         // 7. Copy the Client ID and paste it here
-        clientId: 'YOUR_CLIENT_ID_HERE.apps.googleusercontent.com',
+        clientId: '793407683980-60nn9nngdghn7chf1bb5dnigl1i8aiht.apps.googleusercontent.com',
 
         // Whether Google Sheets integration is enabled
-        enabled: false,
+        enabled: true,
 
         // Default sheet name for exports
         defaultSheetName: 'Players',
