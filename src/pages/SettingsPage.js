@@ -791,25 +791,18 @@ class SettingsPage extends BasePage {
                 <div class="form-group">
                     <label>Select positions to reset:</label>
                     <div class="positions-grid">
-                        ${player.positions.map(pos => {
-                            const rating = Math.round(player.ratings[pos]);
-                            const comparisons = player.comparisons[pos];
-                            return `
-                                <label class="position-checkbox">
-                                    <input
-                                        type="checkbox"
-                                        name="resetPositions"
-                                        value="${pos}"
-                                        class="position-input"
-                                        checked
-                                    >
-                                    <span class="position-label">
-                                        ${this.playerService.positions[pos]} (${pos})
-                                        <span>(${rating} ELO, ${comparisons} comp.)</span>
-                                    </span>
-                                </label>
-                            `;
-                        }).join('')}
+                        ${player.positions.map(pos => `
+                            <label class="position-checkbox">
+                                <input
+                                    type="checkbox"
+                                    name="resetPositions"
+                                    value="${pos}"
+                                    class="position-input"
+                                    checked
+                                >
+                                <span class="position-label">${this.playerService.positions[pos]} (${pos})</span>
+                            </label>
+                        `).join('')}
                     </div>
                     <div class="warning-box">
                         <div class="warning-title">Warning</div>
@@ -870,28 +863,18 @@ class SettingsPage extends BasePage {
                     <div class="positions-grid">
                         ${Object.entries(this.playerService.positions)
                             .filter(([pos]) => stats[pos].count > 0)
-                            .map(([pos, name]) => {
-                                const posStats = stats[pos];
-                                const totalComps = posStats.players.reduce((sum, p) => 
-                                    sum + (p.comparisons[pos] || 0), 0);
-                                return `
-                                    <label class="position-checkbox">
-                                        <input
-                                            type="checkbox"
-                                            name="resetAllPositions"
-                                            value="${pos}"
-                                            class="position-input"
-                                            checked
-                                        >
-                                        <span class="position-label">
-                                            ${name} (${pos})
-                                            <span>
-                                                (${posStats.count} players, ${Math.floor(totalComps / 2)} comp.)
-                                            </span>
-                                        </span>
-                                    </label>
-                                `;
-                            }).join('')}
+                            .map(([pos, name]) => `
+                                <label class="position-checkbox">
+                                    <input
+                                        type="checkbox"
+                                        name="resetAllPositions"
+                                        value="${pos}"
+                                        class="position-input"
+                                        checked
+                                    >
+                                    <span class="position-label">${name} (${pos})</span>
+                                </label>
+                            `).join('')}
                     </div>
                     <div class="warning-box warning-box-danger">
                         <div class="warning-title">Warning</div>
