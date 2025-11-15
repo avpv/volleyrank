@@ -696,6 +696,7 @@
     padding: var(--spacing-6);
     margin-bottom: var(--spacing-8);
     transition: border-color var(--duration-fast) var(--ease-smooth);
+    max-width: 100%;
 }
 
 .team-builder:hover {
@@ -762,6 +763,7 @@
 .teams-result {
     margin-top: var(--spacing-8);
     animation: fadeIn var(--duration-default) ease;
+    max-width: 100%;
 }
 
 @keyframes fadeIn {
@@ -810,6 +812,7 @@
     border-radius: var(--radius-lg);
     margin-bottom: var(--spacing-6);
     transition: border-color var(--duration-fast) var(--ease-smooth);
+    max-width: 100%;
 }
 
 .balance-indicator:hover {
@@ -1429,7 +1432,9 @@
 .page-layout__content {
     flex: 1;
     overflow-y: auto;
+    overflow-x: hidden;
     padding: var(--spacing-6);
+    max-width: 100%;
 }
 
 /* Sidebar toggle button - visible on all platforms */
