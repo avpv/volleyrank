@@ -13,6 +13,8 @@ import { activities } from '../config/activities/index.js';
 import Sidebar from '../components/Sidebar.js';
 import uiConfig from '../config/ui.js';
 import { STORAGE_KEYS } from '../utils/constants.js';
+import GoogleSheetsIntegration from '../integrations/GoogleSheetsIntegration.js';
+import integrationsConfig from '../config/integrations.js';
 
 const { ELEMENT_IDS, DATA_ATTRIBUTES, ANIMATION, TOAST } = uiConfig;
 
@@ -31,6 +33,18 @@ class SettingsPage extends BasePage {
         this.selectedPositions = [];
         this.importModal = null;
         this.sidebar = null;
+
+        // Google Sheets integration
+        this.googleSheetsIntegration = null;
+        this.googleSheetsEnabled = integrationsConfig.googleSheets.enabled;
+        this.googleSheetsSpreadsheetId = storage.get('googleSheetsSpreadsheetId', '');
+
+        // Initialize Google Sheets if enabled
+        if (this.googleSheetsEnabled && integrationsConfig.googleSheets.clientId) {
+            this.googleSheetsIntegration = new GoogleSheetsIntegration(
+                integrationsConfig.googleSheets.clientId
+            );
+        }
     }
 
     onCreate() {
@@ -284,6 +298,14 @@ class SettingsPage extends BasePage {
                             <p class="form-help-text mt-2">
                                 Upload a CSV or JSON file with your players' names and positions
                             </p>
+                        </div>
+                    </div>
+
+                    <!-- Google Sheets Integration Section -->
+                    <div class="player-section google-sheets-section" id="${ELEMENT_IDS.GOOGLE_SHEETS_SECTION}">
+                        <h4 class="section-title">Google Sheets Integration</h4>
+                        <div class="section-content">
+                            ${this.renderGoogleSheetsContent()}
                         </div>
                     </div>
 
@@ -541,6 +563,28 @@ class SettingsPage extends BasePage {
                 this.handlePlayerAction(action, playerId);
             });
         });
+
+        // Google Sheets buttons
+        const googleSheetsConnectBtn = this.$(`#${ELEMENT_IDS.GOOGLE_SHEETS_CONNECT_BTN}`);
+        const googleSheetsDisconnectBtn = this.$(`#${ELEMENT_IDS.GOOGLE_SHEETS_DISCONNECT_BTN}`);
+        const googleSheetsExportBtn = this.$(`#${ELEMENT_IDS.GOOGLE_SHEETS_EXPORT_BTN}`);
+        const googleSheetsImportBtn = this.$(`#${ELEMENT_IDS.GOOGLE_SHEETS_IMPORT_BTN}`);
+
+        if (googleSheetsConnectBtn) {
+            googleSheetsConnectBtn.addEventListener('click', () => this.handleGoogleSheetsConnect());
+        }
+
+        if (googleSheetsDisconnectBtn) {
+            googleSheetsDisconnectBtn.addEventListener('click', () => this.handleGoogleSheetsDisconnect());
+        }
+
+        if (googleSheetsExportBtn) {
+            googleSheetsExportBtn.addEventListener('click', () => this.handleGoogleSheetsExport());
+        }
+
+        if (googleSheetsImportBtn) {
+            googleSheetsImportBtn.addEventListener('click', () => this.handleGoogleSheetsImport());
+        }
     }
 
     handleAddPlayer() {
@@ -1231,6 +1275,269 @@ class SettingsPage extends BasePage {
         } catch (error) {
             toast.error('Import failed: ' + error.message);
             return false;
+        }
+    }
+
+    // ===== GOOGLE SHEETS INTEGRATION =====
+
+    renderGoogleSheetsContent() {
+        const currentActivity = storage.get(STORAGE_KEYS.SELECTED_ACTIVITY, null);
+
+        if (!this.googleSheetsEnabled || !integrationsConfig.googleSheets.clientId) {
+            return `
+                <div class="info-box warning">
+                    <p><strong>Google Sheets integration is not configured.</strong></p>
+                    <p class="mt-2">To enable this feature:</p>
+                    <ol class="mt-2 ml-4">
+                        <li>Set up Google Sheets API credentials</li>
+                        <li>Update the configuration in <code>src/config/integrations.js</code></li>
+                        <li>Set <code>enabled: true</code> and add your Client ID</li>
+                    </ol>
+                    <p class="mt-2">
+                        <a href="https://console.cloud.google.com/" target="_blank" rel="noopener noreferrer" class="text-link">
+                            Get started with Google Cloud Console →
+                        </a>
+                    </p>
+                </div>
+            `;
+        }
+
+        const isConnected = this.googleSheetsIntegration?.checkAuthorization() || false;
+
+        return `
+            <div class="google-sheets-content">
+                <!-- Connection Status -->
+                <div class="connection-status mb-3">
+                    <div class="status-indicator ${isConnected ? 'connected' : 'disconnected'}" id="${ELEMENT_IDS.GOOGLE_SHEETS_STATUS}">
+                        ${isConnected
+                            ? `${getIcon('check-circle', { size: 16 })} <span>Connected to Google Sheets</span>`
+                            : `${getIcon('x-circle', { size: 16 })} <span>Not connected</span>`
+                        }
+                    </div>
+                </div>
+
+                ${!isConnected ? `
+                    <!-- Connect Section -->
+                    <div class="connect-section">
+                        <p class="form-help-text mb-3">
+                            Connect your Google account to sync players with Google Sheets.
+                        </p>
+                        <button
+                            type="button"
+                            class="btn btn-primary"
+                            id="${ELEMENT_IDS.GOOGLE_SHEETS_CONNECT_BTN}"
+                            ${!currentActivity ? 'disabled' : ''}>
+                            ${getIcon('link', { size: 16, className: 'btn-icon' })}
+                            Connect to Google Sheets
+                        </button>
+                    </div>
+                ` : `
+                    <!-- Export/Import Section -->
+                    <div class="export-import-section">
+                        <div class="form-row mb-3">
+                            <button
+                                type="button"
+                                class="btn btn-secondary"
+                                id="${ELEMENT_IDS.GOOGLE_SHEETS_EXPORT_BTN}"
+                                ${!currentActivity ? 'disabled' : ''}>
+                                ${getIcon('upload', { size: 16, className: 'btn-icon' })}
+                                Export to Google Sheets
+                            </button>
+                            <button
+                                type="button"
+                                class="btn btn-secondary"
+                                id="${ELEMENT_IDS.GOOGLE_SHEETS_IMPORT_BTN}"
+                                ${!currentActivity ? 'disabled' : ''}>
+                                ${getIcon('download', { size: 16, className: 'btn-icon' })}
+                                Import from Google Sheets
+                            </button>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="${ELEMENT_IDS.GOOGLE_SHEETS_SPREADSHEET_ID}">
+                                Spreadsheet URL or ID (optional)
+                            </label>
+                            <input
+                                type="text"
+                                id="${ELEMENT_IDS.GOOGLE_SHEETS_SPREADSHEET_ID}"
+                                class="form-control"
+                                placeholder="https://docs.google.com/spreadsheets/d/..."
+                                value="${this.escape(this.googleSheetsSpreadsheetId)}"
+                                ${!currentActivity ? 'disabled' : ''}>
+                            <p class="form-help-text">
+                                Leave empty to create a new spreadsheet on export.
+                                For import, paste the full URL or just the spreadsheet ID.
+                            </p>
+                        </div>
+
+                        <button
+                            type="button"
+                            class="btn btn-link text-danger"
+                            id="${ELEMENT_IDS.GOOGLE_SHEETS_DISCONNECT_BTN}">
+                            ${getIcon('log-out', { size: 16, className: 'btn-icon' })}
+                            Disconnect
+                        </button>
+                    </div>
+                `}
+            </div>
+        `;
+    }
+
+    async handleGoogleSheetsConnect() {
+        if (!this.googleSheetsIntegration) {
+            toast.error('Google Sheets integration is not initialized');
+            return;
+        }
+
+        try {
+            toast.info('Connecting to Google Sheets...', { duration: TOAST.MEDIUM_DURATION });
+            await this.googleSheetsIntegration.authorize();
+            toast.success('Successfully connected to Google Sheets!');
+            this.update();
+        } catch (error) {
+            console.error('Failed to connect to Google Sheets:', error);
+            toast.error('Failed to connect: ' + error.message);
+        }
+    }
+
+    handleGoogleSheetsDisconnect() {
+        if (!this.googleSheetsIntegration) {
+            return;
+        }
+
+        this.googleSheetsIntegration.revokeAuthorization();
+        this.googleSheetsSpreadsheetId = '';
+        storage.set('googleSheetsSpreadsheetId', '');
+        toast.success('Disconnected from Google Sheets');
+        this.update();
+    }
+
+    async handleGoogleSheetsExport() {
+        if (!this.googleSheetsIntegration) {
+            toast.error('Google Sheets integration is not initialized');
+            return;
+        }
+
+        const currentActivity = storage.get(STORAGE_KEYS.SELECTED_ACTIVITY, null);
+        if (!currentActivity) {
+            toast.error('Please select an activity first');
+            return;
+        }
+
+        try {
+            // Get spreadsheet ID from input
+            const spreadsheetInput = this.$(`#${ELEMENT_IDS.GOOGLE_SHEETS_SPREADSHEET_ID}`);
+            let spreadsheetId = spreadsheetInput?.value.trim() || '';
+
+            // Extract ID from URL if full URL was provided
+            if (spreadsheetId) {
+                const extractedId = this.googleSheetsIntegration.extractSpreadsheetId(spreadsheetId);
+                spreadsheetId = extractedId || spreadsheetId;
+            }
+
+            // Get players and positions
+            const players = this.playerService.getAll();
+            if (players.length === 0) {
+                toast.error('No players to export');
+                return;
+            }
+
+            const positions = this.playerService.positions;
+
+            toast.info('Exporting to Google Sheets...', { duration: TOAST.LONG_DURATION });
+
+            const result = await this.googleSheetsIntegration.exportPlayers(
+                players,
+                positions,
+                spreadsheetId || null,
+                integrationsConfig.googleSheets.defaultSheetName
+            );
+
+            // Save the spreadsheet ID for future use
+            this.googleSheetsSpreadsheetId = result.spreadsheetId;
+            storage.set('googleSheetsSpreadsheetId', result.spreadsheetId);
+
+            toast.success(
+                `Exported ${result.rowCount - 1} players to Google Sheets!`,
+                { duration: TOAST.MEDIUM_DURATION }
+            );
+
+            // Show a link to the spreadsheet
+            setTimeout(() => {
+                toast.info(
+                    `<a href="${result.spreadsheetUrl}" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: underline;">Open in Google Sheets →</a>`,
+                    { duration: TOAST.LONG_DURATION, allowHtml: true }
+                );
+            }, TOAST.SHORT_DURATION);
+
+            this.update();
+        } catch (error) {
+            console.error('Export failed:', error);
+            toast.error('Failed to export: ' + error.message);
+        }
+    }
+
+    async handleGoogleSheetsImport() {
+        if (!this.googleSheetsIntegration) {
+            toast.error('Google Sheets integration is not initialized');
+            return;
+        }
+
+        const currentActivity = storage.get(STORAGE_KEYS.SELECTED_ACTIVITY, null);
+        if (!currentActivity) {
+            toast.error('Please select an activity first');
+            return;
+        }
+
+        try {
+            // Get spreadsheet ID from input
+            const spreadsheetInput = this.$(`#${ELEMENT_IDS.GOOGLE_SHEETS_SPREADSHEET_ID}`);
+            let spreadsheetId = spreadsheetInput?.value.trim() || this.googleSheetsSpreadsheetId;
+
+            if (!spreadsheetId) {
+                toast.error('Please provide a spreadsheet URL or ID');
+                return;
+            }
+
+            // Extract ID from URL if full URL was provided
+            const extractedId = this.googleSheetsIntegration.extractSpreadsheetId(spreadsheetId);
+            spreadsheetId = extractedId || spreadsheetId;
+
+            toast.info('Importing from Google Sheets...', { duration: TOAST.LONG_DURATION });
+
+            const players = await this.googleSheetsIntegration.importPlayers(
+                spreadsheetId,
+                integrationsConfig.googleSheets.defaultSheetName
+            );
+
+            if (players.length === 0) {
+                toast.warning('No players found in the spreadsheet');
+                return;
+            }
+
+            // Import players
+            let imported = 0, skipped = 0;
+            players.forEach(playerData => {
+                try {
+                    this.playerService.add(playerData.name, playerData.positions);
+                    imported++;
+                } catch (error) {
+                    skipped++;
+                    console.warn(`Skipped ${playerData.name}:`, error.message);
+                }
+            });
+
+            // Save the spreadsheet ID for future use
+            this.googleSheetsSpreadsheetId = spreadsheetId;
+            storage.set('googleSheetsSpreadsheetId', spreadsheetId);
+
+            toast.success(
+                `Imported ${imported} player(s)${skipped > 0 ? `, skipped ${skipped}` : ''}`,
+                { duration: TOAST.MEDIUM_DURATION }
+            );
+        } catch (error) {
+            console.error('Import failed:', error);
+            toast.error('Failed to import: ' + error.message);
         }
     }
 
