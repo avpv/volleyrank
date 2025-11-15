@@ -804,7 +804,7 @@ class SettingsPage extends BasePage {
                                         checked
                                     >
                                     <span class="position-label">
-                                        ${this.playerService.positions[pos]}
+                                        ${this.playerService.positions[pos]} (${pos})
                                         <span>(${rating} ELO, ${comparisons} comp.)</span>
                                     </span>
                                 </label>
@@ -884,7 +884,7 @@ class SettingsPage extends BasePage {
                                             checked
                                         >
                                         <span class="position-label">
-                                            ${name}
+                                            ${name} (${pos})
                                             <span>
                                                 (${posStats.count} players, ${Math.floor(totalComps / 2)} comp.)
                                             </span>
