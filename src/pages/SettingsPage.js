@@ -530,7 +530,7 @@ class SettingsPage extends BasePage {
         }
 
         if (clearAllBtn) {
-            clearAllBtn.addEventListener('click', () => this.handleClearAll());
+            clearAllBtn.addEventListener('click', () => this.showClearAllModal());
         }
 
         // Player actions
@@ -855,7 +855,7 @@ class SettingsPage extends BasePage {
 
     renderResetAllContent() {
         const stats = this.playerService.getPositionStats();
-        
+
         return `
             <div class="modal-content-inner">
                 <div class="form-group">
@@ -880,6 +880,92 @@ class SettingsPage extends BasePage {
                         <div class="warning-title">Warning</div>
                         <div class="warning-text">
                             This will reset ALL players' ratings to 1500 and clear ALL comparison history for selected positions. This action cannot be undone!
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    // ===== MODAL: Clear All =====
+    showClearAllModal() {
+        const players = this.playerService.getAll();
+        if (players.length === 0) {
+            toast.error('No players to remove');
+            return;
+        }
+
+        const modal = new Modal({
+            title: 'Remove Players by Position',
+            content: this.renderClearAllContent(),
+            showCancel: true,
+            showConfirm: true,
+            confirmText: 'Remove Players',
+            cancelText: 'Cancel',
+            onConfirm: () => {
+                const selected = this.getSelectedModalPositions('clearAllPositions');
+                if (selected.length === 0) {
+                    toast.error('Please select at least one position');
+                    return false;
+                }
+                try {
+                    // Get all players that have at least one of the selected positions
+                    const playersToRemove = players.filter(player =>
+                        player.positions.some(pos => selected.includes(pos))
+                    );
+
+                    if (playersToRemove.length === 0) {
+                        toast.error('No players found with selected positions');
+                        return false;
+                    }
+
+                    // Remove each player
+                    playersToRemove.forEach(player => {
+                        this.playerService.remove(player.id);
+                    });
+
+                    const posNames = selected.map(p => this.playerService.positions[p]).join(', ');
+                    toast.success(`Removed ${playersToRemove.length} player(s) with positions: ${posNames}`);
+                    return true;
+                } catch (error) {
+                    toast.error(error.message);
+                    return false;
+                }
+            }
+        });
+
+        this.addComponent(modal);
+        modal.mount();
+        modal.open();
+    }
+
+    renderClearAllContent() {
+        const stats = this.playerService.getPositionStats();
+
+        return `
+            <div class="modal-content-inner">
+                <div class="form-group">
+                    <label>Select positions - all players with these positions will be removed:</label>
+                    <div class="positions-grid">
+                        ${Object.entries(this.playerService.positions)
+                            .filter(([pos]) => stats[pos].count > 0)
+                            .map(([pos, name]) => `
+                                <label class="position-checkbox">
+                                    <input
+                                        type="checkbox"
+                                        name="clearAllPositions"
+                                        value="${pos}"
+                                        class="position-input"
+                                        checked
+                                    >
+                                    <span class="position-label">${name} (${pos}) - ${stats[pos].count} player(s)</span>
+                                </label>
+                            `).join('')}
+                    </div>
+                    <div class="warning-box warning-box-danger">
+                        <div class="warning-title">Warning</div>
+                        <div class="warning-text">
+                            This will permanently remove all players who play any of the selected positions. This action cannot be undone!
                         </div>
                     </div>
                 </div>
@@ -1152,24 +1238,6 @@ class SettingsPage extends BasePage {
     getSelectedModalPositions(inputName) {
         const checkboxes = document.querySelectorAll(`input[name="${inputName}"]:checked`);
         return Array.from(checkboxes).map(cb => cb.value);
-    }
-
-    handleClearAll() {
-        if (!confirm('Remove all players from the current session? This cannot be undone!')) return;
-
-        try {
-            const players = this.playerService.getAll();
-
-            // Remove each player from the current session
-            players.forEach(player => {
-                this.playerService.remove(player.id);
-            });
-
-            toast.success('All players removed from current session');
-        } catch (error) {
-            toast.error('Failed to remove players');
-            console.error('Clear all error:', error);
-        }
     }
 
 }
