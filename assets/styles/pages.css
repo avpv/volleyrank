@@ -418,6 +418,23 @@
     font-size: var(--font-size-xs);
 }
 
+/* Section Subtitle */
+.section-subtitle {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: var(--letter-spacing-wide);
+    margin-bottom: var(--spacing-3);
+    margin-top: 0;
+}
+
+/* Sheets Config & Actions Sections */
+.sheets-config-section,
+.sheets-actions-section {
+    margin-bottom: var(--spacing-5);
+}
+
 /* Disconnect Section */
 .disconnect-section {
     margin-top: var(--spacing-6);
@@ -433,6 +450,11 @@
 }
 
 .disconnect-section .btn-link:hover {
+    color: var(--color-error);
+    background-color: var(--color-error-light);
+}
+
+.disconnect-section .btn-link-danger:hover {
     color: var(--color-error);
     background-color: var(--color-error-light);
 }
