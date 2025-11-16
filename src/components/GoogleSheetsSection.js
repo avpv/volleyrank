@@ -11,6 +11,7 @@
  */
 
 import Component from './base/Component.js';
+import Modal from './base/Modal.js';
 import { getIcon } from './base/Icons.js';
 import storage from '../core/StorageAdapter.js';
 import toast from './base/Toast.js';
@@ -26,6 +27,7 @@ class GoogleSheetsSection extends Component {
         super(container, props);
 
         this.playerService = props.playerService;
+        this.modal = null;
 
         // Google Sheets integration
         this.googleSheetsIntegration = null;
@@ -56,28 +58,60 @@ class GoogleSheetsSection extends Component {
         this.attachEventListeners();
     }
 
+    onDestroy() {
+        if (this.modal) {
+            this.modal.destroy();
+            this.modal = null;
+        }
+    }
+
     render() {
+        if (!this.googleSheetsEnabled || !integrationsConfig.googleSheets.clientId) {
+            return ''; // Don't show anything if not configured
+        }
+
+        const currentActivity = this.getCurrentActivity();
+        const isConnected = this.googleSheetsIntegration?.checkAuthorization() || false;
+
         return `
             <div class="player-section google-sheets-section" id="${ELEMENT_IDS.GOOGLE_SHEETS_SECTION}">
                 <h4 class="section-title">Google Sheets Integration</h4>
                 <div class="section-content">
-                    ${this.renderContent()}
+                    <div class="google-sheets-compact">
+                        <div class="status-row">
+                            <div class="status-indicator ${isConnected ? 'connected' : 'disconnected'}">
+                                ${isConnected
+                                    ? `${getIcon('check-circle', { size: 16 })} <span>Connected</span>`
+                                    : `${getIcon('x-circle', { size: 16 })} <span>Not connected</span>`
+                                }
+                            </div>
+                            <button
+                                type="button"
+                                class="btn btn-secondary"
+                                id="openGoogleSheetsModalBtn"
+                                ${!currentActivity ? 'disabled' : ''}
+                                aria-label="Open Google Sheets integration">
+                                ${getIcon('settings', { size: 16, className: 'btn-icon' })}
+                                Manage
+                            </button>
+                        </div>
+                        ${!currentActivity ? '<p class="form-help-text mt-2"><span class="help-secondary">Select an activity to use Google Sheets</span></p>' : ''}
+                    </div>
                 </div>
             </div>
         `;
     }
 
-    renderContent() {
-        if (!this.googleSheetsEnabled || !integrationsConfig.googleSheets.clientId) {
-            return this.renderSetupNotice();
-        }
-
+    /**
+     * Render modal content with full Google Sheets functionality
+     */
+    renderModalContent() {
         const isConnected = this.googleSheetsIntegration?.checkAuthorization() || false;
 
         return `
-            <div class="google-sheets-content">
+            <div class="google-sheets-modal-content">
                 <!-- Connection Status -->
-                <div class="connection-status">
+                <div class="connection-status mb-4">
                     <div
                         class="status-indicator ${isConnected ? 'connected' : 'disconnected'}"
                         id="${ELEMENT_IDS.GOOGLE_SHEETS_STATUS}"
@@ -96,32 +130,6 @@ class GoogleSheetsSection extends Component {
         `;
     }
 
-    renderSetupNotice() {
-        return `
-            <div class="setup-notice">
-                <div class="setup-icon">
-                    ${getIcon('file-text', { size: 24 })}
-                </div>
-                <div class="setup-content">
-                    <h4 class="setup-title">Enable Google Sheets Integration</h4>
-                    <p class="setup-description">
-                        Connect your TeamBalance data with Google Sheets for easy sharing and collaboration.
-                    </p>
-                    <details class="setup-instructions">
-                        <summary>View setup instructions</summary>
-                        <ol>
-                            <li>Set up Google Sheets API credentials</li>
-                            <li>Update the configuration in <code>src/config/integrations.js</code></li>
-                            <li>Set <code>enabled: true</code> and add your Client ID</li>
-                        </ol>
-                        <a href="https://console.cloud.google.com/" target="_blank" rel="noopener noreferrer" class="setup-link">
-                            Get started with Google Cloud Console →
-                        </a>
-                    </details>
-                </div>
-            </div>
-        `;
-    }
 
     renderConnectSection() {
         const currentActivity = this.getCurrentActivity();
@@ -223,10 +231,18 @@ class GoogleSheetsSection extends Component {
     }
 
     attachEventListeners() {
-        const googleSheetsConnectBtn = this.$(`#${ELEMENT_IDS.GOOGLE_SHEETS_CONNECT_BTN}`);
-        const googleSheetsDisconnectBtn = this.$(`#${ELEMENT_IDS.GOOGLE_SHEETS_DISCONNECT_BTN}`);
-        const googleSheetsExportBtn = this.$(`#${ELEMENT_IDS.GOOGLE_SHEETS_EXPORT_BTN}`);
-        const googleSheetsImportBtn = this.$(`#${ELEMENT_IDS.GOOGLE_SHEETS_IMPORT_BTN}`);
+        // Open modal button
+        const openModalBtn = this.$('#openGoogleSheetsModalBtn');
+        if (openModalBtn) {
+            openModalBtn.addEventListener('click', () => this.openModal());
+        }
+    }
+
+    attachModalEventListeners() {
+        const googleSheetsConnectBtn = document.getElementById(ELEMENT_IDS.GOOGLE_SHEETS_CONNECT_BTN);
+        const googleSheetsDisconnectBtn = document.getElementById(ELEMENT_IDS.GOOGLE_SHEETS_DISCONNECT_BTN);
+        const googleSheetsExportBtn = document.getElementById(ELEMENT_IDS.GOOGLE_SHEETS_EXPORT_BTN);
+        const googleSheetsImportBtn = document.getElementById(ELEMENT_IDS.GOOGLE_SHEETS_IMPORT_BTN);
 
         if (googleSheetsConnectBtn) {
             googleSheetsConnectBtn.addEventListener('click', () => this.handleConnect());
@@ -245,6 +261,49 @@ class GoogleSheetsSection extends Component {
         }
     }
 
+    openModal() {
+        if (this.modal) {
+            this.modal.destroy();
+        }
+
+        this.modal = new Modal({
+            title: 'Google Sheets Integration',
+            content: this.renderModalContent(),
+            showCancel: false,
+            showConfirm: false,
+            size: 'large',
+            onClose: () => {
+                this.modal = null;
+                // Update the main component to reflect any changes
+                this.update();
+            }
+        });
+
+        this.modal.mount();
+        this.modal.open();
+
+        // Attach event listeners to modal content
+        setTimeout(() => {
+            this.attachModalEventListeners();
+        }, 100);
+    }
+
+    /**
+     * Update modal content after changes
+     */
+    updateModalContent() {
+        if (this.modal) {
+            const modalContent = document.querySelector('.modal-content');
+            if (modalContent) {
+                modalContent.innerHTML = this.renderModalContent();
+                // Re-attach event listeners
+                setTimeout(() => {
+                    this.attachModalEventListeners();
+                }, 50);
+            }
+        }
+    }
+
     async handleConnect() {
         if (!this.googleSheetsIntegration) {
             toast.error('Google Sheets integration is not initialized');
@@ -255,6 +314,7 @@ class GoogleSheetsSection extends Component {
             toast.info('Connecting to Google Sheets...', { duration: TOAST.MEDIUM_DURATION });
             await this.googleSheetsIntegration.authorize();
             toast.success('Successfully connected to Google Sheets!');
+            this.updateModalContent();
             this.update();
         } catch (error) {
             console.error('Failed to connect to Google Sheets:', error);
@@ -271,6 +331,7 @@ class GoogleSheetsSection extends Component {
         this.googleSheetsSpreadsheetId = '';
         storage.set('googleSheetsSpreadsheetId', '');
         toast.success('Disconnected from Google Sheets');
+        this.updateModalContent();
         this.update();
     }
 
@@ -332,6 +393,7 @@ class GoogleSheetsSection extends Component {
                 );
             }, TOAST.SHORT_DURATION);
 
+            this.updateModalContent();
             this.update();
         } catch (error) {
             console.error('Export failed:', error);
