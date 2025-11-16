@@ -605,6 +605,7 @@
    Compare Page - Head-to-Head Interface
    ============================================================================= */
 
+/* Position Selector - Card-Based UI */
 .position-selector {
     margin-bottom: var(--spacing-8);
     padding: var(--spacing-6);
@@ -618,12 +619,317 @@
     border-color: var(--color-border-emphasis);
 }
 
-.position-selector label {
-    display: block;
-    font-size: var(--font-size-base);
-    font-weight: var(--font-weight-medium);
+/* Position Selector Header */
+.position-selector__header {
+    margin-bottom: var(--spacing-6);
+    padding-bottom: var(--spacing-4);
+    border-bottom: 1px solid var(--color-border-default);
+}
+
+.position-selector__header h3 {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
     color: var(--color-text-primary);
-    margin-bottom: var(--spacing-3);
+    margin: 0 0 var(--spacing-2) 0;
+    letter-spacing: -0.01em;
+}
+
+.position-selector__description {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    line-height: var(--line-height-relaxed);
+    margin: 0;
+}
+
+.position-selector__description kbd {
+    display: inline-block;
+    padding: 2px 6px;
+    background-color: var(--color-bg-elevated);
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-family-mono);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Position Grid */
+.position-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--spacing-4);
+}
+
+/* Position Card - Base Styles */
+.position-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-3);
+    padding: var(--spacing-5);
+    background-color: var(--color-surface-base);
+    border: 2px solid var(--color-border-default);
+    border-radius: var(--radius-lg);
+    transition: all var(--duration-fast) var(--ease-smooth);
+    cursor: pointer;
+    text-align: left;
+    min-height: 160px;
+}
+
+.position-card:hover:not([disabled]) {
+    border-color: var(--color-border-emphasis);
+    background-color: var(--color-surface-overlay);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.position-card:focus {
+    outline: none;
+    border-color: var(--color-brand-primary);
+    box-shadow: 0 0 0 3px rgba(47, 129, 247, 0.1);
+}
+
+.position-card:active:not([disabled]) {
+    transform: translateY(0);
+}
+
+/* Position Card States */
+.position-card--ready {
+    border-color: var(--color-brand-primary);
+    background: linear-gradient(135deg, var(--color-surface-base) 0%, rgba(47, 129, 247, 0.03) 100%);
+}
+
+.position-card--ready:hover {
+    border-color: var(--color-brand-primary);
+    background: linear-gradient(135deg, var(--color-surface-overlay) 0%, rgba(47, 129, 247, 0.08) 100%);
+    box-shadow: 0 4px 16px rgba(47, 129, 247, 0.2);
+}
+
+.position-card--in-progress {
+    border-color: var(--color-info);
+    background: linear-gradient(135deg, var(--color-surface-base) 0%, rgba(88, 166, 255, 0.03) 100%);
+}
+
+.position-card--in-progress:hover {
+    border-color: var(--color-info);
+    background: linear-gradient(135deg, var(--color-surface-overlay) 0%, rgba(88, 166, 255, 0.08) 100%);
+    box-shadow: 0 4px 16px rgba(88, 166, 255, 0.2);
+}
+
+.position-card--complete {
+    border-color: var(--color-success);
+    background: linear-gradient(135deg, var(--color-surface-base) 0%, rgba(86, 211, 100, 0.03) 100%);
+}
+
+.position-card--complete:hover {
+    border-color: var(--color-success);
+    background: linear-gradient(135deg, var(--color-surface-overlay) 0%, rgba(86, 211, 100, 0.08) 100%);
+    box-shadow: 0 4px 16px rgba(86, 211, 100, 0.2);
+}
+
+.position-card--disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background-color: var(--color-bg-secondary);
+}
+
+.position-card--disabled:hover {
+    transform: none;
+    box-shadow: none;
+    background-color: var(--color-bg-secondary);
+    border-color: var(--color-border-default);
+}
+
+.position-card--selected {
+    border-color: var(--color-brand-primary);
+    border-width: 3px;
+    box-shadow: 0 0 0 3px rgba(47, 129, 247, 0.15), 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Position Card Header */
+.position-card__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: var(--spacing-2);
+}
+
+.position-card__title {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-1);
+}
+
+.position-card__name {
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+    line-height: 1.2;
+}
+
+.position-card__key {
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: var(--letter-spacing-wide);
+}
+
+.position-card__selected-indicator {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--color-brand-primary);
+    color: white;
+    border-radius: 50%;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-bold);
+    flex-shrink: 0;
+}
+
+/* Position Card Stats */
+.position-card__stats {
+    display: flex;
+    gap: var(--spacing-4);
+    padding: var(--spacing-3) 0;
+}
+
+.position-stat {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+    flex: 1;
+}
+
+.position-stat__icon {
+    font-size: var(--font-size-base);
+    flex-shrink: 0;
+}
+
+.position-stat__value {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text-primary);
+    font-family: var(--font-family-mono);
+    font-variant-numeric: tabular-nums;
+}
+
+.position-stat__label {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-tertiary);
+}
+
+/* Position Card Progress */
+.position-card__progress {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
+    margin-top: auto;
+}
+
+.position-progress-bar {
+    flex: 1;
+    height: 8px;
+    background-color: var(--color-bg-tertiary);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    border: 1px solid var(--color-border-subtle);
+}
+
+.position-progress-fill {
+    height: 100%;
+    border-radius: var(--radius-sm);
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.position-progress-fill--ready {
+    background: var(--color-brand-primary);
+}
+
+.position-progress-fill--in-progress {
+    background: var(--color-info);
+}
+
+.position-progress-fill--in-progress::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.2),
+        transparent
+    );
+    animation: shimmer 2s infinite;
+}
+
+.position-progress-fill--complete {
+    background: var(--color-success);
+}
+
+.position-card__percentage {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text-primary);
+    font-family: var(--font-family-mono);
+    font-variant-numeric: tabular-nums;
+    min-width: 45px;
+    text-align: right;
+}
+
+/* Position Card Status */
+.position-card__status {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+    padding: var(--spacing-2) var(--spacing-3);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-medium);
+    margin-top: var(--spacing-2);
+}
+
+.position-card__status--ready {
+    background-color: rgba(47, 129, 247, 0.1);
+    color: var(--color-brand-primary);
+}
+
+.position-card__status--in-progress {
+    background-color: rgba(88, 166, 255, 0.1);
+    color: var(--color-info);
+}
+
+.position-card__status--complete {
+    background-color: rgba(86, 211, 100, 0.1);
+    color: var(--color-success);
+}
+
+.position-card__status--disabled {
+    background-color: var(--color-bg-tertiary);
+    color: var(--color-text-tertiary);
+}
+
+.position-status__icon {
+    font-size: var(--font-size-base);
+    flex-shrink: 0;
+}
+
+.position-status__text {
+    flex: 1;
+}
+
+.position-status__hint {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-tertiary);
+    font-style: italic;
 }
 
 /* Progress Section */
@@ -1533,7 +1839,8 @@
 @media (max-width: 768px) {
     .add-player-section,
     .team-builder,
-    .comparison-area {
+    .comparison-area,
+    .position-selector {
         padding: var(--spacing-4);
     }
 
@@ -1561,6 +1868,25 @@
 
     .progress-header span:first-child {
         font-size: var(--font-size-sm);
+    }
+
+    /* Position Selector - Mobile */
+    .position-grid {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-3);
+    }
+
+    .position-card {
+        min-height: 140px;
+        padding: var(--spacing-4);
+    }
+
+    .position-card__header h3 {
+        font-size: var(--font-size-base);
+    }
+
+    .position-selector__description {
+        font-size: var(--font-size-xs);
     }
 
     .comparison-cards {

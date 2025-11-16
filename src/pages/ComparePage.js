@@ -132,25 +132,104 @@ class ComparePage extends BasePage {
 
     renderPositionSelector() {
         const positions = this.activityConfig.positions;
+        const progress = this.comparisonService.getAllProgress();
 
         return `
             <div class="position-selector" role="region" aria-label="Position selection">
-                <label for="positionSelect">Select Position to Compare</label>
-                <select
-                    id="positionSelect"
-                    class="position-select"
-                    aria-label="Choose a position for player comparison"
-                    aria-describedby="position-help">
-                    <option value="">Choose a position to start rating...</option>
-                    ${Object.entries(positions).map(([key, name]) => `
-                        <option value="${key}" ${this.selectedPosition === key ? 'selected' : ''}>
-                            ${name} (${key})
-                        </option>
-                    `).join('')}
-                </select>
-                <p class="form-help-text" id="position-help">
-                    Select a position to begin head-to-head player comparisons. Use keyboard shortcuts: <kbd>A</kbd> (left), <kbd>D</kbd> (right), <kbd>W</kbd> (draw)
-                </p>
+                <div class="position-selector__header">
+                    <h3>Select Position to Compare</h3>
+                    <p class="position-selector__description">
+                        Choose a position to begin head-to-head player comparisons. Use keyboard shortcuts: <kbd>A</kbd> (left), <kbd>D</kbd> (right), <kbd>W</kbd> (draw)
+                    </p>
+                </div>
+
+                <div class="position-grid" role="radiogroup" aria-label="Available positions">
+                    ${Object.entries(positions).map(([key, name]) => {
+                        const prog = progress[key];
+                        const players = this.playerService.getByPosition(key);
+                        const isSelected = this.selectedPosition === key;
+                        const isDisabled = players.length < 2;
+                        const isComplete = prog.percentage === 100;
+                        const hasProgress = prog.completed > 0;
+
+                        // Determine card state
+                        let cardState = 'disabled';
+                        let statusText = 'Not enough players';
+                        let statusIcon = '⚠️';
+
+                        if (!isDisabled) {
+                            if (isComplete) {
+                                cardState = 'complete';
+                                statusText = 'Complete';
+                                statusIcon = '✓';
+                            } else if (hasProgress) {
+                                cardState = 'in-progress';
+                                statusText = 'In progress';
+                                statusIcon = '▶';
+                            } else {
+                                cardState = 'ready';
+                                statusText = 'Ready to start';
+                                statusIcon = '→';
+                            }
+                        }
+
+                        return `
+                            <button
+                                type="button"
+                                class="position-card position-card--${cardState} ${isSelected ? 'position-card--selected' : ''}"
+                                data-position="${key}"
+                                role="radio"
+                                aria-checked="${isSelected}"
+                                aria-label="${name} - ${statusText}, ${players.length} players, ${Math.round(prog.percentage)}% complete"
+                                ${isDisabled ? 'disabled aria-disabled="true"' : ''}
+                                tabindex="${isSelected ? '0' : '-1'}">
+
+                                <div class="position-card__header">
+                                    <div class="position-card__title">
+                                        <span class="position-card__name">${name}</span>
+                                        <span class="position-card__key">${key}</span>
+                                    </div>
+                                    ${isSelected ? '<div class="position-card__selected-indicator" aria-hidden="true">●</div>' : ''}
+                                </div>
+
+                                <div class="position-card__stats">
+                                    <div class="position-stat">
+                                        <span class="position-stat__icon" aria-hidden="true">👥</span>
+                                        <span class="position-stat__value">${players.length}</span>
+                                        <span class="position-stat__label">player${players.length !== 1 ? 's' : ''}</span>
+                                    </div>
+                                    ${!isDisabled ? `
+                                        <div class="position-stat">
+                                            <span class="position-stat__icon" aria-hidden="true">📊</span>
+                                            <span class="position-stat__value">${prog.completed}/${prog.total}</span>
+                                            <span class="position-stat__label">comparisons</span>
+                                        </div>
+                                    ` : ''}
+                                </div>
+
+                                ${!isDisabled ? `
+                                    <div class="position-card__progress">
+                                        <div class="position-progress-bar">
+                                            <div class="position-progress-fill position-progress-fill--${cardState}"
+                                                 style="width: ${prog.percentage}%"
+                                                 role="progressbar"
+                                                 aria-valuenow="${Math.round(prog.percentage)}"
+                                                 aria-valuemin="0"
+                                                 aria-valuemax="100"></div>
+                                        </div>
+                                        <span class="position-card__percentage">${Math.round(prog.percentage)}%</span>
+                                    </div>
+                                ` : ''}
+
+                                <div class="position-card__status position-card__status--${cardState}">
+                                    <span class="position-status__icon" aria-hidden="true">${statusIcon}</span>
+                                    <span class="position-status__text">${statusText}</span>
+                                    ${isDisabled ? `<span class="position-status__hint">Need ${2 - players.length} more</span>` : ''}
+                                </div>
+                            </button>
+                        `;
+                    }).join('')}
+                </div>
             </div>
         `;
     }
@@ -404,32 +483,56 @@ class ComparePage extends BasePage {
         // Add keyboard event listener
         document.addEventListener('keydown', this.handleKeyboard);
 
-        // Position selector
-        const positionSelect = this.$('#positionSelect');
-        if (positionSelect) {
-            positionSelect.addEventListener('change', (e) => {
-                this.selectedPosition = e.target.value;
-                this.loadNextPair();
-                this.update();
+        // Position cards
+        const positionCards = this.$$('.position-card');
+        if (positionCards && positionCards.length > 0) {
+            positionCards.forEach(card => {
+                card.addEventListener('click', (e) => {
+                    const positionKey = card.getAttribute('data-position');
+                    if (!positionKey || card.disabled) return;
 
-                // Show notifications for position selection
-                if (this.selectedPosition) {
-                    const status = this.comparisonService.checkStatus(this.selectedPosition);
-                    const positionName = this.activityConfig.positions[this.selectedPosition];
+                    this.selectedPosition = positionKey;
+                    this.loadNextPair();
+                    this.update();
 
-                    if (!status.canCompare) {
-                        if (status.insufficientPlayers) {
-                            toast.info(`${positionName}: Need at least 2 players for comparison. Currently ${status.playerCount} player${status.playerCount === 1 ? '' : 's'} at this position.`);
-                        } else if (status.allPairsCompared) {
-                            toast.success(`${positionName}: All comparisons have been completed for this position.`);
+                    // Show notifications for position selection
+                    if (this.selectedPosition) {
+                        const status = this.comparisonService.checkStatus(this.selectedPosition);
+                        const positionName = this.activityConfig.positions[this.selectedPosition];
+
+                        if (!status.canCompare) {
+                            if (status.insufficientPlayers) {
+                                toast.info(`${positionName}: Need at least 2 players for comparison. Currently ${status.playerCount} player${status.playerCount === 1 ? '' : 's'} at this position.`);
+                            } else if (status.allPairsCompared) {
+                                toast.success(`${positionName}: All comparisons have been completed for this position.`);
+                            }
                         }
                     }
-                }
 
-                // Scroll to comparison area if there are pairs to compare
-                if (this.currentPair) {
-                    this.scrollToComparisonArea();
-                }
+                    // Scroll to comparison area if there are pairs to compare
+                    if (this.currentPair) {
+                        this.scrollToComparisonArea();
+                    }
+                });
+
+                // Keyboard navigation for position cards
+                card.addEventListener('keydown', (e) => {
+                    const allCards = Array.from(this.$$('.position-card:not([disabled])'));
+                    const currentIndex = allCards.indexOf(card);
+
+                    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        const nextIndex = (currentIndex + 1) % allCards.length;
+                        allCards[nextIndex].focus();
+                    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        const prevIndex = (currentIndex - 1 + allCards.length) % allCards.length;
+                        allCards[prevIndex].focus();
+                    } else if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        card.click();
+                    }
+                });
             });
         }
 
