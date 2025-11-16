@@ -74,29 +74,25 @@ class GoogleSheetsSection extends Component {
         const isConnected = this.googleSheetsIntegration?.checkAuthorization() || false;
 
         return `
-            <div class="player-section google-sheets-section" id="${ELEMENT_IDS.GOOGLE_SHEETS_SECTION}">
+            <div class="player-section google-sheets-section">
                 <h4 class="section-title">Google Sheets Integration</h4>
                 <div class="section-content">
-                    <div class="google-sheets-compact">
-                        <div class="status-row">
-                            <div class="status-indicator ${isConnected ? 'connected' : 'disconnected'}">
-                                ${isConnected
-                                    ? `${getIcon('check-circle', { size: 16 })} <span>Connected</span>`
-                                    : `${getIcon('x-circle', { size: 16 })} <span>Not connected</span>`
-                                }
-                            </div>
-                            <button
-                                type="button"
-                                class="btn btn-secondary"
-                                id="openGoogleSheetsModalBtn"
-                                ${!currentActivity ? 'disabled' : ''}
-                                aria-label="Open Google Sheets integration">
-                                ${getIcon('settings', { size: 16, className: 'btn-icon' })}
-                                Manage
-                            </button>
-                        </div>
-                        ${!currentActivity ? '<p class="form-help-text mt-2"><span class="help-secondary">Select an activity to use Google Sheets</span></p>' : ''}
+                    <div class="status-indicator ${isConnected ? 'connected' : 'disconnected'}">
+                        ${isConnected
+                            ? `${getIcon('check-circle', { size: 16 })} <span>Connected</span>`
+                            : `${getIcon('x-circle', { size: 16 })} <span>Not connected</span>`
+                        }
                     </div>
+                    <button
+                        type="button"
+                        class="btn btn-secondary"
+                        id="openGoogleSheetsModalBtn"
+                        ${!currentActivity ? 'disabled' : ''}
+                        aria-label="Open Google Sheets integration">
+                        ${getIcon('settings', { size: 16, className: 'btn-icon' })}
+                        Manage
+                    </button>
+                    ${!currentActivity ? '<p class="form-help-text mt-2">Select an activity to use Google Sheets</p>' : ''}
                 </div>
             </div>
         `;
