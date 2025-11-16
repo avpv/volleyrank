@@ -1285,19 +1285,27 @@ class SettingsPage extends BasePage {
 
         if (!this.googleSheetsEnabled || !integrationsConfig.googleSheets.clientId) {
             return `
-                <div class="info-box warning">
-                    <p><strong>Google Sheets integration is not configured.</strong></p>
-                    <p class="mt-2">To enable this feature:</p>
-                    <ol class="mt-2 ml-4">
-                        <li>Set up Google Sheets API credentials</li>
-                        <li>Update the configuration in <code>src/config/integrations.js</code></li>
-                        <li>Set <code>enabled: true</code> and add your Client ID</li>
-                    </ol>
-                    <p class="mt-2">
-                        <a href="https://console.cloud.google.com/" target="_blank" rel="noopener noreferrer" class="text-link">
-                            Get started with Google Cloud Console →
-                        </a>
-                    </p>
+                <div class="setup-notice">
+                    <div class="setup-icon">
+                        ${getIcon('file-text', { size: 24 })}
+                    </div>
+                    <div class="setup-content">
+                        <h4 class="setup-title">Enable Google Sheets Integration</h4>
+                        <p class="setup-description">
+                            Connect your TeamBalance data with Google Sheets for easy sharing and collaboration.
+                        </p>
+                        <details class="setup-instructions">
+                            <summary>View setup instructions</summary>
+                            <ol>
+                                <li>Set up Google Sheets API credentials</li>
+                                <li>Update the configuration in <code>src/config/integrations.js</code></li>
+                                <li>Set <code>enabled: true</code> and add your Client ID</li>
+                            </ol>
+                            <a href="https://console.cloud.google.com/" target="_blank" rel="noopener noreferrer" class="setup-link">
+                                Get started with Google Cloud Console →
+                            </a>
+                        </details>
+                    </div>
                 </div>
             `;
         }
@@ -1307,8 +1315,13 @@ class SettingsPage extends BasePage {
         return `
             <div class="google-sheets-content">
                 <!-- Connection Status -->
-                <div class="connection-status mb-3">
-                    <div class="status-indicator ${isConnected ? 'connected' : 'disconnected'}" id="${ELEMENT_IDS.GOOGLE_SHEETS_STATUS}">
+                <div class="connection-status">
+                    <div
+                        class="status-indicator ${isConnected ? 'connected' : 'disconnected'}"
+                        id="${ELEMENT_IDS.GOOGLE_SHEETS_STATUS}"
+                        role="status"
+                        aria-live="polite"
+                        aria-label="${isConnected ? 'Google Sheets connection status: connected' : 'Google Sheets connection status: disconnected'}">
                         ${isConnected
                             ? `${getIcon('check-circle', { size: 16 })} <span>Connected to Google Sheets</span>`
                             : `${getIcon('x-circle', { size: 16 })} <span>Not connected</span>`
@@ -1319,43 +1332,66 @@ class SettingsPage extends BasePage {
                 ${!isConnected ? `
                     <!-- Connect Section -->
                     <div class="connect-section">
-                        <p class="form-help-text mb-3">
-                            Connect your Google account to sync players with Google Sheets.
-                        </p>
+                        <div class="connect-prompt">
+                            <p class="prompt-text">
+                                Sync your player roster with Google Sheets for easy collaboration and sharing.
+                            </p>
+                            <ul class="feature-list">
+                                <li>
+                                    ${getIcon('check', { size: 16, className: 'check-icon' })}
+                                    <span>Export player data with ratings</span>
+                                </li>
+                                <li>
+                                    ${getIcon('check', { size: 16, className: 'check-icon' })}
+                                    <span>Import players from spreadsheets</span>
+                                </li>
+                                <li>
+                                    ${getIcon('check', { size: 16, className: 'check-icon' })}
+                                    <span>Keep data synced across devices</span>
+                                </li>
+                            </ul>
+                        </div>
                         <button
                             type="button"
-                            class="btn btn-primary"
+                            class="btn btn-primary btn-lg"
                             id="${ELEMENT_IDS.GOOGLE_SHEETS_CONNECT_BTN}"
+                            aria-describedby="connect-help-text"
                             ${!currentActivity ? 'disabled' : ''}>
                             ${getIcon('link', { size: 16, className: 'btn-icon' })}
-                            Connect to Google Sheets
+                            <span>Connect Google Account</span>
                         </button>
+                        ${!currentActivity ? `<p id="connect-help-text" class="form-help-text" style="margin-top: var(--spacing-3);"><span class="help-secondary">Please select an activity first</span></p>` : ''}
                     </div>
                 ` : `
                     <!-- Export/Import Section -->
                     <div class="export-import-section">
-                        <div class="form-row mb-3">
-                            <button
-                                type="button"
-                                class="btn btn-secondary"
-                                id="${ELEMENT_IDS.GOOGLE_SHEETS_EXPORT_BTN}"
-                                ${!currentActivity ? 'disabled' : ''}>
-                                ${getIcon('upload', { size: 16, className: 'btn-icon' })}
-                                Export to Google Sheets
-                            </button>
-                            <button
-                                type="button"
-                                class="btn btn-secondary"
-                                id="${ELEMENT_IDS.GOOGLE_SHEETS_IMPORT_BTN}"
-                                ${!currentActivity ? 'disabled' : ''}>
-                                ${getIcon('download', { size: 16, className: 'btn-icon' })}
-                                Import from Google Sheets
-                            </button>
+                        <div class="google-sheets-actions">
+                            <div class="action-group">
+                                <button
+                                    type="button"
+                                    class="btn btn-primary"
+                                    id="${ELEMENT_IDS.GOOGLE_SHEETS_EXPORT_BTN}"
+                                    aria-label="Export players to Google Sheets"
+                                    ${!currentActivity ? 'disabled' : ''}>
+                                    ${getIcon('upload', { size: 16, className: 'btn-icon' })}
+                                    <span>Export Players</span>
+                                </button>
+                                <button
+                                    type="button"
+                                    class="btn btn-secondary"
+                                    id="${ELEMENT_IDS.GOOGLE_SHEETS_IMPORT_BTN}"
+                                    aria-label="Import players from Google Sheets"
+                                    ${!currentActivity ? 'disabled' : ''}>
+                                    ${getIcon('download', { size: 16, className: 'btn-icon' })}
+                                    <span>Import Players</span>
+                                </button>
+                            </div>
                         </div>
 
                         <div class="form-group">
-                            <label for="${ELEMENT_IDS.GOOGLE_SHEETS_SPREADSHEET_ID}">
-                                Spreadsheet URL or ID (optional)
+                            <label for="${ELEMENT_IDS.GOOGLE_SHEETS_SPREADSHEET_ID}" class="label-with-hint">
+                                <span class="label-text">Spreadsheet Link</span>
+                                <span class="label-hint">(optional)</span>
                             </label>
                             <input
                                 type="text"
@@ -1363,20 +1399,24 @@ class SettingsPage extends BasePage {
                                 class="form-control"
                                 placeholder="https://docs.google.com/spreadsheets/d/..."
                                 value="${this.escape(this.googleSheetsSpreadsheetId)}"
+                                aria-describedby="spreadsheet-help-text"
                                 ${!currentActivity ? 'disabled' : ''}>
-                            <p class="form-help-text">
-                                Leave empty to create a new spreadsheet on export.
-                                For import, paste the full URL or just the spreadsheet ID.
-                            </p>
+                            <div id="spreadsheet-help-text" class="form-help-text">
+                                <span class="help-primary">Leave empty to create a new spreadsheet</span>
+                                <span class="help-secondary">Paste the full URL or just the ID to use an existing one</span>
+                            </div>
                         </div>
 
-                        <button
-                            type="button"
-                            class="btn btn-link text-danger"
-                            id="${ELEMENT_IDS.GOOGLE_SHEETS_DISCONNECT_BTN}">
-                            ${getIcon('log-out', { size: 16, className: 'btn-icon' })}
-                            Disconnect
-                        </button>
+                        <div class="disconnect-section">
+                            <button
+                                type="button"
+                                class="btn btn-link"
+                                id="${ELEMENT_IDS.GOOGLE_SHEETS_DISCONNECT_BTN}"
+                                aria-label="Disconnect from Google Sheets">
+                                ${getIcon('log-out', { size: 16, className: 'btn-icon' })}
+                                <span>Disconnect Google Sheets</span>
+                            </button>
+                        </div>
                     </div>
                 `}
             </div>

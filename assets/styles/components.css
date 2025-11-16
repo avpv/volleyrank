@@ -148,6 +148,24 @@
     opacity: 1;
 }
 
+/* Button Focus States - Enhanced for Accessibility */
+.btn:focus-visible {
+    outline: 2px solid var(--color-brand-primary);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px rgba(47, 129, 247, 0.12);
+}
+
+.btn-primary:focus-visible {
+    outline-color: white;
+    box-shadow: 0 0 0 4px rgba(47, 129, 247, 0.3);
+}
+
+.btn-link:focus-visible {
+    outline: 2px solid var(--color-brand-primary);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+}
+
 /* Button Icons */
 .btn svg {
     flex-shrink: 0;
@@ -246,6 +264,12 @@
     outline-offset: 1px;
     border-color: var(--color-brand-primary);
     background-color: var(--color-bg-primary);
+}
+
+.form-control:focus-visible {
+    outline: 2px solid var(--color-brand-primary);
+    outline-offset: 1px;
+    box-shadow: 0 0 0 4px rgba(47, 129, 247, 0.12);
 }
 
 .form-control:disabled {
