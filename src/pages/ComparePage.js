@@ -117,17 +117,126 @@ class ComparePage extends BasePage {
         this.setupMobileSidebarToggle();
     }
 
+    getNextPositionSuggestion() {
+        const progress = this.comparisonService.getAllProgress();
+        const positions = this.activityConfig.positions;
+
+        // Find next incomplete position
+        for (const [key, name] of Object.entries(positions)) {
+            if (key === this.selectedPosition) continue;
+
+            const players = this.playerService.getByPosition(key);
+            if (players.length >= 2) {
+                const prog = progress[key];
+                if (prog.percentage < 100) {
+                    return `Try comparing <strong>${name}</strong> players next!`;
+                }
+            }
+        }
+
+        return 'All positions are complete!';
+    }
+
     render() {
         return this.renderPageWithSidebar(`
             <div class="page-header">
                 <h2>Compare Players</h2>
+                <p class="page-subtitle">Build accurate player ratings through head-to-head comparisons</p>
             </div>
 
+            ${this.renderOverallProgress()}
             ${this.renderPositionSelector()}
-            ${this.renderProgressBars()}
             ${this.renderComparisonArea()}
-            ${this.renderStats()}
         `);
+    }
+
+    renderOverallProgress() {
+        const progress = this.comparisonService.getAllProgress();
+        const positions = this.activityConfig.positions;
+
+        // Calculate overall statistics
+        let totalCompleted = 0;
+        let totalComparisons = 0;
+        let completedPositions = 0;
+        let availablePositions = 0;
+
+        Object.keys(positions).forEach(key => {
+            const players = this.playerService.getByPosition(key);
+            if (players.length >= 2) {
+                availablePositions++;
+                const prog = progress[key];
+                totalCompleted += prog.completed;
+                totalComparisons += prog.total;
+                if (prog.percentage === 100) {
+                    completedPositions++;
+                }
+            }
+        });
+
+        const overallPercentage = totalComparisons > 0
+            ? Math.round((totalCompleted / totalComparisons) * 100)
+            : 0;
+
+        const isFullyComplete = availablePositions > 0 && completedPositions === availablePositions;
+
+        // Don't show if no positions are available
+        if (availablePositions === 0) {
+            return '';
+        }
+
+        return `
+            <div class="overall-progress ${isFullyComplete ? 'overall-progress--complete' : ''}" role="status" aria-live="polite">
+                <div class="overall-progress__content">
+                    <div class="overall-progress__header">
+                        <div class="overall-progress__title">
+                            ${isFullyComplete ? `
+                                <span class="overall-progress__icon">🎉</span>
+                                <h3>All Comparisons Complete!</h3>
+                            ` : `
+                                <span class="overall-progress__icon">📊</span>
+                                <h3>Overall Progress</h3>
+                            `}
+                        </div>
+                        <div class="overall-progress__stats">
+                            <div class="overall-stat">
+                                <span class="overall-stat__value">${completedPositions}/${availablePositions}</span>
+                                <span class="overall-stat__label">positions complete</span>
+                            </div>
+                            <div class="overall-stat">
+                                <span class="overall-stat__value">${totalCompleted}/${totalComparisons}</span>
+                                <span class="overall-stat__label">total comparisons</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    ${!isFullyComplete ? `
+                        <div class="overall-progress__bar">
+                            <div class="overall-progress__fill"
+                                 style="width: ${overallPercentage}%"
+                                 role="progressbar"
+                                 aria-valuenow="${overallPercentage}"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100"></div>
+                        </div>
+                        <p class="overall-progress__message">
+                            ${overallPercentage === 0
+                                ? 'Select a position below to start comparing players'
+                                : overallPercentage < 50
+                                    ? 'Great start! Keep going to improve team balance accuracy'
+                                    : overallPercentage < 100
+                                        ? 'You\'re more than halfway there! Almost done'
+                                        : 'Amazing work! All comparisons completed'}
+                        </p>
+                    ` : `
+                        <div class="overall-progress__celebration">
+                            <p class="overall-progress__message">
+                                Excellent work! All player comparisons are complete. Your team balance algorithm now has maximum accuracy.
+                            </p>
+                        </div>
+                    `}
+                </div>
+            </div>
+        `;
     }
 
     renderPositionSelector() {
@@ -234,74 +343,39 @@ class ComparePage extends BasePage {
         `;
     }
 
-    renderProgressBars() {
-        const progress = this.comparisonService.getAllProgress();
-        const positions = this.activityConfig.positions;
-
-        return `
-            <div class="progress-section" role="region" aria-label="Comparison progress by position">
-                <h3 class="mb-3 font-semibold">Comparison Progress</h3>
-                <p class="form-help-text mb-4">Track your rating progress for each position. Click a position above to start comparing.</p>
-                <div class="progress-bars space-y-3 divide-y divide-subtle">
-                    ${Object.entries(positions).map(([key, name]) => {
-                        const prog = progress[key];
-                        const players = this.playerService.getByPosition(key);
-                        
-                        if (players.length < 2) {
-                            return `
-                                <div class="progress-item disabled" role="status">
-                                    <div class="progress-header">
-                                        <span>${name} (${key})</span>
-                                        <span class="progress-status" title="At least 2 players needed">
-                                            ${players.length} player${players.length !== 1 ? 's' : ''} · Need ${2 - players.length} more
-                                        </span>
-                                    </div>
-                                </div>
-                            `;
-                        }
-
-                        const isComplete = prog.percentage === 100;
-                        const hasComparisons = prog.completed > 0;
-
-                        return `
-                            <div class="progress-item ${this.selectedPosition === key ? 'current-position' : ''} transition-colors">
-                                <div class="progress-header d-flex justify-between items-center mb-2">
-                                    <span class="font-medium">${name} (${key})</span>
-                                    <div class="progress-stats d-flex gap-3">
-                                        <span class="progress-count text-sm">${prog.completed}/${prog.total}</span>
-                                        <span class="progress-percentage ${isComplete ? 'complete' : ''} text-sm font-semibold">${Math.round(prog.percentage)}%</span>
-                                    </div>
-                                </div>
-                                ${hasComparisons ? `
-                                    <div class="progress-bar">
-                                        <div class="progress-fill ${isComplete ? 'complete' : ''} transition-all duration-300" style="width: ${prog.percentage}%"></div>
-                                    </div>
-                                ` : ''}
-                            </div>
-                        `;
-                    }).join('')}
-                </div>
-            </div>
-        `;
-    }
 
     renderComparisonArea() {
         if (!this.selectedPosition) {
             const icon = getIcon('target', { size: 48, color: 'var(--color-text-secondary)' });
             return this.renderEmpty(
-                'Choose a position from the dropdown above to begin head-to-head player comparisons. The more comparisons you complete, the more accurate your team balance will be.',
+                'Choose a position from the cards above to begin head-to-head player comparisons. The more comparisons you complete, the more accurate your team balance will be.',
                 icon,
                 'Ready to Compare Players'
             );
         }
 
         const status = this.comparisonService.checkStatus(this.selectedPosition);
+        const posName = this.activityConfig.positions[this.selectedPosition];
+        const progress = this.comparisonService.getProgress(this.selectedPosition);
+        const isComplete = progress.percentage === 100;
 
         if (!status.canCompare) {
-            const icon = getIcon('info', { size: 48, color: 'var(--color-text-secondary)' });
+            const icon = isComplete
+                ? getIcon('check-circle', { size: 48, color: 'var(--color-success)' })
+                : getIcon('info', { size: 48, color: 'var(--color-text-secondary)' });
+
             return `
-                <div class="comparison-area">
-                    ${this.renderEmpty(status.reason, icon)}
+                <div class="comparison-area ${isComplete ? 'comparison-area--complete' : ''}">
+                    ${isComplete ? `
+                        <div class="comparison-complete">
+                            <div class="comparison-complete__icon">${icon}</div>
+                            <h3 class="comparison-complete__title">Position Complete!</h3>
+                            <p class="comparison-complete__message">
+                                All ${posName} comparisons are finished (${progress.completed}/${progress.total}).
+                                ${this.getNextPositionSuggestion()}
+                            </p>
+                        </div>
+                    ` : this.renderEmpty(status.reason, icon)}
                 </div>
             `;
         }
@@ -333,12 +407,21 @@ class ComparePage extends BasePage {
         }
 
         const posName = this.activityConfig.positions[this.selectedPosition];
+        const currentProgress = this.comparisonService.getProgress(this.selectedPosition);
+        const progressPercent = Math.round(currentProgress.percentage);
 
         return `
-            <div class="comparison-area" role="region" aria-label="Player comparison">
-                <div class="comparison-info text-center mb-6">
-                    <p class="text-secondary mb-2">Who is better at:</p>
-                    <h3 class="text-xl font-semibold text-brand">${posName} position</h3>
+            <div class="comparison-area comparison-area--active" role="region" aria-label="Player comparison">
+                <div class="comparison-header">
+                    <div class="comparison-info">
+                        <p class="comparison-question">Who is better at <strong>${posName}</strong>?</p>
+                        <div class="comparison-progress-indicator">
+                            <div class="progress-mini">
+                                <div class="progress-mini__fill" style="width: ${progressPercent}%"></div>
+                            </div>
+                            <span class="comparison-progress-text">${currentProgress.completed}/${currentProgress.total} comparisons · ${progressPercent}% complete</span>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="comparison-cards d-grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 items-center" role="group" aria-label="Choose the better player">
@@ -402,28 +485,6 @@ class ComparePage extends BasePage {
         `;
     }
 
-    renderStats() {
-        if (!this.selectedPosition) {
-            return '';
-        }
-
-        const progress = this.comparisonService.getProgress(this.selectedPosition);
-        const posName = this.activityConfig.positions[this.selectedPosition];
-        const isComplete = progress.percentage === 100;
-
-        return `
-            <div class="stats-section">
-                <div class="stat-card">
-                    <div class="stat-label">${posName} Progress</div>
-                    <div class="stat-value">${progress.completed} / ${progress.total}</div>
-                    <div class="stat-detail">${progress.remaining} remaining · <span class="stat-percentage ${isComplete ? 'complete' : ''}">${Math.round(progress.percentage)}%</span></div>
-                    <div class="progress-bar">
-                        <div class="progress-fill ${isComplete ? 'complete' : ''}" style="width: ${progress.percentage}%"></div>
-                    </div>
-                </div>
-            </div>
-        `;
-    }
 
     attachEventListeners() {
         // Remove old keyboard event listener before adding a new one
