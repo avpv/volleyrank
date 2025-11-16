@@ -131,6 +131,7 @@
 /* Transparent background sections with bottom border only on title */
 .player-section.import-section,
 .player-section.manual-add-section,
+.player-section.google-sheets-section,
 .player-section.danger-zone-section {
     background-color: transparent;
     border: none;
@@ -138,6 +139,7 @@
 
 .player-section.import-section .section-title,
 .player-section.manual-add-section .section-title,
+.player-section.google-sheets-section .section-title,
 .player-section.danger-zone-section .section-title {
     border-bottom: 1px solid var(--color-border-default);
 }
@@ -146,13 +148,15 @@
     margin-top: var(--spacing-4);
 }
 
-.import-section .section-content {
+.import-section .section-content,
+.google-sheets-section .section-content {
     display: flex;
     gap: var(--spacing-3);
 }
 
 @media (max-width: 768px) {
-    .import-section .section-content {
+    .import-section .section-content,
+    .google-sheets-section .section-content {
         flex-direction: column;
         align-items: flex-start;
     }
