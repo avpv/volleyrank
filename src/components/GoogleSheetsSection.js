@@ -105,7 +105,7 @@ class GoogleSheetsSection extends Component {
         const isConnected = this.googleSheetsIntegration?.checkAuthorization() || false;
 
         return `
-            <div class="google-sheets-modal-content">
+            <div class="modal-content-inner">
                 <!-- Connection Status -->
                 <div class="connection-status mb-4">
                     <div
@@ -266,8 +266,12 @@ class GoogleSheetsSection extends Component {
             title: 'Google Sheets Integration',
             content: this.renderModalContent(),
             showCancel: false,
-            showConfirm: false,
+            showConfirm: true,
+            confirmText: 'Close',
             size: 'large',
+            onConfirm: () => {
+                return true; // Close modal
+            },
             onClose: () => {
                 this.modal = null;
                 // Update the main component to reflect any changes
