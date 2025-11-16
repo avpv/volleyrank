@@ -74,6 +74,10 @@
         align-items: stretch;
     }
 
+    .activity-select {
+        max-width: none;
+    }
+
     .activity-selector-row .btn {
         width: 100%;
     }
