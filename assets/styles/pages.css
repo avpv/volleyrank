@@ -151,6 +151,13 @@
     gap: var(--spacing-3);
 }
 
+@media (max-width: 768px) {
+    .import-section .section-content {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
 .player-form {
     max-width: 800px;
 }
