@@ -406,7 +406,6 @@ class ComparePage extends BasePage {
             `;
         }
 
-        const posName = this.activityConfig.positions[this.selectedPosition];
         const currentProgress = this.comparisonService.getProgress(this.selectedPosition);
         const progressPercent = Math.round(currentProgress.percentage);
 
