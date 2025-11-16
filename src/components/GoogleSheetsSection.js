@@ -105,7 +105,7 @@ class GoogleSheetsSection extends Component {
         const isConnected = this.googleSheetsIntegration?.checkAuthorization() || false;
 
         return `
-            <div class="google-sheets-modal-content">
+            <div class="modal-content-inner">
                 <!-- Connection Status -->
                 <div class="connection-status mb-4">
                     <div
@@ -170,7 +170,32 @@ class GoogleSheetsSection extends Component {
         return `
             <!-- Export/Import Section -->
             <div class="export-import-section">
-                <div class="google-sheets-actions">
+                <!-- Configuration Section -->
+                <div class="sheets-config-section">
+                    <h5 class="section-subtitle">Spreadsheet Configuration</h5>
+                    <div class="form-group">
+                        <label for="${ELEMENT_IDS.GOOGLE_SHEETS_SPREADSHEET_ID}" class="label-with-hint">
+                            <span class="label-text">Spreadsheet Link</span>
+                            <span class="label-hint">(optional)</span>
+                        </label>
+                        <input
+                            type="text"
+                            id="${ELEMENT_IDS.GOOGLE_SHEETS_SPREADSHEET_ID}"
+                            class="form-control"
+                            placeholder="https://docs.google.com/spreadsheets/d/..."
+                            value="${this.escape(this.googleSheetsSpreadsheetId)}"
+                            aria-describedby="spreadsheet-help-text"
+                            ${!currentActivity ? 'disabled' : ''}>
+                        <div id="spreadsheet-help-text" class="form-help-text">
+                            <span class="help-primary">Leave empty to create a new spreadsheet on export</span>
+                            <span class="help-secondary">Or paste the full URL or ID to use an existing spreadsheet</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions Section -->
+                <div class="sheets-actions-section">
+                    <h5 class="section-subtitle">Sync Data</h5>
                     <div class="action-group">
                         <button
                             type="button"
@@ -183,7 +208,7 @@ class GoogleSheetsSection extends Component {
                         </button>
                         <button
                             type="button"
-                            class="btn btn-secondary"
+                            class="btn btn-primary"
                             id="${ELEMENT_IDS.GOOGLE_SHEETS_IMPORT_BTN}"
                             aria-label="Import players from Google Sheets"
                             ${!currentActivity ? 'disabled' : ''}>
@@ -191,35 +216,20 @@ class GoogleSheetsSection extends Component {
                             <span>Import Players</span>
                         </button>
                     </div>
+                    <p class="form-help-text mt-2">
+                        Export sends your current players to Google Sheets. Import brings players from the spreadsheet into your roster.
+                    </p>
                 </div>
 
-                <div class="form-group">
-                    <label for="${ELEMENT_IDS.GOOGLE_SHEETS_SPREADSHEET_ID}" class="label-with-hint">
-                        <span class="label-text">Spreadsheet Link</span>
-                        <span class="label-hint">(optional)</span>
-                    </label>
-                    <input
-                        type="text"
-                        id="${ELEMENT_IDS.GOOGLE_SHEETS_SPREADSHEET_ID}"
-                        class="form-control"
-                        placeholder="https://docs.google.com/spreadsheets/d/..."
-                        value="${this.escape(this.googleSheetsSpreadsheetId)}"
-                        aria-describedby="spreadsheet-help-text"
-                        ${!currentActivity ? 'disabled' : ''}>
-                    <div id="spreadsheet-help-text" class="form-help-text">
-                        <span class="help-primary">Leave empty to create a new spreadsheet</span>
-                        <span class="help-secondary">Paste the full URL or just the ID to use an existing one</span>
-                    </div>
-                </div>
-
+                <!-- Account Management Section -->
                 <div class="disconnect-section">
                     <button
                         type="button"
-                        class="btn btn-link"
+                        class="btn btn-link btn-link-danger"
                         id="${ELEMENT_IDS.GOOGLE_SHEETS_DISCONNECT_BTN}"
                         aria-label="Disconnect from Google Sheets">
                         ${getIcon('log-out', { size: 16, className: 'btn-icon' })}
-                        <span>Disconnect Google Sheets</span>
+                        <span>Disconnect Account</span>
                     </button>
                 </div>
             </div>
@@ -266,8 +276,12 @@ class GoogleSheetsSection extends Component {
             title: 'Google Sheets Integration',
             content: this.renderModalContent(),
             showCancel: false,
-            showConfirm: false,
+            showConfirm: true,
+            confirmText: 'Close',
             size: 'large',
+            onConfirm: () => {
+                return true; // Close modal
+            },
             onClose: () => {
                 this.modal = null;
                 // Update the main component to reflect any changes
