@@ -190,10 +190,8 @@ class ComparePage extends BasePage {
                     <div class="overall-progress__header">
                         <div class="overall-progress__title">
                             ${isFullyComplete ? `
-                                <span class="overall-progress__icon">🎉</span>
-                                <h3>All Comparisons Complete!</h3>
+                                <h3>All Comparisons Complete</h3>
                             ` : `
-                                <span class="overall-progress__icon">📊</span>
                                 <h3>Overall Progress</h3>
                             `}
                         </div>
@@ -264,21 +262,17 @@ class ComparePage extends BasePage {
                         // Determine card state
                         let cardState = 'disabled';
                         let statusText = 'Not enough players';
-                        let statusIcon = '⚠️';
 
                         if (!isDisabled) {
                             if (isComplete) {
                                 cardState = 'complete';
                                 statusText = 'Complete';
-                                statusIcon = '✓';
                             } else if (hasProgress) {
                                 cardState = 'in-progress';
                                 statusText = 'In progress';
-                                statusIcon = '▶';
                             } else {
                                 cardState = 'ready';
                                 statusText = 'Ready to start';
-                                statusIcon = '→';
                             }
                         }
 
@@ -298,18 +292,16 @@ class ComparePage extends BasePage {
                                         <span class="position-card__name">${name}</span>
                                         <span class="position-card__key">${key}</span>
                                     </div>
-                                    ${isSelected ? '<div class="position-card__selected-indicator" aria-hidden="true">●</div>' : ''}
+                                    ${isSelected ? '<div class="position-card__selected-indicator" aria-hidden="true">SELECTED</div>' : ''}
                                 </div>
 
                                 <div class="position-card__stats">
                                     <div class="position-stat">
-                                        <span class="position-stat__icon" aria-hidden="true">👥</span>
                                         <span class="position-stat__value">${players.length}</span>
                                         <span class="position-stat__label">player${players.length !== 1 ? 's' : ''}</span>
                                     </div>
                                     ${!isDisabled ? `
                                         <div class="position-stat">
-                                            <span class="position-stat__icon" aria-hidden="true">📊</span>
                                             <span class="position-stat__value">${prog.completed}/${prog.total}</span>
                                             <span class="position-stat__label">comparisons</span>
                                         </div>
@@ -331,7 +323,6 @@ class ComparePage extends BasePage {
                                 ` : ''}
 
                                 <div class="position-card__status position-card__status--${cardState}">
-                                    <span class="position-status__icon" aria-hidden="true">${statusIcon}</span>
                                     <span class="position-status__text">${statusText}</span>
                                     ${isDisabled ? `<span class="position-status__hint">Need ${2 - players.length} more</span>` : ''}
                                 </div>
