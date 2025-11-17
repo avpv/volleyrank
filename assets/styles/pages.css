@@ -628,13 +628,12 @@
 }
 
 .overall-progress--complete {
-    background: var(--color-surface-raised);
-    border-color: var(--color-success);
-    border-left-width: 1px;
+    background: rgba(86, 211, 100, 0.03);
+    border: 1px solid rgba(86, 211, 100, 0.3);
 }
 
 .overall-progress--complete:hover {
-    border-color: var(--color-success);
+    border-color: rgba(86, 211, 100, 0.4);
 }
 
 .overall-progress__content {
@@ -667,7 +666,7 @@
 
 .overall-progress__stats {
     display: flex;
-    gap: var(--spacing-8);
+    gap: var(--spacing-6);
 }
 
 .overall-stat {
@@ -675,7 +674,7 @@
     flex-direction: column;
     align-items: flex-end;
     gap: var(--spacing-2);
-    min-width: 140px;
+    min-width: 120px;
     text-align: right;
 }
 
@@ -692,10 +691,10 @@
 }
 
 .overall-stat__label {
-    font-size: var(--font-size-xxs);
+    font-size: var(--font-size-xs);
     color: var(--color-text-tertiary);
     text-transform: uppercase;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.05em;
     font-weight: var(--font-weight-medium);
 }
 
@@ -706,6 +705,7 @@
     border-radius: 2px;
     overflow: hidden;
     position: relative;
+    border: none;
 }
 
 .overall-progress__fill {
@@ -834,8 +834,7 @@
 
 .position-card--in-progress {
     background: var(--color-surface-base);
-    border-color: var(--color-info);
-    border-left-width: 1px;
+    border: 1px solid var(--color-info);
 }
 
 .position-card--in-progress:hover {
@@ -844,8 +843,7 @@
 
 .position-card--complete {
     background: var(--color-surface-base);
-    border-color: var(--color-success);
-    border-left-width: 1px;
+    border: 1px solid var(--color-success);
 }
 
 .position-card--complete:hover {
@@ -864,9 +862,8 @@
 }
 
 .position-card--selected {
-    border-color: var(--color-brand-primary);
-    border-width: 1px;
-    box-shadow: 0 0 0 2px rgba(47, 129, 247, 0.1);
+    border: 1px solid var(--color-brand-primary);
+    background-color: var(--color-surface-interactive);
 }
 
 /* Position Card Header */
@@ -906,10 +903,10 @@
     color: white;
     border-radius: 2px;
     font-size: var(--font-size-xs);
-    font-weight: var(--font-weight-bold);
+    font-weight: var(--font-weight-semibold);
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    padding: var(--spacing-1) var(--spacing-2);
+    padding: 2px 8px;
     flex-shrink: 0;
 }
 
@@ -926,6 +923,7 @@
     align-items: center;
     gap: var(--spacing-2);
     flex: 1;
+    min-width: 0;
 }
 
 .position-stat__value {
@@ -934,6 +932,7 @@
     color: var(--color-text-primary);
     font-family: var(--font-family-mono);
     font-variant-numeric: tabular-nums;
+    line-height: 1.2;
 }
 
 .position-stat__label {
@@ -951,11 +950,11 @@
 
 .position-progress-bar {
     flex: 1;
-    height: 8px;
+    height: 6px;
     background-color: var(--color-bg-tertiary);
     border-radius: 2px;
     overflow: hidden;
-    border: 1px solid var(--color-border-subtle);
+    border: none;
 }
 
 .position-progress-fill {
@@ -999,7 +998,7 @@
     margin-top: var(--spacing-2);
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    border-left: 1px solid transparent;
+    border-left: 2px solid transparent;
     padding-left: var(--spacing-2);
 }
 
@@ -1222,12 +1221,12 @@
 }
 
 .comparison-area--complete {
-    background: var(--color-surface-raised);
-    border-color: var(--color-success);
+    background: rgba(86, 211, 100, 0.03);
+    border: 1px solid rgba(86, 211, 100, 0.3);
 }
 
 .comparison-area--complete:hover {
-    border-color: var(--color-success);
+    border-color: rgba(86, 211, 100, 0.4);
 }
 
 /* Comparison Header */
@@ -1272,6 +1271,7 @@
     background-color: var(--color-bg-tertiary);
     border-radius: 2px;
     overflow: hidden;
+    border: 1px solid var(--color-border-subtle);
 }
 
 .progress-mini__fill {
@@ -1335,7 +1335,7 @@
 
 .comparison-cards {
     display: flex;
-    gap: var(--spacing-6);
+    gap: var(--spacing-5);
     align-items: stretch;
     justify-content: center;
     flex-wrap: wrap;
@@ -1374,7 +1374,7 @@
     transition: opacity 0.2s ease-out;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     z-index: 10;
-    opacity: 0.5;
+    opacity: 0.7;
 }
 
 .keyboard-hint-button {
