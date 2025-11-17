@@ -1385,14 +1385,14 @@ select.form-control {
 .draw-button {
     padding: var(--spacing-3) var(--spacing-6);
     background-color: var(--color-surface-raised);
-    border: 2px solid var(--color-border-default);
-    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border-default);
+    border-radius: 4px;
     color: var(--color-text-secondary);
     font-size: var(--font-size-base);
     font-weight: var(--font-weight-medium);
     cursor: pointer;
-    transition: border-color var(--duration-fast) var(--ease-smooth),
-                background-color var(--duration-fast) var(--ease-smooth);
+    transition: border-color 0.2s ease-out,
+                background-color 0.2s ease-out;
     white-space: nowrap;
 }
 
