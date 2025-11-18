@@ -67,19 +67,19 @@
     /* Semantic Colors */
     --color-success: #56d364;
     --color-success-hover: #3fb950;
-    --color-success-light: rgba(86, 211, 100, 0.1);
+    --color-success-light: rgba(86, 211, 100, 0.12);
 
     --color-warning: #e3b341;
     --color-warning-hover: #d29922;
-    --color-warning-light: rgba(227, 179, 65, 0.1);
+    --color-warning-light: rgba(227, 179, 65, 0.12);
 
     --color-error: #ff6b6b;
     --color-error-hover: #f85149;
-    --color-error-light: rgba(255, 107, 107, 0.1);
+    --color-error-light: rgba(255, 107, 107, 0.12);
     
     --color-info: #2f81f7;
     --color-info-hover: #58a6ff;
-    --color-info-light: rgba(47, 129, 247, 0.1);
+    --color-info-light: rgba(47, 129, 247, 0.12);
     
     /* Gradients - Simplified */
     --gradient-brand: linear-gradient(135deg, #2f81f7 0%, #1f6feb 100%);
@@ -270,17 +270,18 @@ h1 {
 }
 
 h2 {
-    font-size: var(--font-size-3xl);
-    font-weight: var(--font-weight-semibold);
+    font-size: 2rem;
+    font-weight: var(--font-weight-bold);
     color: var(--color-text-primary);
     letter-spacing: -0.02em;
     margin-bottom: var(--spacing-8);
 }
 
 h3 {
-    font-size: var(--font-size-xl);
+    font-size: var(--font-size-2xl);
     font-weight: var(--font-weight-semibold);
     margin-bottom: var(--spacing-5);
+    letter-spacing: -0.015em;
 }
 
 h4 {
@@ -291,8 +292,8 @@ h4 {
 p {
     margin-bottom: var(--spacing-4);
     color: var(--color-text-secondary);
-    line-height: 1.7;
-    max-width: 65ch;
+    line-height: var(--line-height-relaxed);
+    max-width: 70ch;
 }
 
 a {
@@ -692,6 +693,7 @@ a:hover {
 :focus-visible {
     outline: 2px solid var(--color-brand-primary);
     outline-offset: 2px;
+    border-radius: var(--radius-sm);
 }
 
 /* Enhanced focus for buttons */
@@ -746,6 +748,21 @@ textarea:focus-visible {
 
     h2 {
         font-size: var(--font-size-xl);
+    }
+
+    /* Touch target improvements */
+    .btn:not(.btn-sm) {
+        min-height: 48px;
+        padding: var(--spacing-4) var(--spacing-5);
+    }
+
+    .position-checkbox {
+        min-height: 48px;
+        padding: calc(var(--spacing-3) + var(--spacing-1) / 2);
+    }
+
+    .form-group {
+        margin-bottom: var(--spacing-6);
     }
 }
 

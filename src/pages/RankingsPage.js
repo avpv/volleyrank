@@ -135,6 +135,10 @@ class RankingsPage extends BasePage {
         const comparisons = player.positionComparisons;
         const rankLabel = rank === 1 ? '🥇 1st' : rank === 2 ? '🥈 2nd' : rank === 3 ? '🥉 3rd' : `#${rank}`;
 
+        // Determine comparison status
+        const hasComparisons = comparisons > 0;
+        const statusClass = hasComparisons ? 'success' : 'neutral';
+
         return `
             <li class="ranking-item d-flex items-center gap-3 py-3" role="listitem">
                 <div
@@ -145,10 +149,13 @@ class RankingsPage extends BasePage {
                 </div>
                 <div class="ranking-info flex-1">
                     <div class="ranking-name font-medium mb-1">${this.escape(player.name)}</div>
-                    <div class="ranking-stats text-sm text-secondary" aria-label="Player statistics">
-                        <span aria-label="ELO rating">${rating} ELO</span>
+                    <div class="ranking-stats text-sm text-secondary d-flex items-center gap-2" aria-label="Player statistics">
+                        <span class="status-indicator">
+                            <span class="status-dot status-dot--${statusClass}"></span>
+                            <span aria-label="ELO rating">${rating} ELO</span>
+                        </span>
                         <span aria-hidden="true"> • </span>
-                        <span aria-label="Number of comparisons">${comparisons} comparison${comparisons !== 1 ? 's' : ''}</span>
+                        <span aria-label="Number of comparisons">${comparisons} comp.</span>
                     </div>
                 </div>
             </li>

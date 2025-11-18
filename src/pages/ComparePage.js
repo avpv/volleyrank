@@ -292,7 +292,11 @@ class ComparePage extends BasePage {
                                         <span class="position-card__name">${name}</span>
                                         <span class="position-card__key">${key}</span>
                                     </div>
-                                    ${isSelected ? '<div class="position-card__selected-indicator" aria-hidden="true">SELECTED</div>' : ''}
+                                    ${!isDisabled ? `
+                                        <span class="status-badge status-badge--${isComplete ? 'success' : hasProgress ? 'info' : 'neutral'}">
+                                            ${isComplete ? 'Complete' : hasProgress ? 'In Progress' : 'Ready'}
+                                        </span>
+                                    ` : '<span class="status-badge status-badge--neutral">Not Ready</span>'}
                                 </div>
 
                                 <div class="position-card__stats">
