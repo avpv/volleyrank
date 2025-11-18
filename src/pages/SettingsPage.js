@@ -463,9 +463,16 @@ class SettingsPage extends BasePage {
             const comparisons = player.comparisons[pos];
             const name = this.playerService.positions[pos];
 
+            // Determine comparison status
+            const hasComparisons = comparisons > 0;
+            const statusClass = hasComparisons ? 'success' : 'neutral';
+
             return `
                 <div class="position-badge first:mt-0 last:mb-0">
-                    <div class="badge-position font-medium">${name}</div>
+                    <div class="badge-position font-medium d-flex items-center gap-2">
+                        <span class="status-dot status-dot--${statusClass}"></span>
+                        ${name}
+                    </div>
                     <div class="badge-stats d-flex gap-2 text-xs">
                         <span class="badge-rating">${rating} ELO</span>
                         <span class="badge-comparisons text-tertiary">${comparisons} comp.</span>

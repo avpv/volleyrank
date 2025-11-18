@@ -389,11 +389,16 @@ class TeamsPage extends BasePage {
                         ${getIcon(quality.icon, { size: 40, className: 'balance-icon-svg' })}
                     </div>
                     <div class="balance-content">
-                        <span class="balance-label">Team Balance Quality: ${quality.label}</span>
+                        <span class="balance-label d-flex items-center gap-2">
+                            Team Balance Quality:
+                            <span class="status-badge status-badge--${weightedBalance < 50 ? 'success' : weightedBalance < 100 ? 'info' : 'warning'}">
+                                ${quality.label}
+                            </span>
+                        </span>
                         <span class="balance-value">${weightedBalance} ELO average difference</span>
                     </div>
                     <div class="balance-explanation">
-                        ${weightedBalance < 50 ? '✅ Excellent balance!' : weightedBalance < 100 ? '👍 Good balance' : '⚠️ Consider re-generating for better balance'}
+                        ${weightedBalance < 50 ? 'Excellent balance!' : weightedBalance < 100 ? 'Good balance' : 'Consider re-generating for better balance'}
                         Lower difference means more even teams.
                     </div>
                 </div>
@@ -431,12 +436,13 @@ class TeamsPage extends BasePage {
 
         return `
             <div class="team-card">
-                <div class="team-header mb-4">
+                <div class="team-header mb-4 d-flex justify-between items-center">
                     <h4 class="font-semibold text-lg md:text-xl m-0">Team ${index + 1}</h4>
+                    ${showElo ? `<span class="status-badge status-badge--neutral">${weightedRating} ELO</span>` : ''}
                 </div>
                 ${showElo ? `
                     <div class="team-rating text-sm text-secondary mb-4 pb-3 border-b border-subtle">
-                        ${weightedRating} weighted ELO (${strength.totalRating} raw, avg ${strength.averageRating})
+                        ${strength.totalRating} raw ELO • avg ${strength.averageRating}
                     </div>
                 ` : ''}
 
@@ -469,11 +475,19 @@ class TeamsPage extends BasePage {
         const position = player.assignedPosition;
         const rating = Math.round(player.positionRating);
         const posName = this.playerService.positions[position];
+        const comparisons = player.positionComparisons || 0;
+
+        // Determine rating status based on comparisons
+        const hasComparisons = comparisons > 0;
+        const statusClass = hasComparisons ? 'success' : 'neutral';
 
         return `
             <div class="team-player">
                 <div class="player-info flex-1">
-                    <div class="player-name font-medium mb-1">${this.escape(player.name)}</div>
+                    <div class="player-name font-medium mb-1 d-flex items-center gap-2">
+                        <span class="status-dot status-dot--${statusClass}"></span>
+                        ${this.escape(player.name)}
+                    </div>
                     <div class="player-position text-sm text-secondary">${posName}</div>
                 </div>
                 ${showElo ? `
