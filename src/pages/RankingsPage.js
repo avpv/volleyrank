@@ -150,10 +150,7 @@ class RankingsPage extends BasePage {
                 <div class="ranking-info flex-1">
                     <div class="ranking-name font-medium mb-1">${this.escape(player.name)}</div>
                     <div class="ranking-stats text-sm text-secondary d-flex items-center gap-2" aria-label="Player statistics">
-                        <span class="status-indicator">
-                            <span class="status-dot status-dot--${statusClass}"></span>
-                            <span aria-label="ELO rating">${rating} ELO</span>
-                        </span>
+                        <span aria-label="ELO rating">${rating} ELO</span>
                         <span aria-hidden="true"> • </span>
                         <span aria-label="Number of comparisons">${comparisons} comp.</span>
                     </div>

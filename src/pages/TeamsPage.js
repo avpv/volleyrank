@@ -479,8 +479,7 @@ class TeamsPage extends BasePage {
         return `
             <div class="team-player">
                 <div class="player-info flex-1">
-                    <div class="player-name font-medium mb-1 d-flex items-center gap-2">
-                        <span class="status-dot status-dot--${statusClass}"></span>
+                    <div class="player-name font-medium mb-1">
                         ${this.escape(player.name)}
                     </div>
                     <div class="player-position text-sm text-secondary">${posName}</div>
