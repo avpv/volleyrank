@@ -718,26 +718,10 @@
 
 .overall-progress__fill {
     height: 100%;
-    background: linear-gradient(90deg,
-        var(--color-brand-primary) 0%,
-        var(--color-brand-primary-hover) 100%);
+    background: var(--color-brand-primary);
     border-radius: 3px;
     transition: width 0.4s var(--ease-out);
     position: relative;
-}
-
-.overall-progress__fill::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(90deg,
-        transparent 0%,
-        rgba(255, 255, 255, 0.1) 50%,
-        transparent 100%);
-    animation: shine 2s infinite;
 }
 
 .overall-progress__message {
@@ -820,13 +804,13 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-4);
-    padding: var(--spacing-6);
+    gap: var(--spacing-3);
+    padding: var(--spacing-5);
     background-color: var(--color-surface-base);
     border: 1px solid var(--color-border-default);
     border-radius: var(--radius-lg);
-    transition: all var(--duration-fast) var(--ease-smooth),
-                transform var(--duration-fast) var(--ease-out);
+    transition: border-color var(--duration-fast) var(--ease-smooth),
+                background-color var(--duration-fast) var(--ease-smooth);
     cursor: pointer;
     text-align: left;
     min-height: 160px;
@@ -835,8 +819,6 @@
 .position-card:hover:not([disabled]) {
     border-color: var(--color-border-emphasis);
     background-color: var(--color-bg-hover);
-    transform: translateY(-1px);
-    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.18);
 }
 
 .position-card:focus {
@@ -991,36 +973,16 @@
     position: relative;
 }
 
-.position-progress-fill::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(90deg,
-        transparent 0%,
-        rgba(255, 255, 255, 0.1) 50%,
-        transparent 100%);
-    animation: shine 2s infinite;
-}
-
 .position-progress-fill--ready {
-    background: linear-gradient(90deg,
-        var(--color-brand-primary) 0%,
-        var(--color-brand-primary-hover) 100%);
+    background: var(--color-brand-primary);
 }
 
 .position-progress-fill--in-progress {
-    background: linear-gradient(90deg,
-        var(--color-info) 0%,
-        var(--color-info-hover) 100%);
+    background: var(--color-info);
 }
 
 .position-progress-fill--complete {
-    background: linear-gradient(90deg,
-        var(--color-success) 0%,
-        var(--color-success-hover) 100%);
+    background: var(--color-success);
 }
 
 .position-card__percentage {
@@ -1223,37 +1185,14 @@
 
 .progress-fill {
     height: 100%;
-    background: linear-gradient(90deg,
-        var(--color-brand-primary) 0%,
-        var(--color-brand-primary-hover) 100%);
+    background: var(--color-brand-primary);
     border-radius: 3px;
     transition: width 0.4s var(--ease-out);
     position: relative;
 }
 
-.progress-fill::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(90deg,
-        transparent 0%,
-        rgba(255, 255, 255, 0.1) 50%,
-        transparent 100%);
-    animation: shine 2s infinite;
-}
-
-@keyframes shine {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
-}
-
 .progress-fill.complete {
-    background: linear-gradient(90deg,
-        var(--color-success) 0%,
-        var(--color-success-hover) 100%);
+    background: var(--color-success);
 }
 
 /* Progress Variants */
@@ -1631,14 +1570,14 @@
     background-color: var(--color-surface-raised);
     border: 1px solid var(--color-border-default);
     border-radius: var(--radius-lg);
-    padding: var(--spacing-6);
-    transition: border-color var(--duration-fast) var(--ease-smooth);
+    padding: var(--spacing-5);
+    transition: border-color var(--duration-fast) var(--ease-smooth),
+                background-color var(--duration-fast) var(--ease-smooth);
 }
 
 .ranking-card:hover {
     border-color: var(--color-border-emphasis);
     background-color: var(--color-surface-overlay);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .ranking-title {
@@ -1909,14 +1848,14 @@
     background-color: var(--color-surface-raised);
     border: 1px solid var(--color-border-default);
     border-radius: var(--radius-lg);
-    padding: var(--spacing-6);
-    transition: border-color var(--duration-fast) var(--ease-smooth);
+    padding: var(--spacing-5);
+    transition: border-color var(--duration-fast) var(--ease-smooth),
+                background-color var(--duration-fast) var(--ease-smooth);
 }
 
 .team-card:hover {
     border-color: var(--color-border-emphasis);
     background-color: var(--color-surface-overlay);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .team-header {

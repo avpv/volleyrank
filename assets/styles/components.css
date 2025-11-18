@@ -32,14 +32,10 @@
     border-radius: var(--radius-md);
     cursor: pointer;
     user-select: none;
-    transition: all var(--duration-fast) var(--ease-smooth),
-                transform var(--duration-fast) var(--ease-out);
+    transition: background-color var(--duration-fast) var(--ease-smooth),
+                border-color var(--duration-fast) var(--ease-smooth);
     position: relative;
     min-height: 44px;
-}
-
-.btn:active:not(:disabled) {
-    transform: scale(0.98);
 }
 
 /* Button Variants */
@@ -690,15 +686,14 @@ select.form-control {
     background-color: var(--color-surface-raised);
     border: 1px solid var(--color-border-default);
     border-radius: var(--radius-lg);
-    padding: var(--spacing-6);
-    transition: all var(--duration-fast) var(--ease-smooth),
-                transform var(--duration-fast) var(--ease-out);
+    padding: var(--spacing-5);
+    transition: border-color var(--duration-fast) var(--ease-smooth),
+                background-color var(--duration-fast) var(--ease-smooth);
 }
 
 .card:hover {
     border-color: var(--color-border-emphasis);
     background-color: var(--color-surface-overlay);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 /* Player Cards - Compare Page */
@@ -706,7 +701,7 @@ select.form-control {
     background-color: var(--color-surface-raised);
     border: 1px solid var(--color-border-default);
     border-radius: var(--radius-lg);
-    padding: var(--spacing-6);
+    padding: var(--spacing-5);
     position: relative;
     display: flex;
     flex-direction: column;
@@ -719,7 +714,6 @@ select.form-control {
 .player-card:hover {
     border-color: var(--color-border-emphasis);
     background-color: var(--color-surface-overlay);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .player-card.clickable {
@@ -740,7 +734,7 @@ select.form-control {
     background-color: var(--color-surface-raised);
     border: 1px solid var(--color-border-default);
     border-radius: var(--radius-lg);
-    padding: var(--spacing-6);
+    padding: var(--spacing-5);
     position: relative;
     display: flex;
     flex-direction: column;
@@ -752,7 +746,6 @@ select.form-control {
 .settings-player-card:hover {
     border-color: var(--color-border-emphasis);
     background-color: var(--color-surface-overlay);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .player-header {
@@ -910,32 +903,113 @@ select.form-control {
    The Compare page now has its own dedicated progress styles without conflicts. */
 
 /* =============================================================================
+   Status Indicators - Functional GitHub-style status dots and badges
+   ============================================================================= */
+
+.status-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-2);
+    font-size: var(--font-size-xs);
+    color: var(--color-text-secondary);
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.status-dot--success {
+    background-color: var(--color-success);
+}
+
+.status-dot--warning {
+    background-color: var(--color-warning);
+}
+
+.status-dot--error {
+    background-color: var(--color-error);
+}
+
+.status-dot--info {
+    background-color: var(--color-info);
+}
+
+.status-dot--neutral {
+    background-color: var(--color-text-tertiary);
+}
+
+/* Compact status badge - GitHub style */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0 var(--spacing-2);
+    height: 20px;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-medium);
+    line-height: 1;
+    border-radius: var(--radius-lg);
+    border: 1px solid;
+}
+
+.status-badge--success {
+    background-color: var(--color-success-light);
+    border-color: var(--color-success);
+    color: var(--color-success);
+}
+
+.status-badge--warning {
+    background-color: var(--color-warning-light);
+    border-color: var(--color-warning);
+    color: var(--color-warning);
+}
+
+.status-badge--error {
+    background-color: var(--color-error-light);
+    border-color: var(--color-error);
+    color: var(--color-error);
+}
+
+.status-badge--info {
+    background-color: var(--color-info-light);
+    border-color: var(--color-info);
+    color: var(--color-info);
+}
+
+.status-badge--neutral {
+    background-color: var(--color-bg-tertiary);
+    border-color: var(--color-border-default);
+    color: var(--color-text-secondary);
+}
+
+/* =============================================================================
    Statistics Cards
    ============================================================================= */
 
 .stat-card {
     text-align: center;
-    padding: var(--spacing-6);
+    padding: var(--spacing-4);
     background-color: var(--color-surface-raised);
     border: 1px solid var(--color-border-default);
     border-radius: var(--radius-lg);
     transition: border-color var(--duration-fast) var(--ease-smooth),
-                box-shadow var(--duration-fast) var(--ease-smooth);
+                background-color var(--duration-fast) var(--ease-smooth);
 }
 
 .stat-card:hover {
     border-color: var(--color-border-emphasis);
     background-color: var(--color-surface-overlay);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .stat-number {
-    font-size: 2.75rem;
+    font-size: 2rem;
     font-weight: var(--font-weight-bold);
     color: var(--color-text-primary);
     line-height: 1;
-    letter-spacing: -0.03em;
-    margin-bottom: var(--spacing-3);
+    letter-spacing: -0.02em;
+    margin-bottom: var(--spacing-2);
     font-variant-numeric: tabular-nums;
 }
 
@@ -948,11 +1022,11 @@ select.form-control {
 }
 
 .stat-value {
-    font-size: 2.75rem;
+    font-size: 2rem;
     font-weight: var(--font-weight-bold);
     color: var(--color-text-primary);
     line-height: var(--line-height-tight);
-    letter-spacing: -0.03em;
+    letter-spacing: -0.02em;
     font-variant-numeric: tabular-nums;
 }
 
