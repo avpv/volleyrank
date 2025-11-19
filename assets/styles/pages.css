@@ -1133,17 +1133,6 @@
     margin-bottom: var(--spacing-1);
 }
 
-.position-card__key {
-    font-size: var(--font-size-xs);
-    font-weight: var(--font-weight-bold);
-    color: var(--color-text-tertiary);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    background: var(--color-bg-elevated);
-    padding: 2px 6px;
-    border-radius: var(--radius-sm);
-}
-
 .position-card__selected-indicator {
     display: flex;
     align-items: center;
