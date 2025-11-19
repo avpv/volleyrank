@@ -940,15 +940,26 @@
 
 /* Position Card States */
 .position-card--disabled {
-    opacity: 0.7;
-    cursor: not-allowed;
-    background-color: var(--color-bg-secondary);
-    border-style: dashed;
+    /* Match ranking-card empty state */
+    background-color: var(--color-surface-raised);
+    border-style: solid;
+    opacity: 1;
+    cursor: default;
 }
 
 .position-card--disabled:hover {
-    background-color: var(--color-bg-secondary);
     border-color: var(--color-border-default);
+}
+
+/* Match ranking-title style for the header in disabled state */
+.position-card--disabled .position-card__header {
+    margin-bottom: var(--spacing-6);
+    padding-bottom: var(--spacing-3);
+    border-bottom: 1px solid var(--color-border-default);
+}
+
+.position-card--disabled .position-card__name {
+    font-size: var(--font-size-lg);
 }
 
 .position-card--selected {
