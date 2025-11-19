@@ -129,12 +129,15 @@ class ComparePage extends BasePage {
             if (players.length >= 2) {
                 const prog = progress[key];
                 if (prog.percentage < 100) {
-                    return `Try comparing <strong>${name}</strong> players next!`;
+                    return {
+                        html: `Try comparing <strong class="position-suggestion" data-position="${key}">${name}</strong> players next!`,
+                        positionKey: key
+                    };
                 }
             }
         }
 
-        return 'All positions are complete!';
+        return { html: 'All positions are complete!', positionKey: null };
     }
 
     render() {
@@ -301,6 +304,7 @@ class ComparePage extends BasePage {
                 ? getIcon('check-circle', { size: 48, color: 'var(--color-success)' })
                 : getIcon('info', { size: 48, color: 'var(--color-text-secondary)' });
 
+            const suggestion = this.getNextPositionSuggestion();
             return `
                 <div class="comparison-area ${isComplete ? 'comparison-area--complete' : ''}">
                     ${isComplete ? `
@@ -309,7 +313,7 @@ class ComparePage extends BasePage {
                             <h3 class="comparison-complete__title">Position Complete!</h3>
                             <p class="comparison-complete__message">
                                 All ${posName} comparisons are finished (${progress.completed}/${progress.total}).
-                                ${this.getNextPositionSuggestion()}
+                                ${suggestion.html}
                             </p>
                         </div>
                     ` : this.renderEmpty(status.reason, icon)}
@@ -613,6 +617,24 @@ class ComparePage extends BasePage {
                 // Animate the button on click
                 this.animateKeyPress(drawButton);
                 this.handleDraw(player1Id, player2Id);
+            });
+        }
+
+        // Position suggestion click handler
+        const positionSuggestion = this.$('.position-suggestion');
+        if (positionSuggestion) {
+            positionSuggestion.addEventListener('click', () => {
+                const positionKey = positionSuggestion.getAttribute('data-position');
+                if (positionKey) {
+                    this.selectedPosition = positionKey;
+                    this.loadNextPair();
+                    this.update();
+
+                    // Scroll to comparison area if there are pairs to compare
+                    if (this.currentPair) {
+                        this.scrollToComparisonArea();
+                    }
+                }
             });
         }
     }

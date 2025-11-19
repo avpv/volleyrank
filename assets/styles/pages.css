@@ -1446,6 +1446,15 @@
     font-weight: var(--font-weight-semibold);
 }
 
+.comparison-complete__message .position-suggestion {
+    cursor: pointer;
+    transition: text-decoration 0.2s ease;
+}
+
+.comparison-complete__message .position-suggestion:hover {
+    text-decoration: underline;
+}
+
 .comparison-cards {
     display: grid;
     grid-template-columns: 1fr auto 1fr;
