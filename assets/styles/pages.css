@@ -686,8 +686,8 @@
     padding: var(--spacing-5);
     background-color: var(--color-surface-base);
     border: 1px solid var(--color-border-default);
-    border-radius: var(--radius-lg);
-    transition: var(--transition-default);
+    border-radius: var(--radius-md);
+    transition: all 0.15s ease;
     cursor: pointer;
     text-align: left;
     min-height: 160px;
@@ -695,7 +695,9 @@
 
 .position-card:hover:not([disabled]) {
     border-color: var(--color-border-emphasis);
-    background-color: var(--color-bg-hover);
+    background-color: var(--color-surface-raised);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .position-card:focus {
@@ -706,34 +708,32 @@
 
 .position-card:active:not([disabled]) {
     transform: translateY(0);
+    box-shadow: none;
 }
 
 /* Position Card States */
 .position-card--ready {
     background: var(--color-surface-base);
-    border-color: var(--color-brand-primary);
 }
 
 .position-card--ready:hover {
-    border-color: var(--color-brand-primary);
+    border-color: var(--color-border-emphasis);
 }
 
 .position-card--in-progress {
     background: var(--color-surface-base);
-    border: 1px solid var(--color-info);
 }
 
 .position-card--in-progress:hover {
-    border-color: var(--color-info);
+    border-color: var(--color-border-emphasis);
 }
 
 .position-card--complete {
     background: var(--color-surface-base);
-    border: 1px solid var(--color-success);
 }
 
 .position-card--complete:hover {
-    border-color: var(--color-success);
+    border-color: var(--color-border-emphasis);
 }
 
 .position-card--disabled {
@@ -748,8 +748,9 @@
 }
 
 .position-card--selected {
-    border: 1px solid var(--color-brand-primary);
+    border: 2px solid var(--color-brand-primary);
     background-color: var(--color-surface-interactive);
+    box-shadow: 0 0 0 3px rgba(47, 129, 247, 0.1);
 }
 
 /* Position Card Header */
@@ -758,12 +759,46 @@
     justify-content: space-between;
     align-items: flex-start;
     margin-bottom: var(--spacing-2);
+    gap: var(--spacing-3);
 }
 
 .position-card__title {
     display: flex;
     flex-direction: column;
     gap: var(--spacing-1);
+    flex: 1;
+    min-width: 0;
+}
+
+.position-card__actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2);
+    align-items: flex-end;
+    flex-shrink: 0;
+}
+
+.position-card__reset-btn {
+    padding: var(--spacing-1) var(--spacing-3);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-secondary);
+    background-color: var(--color-surface-raised);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: var(--transition-default);
+    white-space: nowrap;
+}
+
+.position-card__reset-btn:hover {
+    color: var(--color-error);
+    background-color: var(--color-error-light);
+    border-color: var(--color-error);
+}
+
+.position-card__reset-btn:active {
+    transform: scale(0.95);
 }
 
 .position-card__name {

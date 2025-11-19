@@ -475,6 +475,48 @@ class ComparisonService {
     }
 
     /**
+     * Reset comparisons for a single position
+     *
+     * @param {string} position - Position to reset
+     */
+    resetPosition(position) {
+        // Get all players at this position
+        const players = this.playerRepository.getByPosition(position);
+
+        if (players.length === 0) {
+            return;
+        }
+
+        // Reset each player's data for this position
+        const updates = players.map(player => ({
+            id: player.id,
+            updates: {
+                ratings: {
+                    ...player.ratings,
+                    [position]: 1500
+                },
+                comparisons: {
+                    ...player.comparisons,
+                    [position]: 0
+                },
+                comparedWith: {
+                    ...player.comparedWith,
+                    [position]: []
+                }
+            }
+        }));
+
+        // Update all players
+        this.playerRepository.updateMany(updates);
+
+        // Emit event
+        this.eventBus.emit('comparison:reset-position', {
+            position,
+            playersAffected: players.length
+        });
+    }
+
+    /**
      * Reset all comparisons for positions
      *
      * @param {Array<string>} positions - Positions to reset
