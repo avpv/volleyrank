@@ -144,97 +144,9 @@ class ComparePage extends BasePage {
                 <p class="page-subtitle">Build accurate player ratings through head-to-head comparisons</p>
             </div>
 
-            ${this.renderOverallProgress()}
             ${this.renderPositionSelector()}
             ${this.renderComparisonArea()}
         `);
-    }
-
-    renderOverallProgress() {
-        const progress = this.comparisonService.getAllProgress();
-        const positions = this.activityConfig.positions;
-
-        // Calculate overall statistics
-        let totalCompleted = 0;
-        let totalComparisons = 0;
-        let completedPositions = 0;
-        let availablePositions = 0;
-
-        Object.keys(positions).forEach(key => {
-            const players = this.playerService.getByPosition(key);
-            if (players.length >= 2) {
-                availablePositions++;
-                const prog = progress[key];
-                totalCompleted += prog.completed;
-                totalComparisons += prog.total;
-                if (prog.percentage === 100) {
-                    completedPositions++;
-                }
-            }
-        });
-
-        const overallPercentage = totalComparisons > 0
-            ? Math.round((totalCompleted / totalComparisons) * 100)
-            : 0;
-
-        const isFullyComplete = availablePositions > 0 && completedPositions === availablePositions;
-
-        // Don't show if no positions are available
-        if (availablePositions === 0) {
-            return '';
-        }
-
-        return `
-            <div class="overall-progress ${isFullyComplete ? 'overall-progress--complete' : ''}" role="status" aria-live="polite">
-                <div class="overall-progress__content">
-                    <div class="overall-progress__header">
-                        <div class="overall-progress__title">
-                            ${isFullyComplete ? `
-                                <h3>All Comparisons Complete</h3>
-                            ` : `
-                                <h3>Overall Progress</h3>
-                            `}
-                        </div>
-                        <div class="overall-progress__stats">
-                            <div class="overall-stat">
-                                <span class="overall-stat__value">${completedPositions}/${availablePositions}</span>
-                                <span class="overall-stat__label">positions complete</span>
-                            </div>
-                            <div class="overall-stat">
-                                <span class="overall-stat__value">${totalCompleted}/${totalComparisons}</span>
-                                <span class="overall-stat__label">total comparisons</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    ${!isFullyComplete ? `
-                        <div class="overall-progress__bar">
-                            <div class="overall-progress__fill"
-                                 style="width: ${overallPercentage}%"
-                                 role="progressbar"
-                                 aria-valuenow="${overallPercentage}"
-                                 aria-valuemin="0"
-                                 aria-valuemax="100"></div>
-                        </div>
-                        <p class="overall-progress__message">
-                            ${overallPercentage === 0
-                                ? 'Select a position below to start comparing players'
-                                : overallPercentage < 50
-                                    ? 'Great start! Keep going to improve team balance accuracy'
-                                    : overallPercentage < 100
-                                        ? 'You\'re more than halfway there! Almost done'
-                                        : 'Amazing work! All comparisons completed'}
-                        </p>
-                    ` : `
-                        <div class="overall-progress__celebration">
-                            <p class="overall-progress__message">
-                                Excellent work! All player comparisons are complete. Your team balance algorithm now has maximum accuracy.
-                            </p>
-                        </div>
-                    `}
-                </div>
-            </div>
-        `;
     }
 
     renderPositionSelector() {
