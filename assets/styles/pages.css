@@ -180,66 +180,9 @@
    Google Sheets Integration - Enhanced UI
    ============================================================================= */
 
-/* Comparison Area */
-.comparison-area {
-    margin-top: var(--spacing-8);
-    padding: var(--spacing-8);
-    background-color: transparent;
-    border: 1px solid var(--color-border-default);
-    border-radius: var(--radius-lg);
-    transition: all var(--duration-normal) var(--ease-smooth);
-    position: relative;
-    overflow: hidden;
-}
+/* Comparison Area - Removed duplicate definition, see line ~1326 for main definition */
 
-.comparison-area--active {
-    background-color: var(--color-surface-raised);
-    border-color: var(--color-border-default);
-}
-
-.comparison-header {
-    text-align: center;
-    margin-bottom: var(--spacing-8);
-    position: relative;
-    z-index: 1;
-}
-
-.comparison-question {
-    font-size: var(--font-size-xl);
-    color: var(--color-text-primary);
-    margin-bottom: var(--spacing-4);
-}
-
-.comparison-progress-indicator {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--spacing-2);
-    max-width: 300px;
-    margin: 0 auto;
-}
-
-.progress-mini {
-    width: 100%;
-    height: 4px;
-    background-color: var(--color-bg-secondary);
-    border: 1px solid var(--color-border-default);
-    border-radius: var(--radius-full);
-    overflow: hidden;
-}
-
-.progress-mini__fill {
-    height: 100%;
-    background-color: var(--color-brand-primary);
-    border-radius: var(--radius-full);
-    transition: width var(--duration-normal) var(--ease-smooth);
-}
-
-.comparison-progress-text {
-    font-size: var(--font-size-xs);
-    color: var(--color-text-tertiary);
-    font-variant-numeric: tabular-nums;
-}
+/* Comparison Header, Question, Progress - See line ~1340 for definitions */
 
 /* Comparison Cards Grid */
 .comparison-cards {
@@ -1323,24 +1266,28 @@
     background: var(--color-warning);
 }
 
-/* Comparison Area - Block Structure */
+/* Comparison Area - Block Structure (following GitHub-style section pattern) */
 .comparison-area {
-    margin-top: var(--spacing-10);
-    padding-top: var(--spacing-8);
+    margin-top: var(--spacing-12);
+    padding-top: var(--spacing-10);
     border-top: 1px solid var(--color-border-default);
+    margin-bottom: var(--spacing-12);
+}
+
+.page-header+.comparison-area {
+    border-top: none;
+    margin-top: var(--spacing-8);
+    padding-top: 0;
+}
+
+.comparison-area--active {
+    /* Active state shows comparison UI */
     min-height: 400px;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-}
-
-
-
-.comparison-area--active {
     align-items: stretch;
     justify-content: flex-start;
+    position: relative;
 }
 
 .comparison-area--complete {
@@ -1355,6 +1302,11 @@
     border-radius: var(--radius-lg);
     padding: var(--spacing-6);
     border: 1px solid var(--color-border-default);
+    transition: var(--transition-default);
+}
+
+.comparison-header:hover {
+    border-color: var(--color-border-emphasis);
 }
 
 .comparison-info {
