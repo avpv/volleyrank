@@ -141,7 +141,7 @@ class ComparePage extends BasePage {
         return this.renderPageWithSidebar(`
             <div class="page-header">
                 <h2>Compare Players</h2>
-                <p class="page-subtitle">Build accurate player ratings through head-to-head comparisons</p>
+                <p class="page-subtitle">Build accurate player ratings through head-to-head comparisons using the ELO ranking system</p>
             </div>
 
             ${this.renderPositionSelector()}
@@ -170,10 +170,10 @@ class ComparePage extends BasePage {
                             type="button"
                             class="btn btn-secondary"
                             id="${ELEMENT_IDS.RESET_ALL_BTN}"
-                            title="${hasAnyComparisons ? 'Reset all comparisons for all positions' : 'No comparisons to reset'}"
-                            aria-label="Reset all comparisons"
+                            ${!hasAnyComparisons ? `data-disabled-reason="No comparisons to reset"` : ''}
+                            aria-label="Reset all comparisons for all positions"
                             ${!hasAnyComparisons ? 'disabled' : ''}>
-                            ${getIcon('refresh', { size: 16, className: 'btn-icon' })}
+                            ${getIcon('refresh', { size: 16 })}
                             Reset All
                         </button>
                     </div>
@@ -264,10 +264,11 @@ class ComparePage extends BasePage {
                                             type="button"
                                             class="position-card__reset-btn"
                                             data-position-reset="${key}"
-                                            aria-label="Reset ${name} comparisons"
-                                            title="${hasProgress ? 'Reset comparisons for this position' : 'No comparisons to reset'}"
+                                            aria-label="Reset ${this.escape(name)} comparisons"
+                                            ${!hasProgress ? `data-disabled-reason="No comparisons to reset"` : ''}
                                             onclick="event.stopPropagation();"
                                             ${!hasProgress ? 'disabled' : ''}>
+                                            ${getIcon('refresh-cw', { size: 14 })}
                                             Reset
                                         </button>
                                     </div>
@@ -304,15 +305,15 @@ class ComparePage extends BasePage {
             return `
                 <div class="comparison-area ${isComplete ? 'comparison-area--complete' : ''}">
                     ${isComplete ? `
-                        <div class="comparison-complete">
-                            <div class="comparison-complete__icon">${icon}</div>
-                            <h3 class="comparison-complete__title">Position Complete!</h3>
+                        <div class="comparison-complete" role="status" aria-live="polite" aria-label="Position complete">
+                            <div class="comparison-complete__icon" aria-hidden="true">${icon}</div>
+                            <h3 class="comparison-complete__title">All ${this.escape(posName)} Comparisons Complete!</h3>
                             <p class="comparison-complete__message">
-                                All ${posName} comparisons are finished (${progress.completed}/${progress.total}).
+                                You've completed all ${progress.completed} comparisons for this position.
                                 ${this.getNextPositionSuggestion()}
                             </p>
                         </div>
-                    ` : this.renderEmpty(status.reason, icon)}
+                    ` : this.renderEmpty(status.reason, icon, 'Cannot Compare')}
                 </div>
             `;
         }
@@ -350,12 +351,12 @@ class ComparePage extends BasePage {
             <div class="comparison-area comparison-area--active" role="region" aria-label="Player comparison">
                 <div class="comparison-header">
                     <div class="comparison-info">
-                        <p class="comparison-question">Who is better at <strong>${posName}</strong>?</p>
-                        <div class="comparison-progress-indicator">
-                            <div class="progress-mini">
-                                <div class="progress-mini__fill" style="width: ${progressPercent}%"></div>
+                        <p class="comparison-question">Who is better at <strong>${this.escape(posName)}</strong>?</p>
+                        <div class="comparison-progress-indicator" role="status" aria-live="polite">
+                            <div class="progress-mini" role="progressbar" aria-valuenow="${progressPercent}" aria-valuemin="0" aria-valuemax="100" aria-label="Comparison progress">
+                                <div class="progress-mini__fill" style="width: ${progressPercent}%" aria-hidden="true"></div>
                             </div>
-                            <span class="comparison-progress-text">${currentProgress.completed}/${currentProgress.total} comparisons · ${progressPercent}% complete</span>
+                            <span class="comparison-progress-text">${currentProgress.completed} of ${currentProgress.total} comparisons · ${progressPercent}% complete</span>
                         </div>
                     </div>
                 </div>
@@ -366,33 +367,34 @@ class ComparePage extends BasePage {
                         id="leftPlayerCard"
                         data-winner-id="${player1.id}"
                         data-loser-id="${player2.id}"
-                        aria-label="Select ${this.escape(player1.name)} as better player (keyboard: A)"
-                        role="button">
-                        <div class="keyboard-hint" aria-hidden="true">A</div>
-                        <div class="player-avatar d-flex items-center justify-center">
-                            ${player1.name.charAt(0).toUpperCase()}
+                        aria-label="Select ${this.escape(player1.name)} as better player. Press A or click to choose."
+                        type="button">
+                        <div class="keyboard-hint" aria-label="Keyboard shortcut A">A</div>
+                        <div class="player-avatar" aria-hidden="true">
+                            ${this.escape(player1.name.charAt(0).toUpperCase())}
                         </div>
-                        <div class="player-name font-semibold">${this.escape(player1.name)}</div>
-                        <div class="player-position text-secondary">${posName}</div>
-                        <div class="player-rating font-medium" aria-label="Current rating">
+                        <div class="player-name">${this.escape(player1.name)}</div>
+                        <div class="player-position">${this.escape(posName)}</div>
+                        <div class="player-rating" aria-label="Current ELO rating: ${Math.round(player1.ratings[this.selectedPosition])}">
                             ${Math.round(player1.ratings[this.selectedPosition])} <span class="text-tertiary text-xs">ELO</span>
                         </div>
-                        <div class="player-comparisons text-tertiary" aria-label="Number of comparisons">
+                        <div class="player-comparisons" aria-label="${player1.comparisons[this.selectedPosition]} comparisons completed">
                             ${player1.comparisons[this.selectedPosition]} comparison${player1.comparisons[this.selectedPosition] !== 1 ? 's' : ''}
                         </div>
                     </button>
 
-                    <div class="vs-divider" aria-hidden="true">
-                        <div class="vs-text">VS</div>
+                    <div class="vs-divider">
+                        <div class="vs-text" aria-hidden="true">VS</div>
                         <button
                             class="draw-button"
                             id="drawButton"
                             data-player1-id="${player1.id}"
                             data-player2-id="${player2.id}"
-                            aria-label="Mark as equal skill level (keyboard: W)"
+                            aria-label="Mark players as equal skill level. Press W or click to choose."
+                            type="button"
                             title="Both players have equal skill">
-                            <span class="keyboard-hint-button" aria-hidden="true">W</span>
-                            Equal Skill
+                            <span class="keyboard-hint-button" aria-label="Keyboard shortcut W">W</span>
+                            Equal
                         </button>
                     </div>
 
@@ -401,18 +403,18 @@ class ComparePage extends BasePage {
                         id="rightPlayerCard"
                         data-winner-id="${player2.id}"
                         data-loser-id="${player1.id}"
-                        aria-label="Select ${this.escape(player2.name)} as better player (keyboard: D)"
-                        role="button">
-                        <div class="keyboard-hint" aria-hidden="true">D</div>
-                        <div class="player-avatar d-flex items-center justify-center">
-                            ${player2.name.charAt(0).toUpperCase()}
+                        aria-label="Select ${this.escape(player2.name)} as better player. Press D or click to choose."
+                        type="button">
+                        <div class="keyboard-hint" aria-label="Keyboard shortcut D">D</div>
+                        <div class="player-avatar" aria-hidden="true">
+                            ${this.escape(player2.name.charAt(0).toUpperCase())}
                         </div>
-                        <div class="player-name font-semibold">${this.escape(player2.name)}</div>
-                        <div class="player-position text-secondary">${posName}</div>
-                        <div class="player-rating font-medium" aria-label="Current rating">
+                        <div class="player-name">${this.escape(player2.name)}</div>
+                        <div class="player-position">${this.escape(posName)}</div>
+                        <div class="player-rating" aria-label="Current ELO rating: ${Math.round(player2.ratings[this.selectedPosition])}">
                             ${Math.round(player2.ratings[this.selectedPosition])} <span class="text-tertiary text-xs">ELO</span>
                         </div>
-                        <div class="player-comparisons text-tertiary" aria-label="Number of comparisons">
+                        <div class="player-comparisons" aria-label="${player2.comparisons[this.selectedPosition]} comparisons completed">
                             ${player2.comparisons[this.selectedPosition]} comparison${player2.comparisons[this.selectedPosition] !== 1 ? 's' : ''}
                         </div>
                     </button>

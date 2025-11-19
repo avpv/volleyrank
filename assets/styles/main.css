@@ -36,16 +36,16 @@
     --color-bg-hover: rgba(255, 255, 255, 0.03);
     --color-surface-hover: #2d333b;
     
-    /* Borders - Simplified system */
+    /* Borders - Simplified system with better contrast */
     --color-border-muted: #21262d;       /* Subtle dividers, table borders */
     --color-border-default: #30363d;     /* Standard borders (cards, inputs) */
-    --color-border-emphasis: #57606a;    /* Hover/focus states, active elements */
+    --color-border-emphasis: #6b737d;    /* Stronger emphasis for better visibility */
     
-    /* Text Colors - Refined hierarchy */
+    /* Text Colors - Enhanced contrast for better readability */
     --color-text-primary: #e6edf3;
-    --color-text-secondary: #adb5bd;
-    --color-text-tertiary: #9da5ae;
-    --color-text-disabled: #495057;
+    --color-text-secondary: #b8c1ca;       /* Improved contrast */
+    --color-text-tertiary: #a5afb8;        /* Improved contrast */
+    --color-text-disabled: #6b737d;        /* Better visibility */
     --color-text-inverse: #0d1117;
     --color-text-link: #58a6ff;
 
@@ -93,10 +93,10 @@
     --font-size-2-5xl: 1.75rem;   /* 28px - subsection headers */
     --font-size-3xl: 2rem;        /* 32px - page titles */
     
-    /* Font Weights - Simplified (3 weights only) */
-    --font-weight-normal: 400;      /* Body text, labels, descriptions */
+    /* Font Weights - Simplified (3 weights only for consistency) */
+    --font-weight-normal: 400;      /* Body text, descriptions */
     --font-weight-medium: 500;      /* Emphasized text, buttons, nav links */
-    --font-weight-semibold: 600;    /* Headings, card titles, important elements */
+    --font-weight-semibold: 600;    /* Headings, labels, card titles, important elements */
     
     /* Line Heights */
     --line-height-none: 1;
@@ -104,10 +104,10 @@
     --line-height-normal: 1.5;
     --line-height-relaxed: 1.75;
     
-    /* Letter Spacing */
-    --letter-spacing-tight: -0.01em;
-    --letter-spacing-normal: 0;
-    --letter-spacing-wide: 0.01em;
+    /* Letter Spacing - Improved for readability */
+    --letter-spacing-tight: -0.02em;        /* Tight for large headings */
+    --letter-spacing-normal: 0;             /* Normal body text */
+    --letter-spacing-wide: 0.02em;          /* Wide for uppercase labels */
     
     /* ==========================================================================
        Spacing - Scale
@@ -243,10 +243,10 @@ h1 {
 }
 
 h2 {
-    font-size: 2rem;
+    font-size: 1.75rem;
     font-weight: var(--font-weight-semibold);
     color: var(--color-text-primary);
-    letter-spacing: -0.02em;
+    letter-spacing: var(--letter-spacing-tight);
     margin-bottom: var(--spacing-8);
 }
 
@@ -539,6 +539,8 @@ a:hover {
 .empty-state {
     text-align: center;
     padding: var(--spacing-12) var(--spacing-8);
+    background-color: var(--color-surface-raised);
+    border-radius: var(--radius-lg);
     animation: fadeIn 0.3s ease-out;
 }
 
@@ -638,7 +640,7 @@ a:hover {
    ============================================================================= */
 
 *:focus-visible {
-    outline: 2px solid var(--color-brand-primary);
+    outline: 3px solid var(--color-brand-primary);
     outline-offset: 2px;
 }
 
