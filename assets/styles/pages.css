@@ -630,18 +630,16 @@
 
 /* Position Selector - Card-Based UI */
 .position-selector {
-    margin-bottom: var(--spacing-10);
-    padding: var(--spacing-8);
+    margin-bottom: var(--spacing-6);
+    padding: var(--spacing-6);
     background-color: var(--color-surface-raised);
     border: 1px solid var(--color-border-default);
-    border-radius: var(--radius-xl);
+    border-radius: var(--radius-lg);
     transition: var(--transition-default);
-    box-shadow: var(--shadow-sm);
 }
 
 .position-selector:hover {
     border-color: var(--color-border-emphasis);
-    box-shadow: var(--shadow-md);
 }
 
 /* Position Selector Header */
@@ -1106,9 +1104,8 @@
     border: 1px solid var(--color-border-default);
     border-radius: var(--radius-lg);
     padding: var(--spacing-6);
-    margin-bottom: var(--spacing-8);
-    margin-top: var(--spacing-10);
-    padding-top: calc(var(--spacing-6) + var(--spacing-8));
+    margin-bottom: var(--spacing-6);
+    margin-top: var(--spacing-6);
     min-height: 400px;
     display: flex;
     flex-direction: column;
