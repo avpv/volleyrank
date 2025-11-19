@@ -229,10 +229,10 @@ class ComparePage extends BasePage {
                                 </div>
 
                                 ${isDisabled ? `
-                                    <div class="empty-state animate-fade-in" role="status" aria-label="Empty state">
-                                        <div class="empty-state__icon" aria-hidden="true">${getIcon('user-x', { size: 40, color: 'var(--color-text-secondary)', strokeWidth: 2 })}</div>
-                                        <p class="empty-state__description">Not enough players assigned to the ${name} position yet. Add players on the Settings page.</p>
-                                    </div>
+                                    ${this.renderEmpty(
+                `Not enough players assigned to the ${name} position yet. Add players on the Settings page.`,
+                getIcon('users-x', { size: 40, color: 'var(--color-text-secondary)' })
+            )}
                                 ` : `
                                     <div class="position-card__info">
                                         <div class="position-card__stats">

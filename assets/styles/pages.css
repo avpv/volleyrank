@@ -942,24 +942,26 @@
 .position-card--disabled {
     /* Match ranking-card empty state */
     background-color: var(--color-surface-raised);
-    border-style: solid;
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-lg);
     opacity: 1;
     cursor: default;
 }
 
 .position-card--disabled:hover {
-    border-color: var(--color-border-default);
+    border-color: var(--color-border-emphasis);
 }
 
 /* Match ranking-title style for the header in disabled state */
 .position-card--disabled .position-card__header {
-    margin-bottom: var(--spacing-6);
-    padding-bottom: var(--spacing-3);
-    border-bottom: 1px solid var(--color-border-default);
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
 }
 
 .position-card--disabled .position-card__name {
     font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
 }
 
 .position-card--selected {
