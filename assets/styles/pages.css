@@ -1089,11 +1089,19 @@
 }
 
 /* Position Card Stats */
+/* Position Card Info Container */
+.position-card__info {
+    padding: var(--spacing-4);
+    margin: var(--spacing-3) 0;
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-md);
+}
+
 .position-card__stats {
     display: flex;
     gap: var(--spacing-4);
-    padding: var(--spacing-4) 0;
-    margin: var(--spacing-3) 0;
+    padding: 0;
+    margin: 0 0 var(--spacing-3) 0;
 }
 
 .position-stat {
@@ -1123,7 +1131,7 @@
     display: flex;
     align-items: center;
     gap: var(--spacing-3);
-    margin-bottom: var(--spacing-4);
+    margin: 0;
 }
 
 

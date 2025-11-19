@@ -234,27 +234,29 @@ class ComparePage extends BasePage {
                                         <p class="empty-state__description">Not enough players assigned to the ${name} position yet. Add players on the Settings page.</p>
                                     </div>
                                 ` : `
-                                    <div class="position-card__stats">
-                                        <div class="position-stat">
-                                            <span class="position-stat__value">${players.length}</span>
-                                            <span class="position-stat__label">player${players.length !== 1 ? 's' : ''}</span>
+                                    <div class="position-card__info">
+                                        <div class="position-card__stats">
+                                            <div class="position-stat">
+                                                <span class="position-stat__value">${players.length}</span>
+                                                <span class="position-stat__label">player${players.length !== 1 ? 's' : ''}</span>
+                                            </div>
+                                            <div class="position-stat">
+                                                <span class="position-stat__value">${prog.completed}/${prog.total}</span>
+                                                <span class="position-stat__label">comparisons</span>
+                                            </div>
                                         </div>
-                                        <div class="position-stat">
-                                            <span class="position-stat__value">${prog.completed}/${prog.total}</span>
-                                            <span class="position-stat__label">comparisons</span>
-                                        </div>
-                                    </div>
 
-                                    <div class="position-card__progress">
-                                        <div class="position-progress-bar">
-                                            <div class="position-progress-fill position-progress-fill--${cardState}"
-                                                 style="width: ${prog.percentage}%"
-                                                 role="progressbar"
-                                                 aria-valuenow="${Math.round(prog.percentage)}"
-                                                 aria-valuemin="0"
-                                                 aria-valuemax="100"></div>
+                                        <div class="position-card__progress">
+                                            <div class="position-progress-bar">
+                                                <div class="position-progress-fill position-progress-fill--${cardState}"
+                                                     style="width: ${prog.percentage}%"
+                                                     role="progressbar"
+                                                     aria-valuenow="${Math.round(prog.percentage)}"
+                                                     aria-valuemin="0"
+                                                     aria-valuemax="100"></div>
+                                            </div>
+                                            <span class="position-card__percentage">${Math.round(prog.percentage)}%</span>
                                         </div>
-                                        <span class="position-card__percentage">${Math.round(prog.percentage)}%</span>
                                     </div>
 
                                     <div class="position-card__actions">
