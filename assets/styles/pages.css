@@ -743,10 +743,12 @@
 
 .position-card__actions {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     gap: var(--spacing-2);
-    align-items: flex-end;
+    align-items: center;
     flex-shrink: 0;
+    flex-wrap: wrap;
+    justify-content: flex-end;
 }
 
 .position-card__reset-btn {
