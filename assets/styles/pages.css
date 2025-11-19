@@ -996,15 +996,37 @@
 }
 
 .position-card__badges .status-badge {
-    background: rgba(47, 129, 247, 0.15);
-    color: var(--color-brand-primary);
-    border: 1px solid var(--color-brand-primary);
     font-size: var(--font-size-xs);
     padding: 2px var(--spacing-2);
     border-radius: var(--radius-sm);
     font-weight: var(--font-weight-semibold);
     text-transform: uppercase;
     letter-spacing: 0.05em;
+    border: 1px solid transparent;
+}
+
+.position-card__badges .status-badge--success {
+    background: rgba(86, 211, 100, 0.15);
+    color: var(--color-success);
+    border-color: var(--color-success);
+}
+
+.position-card__badges .status-badge--in-progress {
+    background: rgba(47, 129, 247, 0.15);
+    color: var(--color-brand-primary);
+    border-color: var(--color-brand-primary);
+}
+
+.position-card__badges .status-badge--ready {
+    background: rgba(163, 113, 247, 0.15);
+    color: var(--color-brand-secondary);
+    border-color: var(--color-brand-secondary);
+}
+
+.position-card__badges .status-badge--not-ready {
+    background: rgba(110, 118, 129, 0.15);
+    color: var(--color-text-secondary);
+    border-color: var(--color-border-emphasis);
 }
 
 .position-card__actions {
