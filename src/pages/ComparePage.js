@@ -181,39 +181,38 @@ class ComparePage extends BasePage {
 
                 <div class="position-grid" role="radiogroup" aria-label="Available positions">
                     ${Object.entries(positions).map(([key, name]) => {
-                        const prog = progress[key];
-                        const players = this.playerService.getByPosition(key);
-                        const isSelected = this.selectedPosition === key;
-                        const isDisabled = players.length < 2;
-                        const isComplete = prog.percentage === 100;
-                        const hasProgress = prog.completed > 0;
+            const prog = progress[key];
+            const players = this.playerService.getByPosition(key);
+            const isSelected = this.selectedPosition === key;
+            const isDisabled = players.length < 2;
+            const isComplete = prog.percentage === 100;
+            const hasProgress = prog.completed > 0;
 
-                        // Determine card state
-                        let cardState = 'disabled';
-                        let statusText = 'Not enough players';
+            // Determine card state
+            let cardState = 'disabled';
+            let statusText = 'Not enough players';
 
-                        if (!isDisabled) {
-                            if (isComplete) {
-                                cardState = 'complete';
-                                statusText = 'Complete';
-                            } else if (hasProgress) {
-                                cardState = 'in-progress';
-                                statusText = 'In progress';
-                            } else {
-                                cardState = 'ready';
-                                statusText = 'Ready to start';
-                            }
-                        }
+            if (!isDisabled) {
+                if (isComplete) {
+                    cardState = 'complete';
+                    statusText = 'Complete';
+                } else if (hasProgress) {
+                    cardState = 'in-progress';
+                    statusText = 'In progress';
+                } else {
+                    cardState = 'ready';
+                    statusText = 'Ready to start';
+                }
+            }
 
-                        return `
-                            <button
-                                type="button"
+            return `
+                            <div
                                 class="position-card position-card--${cardState} ${isSelected ? 'position-card--selected' : ''}"
                                 data-position="${key}"
                                 role="radio"
                                 aria-checked="${isSelected}"
                                 aria-label="${name} - ${statusText}, ${players.length} players, ${Math.round(prog.percentage)}% complete"
-                                ${isDisabled ? 'disabled aria-disabled="true"' : ''}
+                                ${isDisabled ? 'aria-disabled="true"' : ''}
                                 tabindex="${isSelected ? '0' : '-1'}">
 
                                 <div class="position-card__header">
@@ -273,9 +272,9 @@ class ComparePage extends BasePage {
                                     <span class="position-status__text">${statusText}</span>
                                     ${isDisabled ? `<span class="position-status__hint">Need ${2 - players.length} more</span>` : ''}
                                 </div>
-                            </button>
+                            </div>
                         `;
-                    }).join('')}
+        }).join('')}
                 </div>
             </div>
         `;
