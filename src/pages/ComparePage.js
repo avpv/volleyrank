@@ -288,12 +288,7 @@ class ComparePage extends BasePage {
 
     renderComparisonArea() {
         if (!this.selectedPosition) {
-            const icon = getIcon('target', { size: 48, color: 'var(--color-text-secondary)' });
-            return this.renderEmpty(
-                'Choose a position from the cards above to begin head-to-head player comparisons. The more comparisons you complete, the more accurate your team balance will be.',
-                icon,
-                'Ready to Compare Players'
-            );
+            return '';
         }
 
         const status = this.comparisonService.checkStatus(this.selectedPosition);
