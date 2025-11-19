@@ -218,7 +218,7 @@ class ComparePage extends BasePage {
                                 <div class="position-card__header">
                                     <div class="position-card__title">
                                         <span class="position-card__name">${name}</span>
-                                        <span class="position-card__key">${key}</span>
+
                                     </div>
                                     <div class="position-card__actions">
                                         ${!isDisabled ? `

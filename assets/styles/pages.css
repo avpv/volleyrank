@@ -1063,9 +1063,12 @@
 }
 
 @keyframes selectedPulse {
-    0%, 100% {
+
+    0%,
+    100% {
         box-shadow: 0 0 0 2px var(--color-brand-primary), 0 8px 24px rgba(47, 129, 247, 0.2);
     }
+
     50% {
         box-shadow: 0 0 0 2px var(--color-brand-primary), 0 8px 24px rgba(47, 129, 247, 0.35);
     }
@@ -1133,16 +1136,7 @@
     margin-bottom: var(--spacing-1);
 }
 
-.position-card__key {
-    font-size: var(--font-size-xs);
-    font-weight: var(--font-weight-bold);
-    color: var(--color-text-tertiary);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    background: var(--color-bg-elevated);
-    padding: 2px 6px;
-    border-radius: var(--radius-sm);
-}
+
 
 .position-card__selected-indicator {
     display: flex;
@@ -1222,6 +1216,7 @@
     0% {
         background-position: -200% 0;
     }
+
     100% {
         background-position: 200% 0;
     }
@@ -1570,6 +1565,7 @@
     0% {
         transform: translateX(-100%);
     }
+
     100% {
         transform: translateX(100%);
     }
@@ -1643,6 +1639,7 @@
         opacity: 0;
         transform: translateY(10px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -1671,6 +1668,7 @@
         opacity: 0;
         transform: translateY(20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
