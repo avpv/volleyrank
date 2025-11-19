@@ -97,9 +97,6 @@
 }
 
 /* Add player accordion uses .accordion styles from components.css */
-.add-player-section {
-    /* Inherits accordion styling - no additional styles needed */
-}
 
 /* Player sections within accordion */
 .player-section {
@@ -1344,11 +1341,7 @@
     padding-top: 0;
 }
 
-.position-selector+.comparison-area {
-    border-top: none;
-    margin-top: 0;
-    padding-top: 0;
-}
+
 
 .comparison-area--active {
     align-items: stretch;
@@ -1431,10 +1424,6 @@
     text-align: center;
     padding: var(--spacing-12) var(--spacing-8);
     gap: var(--spacing-5);
-}
-
-.comparison-complete__icon {
-    /* No animation */
 }
 
 .comparison-complete__title {
