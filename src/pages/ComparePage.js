@@ -262,12 +262,13 @@ class ComparePage extends BasePage {
                                     <div class="position-card__actions">
                                         <button
                                             type="button"
-                                            class="position-card__reset-btn"
+                                            class="btn btn-sm btn-secondary position-card__reset-btn"
                                             data-position-reset="${key}"
                                             aria-label="Reset ${name} comparisons"
                                             title="${hasProgress ? 'Reset comparisons for this position' : 'No comparisons to reset'}"
                                             onclick="event.stopPropagation();"
                                             ${!hasProgress ? 'disabled' : ''}>
+                                            ${getIcon('refresh', { size: 14, className: 'btn-icon' })}
                                             Reset
                                         </button>
                                     </div>
