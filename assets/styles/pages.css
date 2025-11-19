@@ -683,8 +683,8 @@
     display: flex;
     flex-direction: column;
     gap: var(--spacing-3);
-    padding: var(--spacing-5);
-    background-color: var(--color-surface-base);
+    padding: var(--spacing-4);
+    background-color: var(--color-surface-raised);
     border: 1px solid var(--color-border-default);
     border-radius: var(--radius-md);
     transition: all 0.15s ease;
@@ -695,9 +695,6 @@
 
 .position-card:hover:not([disabled]) {
     border-color: var(--color-border-emphasis);
-    background-color: var(--color-surface-raised);
-    transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .position-card:focus {
@@ -707,35 +704,10 @@
 }
 
 .position-card:active:not([disabled]) {
-    transform: translateY(0);
-    box-shadow: none;
+    transform: scale(0.98);
 }
 
 /* Position Card States */
-.position-card--ready {
-    background: var(--color-surface-base);
-}
-
-.position-card--ready:hover {
-    border-color: var(--color-border-emphasis);
-}
-
-.position-card--in-progress {
-    background: var(--color-surface-base);
-}
-
-.position-card--in-progress:hover {
-    border-color: var(--color-border-emphasis);
-}
-
-.position-card--complete {
-    background: var(--color-surface-base);
-}
-
-.position-card--complete:hover {
-    border-color: var(--color-border-emphasis);
-}
-
 .position-card--disabled {
     opacity: 0.5;
     cursor: not-allowed;
@@ -748,9 +720,8 @@
 }
 
 .position-card--selected {
-    border: 2px solid var(--color-brand-primary);
-    background-color: var(--color-surface-interactive);
-    box-shadow: 0 0 0 3px rgba(47, 129, 247, 0.1);
+    border: 1px solid var(--color-brand-primary);
+    box-shadow: 0 0 0 2px rgba(47, 129, 247, 0.1);
 }
 
 /* Position Card Header */
@@ -849,7 +820,7 @@
 
 .position-stat__value {
     font-size: var(--font-size-sm);
-    font-weight: var(--font-weight-bold);
+    font-weight: var(--font-weight-semibold);
     color: var(--color-text-primary);
     font-family: var(--font-family-mono);
     font-variant-numeric: tabular-nums;
@@ -858,7 +829,7 @@
 
 .position-stat__label {
     font-size: var(--font-size-xs);
-    color: var(--color-text-tertiary);
+    color: var(--color-text-secondary);
 }
 
 /* Position Card Progress */
@@ -871,16 +842,15 @@
 
 .position-progress-bar {
     flex: 1;
-    height: 6px;
+    height: 8px;
     background-color: var(--color-bg-tertiary);
-    border-radius: 3px;
+    border-radius: 4px;
     overflow: hidden;
-    border: 1px solid var(--color-border-subtle);
 }
 
 .position-progress-fill {
     height: 100%;
-    border-radius: 3px;
+    border-radius: 4px;
     transition: width 0.4s var(--ease-out);
     position: relative;
 }
@@ -898,12 +868,12 @@
 }
 
 .position-card__percentage {
-    font-size: var(--font-size-base);
+    font-size: var(--font-size-sm);
     font-weight: var(--font-weight-semibold);
-    color: var(--color-text-primary);
+    color: var(--color-text-secondary);
     font-family: var(--font-family-mono);
     font-variant-numeric: tabular-nums;
-    min-width: 48px;
+    min-width: 42px;
     text-align: right;
 }
 
@@ -913,7 +883,6 @@
     align-items: center;
     gap: var(--spacing-2);
     padding: var(--spacing-2) 0;
-    border-radius: 2px;
     font-size: var(--font-size-xs);
     font-weight: var(--font-weight-medium);
     margin-top: var(--spacing-2);
@@ -925,17 +894,17 @@
 
 .position-card__status--ready {
     border-left-color: var(--color-brand-primary);
-    color: var(--color-brand-primary);
+    color: var(--color-text-secondary);
 }
 
 .position-card__status--in-progress {
     border-left-color: var(--color-info);
-    color: var(--color-info);
+    color: var(--color-text-secondary);
 }
 
 .position-card__status--complete {
     border-left-color: var(--color-success);
-    color: var(--color-success);
+    color: var(--color-text-secondary);
 }
 
 .position-card__status--disabled {
@@ -1087,18 +1056,17 @@
 /* Progress Bar - Unified Component */
 .progress-bar {
     width: 100%;
-    height: 6px;
+    height: 8px;
     background-color: var(--color-bg-tertiary);
-    border-radius: 3px;
+    border-radius: 4px;
     overflow: hidden;
     position: relative;
-    border: 1px solid var(--color-border-subtle);
 }
 
 .progress-fill {
     height: 100%;
     background: var(--color-brand-primary);
-    border-radius: 3px;
+    border-radius: 4px;
     transition: width 0.4s var(--ease-out);
     position: relative;
 }
@@ -1173,9 +1141,9 @@
 }
 
 .comparison-question {
-    font-size: var(--font-size-xl);
+    font-size: var(--font-size-lg);
     color: var(--color-text-primary);
-    font-weight: var(--font-weight-semibold);
+    font-weight: var(--font-weight-medium);
     margin: 0 0 var(--spacing-4) 0;
     line-height: var(--line-height-tight);
     letter-spacing: -0.01em;
@@ -1183,36 +1151,35 @@
 
 .comparison-question strong {
     color: var(--color-brand-primary);
-    font-weight: var(--font-weight-semibold);
+    font-weight: var(--font-weight-medium);
 }
 
 .comparison-progress-indicator {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: var(--spacing-2);
+    gap: var(--spacing-3);
 }
 
 .progress-mini {
     width: 100%;
-    max-width: 400px;
-    height: 6px;
+    max-width: 500px;
+    height: 8px;
     background-color: var(--color-bg-tertiary);
-    border-radius: 2px;
+    border-radius: 4px;
     overflow: hidden;
-    border: 1px solid var(--color-border-subtle);
 }
 
 .progress-mini__fill {
     height: 100%;
     background: var(--color-brand-primary);
-    border-radius: 2px;
+    border-radius: 4px;
     transition: width 0.3s ease-out;
 }
 
 .comparison-progress-text {
-    font-size: var(--font-size-sm);
-    color: var(--color-text-tertiary);
+    font-size: var(--font-size-xs);
+    color: var(--color-text-secondary);
     font-weight: var(--font-weight-medium);
 }
 
@@ -1304,7 +1271,7 @@
     transition: opacity 0.2s ease-out;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     z-index: 10;
-    opacity: 0.7;
+    opacity: 0.6;
 }
 
 .keyboard-hint-button {
@@ -1314,7 +1281,7 @@
     width: 24px;
     height: 24px;
     background-color: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid var(--color-border-default);
     border-radius: 2px;
     font-size: var(--font-size-xs);
     font-weight: var(--font-weight-bold);
@@ -1323,18 +1290,27 @@
     transition: all 0.2s ease-out;
 }
 
-.player-card.clickable:hover .keyboard-hint {
+.player-card.clickable:hover .keyboard-hint,
+.player-card.clickable:focus-visible .keyboard-hint {
     opacity: 1;
 }
 
 .draw-button:hover .keyboard-hint-button {
     background-color: rgba(255, 255, 255, 0.15);
-    border-color: rgba(255, 255, 255, 0.3);
+    border-color: var(--color-border-emphasis);
+}
+
+/* Hide keyboard hints on touch devices */
+@media (hover: none) {
+    .keyboard-hint,
+    .keyboard-hint-button {
+        display: none;
+    }
 }
 
 /* Key Press Animation */
 .key-pressed {
-    animation: keyPressAnimation 0.4s ease-in-out;
+    animation: keyPressAnimation 0.2s ease-out;
 }
 
 @keyframes keyPressAnimation {
@@ -1342,8 +1318,7 @@
         transform: scale(1);
     }
     50% {
-        transform: scale(0.95);
-        box-shadow: 0 0 0 6px rgba(47, 129, 247, 0.4);
+        transform: scale(0.98);
     }
     100% {
         transform: scale(1);
@@ -1352,58 +1327,11 @@
 
 .player-card.clickable.key-pressed {
     border-color: var(--color-brand-primary);
-    background-color: var(--color-surface-interactive);
-}
-
-.player-card.clickable.key-pressed .keyboard-hint {
-    animation: keyboardHintFill 0.4s ease-out forwards;
-    border-color: var(--color-brand-primary);
-    color: white;
-    box-shadow: 0 0 0 4px rgba(47, 129, 247, 0.5), 0 6px 16px rgba(47, 129, 247, 0.4);
-    transition: none; /* Disable transition during animation to prevent conflicts */
-}
-
-@keyframes keyboardHintFill {
-    0% {
-        background: var(--color-surface-base);
-    }
-    30% {
-        background: linear-gradient(to top, var(--color-brand-primary) 50%, var(--color-surface-base) 50%);
-    }
-    60% {
-        background: var(--color-brand-primary);
-    }
-    100% {
-        background: var(--color-brand-primary);
-    }
 }
 
 .draw-button.key-pressed {
-    transform: scale(0.95);
+    transform: scale(0.98);
     border-color: var(--color-brand-primary);
-    background-color: var(--color-surface-interactive);
-}
-
-.draw-button.key-pressed .keyboard-hint-button {
-    animation: keyboardHintButtonFill 0.4s ease-out forwards;
-    border-color: rgba(255, 255, 255, 0.9);
-    box-shadow: 0 0 16px rgba(255, 255, 255, 0.8);
-    transition: none; /* Disable transition during animation to prevent conflicts */
-}
-
-@keyframes keyboardHintButtonFill {
-    0% {
-        background: rgba(255, 255, 255, 0.15);
-    }
-    30% {
-        background: rgba(255, 255, 255, 0.5);
-    }
-    60% {
-        background: rgba(255, 255, 255, 0.7);
-    }
-    100% {
-        background: rgba(255, 255, 255, 0.5);
-    }
 }
 
 /* Comparison Progress Indicator */
@@ -1443,7 +1371,7 @@
 
 .player-rating {
     text-align: center;
-    font-size: var(--font-size-3xl);
+    font-size: var(--font-size-2xl);
     font-weight: var(--font-weight-bold);
     color: var(--color-brand-primary);
     margin-top: var(--spacing-4);
@@ -1452,11 +1380,16 @@
     letter-spacing: -0.02em;
 }
 
+.player-rating .text-tertiary {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+}
+
 .player-comparisons {
     text-align: center;
     font-size: var(--font-size-sm);
     color: var(--color-text-tertiary);
-    margin-top: var(--spacing-2);
+    margin-top: var(--spacing-3);
 }
 
 /* Stats Section */
@@ -2012,7 +1945,7 @@
     }
 
     .position-card {
-        min-height: 140px;
+        min-height: auto;
         padding: var(--spacing-4);
     }
 
@@ -2167,8 +2100,9 @@
     }
 
     .draw-button {
-        padding: var(--spacing-1) var(--spacing-3);
+        padding: var(--spacing-3) var(--spacing-4);
         font-size: var(--font-size-xs);
+        min-height: 48px;
     }
 
     /* Extra compact player cards on very small screens */
