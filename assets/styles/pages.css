@@ -20,9 +20,9 @@
     background-color: var(--color-surface-raised);
     border: 1px solid var(--color-border-default);
     border-radius: var(--radius-lg);
-    padding: var(--spacing-4);
-    margin-bottom: var(--spacing-4);
-    transition: border-color var(--duration-fast) var(--ease-smooth);
+    padding: var(--spacing-6);
+    margin-bottom: var(--spacing-6);
+    transition: var(--transition-default);
 }
 
 .activity-selector-section:hover {
@@ -628,7 +628,7 @@
     background-color: var(--color-surface-raised);
     border: 1px solid var(--color-border-default);
     border-radius: var(--radius-lg);
-    transition: border-color var(--duration-fast) var(--ease-smooth);
+    transition: var(--transition-default);
 }
 
 .position-selector:hover {
@@ -674,7 +674,7 @@
 .position-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: var(--spacing-4);
+    gap: var(--spacing-6);
 }
 
 /* Position Card - Base Styles */
@@ -687,8 +687,7 @@
     background-color: var(--color-surface-base);
     border: 1px solid var(--color-border-default);
     border-radius: var(--radius-lg);
-    transition: border-color var(--duration-fast) var(--ease-smooth),
-                background-color var(--duration-fast) var(--ease-smooth);
+    transition: var(--transition-default);
     cursor: pointer;
     text-align: left;
     min-height: 160px;
@@ -926,7 +925,7 @@
     border-radius: var(--radius-lg);
     padding: var(--spacing-6);
     margin-bottom: var(--spacing-8);
-    transition: border-color var(--duration-fast) var(--ease-smooth);
+    transition: var(--transition-default);
 }
 
 .progress-section:hover {
@@ -1097,7 +1096,7 @@
     align-items: center;
     justify-content: center;
     position: relative;
-    transition: border-color var(--duration-fast) var(--ease-smooth);
+    transition: var(--transition-default);
 }
 
 .page-header + .comparison-area {
@@ -1451,13 +1450,11 @@
     border: 1px solid var(--color-border-default);
     border-radius: var(--radius-lg);
     padding: var(--spacing-5);
-    transition: border-color var(--duration-fast) var(--ease-smooth),
-                background-color var(--duration-fast) var(--ease-smooth);
+    transition: var(--transition-default);
 }
 
 .ranking-card:hover {
     border-color: var(--color-border-emphasis);
-    background-color: var(--color-surface-overlay);
 }
 
 .ranking-title {
@@ -1488,7 +1485,7 @@
     border-radius: var(--radius-lg);
     padding: var(--spacing-6);
     margin-bottom: var(--spacing-8);
-    transition: border-color var(--duration-fast) var(--ease-smooth);
+    transition: var(--transition-default);
     max-width: 100%;
 }
 
@@ -1606,7 +1603,7 @@
     border: 1px solid;
     border-radius: var(--radius-lg);
     margin-bottom: var(--spacing-6);
-    transition: border-color var(--duration-fast) var(--ease-smooth);
+    transition: var(--transition-default);
     max-width: 100%;
 }
 
@@ -1729,13 +1726,11 @@
     border: 1px solid var(--color-border-default);
     border-radius: var(--radius-lg);
     padding: var(--spacing-5);
-    transition: border-color var(--duration-fast) var(--ease-smooth),
-                background-color var(--duration-fast) var(--ease-smooth);
+    transition: var(--transition-default);
 }
 
 .team-card:hover {
     border-color: var(--color-border-emphasis);
-    background-color: var(--color-surface-overlay);
 }
 
 .team-header {

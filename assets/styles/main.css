@@ -36,18 +36,10 @@
     --color-bg-hover: rgba(255, 255, 255, 0.03);
     --color-surface-hover: #2d333b;
     
-    /* Borders - Minimal hierarchy system */
-    --color-border-subtle: #21262d;      /* Subtle dividers */
-    --color-border-default: #30363d;     /* Standard borders */
-    --color-border-emphasis: #484f58;    /* Hover/emphasis states */
-    --color-border-strong: #57606a;      /* Strong emphasis */
-    --color-border-interactive: #58a6ff; /* Interactive elements */
-
-    /* Border Semantic Aliases */
-    --color-border-separator: var(--color-border-subtle);
-    --color-border-container: var(--color-border-default);
-    --color-border-hover: var(--color-border-emphasis);
-    --color-border-focus: var(--color-border-strong);
+    /* Borders - Simplified system */
+    --color-border-muted: #21262d;       /* Subtle dividers, table borders */
+    --color-border-default: #30363d;     /* Standard borders (cards, inputs) */
+    --color-border-emphasis: #57606a;    /* Hover/focus states, active elements */
     
     /* Text Colors - Refined hierarchy */
     --color-text-primary: #e6edf3;
@@ -81,10 +73,6 @@
     --color-info-hover: #58a6ff;
     --color-info-light: rgba(47, 129, 247, 0.12);
     
-    /* Gradients - Simplified */
-    --gradient-brand: linear-gradient(135deg, #2f81f7 0%, #1f6feb 100%);
-    --gradient-cool: linear-gradient(135deg, #2f81f7 0%, #a371f7 100%);
-    
     /* ==========================================================================
        Typography - Scale
        ========================================================================== */
@@ -105,12 +93,10 @@
     --font-size-2-5xl: 1.75rem;   /* 28px - subsection headers */
     --font-size-3xl: 2rem;        /* 32px - page titles */
     
-    /* Font Weights */
-    --font-weight-light: 300;
-    --font-weight-regular: 400;
-    --font-weight-medium: 500;
-    --font-weight-semibold: 600;
-    --font-weight-bold: 700;
+    /* Font Weights - Simplified (3 weights only) */
+    --font-weight-normal: 400;      /* Body text, labels, descriptions */
+    --font-weight-medium: 500;      /* Emphasized text, buttons, nav links */
+    --font-weight-semibold: 600;    /* Headings, card titles, important elements */
     
     /* Line Heights */
     --line-height-none: 1;
@@ -144,43 +130,30 @@
        Border Radius - Minimal geometric shapes
        ========================================================================== */
 
-    --radius-sm: 0.125rem;   /* 2px - minimal rounding */
-    --radius-md: 0.1875rem;  /* 3px - standard elements */
-    --radius-lg: 0.25rem;    /* 4px - large cards */
-    --radius-xl: 0.25rem;    /* 4px - same as lg, no larger values */
+    --radius-sm: 2px;   /* Minimal rounding - badges, kbd, rank badges */
+    --radius-md: 3px;   /* Standard - buttons, inputs, small cards */
+    --radius-lg: 4px;   /* Large surfaces - modals, major sections */
     
     /* ==========================================================================
-       Shadows - Minimal single-layer system
+       Shadows - Minimal system (use sparingly)
        ========================================================================== */
 
-    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.08);
-    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
-    --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.12);
-    --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.14);
-    --shadow-xl: 0 12px 24px rgba(0, 0, 0, 0.16);
-    --shadow-2xl: 0 16px 32px rgba(0, 0, 0, 0.2);
-
-    /* Interactive shadow states - minimal */
-    --shadow-button-active: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+    --shadow-focus: 0 0 0 3px rgba(47, 129, 247, 0.12);     /* Focus states */
+    --shadow-modal: 0 8px 24px rgba(0, 0, 0, 0.15);         /* Modal overlays */
+    --shadow-toast: 0 4px 12px rgba(0, 0, 0, 0.2);          /* Toast notifications */
+    --shadow-button-active: inset 0 1px 3px rgba(0, 0, 0, 0.2); /* Button pressed */
     
     /* ==========================================================================
-       Animation & Timing - Enhanced easing
+       Animation & Timing - Simplified
        ========================================================================== */
 
-    --duration-instant: 0.05s;
-    --duration-fast: 0.2s;
-    --duration-default: 0.3s;
-    --duration-slow: 0.4s;
-    --duration-slower: 0.6s;
+    --duration-fast: 0.2s;      /* Hover states, simple color changes */
+    --duration-default: 0.3s;   /* Standard interactions, modals */
 
     --ease-smooth: cubic-bezier(0.4, 0.0, 0.2, 1);
     --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-    --ease-in: cubic-bezier(0.4, 0.0, 1, 1);
-    --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
-    --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
 
-    --transition-default: all var(--duration-default) var(--ease-smooth);
-    --transition-transform: transform var(--duration-default) var(--ease-smooth);
+    --transition-default: all var(--duration-fast) var(--ease-smooth);
     --transition-colors: background-color var(--duration-fast) var(--ease-smooth),
                          color var(--duration-fast) var(--ease-smooth),
                          border-color var(--duration-fast) var(--ease-smooth);
@@ -265,23 +238,22 @@ h1, h2, h3, h4, h5, h6 {
 
 h1 {
     font-size: 2rem;
-    font-weight: var(--font-weight-bold);
+    font-weight: var(--font-weight-semibold);
     letter-spacing: -0.02em;
 }
 
 h2 {
     font-size: 2rem;
-    font-weight: var(--font-weight-bold);
+    font-weight: var(--font-weight-semibold);
     color: var(--color-text-primary);
     letter-spacing: -0.02em;
     margin-bottom: var(--spacing-8);
 }
 
 h3 {
-    font-size: var(--font-size-2xl);
+    font-size: var(--font-size-xl);
     font-weight: var(--font-weight-semibold);
     margin-bottom: var(--spacing-5);
-    letter-spacing: -0.015em;
 }
 
 h4 {
@@ -361,11 +333,9 @@ a:hover {
     height: 32px;
     border-radius: var(--radius-md);
     font-size: var(--font-size-lg);
-    font-weight: var(--font-weight-bold);
+    font-weight: var(--font-weight-semibold);
     color: white;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
     transition: var(--transition-default);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 /* T - Team 1 (Blue) */
@@ -376,19 +346,6 @@ a:hover {
 /* B - Team 2 (Purple) */
 .title-b {
     background: #8b5cf6;
-}
-
-.title-t:hover,
-.title-b:hover {
-    background: var(--color-brand-primary);
-}
-
-.title-t:hover {
-    box-shadow: 0 4px 12px rgba(47, 129, 247, 0.4);
-}
-
-.title-b:hover {
-    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
 }
 
 .app-title-link {
@@ -412,20 +369,10 @@ a:hover {
     text-decoration: none;
 }
 
-.app-title-link:active {
-    transform: scale(0.98);
-}
-
 /* App Logo */
 .app-logo {
     flex-shrink: 0;
     transition: var(--transition-default);
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
-}
-
-.app-title-link:hover .app-logo {
-    filter: drop-shadow(0 4px 8px rgba(47, 129, 247, 0.3));
-    transform: translateY(-1px);
 }
 
 .app-subtitle {
@@ -687,24 +634,15 @@ a:hover {
 }
 
 /* =============================================================================
-   Focus States - Enhanced for accessibility
+   Focus States - Minimal and accessible
    ============================================================================= */
 
-:focus-visible {
+*:focus-visible {
     outline: 2px solid var(--color-brand-primary);
     outline-offset: 2px;
-    border-radius: var(--radius-sm);
 }
 
-/* Enhanced focus for buttons */
-button:focus-visible,
-.btn:focus-visible {
-    outline: 2px solid var(--color-brand-primary);
-    outline-offset: 2px;
-    box-shadow: 0 0 0 4px rgba(47, 129, 247, 0.1);
-}
-
-/* Form controls already have custom focus states */
+/* Form controls have border-based focus */
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
