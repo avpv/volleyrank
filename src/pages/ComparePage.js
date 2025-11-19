@@ -218,26 +218,13 @@ class ComparePage extends BasePage {
                                 <div class="position-card__header">
                                     <div class="position-card__title">
                                         <span class="position-card__name">${name}</span>
-
                                     </div>
-                                    <div class="position-card__actions">
+                                    <div class="position-card__badges">
                                         ${!isDisabled ? `
                                             <span class="status-badge status-badge--${isComplete ? 'success' : hasProgress ? 'info' : 'neutral'}">
                                                 ${isComplete ? 'Complete' : hasProgress ? 'In Progress' : 'Ready'}
                                             </span>
                                         ` : '<span class="status-badge status-badge--neutral">Not Ready</span>'}
-                                        ${!isDisabled ? `
-                                            <button
-                                                type="button"
-                                                class="position-card__reset-btn"
-                                                data-position-reset="${key}"
-                                                aria-label="Reset ${name} comparisons"
-                                                title="${hasProgress ? 'Reset comparisons for this position' : 'No comparisons to reset'}"
-                                                onclick="event.stopPropagation();"
-                                                ${!hasProgress ? 'disabled' : ''}>
-                                                Reset
-                                            </button>
-                                        ` : ''}
                                     </div>
                                 </div>
 
@@ -272,6 +259,21 @@ class ComparePage extends BasePage {
                                     <span class="position-status__text">${statusText}</span>
                                     ${isDisabled ? `<span class="position-status__hint">Need ${2 - players.length} more</span>` : ''}
                                 </div>
+
+                                ${!isDisabled ? `
+                                    <div class="position-card__actions">
+                                        <button
+                                            type="button"
+                                            class="position-card__reset-btn"
+                                            data-position-reset="${key}"
+                                            aria-label="Reset ${name} comparisons"
+                                            title="${hasProgress ? 'Reset comparisons for this position' : 'No comparisons to reset'}"
+                                            onclick="event.stopPropagation();"
+                                            ${!hasProgress ? 'disabled' : ''}>
+                                            Reset
+                                        </button>
+                                    </div>
+                                ` : ''}
                             </div>
                         `;
         }).join('')}

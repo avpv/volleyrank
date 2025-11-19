@@ -993,18 +993,17 @@
 
 /* Position Card - Enhanced Design */
 .position-card {
-    background: linear-gradient(135deg, var(--color-surface-raised) 0%, var(--color-surface-base) 100%);
-    border: 2px solid var(--color-border-default);
+    background-color: var(--color-surface-raised);
+    border: 1px solid var(--color-border-default);
     border-radius: var(--radius-lg);
-    padding: var(--spacing-6);
+    padding: var(--spacing-5);
     position: relative;
     display: flex;
     flex-direction: column;
     min-height: 280px;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: var(--transition-default);
     cursor: pointer;
     text-align: left;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     overflow: hidden;
 }
 
@@ -1027,10 +1026,10 @@
 }
 
 .position-card:hover:not([disabled]) {
-    border-color: var(--color-brand-primary);
-    transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2), 0 0 0 1px var(--color-brand-primary);
-    background: linear-gradient(135deg, var(--color-surface-overlay) 0%, var(--color-surface-raised) 100%);
+    border-color: var(--color-border-emphasis);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    background-color: var(--color-surface-overlay);
 }
 
 .position-card:focus {
@@ -1076,10 +1075,10 @@
 
 /* Position Card Header */
 .position-card__header {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    align-items: start;
-    margin-bottom: var(--spacing-2);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: var(--spacing-4);
     gap: var(--spacing-3);
 }
 
@@ -1093,19 +1092,25 @@
 
 .position-card__actions {
     display: flex;
-    flex-direction: column;
-    gap: var(--spacing-2);
-    align-items: flex-end;
+    gap: var(--spacing-3);
+    padding-top: var(--spacing-4);
+    border-top: 1px solid var(--color-border-default);
+    flex-wrap: wrap;
+    margin-top: auto;
 }
 
 .position-card__reset-btn {
-    padding: var(--spacing-1) var(--spacing-3);
     font-size: var(--font-size-xs);
-    font-weight: var(--font-weight-medium);
+    font-weight: var(--font-weight-semibold);
+    min-height: 36px;
+    padding: var(--spacing-2) var(--spacing-3);
+    flex: 1;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
     color: var(--color-text-secondary);
     background-color: var(--color-surface-raised);
     border: 1px solid var(--color-border-default);
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-md);
     cursor: pointer;
     transition: var(--transition-default);
     white-space: nowrap;
@@ -1188,7 +1193,7 @@
     display: flex;
     align-items: center;
     gap: var(--spacing-3);
-    margin-top: auto;
+    margin-bottom: var(--spacing-4);
 }
 
 
