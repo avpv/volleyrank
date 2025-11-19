@@ -962,6 +962,8 @@
     justify-content: space-between;
     align-items: flex-start;
     margin-bottom: var(--spacing-4);
+    padding-bottom: var(--spacing-3);
+    border-bottom: 1px solid var(--color-border-default);
     gap: var(--spacing-3);
 }
 
