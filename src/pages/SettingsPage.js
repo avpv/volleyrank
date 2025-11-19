@@ -143,6 +143,7 @@ class SettingsPage extends BasePage {
         return this.renderPageWithSidebar(`
             <div class="page-header">
                 <h2>Player Management</h2>
+                <p class="page-subtitle">Add players, assign positions, and manage your roster</p>
             </div>
 
             ${players.length === 0 ? this.renderWelcomeGuide() : ''}
@@ -157,19 +158,19 @@ class SettingsPage extends BasePage {
     renderWelcomeGuide() {
         return `
             <div class="welcome-guide" role="complementary" aria-label="Getting started guide">
-                <h3 class="mb-3 font-semibold">👋 Welcome to TeamBalance!</h3>
-                <p class="mb-4 text-secondary">
-                    Create perfectly balanced teams. Get started in 4 simple steps:
+                <h3>Welcome to TeamBalance!</h3>
+                <p class="text-secondary">
+                    Create perfectly balanced teams in 4 simple steps:
                 </p>
-                <ol class="space-y-2">
+                <ol class="welcome-guide__steps">
                     <li>
-                        <a href="#" class="guide-link" ${DATA_ATTRIBUTES.ACTION}="select-activity">
+                        <a href="#" class="guide-link" ${DATA_ATTRIBUTES.ACTION}="select-activity" aria-label="Select your sport or activity">
                             <strong>Select your sport or activity</strong>
-                        </a> from the dropdown below to begin
+                        </a> from the dropdown below
                     </li>
                     <li><strong>Add your players</strong> and assign their positions</li>
                     <li><strong>Compare players head-to-head</strong> to build accurate skill ratings</li>
-                    <li><strong>Generate balanced teams automatically</strong> with one click</li>
+                    <li><strong>Generate balanced teams</strong> automatically with one click</li>
                 </ol>
             </div>
         `;

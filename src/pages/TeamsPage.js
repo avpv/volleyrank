@@ -231,7 +231,7 @@ class TeamsPage extends BasePage {
         return this.renderPageWithSidebar(`
             <div class="page-header">
                 <h2>Create Balanced Teams</h2>
-                <p class="text-secondary mt-2">Configure team composition and weights, then generate optimally balanced teams using mathematical algorithms</p>
+                <p class="page-subtitle">Configure team composition and weights, then generate optimally balanced teams using mathematical algorithms</p>
             </div>
 
             ${this.renderTeamBuilder()}
@@ -294,19 +294,21 @@ class TeamsPage extends BasePage {
                     </div>
                 </div>
 
-                <div class="builder-settings">
+                <div class="form-actions">
                     <button
-                        class="btn btn-primary btn-large"
+                        class="btn btn-primary ${this.state.isOptimizing ? 'btn-loading' : ''}"
                         id="optimizeBtn"
                         ${players.length < 2 ? 'disabled' : ''}
+                        ${players.length < 2 ? `data-disabled-reason="Add at least 2 players to create teams"` : ''}
                         aria-label="${this.state.isOptimizing ? 'Optimizing teams...' : 'Generate balanced teams'}"
                         ${this.state.isOptimizing ? 'aria-busy="true"' : ''}>
-                        ${getIcon('users', { size: 18, className: 'btn-icon' })}
+                        ${!this.state.isOptimizing ? getIcon('users', { size: 18 }) : ''}
                         ${this.state.isOptimizing ? 'Generating Teams...' : 'Generate Balanced Teams'}
                     </button>
                     ${players.length < 2 ? `
-                        <p class="form-help-text text-warning mt-3">
-                            ⚠️ Add at least 2 players on the Settings page to create teams
+                        <p class="form-help form-help--error">
+                            ${getIcon('alert-circle', { size: 14 })}
+                            Add at least 2 players on the Settings page to create teams
                         </p>
                     ` : ''}
                 </div>
@@ -357,12 +359,12 @@ class TeamsPage extends BasePage {
 
         return `
             <div class="teams-result" role="region" aria-label="Generated teams results">
-                <div class="result-header d-flex flex-column md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+                <div class="result-header">
                     <div>
-                        <h3 class="text-xl md:text-2xl font-semibold m-0">Your Balanced Teams</h3>
-                        <p class="text-secondary text-sm mt-1">${teams.length} teams generated</p>
+                        <h3>Your Balanced Teams</h3>
+                        <p class="text-secondary text-sm">${teams.length} team${teams.length !== 1 ? 's' : ''} generated</p>
                     </div>
-                    <div class="result-controls d-flex items-center gap-4">
+                    <div class="result-controls">
                         <label class="toggle-switch">
                             <input
                                 type="checkbox"
@@ -370,40 +372,36 @@ class TeamsPage extends BasePage {
                                 ${this.state.showEloRatings ? 'checked' : ''}
                                 aria-label="Toggle ELO ratings visibility"
                             >
-                            <span class="toggle-slider"></span>
-                            <span class="toggle-label">Show ELO Ratings</span>
+                            <span class="toggle-slider" aria-hidden="true"></span>
+                            <span class="toggle-label">Show ELO</span>
                         </label>
-                        <div class="control-divider" style="width: 1px; height: 24px; background: var(--color-border-default);" aria-hidden="true"></div>
                         <button
-                            class="btn btn-primary btn-sm"
+                            class="btn btn-secondary btn-sm"
                             id="exportTeamsBtn"
-                            aria-label="Export teams to file">
-                            ${getIcon('arrow-up', { size: 16, className: 'btn-icon' })}
+                            aria-label="Export teams to CSV file">
+                            ${getIcon('download', { size: 16 })}
                             Export
                         </button>
                     </div>
                 </div>
 
-                <div class="balance-indicator balance-indicator--${quality.class}" role="status" aria-live="polite">
+                <div class="balance-indicator balance-indicator--${quality.class}" role="status" aria-live="polite" aria-label="Team balance quality: ${quality.label}">
                     <div class="balance-icon" aria-hidden="true">
-                        ${getIcon(quality.icon, { size: 40, className: 'balance-icon-svg' })}
+                        ${getIcon(quality.icon, { size: 32, className: 'balance-icon-svg' })}
                     </div>
                     <div class="balance-content">
-                        <span class="balance-label d-flex items-center gap-2">
+                        <span class="balance-label">
                             Team Balance Quality:
-                            <span class="status-badge status-badge--${weightedBalance < 50 ? 'success' : weightedBalance < 100 ? 'in-progress' : 'warning'}">
-                                ${quality.label}
-                            </span>
+                            <strong>${quality.label}</strong>
                         </span>
-                        <span class="balance-value">${weightedBalance} ELO average difference</span>
-                    </div>
-                    <div class="balance-explanation">
-                        ${weightedBalance < 50 ? 'Excellent balance!' : weightedBalance < 100 ? 'Good balance' : 'Consider re-generating for better balance'}
-                        Lower difference means more even teams.
+                        <span class="balance-value">${weightedBalance} ELO difference</span>
+                        <span class="balance-explanation">
+                            ${this.getBalanceMessage(weightedBalance)}
+                        </span>
                     </div>
                 </div>
 
-                <div class="teams-grid d-grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                <div class="teams-grid">
                     ${teams.map((team, index) => this.renderTeam(team, index)).join('')}
                 </div>
             </div>
@@ -429,22 +427,29 @@ class TeamsPage extends BasePage {
         return { label: 'Poor', class: 'poor', icon: 'alert-triangle' };
     }
 
+    getBalanceMessage(weightedBalance) {
+        if (weightedBalance < 50) return 'Excellent balance! Teams are very evenly matched.';
+        if (weightedBalance < 100) return 'Good balance. Teams should be competitive.';
+        if (weightedBalance < 150) return 'Acceptable balance. Teams are reasonably matched.';
+        return 'Consider re-generating for better balance. Lower difference means more even teams.';
+    }
+
     renderTeam(team, index) {
         const strength = this.eloService.calculateTeamStrength(team);
         const weightedRating = this.calculateWeightedTeamRating(team);
         const showElo = this.state.showEloRatings;
 
         return `
-            <div class="team-card">
-                <div class="team-header mb-4 d-flex justify-between items-center">
-                    <h4 class="font-semibold text-lg md:text-xl m-0">Team ${index + 1}</h4>
-                    ${showElo ? `<span class="status-badge status-badge--neutral">${weightedRating} ELO</span>` : ''}
+            <article class="team-card" role="region" aria-label="Team ${index + 1}">
+                <div class="team-header">
+                    <h4>Team ${index + 1}</h4>
+                    ${showElo ? `<span class="team-rating" aria-label="Team ELO rating">${weightedRating} ELO</span>` : ''}
                 </div>
 
-                <div class="team-players">
+                <ul class="team-players" role="list" aria-label="Team ${index + 1} players">
                     ${team.map((player, playerIndex) => this.renderTeamPlayer(player, showElo, playerIndex)).join('')}
-                </div>
-            </div>
+                </ul>
+            </article>
         `;
     }
 
@@ -472,22 +477,18 @@ class TeamsPage extends BasePage {
         const posName = this.playerService.positions[position];
         const comparisons = player.positionComparisons || 0;
 
-        // Determine rating status based on comparisons
-        const hasComparisons = comparisons > 0;
-        const statusClass = hasComparisons ? 'success' : 'neutral';
-
         return `
-            <div class="team-player">
-                <div class="player-info flex-1">
-                    <div class="player-name font-medium mb-1">
+            <li class="team-player" role="listitem">
+                <div class="player-info">
+                    <div class="player-name">
                         ${this.escape(player.name)}
                     </div>
-                    <div class="player-position text-sm text-secondary">${posName}</div>
+                    <div class="player-position">${this.escape(posName)}</div>
                 </div>
                 ${showElo ? `
-                    <div class="player-rating font-semibold text-brand">${rating}</div>
+                    <div class="player-rating" aria-label="${this.escape(player.name)} ELO rating">${rating}</div>
                 ` : ''}
-            </div>
+            </li>
         `;
     }
 
@@ -609,8 +610,8 @@ class TeamsPage extends BasePage {
                 return;
             }
 
-            // Show optimizing message
-            toast.info('Optimizing teams... This may take a moment', uiConfig.TOAST.LONG_DURATION);
+            // Show optimizing message with better UX
+            toast.info('Optimizing teams... This may take a few seconds', uiConfig.TOAST.LONG_DURATION);
 
             // Apply custom position weights temporarily for optimization
             const originalWeights = { ...this.activityConfig.positionWeights };
@@ -635,7 +636,11 @@ class TeamsPage extends BasePage {
                 // Save teams to active session
                 this.saveTeams(result);
 
-                toast.success(`Teams created! Balance: ${weightedBalance} weighted ELO difference`);
+                // Show success message with quality feedback
+                const qualityMsg = weightedBalance < 50 ? 'Excellent balance!' :
+                                  weightedBalance < 100 ? 'Good balance!' :
+                                  'Teams created!';
+                toast.success(`${qualityMsg} Balance: ${weightedBalance} ELO difference`);
             } finally {
                 // Restore original weights
                 Object.assign(this.activityConfig.positionWeights, originalWeights);
