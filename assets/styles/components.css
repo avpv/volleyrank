@@ -876,9 +876,14 @@ select.form-control {
     color: var(--color-error);
 }
 
-.status-badge--info {
+.status-badge--in-progress {
     border-color: var(--color-brand-primary);
     color: var(--color-brand-primary);
+}
+
+.status-badge--ready {
+    border-color: var(--color-brand-secondary);
+    color: var(--color-brand-secondary);
 }
 
 .status-badge--neutral {

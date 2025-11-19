@@ -391,7 +391,7 @@ class TeamsPage extends BasePage {
                     <div class="balance-content">
                         <span class="balance-label d-flex items-center gap-2">
                             Team Balance Quality:
-                            <span class="status-badge status-badge--${weightedBalance < 50 ? 'success' : weightedBalance < 100 ? 'info' : 'warning'}">
+                            <span class="status-badge status-badge--${weightedBalance < 50 ? 'success' : weightedBalance < 100 ? 'in-progress' : 'warning'}">
                                 ${quality.label}
                             </span>
                         </span>
@@ -653,12 +653,12 @@ class TeamsPage extends BasePage {
         try {
             const { teams } = this.state.teams;
             const showElo = this.state.showEloRatings;
-            
+
             const lines = [];
-            const header = showElo ? 
-                ['Team', 'Player', 'Position', 'ELO Rating'] : 
+            const header = showElo ?
+                ['Team', 'Player', 'Position', 'ELO Rating'] :
                 ['Team', 'Player', 'Position'];
-            
+
             lines.push(header.join(','));
 
             teams.forEach((team, teamIndex) => {
@@ -666,17 +666,17 @@ class TeamsPage extends BasePage {
                     const position = player.assignedPosition;
                     const posName = this.playerService.positions[position];
                     const rating = Math.round(player.positionRating);
-                    
+
                     const row = [
                         `Team ${teamIndex + 1}`,
                         `"${player.name.replace(/"/g, '""')}"`,
                         posName
                     ];
-                    
+
                     if (showElo) {
                         row.push(rating);
                     }
-                    
+
                     lines.push(row.join(','));
                 });
             });
@@ -684,7 +684,7 @@ class TeamsPage extends BasePage {
             const csv = lines.join('\n');
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = URL.createObjectURL(blob);
-            
+
             const link = document.createElement('a');
             link.href = url;
             link.download = `teams-${new Date().toISOString().split('T')[0]}.csv`;
@@ -692,7 +692,7 @@ class TeamsPage extends BasePage {
             link.click();
             document.body.removeChild(link);
             URL.revokeObjectURL(url);
-            
+
             toast.success('Teams exported!');
         } catch (error) {
             toast.error('Export failed');
