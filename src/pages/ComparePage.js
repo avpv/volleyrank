@@ -210,14 +210,15 @@ class ComparePage extends BasePage {
                                                 ${isComplete ? 'Complete' : hasProgress ? 'In Progress' : 'Ready'}
                                             </span>
                                         ` : '<span class="status-badge status-badge--neutral">Not Ready</span>'}
-                                        ${hasProgress && !isDisabled ? `
+                                        ${!isDisabled ? `
                                             <button
                                                 type="button"
                                                 class="position-card__reset-btn"
                                                 data-position-reset="${key}"
                                                 aria-label="Reset ${name} comparisons"
-                                                title="Reset comparisons for this position"
-                                                onclick="event.stopPropagation();">
+                                                title="${hasProgress ? 'Reset comparisons for this position' : 'No comparisons to reset'}"
+                                                onclick="event.stopPropagation();"
+                                                ${!hasProgress ? 'disabled' : ''}>
                                                 Reset
                                             </button>
                                         ` : ''}
@@ -470,6 +471,10 @@ class ComparePage extends BasePage {
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
                     e.preventDefault();
+
+                    // Don't process if button is disabled
+                    if (btn.disabled) return;
+
                     const positionKey = btn.getAttribute('data-position-reset');
                     if (!positionKey) return;
 

@@ -762,14 +762,20 @@
     white-space: nowrap;
 }
 
-.position-card__reset-btn:hover {
+.position-card__reset-btn:hover:not(:disabled) {
     color: var(--color-error);
     background-color: var(--color-error-light);
     border-color: var(--color-error);
 }
 
-.position-card__reset-btn:active {
+.position-card__reset-btn:active:not(:disabled) {
     transform: scale(0.95);
+}
+
+.position-card__reset-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    color: var(--color-text-tertiary);
 }
 
 .position-card__name {
