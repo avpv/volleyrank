@@ -1326,7 +1326,7 @@
 .comparison-area {
     margin-top: var(--spacing-10);
     padding-top: var(--spacing-8);
-    border-top: 1px solid var(--color-border-subtle);
+    border-top: 1px solid var(--color-border-default);
     min-height: 400px;
     display: flex;
     flex-direction: column;
