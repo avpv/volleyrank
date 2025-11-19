@@ -877,8 +877,8 @@ select.form-control {
 }
 
 .status-badge--info {
-    border-color: var(--color-info);
-    color: var(--color-info);
+    border-color: var(--color-brand-primary);
+    color: var(--color-brand-primary);
 }
 
 .status-badge--neutral {

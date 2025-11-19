@@ -221,7 +221,7 @@ class ComparePage extends BasePage {
                                     </div>
                                     <div class="position-card__badges">
                                         ${!isDisabled ? `
-                                            <span class="status-badge status-badge--${isComplete ? 'success' : hasProgress ? 'info' : 'neutral'}">
+                                            <span class="status-badge status-badge--${isComplete ? 'success' : hasProgress ? 'info' : 'info'}">
                                                 ${isComplete ? 'Complete' : hasProgress ? 'In Progress' : 'Ready'}
                                             </span>
                                         ` : '<span class="status-badge status-badge--neutral">Not Ready</span>'}
