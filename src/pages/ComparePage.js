@@ -360,30 +360,30 @@ class ComparePage extends BasePage {
                     </div>
                 </div>
 
-                <div class="comparison-cards d-grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 items-center" role="group" aria-label="Choose the better player">
+                <div class="comparison-cards" role="group" aria-label="Choose the better player">
                     <button
-                        class="player-card clickable cursor-pointer"
+                        class="player-card clickable"
                         id="leftPlayerCard"
                         data-winner-id="${player1.id}"
                         data-loser-id="${player2.id}"
                         aria-label="Select ${this.escape(player1.name)} as better player (keyboard: A)"
                         role="button">
                         <div class="keyboard-hint" aria-hidden="true">A</div>
-                        <div class="player-avatar blue d-flex items-center justify-center mb-3">
+                        <div class="player-avatar d-flex items-center justify-center">
                             ${player1.name.charAt(0).toUpperCase()}
                         </div>
-                        <div class="player-name text-center font-semibold mb-2">${this.escape(player1.name)}</div>
-                        <div class="player-position text-center text-sm text-secondary mb-2">${posName}</div>
-                        <div class="player-rating text-center font-medium mb-1" aria-label="Current rating">
+                        <div class="player-name font-semibold">${this.escape(player1.name)}</div>
+                        <div class="player-position text-secondary">${posName}</div>
+                        <div class="player-rating font-medium" aria-label="Current rating">
                             ${Math.round(player1.ratings[this.selectedPosition])} <span class="text-tertiary text-xs">ELO</span>
                         </div>
-                        <div class="player-comparisons text-center text-xs text-tertiary" aria-label="Number of comparisons">
+                        <div class="player-comparisons text-tertiary" aria-label="Number of comparisons">
                             ${player1.comparisons[this.selectedPosition]} comparison${player1.comparisons[this.selectedPosition] !== 1 ? 's' : ''}
                         </div>
                     </button>
 
-                    <div class="vs-divider d-flex flex-column items-center gap-4 my-4 md:my-0" aria-hidden="true">
-                        <div class="vs-text font-bold text-2xl md:text-3xl">VS</div>
+                    <div class="vs-divider" aria-hidden="true">
+                        <div class="vs-text">VS</div>
                         <button
                             class="draw-button"
                             id="drawButton"
@@ -397,22 +397,22 @@ class ComparePage extends BasePage {
                     </div>
 
                     <button
-                        class="player-card clickable cursor-pointer"
+                        class="player-card clickable"
                         id="rightPlayerCard"
                         data-winner-id="${player2.id}"
                         data-loser-id="${player1.id}"
                         aria-label="Select ${this.escape(player2.name)} as better player (keyboard: D)"
                         role="button">
                         <div class="keyboard-hint" aria-hidden="true">D</div>
-                        <div class="player-avatar purple d-flex items-center justify-center mb-3">
+                        <div class="player-avatar d-flex items-center justify-center">
                             ${player2.name.charAt(0).toUpperCase()}
                         </div>
-                        <div class="player-name text-center font-semibold mb-2">${this.escape(player2.name)}</div>
-                        <div class="player-position text-center text-sm text-secondary mb-2">${posName}</div>
-                        <div class="player-rating text-center font-medium mb-1" aria-label="Current rating">
+                        <div class="player-name font-semibold">${this.escape(player2.name)}</div>
+                        <div class="player-position text-secondary">${posName}</div>
+                        <div class="player-rating font-medium" aria-label="Current rating">
                             ${Math.round(player2.ratings[this.selectedPosition])} <span class="text-tertiary text-xs">ELO</span>
                         </div>
-                        <div class="player-comparisons text-center text-xs text-tertiary" aria-label="Number of comparisons">
+                        <div class="player-comparisons text-tertiary" aria-label="Number of comparisons">
                             ${player2.comparisons[this.selectedPosition]} comparison${player2.comparisons[this.selectedPosition] !== 1 ? 's' : ''}
                         </div>
                     </button>

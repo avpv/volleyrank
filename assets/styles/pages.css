@@ -183,6 +183,217 @@
    Google Sheets Integration - Enhanced UI
    ============================================================================= */
 
+/* Comparison Area */
+.comparison-area {
+    margin-top: var(--spacing-8);
+    padding: var(--spacing-8);
+    background-color: var(--color-surface-raised);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-lg);
+    transition: all var(--duration-normal) var(--ease-smooth);
+    position: relative;
+    overflow: hidden;
+}
+
+.comparison-area--active {
+    background: linear-gradient(to bottom, var(--color-surface-raised), var(--color-surface-base));
+    border-color: var(--color-border-emphasis);
+    box-shadow: var(--shadow-lg);
+}
+
+.comparison-header {
+    text-align: center;
+    margin-bottom: var(--spacing-8);
+    position: relative;
+    z-index: 1;
+}
+
+.comparison-question {
+    font-size: var(--font-size-xl);
+    color: var(--color-text-primary);
+    margin-bottom: var(--spacing-4);
+}
+
+.comparison-progress-indicator {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-2);
+    max-width: 300px;
+    margin: 0 auto;
+}
+
+.progress-mini {
+    width: 100%;
+    height: 4px;
+    background-color: var(--color-bg-secondary);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+}
+
+.progress-mini__fill {
+    height: 100%;
+    background-color: var(--color-brand-primary);
+    border-radius: var(--radius-full);
+    transition: width var(--duration-normal) var(--ease-smooth);
+}
+
+.comparison-progress-text {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-tertiary);
+    font-variant-numeric: tabular-nums;
+}
+
+/* Comparison Cards Grid */
+.comparison-cards {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: var(--spacing-6);
+    align-items: center;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+    .comparison-cards {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-8);
+    }
+}
+
+/* Player Card in Comparison */
+.comparison-cards .player-card {
+    min-height: 360px;
+    padding: var(--spacing-8);
+    align-items: center;
+    text-align: center;
+    border-width: 2px;
+    background-color: var(--color-surface-default);
+}
+
+.comparison-cards .player-card:hover {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: var(--shadow-xl);
+    z-index: 10;
+}
+
+.comparison-cards .player-avatar {
+    width: 96px;
+    height: 96px;
+    font-size: 36px;
+    border-radius: 50%;
+    margin-bottom: var(--spacing-4);
+    background: linear-gradient(135deg, var(--color-brand-primary), var(--color-brand-secondary));
+    color: white;
+    box-shadow: var(--shadow-md);
+    border: 4px solid var(--color-surface-raised);
+}
+
+.comparison-cards .player-card:nth-child(3) .player-avatar {
+    background: linear-gradient(135deg, var(--color-brand-secondary), var(--color-brand-tertiary));
+}
+
+.comparison-cards .player-name {
+    font-size: var(--font-size-2xl);
+    margin-bottom: var(--spacing-2);
+}
+
+.comparison-cards .player-position {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: var(--spacing-4);
+    font-weight: var(--font-weight-semibold);
+}
+
+.comparison-cards .player-rating {
+    font-size: var(--font-size-3xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text-primary);
+    margin-bottom: var(--spacing-2);
+    font-variant-numeric: tabular-nums;
+}
+
+.comparison-cards .player-comparisons {
+    margin-top: auto;
+    padding-top: var(--spacing-4);
+    border-top: 1px solid var(--color-border-subtle);
+    width: 100%;
+}
+
+/* VS Divider */
+.vs-divider {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-4);
+    position: relative;
+    z-index: 5;
+}
+
+.vs-text {
+    font-size: var(--font-size-3xl);
+    font-weight: 900;
+    color: var(--color-text-tertiary);
+    opacity: 0.3;
+    font-style: italic;
+    user-select: none;
+}
+
+/* Draw Button */
+.draw-button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background-color: var(--color-surface-raised);
+    border: 2px solid var(--color-border-default);
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: all var(--duration-fast) var(--ease-smooth);
+    box-shadow: var(--shadow-md);
+}
+
+.draw-button:hover {
+    background-color: var(--color-surface-overlay);
+    border-color: var(--color-text-tertiary);
+    transform: scale(1.1);
+    color: var(--color-text-primary);
+}
+
+.draw-button:active {
+    transform: scale(0.95);
+}
+
+/* Keyboard Hints */
+.keyboard-hint {
+    position: absolute;
+    top: var(--spacing-4);
+    right: var(--spacing-4);
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--color-bg-elevated);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-family-mono);
+    font-size: var(--font-size-xs);
+    color: var(--color-text-tertiary);
+    opacity: 0.6;
+}
+
+.keyboard-hint-button {
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-bold);
+    margin-bottom: 2px;
+}
+
 /* Google Sheets Content Container */
 .google-sheets-content {
     display: flex;
@@ -685,6 +896,8 @@
 }
 
 /* Position Card - matches settings-player-card */
+
+/* Position Card - matches settings-player-card */
 .position-card {
     background-color: var(--color-surface-raised);
     border: 1px solid var(--color-border-default);
@@ -693,18 +906,21 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    min-height: 300px;
-    transition: all var(--duration-fast) var(--ease-smooth);
+    min-height: 320px;
+    /* Increased height for better breathing room */
+    transition: all var(--duration-normal) var(--ease-spring);
+    /* Smoother transition */
     cursor: pointer;
     text-align: left;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-sm);
 }
 
 .position-card:hover:not([disabled]) {
-    border-color: var(--color-border-emphasis);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    background-color: var(--color-surface-overlay);
+    border-color: var(--color-brand-primary);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-xl);
+    background-color: var(--color-surface-raised);
+    /* Keep base background but rely on shadow/border */
 }
 
 .position-card:focus {
@@ -715,10 +931,11 @@
 
 /* Position Card States */
 .position-card--disabled {
-    opacity: 0.6;
+    opacity: 0.7;
     cursor: not-allowed;
     background-color: var(--color-bg-secondary);
     box-shadow: none;
+    border-style: dashed;
 }
 
 .position-card--disabled:hover {
@@ -730,8 +947,8 @@
 
 .position-card--selected {
     border-color: var(--color-brand-primary);
-    background-color: var(--color-surface-interactive);
-    box-shadow: 0 0 0 1px var(--color-brand-primary);
+    background-color: var(--color-surface-raised);
+    box-shadow: 0 0 0 2px var(--color-brand-primary), var(--shadow-md);
 }
 
 /* Position Card Header */
@@ -860,31 +1077,35 @@
     margin-top: auto;
 }
 
+
 .position-progress-bar {
     flex: 1;
-    height: 8px;
+    height: 10px;
     background-color: var(--color-bg-tertiary);
-    border-radius: 4px;
+    border-radius: var(--radius-full);
     overflow: hidden;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .position-progress-fill {
     height: 100%;
-    border-radius: 4px;
-    transition: width 0.4s var(--ease-out);
+    border-radius: var(--radius-full);
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
+    background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.1) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, transparent 75%, transparent);
+    background-size: 1rem 1rem;
 }
 
 .position-progress-fill--ready {
-    background: var(--color-brand-primary);
+    background-color: var(--color-brand-primary);
 }
 
 .position-progress-fill--in-progress {
-    background: var(--color-info);
+    background-color: var(--color-info);
 }
 
 .position-progress-fill--complete {
-    background: var(--color-success);
+    background-color: var(--color-success);
 }
 
 .position-card__percentage {
