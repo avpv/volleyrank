@@ -441,7 +441,7 @@ class TeamsPage extends BasePage {
                     ${showElo ? `<span class="status-badge status-badge--neutral">${weightedRating} ELO</span>` : ''}
                 </div>
 
-                <div class="team-players divide-y divide-subtle">
+                <div class="team-players">
                     ${team.map((player, playerIndex) => this.renderTeamPlayer(player, showElo, playerIndex)).join('')}
                 </div>
             </div>

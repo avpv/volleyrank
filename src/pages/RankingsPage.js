@@ -119,7 +119,7 @@ class RankingsPage extends BasePage {
                     <h3 class="ranking-title font-semibold text-lg">${positionName}s</h3>
                     <p class="text-xs text-tertiary">${players.length} player${players.length !== 1 ? 's' : ''} ranked</p>
                 </header>
-                <ol class="ranking-list divide-y divide-subtle" aria-label="${positionName} player rankings">
+                <ol class="ranking-list" aria-label="${positionName} player rankings">
                     ${players.map((player, index) =>
                         this.renderRankingItem(player, index, position)
                     ).join('')}
