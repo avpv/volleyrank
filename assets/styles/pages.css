@@ -726,9 +726,9 @@
 
 /* Position Card Header */
 .position-card__header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: start;
     margin-bottom: var(--spacing-2);
     gap: var(--spacing-3);
 }
@@ -743,12 +743,9 @@
 
 .position-card__actions {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     gap: var(--spacing-2);
-    align-items: center;
-    flex-shrink: 0;
-    flex-wrap: wrap;
-    justify-content: flex-end;
+    align-items: flex-end;
 }
 
 .position-card__reset-btn {
