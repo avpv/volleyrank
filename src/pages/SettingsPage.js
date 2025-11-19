@@ -469,8 +469,7 @@ class SettingsPage extends BasePage {
 
             return `
                 <div class="position-badge first:mt-0 last:mb-0">
-                    <div class="badge-position font-medium d-flex items-center gap-2">
-                        <span class="status-dot status-dot--${statusClass}"></span>
+                    <div class="badge-position font-medium">
                         ${name}
                     </div>
                     <div class="badge-stats d-flex gap-2 text-xs">

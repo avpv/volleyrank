@@ -440,11 +440,6 @@ class TeamsPage extends BasePage {
                     <h4 class="font-semibold text-lg md:text-xl m-0">Team ${index + 1}</h4>
                     ${showElo ? `<span class="status-badge status-badge--neutral">${weightedRating} ELO</span>` : ''}
                 </div>
-                ${showElo ? `
-                    <div class="team-rating text-sm text-secondary mb-4 pb-3 border-b border-subtle">
-                        ${strength.totalRating} raw ELO • avg ${strength.averageRating}
-                    </div>
-                ` : ''}
 
                 <div class="team-players divide-y divide-subtle">
                     ${team.map((player, playerIndex) => this.renderTeamPlayer(player, showElo, playerIndex)).join('')}
@@ -484,8 +479,7 @@ class TeamsPage extends BasePage {
         return `
             <div class="team-player">
                 <div class="player-info flex-1">
-                    <div class="player-name font-medium mb-1 d-flex items-center gap-2">
-                        <span class="status-dot status-dot--${statusClass}"></span>
+                    <div class="player-name font-medium mb-1">
                         ${this.escape(player.name)}
                     </div>
                     <div class="player-position text-sm text-secondary">${posName}</div>
