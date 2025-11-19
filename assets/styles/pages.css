@@ -122,10 +122,10 @@
     font-size: var(--font-size-lg);
     font-weight: var(--font-weight-semibold);
     color: var(--color-text-primary);
-    letter-spacing: var(--letter-spacing-tight);
+    letter-spacing: -0.01em;
     margin: 0 0 var(--spacing-4) 0;
-    padding-bottom: var(--spacing-4);
-    border-bottom: 2px solid var(--color-border-default);
+    padding-bottom: var(--spacing-3);
+    border-bottom: 1px solid var(--color-border-default);
 }
 
 /* Transparent background sections with bottom border only on title */
@@ -317,7 +317,7 @@
 /* Rating Display - Clean Typography */
 .comparison-cards .player-rating {
     font-size: var(--font-size-3xl);
-    font-weight: var(--font-weight-semibold);
+    font-weight: var(--font-weight-bold);
     color: var(--color-text-primary);
     margin-bottom: var(--spacing-2);
     font-variant-numeric: tabular-nums;
@@ -405,7 +405,7 @@
 
 .keyboard-hint-button {
     font-size: var(--font-size-xs);
-    font-weight: var(--font-weight-semibold);
+    font-weight: var(--font-weight-bold);
     margin-bottom: 2px;
 }
 
@@ -649,7 +649,7 @@
 .section-subtitle {
     font-size: var(--font-size-sm);
     font-weight: var(--font-weight-semibold);
-    color: var(--color-text-primary);
+    color: var(--color-text-secondary);
     text-transform: uppercase;
     letter-spacing: var(--letter-spacing-wide);
     margin-bottom: var(--spacing-3);
@@ -808,13 +808,13 @@
 /* Players Section */
 .players-section {
     margin-top: var(--spacing-10);
-    padding-top: var(--spacing-10);
+    padding-top: var(--spacing-8);
     border-top: 1px solid var(--color-border-subtle);
 }
 
 .page-header+.players-section {
     border-top: none;
-    margin-top: var(--spacing-10);
+    margin-top: var(--spacing-8);
     padding-top: 0;
 }
 
@@ -824,7 +824,7 @@
     color: var(--color-text-primary);
     margin-bottom: var(--spacing-6);
     padding-bottom: var(--spacing-4);
-    border-bottom: 2px solid var(--color-border-default);
+    border-bottom: 1px solid var(--color-border-default);
 }
 
 /* Players Grid */
@@ -858,15 +858,15 @@
 
 /* Position Selector - Block Structure (like players-section) */
 .position-selector {
-    margin-top: var(--spacing-10);
+    margin-top: var(--spacing-12);
     padding-top: var(--spacing-10);
     border-top: 1px solid var(--color-border-subtle);
-    margin-bottom: var(--spacing-10);
+    margin-bottom: var(--spacing-12);
 }
 
 .page-header+.position-selector {
     border-top: none;
-    margin-top: var(--spacing-10);
+    margin-top: var(--spacing-8);
     padding-top: 0;
 }
 
@@ -881,7 +881,7 @@
     color: var(--color-text-primary);
     margin: 0 0 var(--spacing-6) 0;
     padding-bottom: var(--spacing-4);
-    border-bottom: 2px solid var(--color-border-default);
+    border-bottom: 1px solid var(--color-border-default);
 }
 
 .position-selector__description {
@@ -932,14 +932,15 @@
     border-color: var(--color-border-emphasis);
 }
 
-.position-card:focus-visible {
-    outline: 3px solid var(--color-brand-primary);
-    outline-offset: 2px;
+.position-card:focus {
+    outline: none;
+    border-color: var(--color-brand-primary);
+    box-shadow: 0 0 0 3px rgba(47, 129, 247, 0.1);
 }
 
 /* Position Card States */
 .position-card--disabled {
-    opacity: 0.6;
+    opacity: 0.7;
     cursor: not-allowed;
     background-color: var(--color-bg-secondary);
     border-style: dashed;
@@ -1050,7 +1051,7 @@
 }
 
 .position-card__reset-btn:focus-visible {
-    outline: 3px solid var(--color-brand-primary);
+    outline: 2px solid var(--color-brand-primary);
     outline-offset: 2px;
 }
 
@@ -1078,11 +1079,11 @@
     justify-content: center;
     background-color: var(--color-brand-primary);
     color: white;
-    border-radius: var(--radius-sm);
+    border-radius: 2px;
     font-size: var(--font-size-xs);
     font-weight: var(--font-weight-semibold);
     text-transform: uppercase;
-    letter-spacing: var(--letter-spacing-wide);
+    letter-spacing: 0.05em;
     padding: 2px 8px;
     flex-shrink: 0;
 }
@@ -1277,7 +1278,7 @@
 
 .progress-percentage {
     font-size: var(--font-size-base);
-    font-weight: var(--font-weight-semibold);
+    font-weight: var(--font-weight-bold);
     color: var(--color-brand-primary);
     min-width: 50px;
     text-align: right;
@@ -1400,7 +1401,6 @@
 .comparison-question strong {
     color: var(--color-brand-primary);
     font-weight: var(--font-weight-semibold);
-    letter-spacing: inherit;
 }
 
 .comparison-progress-indicator {
@@ -1451,7 +1451,7 @@
 
 .comparison-complete__title {
     font-size: var(--font-size-2xl);
-    font-weight: var(--font-weight-semibold);
+    font-weight: var(--font-weight-bold);
     color: var(--color-success);
     margin: 0;
 }
@@ -1499,7 +1499,7 @@
     align-items: center;
     justify-content: center;
     font-size: var(--font-size-sm);
-    font-weight: var(--font-weight-semibold);
+    font-weight: var(--font-weight-bold);
     color: var(--color-text-primary);
     font-family: var(--font-family-mono);
     transition: border-color var(--duration-fast) ease;
@@ -1517,7 +1517,7 @@
     border: 1px solid var(--color-border-default);
     border-radius: var(--radius-sm);
     font-size: var(--font-size-xs);
-    font-weight: var(--font-weight-semibold);
+    font-weight: var(--font-weight-bold);
     font-family: var(--font-family-mono);
     margin-right: var(--spacing-2);
     transition: border-color var(--duration-fast) ease;
@@ -1608,12 +1608,12 @@
 .player-rating {
     text-align: center;
     font-size: var(--font-size-2xl);
-    font-weight: var(--font-weight-semibold);
+    font-weight: var(--font-weight-bold);
     color: var(--color-brand-primary);
     margin-top: var(--spacing-4);
     font-family: var(--font-family-mono);
     font-variant-numeric: tabular-nums;
-    letter-spacing: var(--letter-spacing-tight);
+    letter-spacing: -0.02em;
 }
 
 .player-rating .text-tertiary {
@@ -1666,8 +1666,8 @@
     font-weight: var(--font-weight-semibold);
     color: var(--color-text-primary);
     margin-bottom: var(--spacing-6);
-    padding-bottom: var(--spacing-4);
-    border-bottom: 2px solid var(--color-border-default);
+    padding-bottom: var(--spacing-3);
+    border-bottom: 1px solid var(--color-border-default);
     display: flex;
     align-items: center;
     gap: var(--spacing-3);
@@ -1945,12 +1945,12 @@
 .team-header {
     margin-bottom: var(--spacing-6);
     padding-bottom: var(--spacing-4);
-    border-bottom: 2px solid var(--color-border-default);
+    border-bottom: 1px solid var(--color-border-default);
 }
 
 .team-header h4 {
     font-size: var(--font-size-2xl);
-    font-weight: var(--font-weight-semibold);
+    font-weight: var(--font-weight-bold);
     color: var(--color-text-primary);
     margin: 0;
 }
@@ -2005,7 +2005,7 @@
 
 .player-rating {
     font-size: var(--font-size-sm);
-    font-weight: var(--font-weight-semibold);
+    font-weight: var(--font-weight-bold);
     color: var(--color-brand-primary);
     font-family: var(--font-family-mono);
     font-variant-numeric: tabular-nums;

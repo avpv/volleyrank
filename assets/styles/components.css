@@ -116,7 +116,7 @@
 
 /* Button States */
 .btn:disabled {
-    opacity: 0.6;
+    opacity: 0.5;
     cursor: not-allowed;
     position: relative;
 }
@@ -147,7 +147,7 @@
 
 /* Button Focus States */
 .btn:focus-visible {
-    outline: 3px solid var(--color-brand-primary);
+    outline: 2px solid var(--color-brand-primary);
     outline-offset: 2px;
 }
 
@@ -202,7 +202,7 @@
    ============================================================================= */
 
 .form-group {
-    margin-bottom: var(--spacing-6);
+    margin-bottom: var(--spacing-8);
 }
 
 .form-group label {
@@ -211,7 +211,6 @@
     font-weight: var(--font-weight-semibold);
     color: var(--color-text-primary);
     margin-bottom: var(--spacing-3);
-    letter-spacing: var(--letter-spacing-wide);
 }
 
 .form-group label.required::after {
@@ -356,11 +355,11 @@ select.form-control {
 
 .composition-header-cell {
     font-size: var(--font-size-xs);
-    font-weight: var(--font-weight-semibold);
+    font-weight: var(--font-weight-bold);
     color: var(--color-text-primary);
     text-align: center;
     text-transform: uppercase;
-    letter-spacing: var(--letter-spacing-wide);
+    letter-spacing: 0.05em;
 }
 
 .composition-header-cell.position-cell {
@@ -638,11 +637,14 @@ select.form-control {
     flex-direction: column;
     justify-content: space-between;
     min-height: 300px;
-    transition: var(--transition-default);
+    transition: all var(--duration-fast) var(--ease-smooth);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .player-card:hover {
     border-color: var(--color-border-emphasis);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     background-color: var(--color-surface-overlay);
 }
 
@@ -655,7 +657,7 @@ select.form-control {
 }
 
 .player-card.clickable:focus-visible {
-    outline: 3px solid var(--color-brand-primary);
+    outline: 2px solid var(--color-brand-primary);
     outline-offset: 2px;
 }
 
@@ -702,7 +704,7 @@ select.form-control {
     border-radius: var(--radius-sm);
     font-weight: var(--font-weight-semibold);
     text-transform: uppercase;
-    letter-spacing: var(--letter-spacing-wide);
+    letter-spacing: 0.05em;
 }
 
 .player-positions {
@@ -763,10 +765,10 @@ select.form-control {
 
 .badge-position {
     font-size: var(--font-size-sm);
-    font-weight: var(--font-weight-semibold);
+    font-weight: var(--font-weight-bold);
     color: var(--color-text-primary);
     text-transform: uppercase;
-    letter-spacing: var(--letter-spacing-wide);
+    letter-spacing: 0.05em;
 }
 
 .badge-stats {
@@ -780,7 +782,7 @@ select.form-control {
 }
 
 .badge-rating {
-    font-weight: var(--font-weight-semibold);
+    font-weight: var(--font-weight-bold);
     color: var(--color-brand-primary);
     font-size: var(--font-size-xl);
     line-height: 1;
@@ -806,7 +808,7 @@ select.form-control {
     align-items: center;
     justify-content: center;
     font-size: var(--font-size-2xl);
-    font-weight: var(--font-weight-semibold);
+    font-weight: var(--font-weight-bold);
     color: white;
     margin: 0 auto var(--spacing-4);
 }
@@ -907,21 +909,21 @@ select.form-control {
 }
 
 .stat-number {
-    font-size: 2.5rem;
+    font-size: 2rem;
     font-weight: var(--font-weight-semibold);
     color: var(--color-text-primary);
     line-height: 1;
-    letter-spacing: var(--letter-spacing-tight);
+    letter-spacing: -0.02em;
     margin-bottom: var(--spacing-2);
     font-variant-numeric: tabular-nums;
 }
 
 .stat-label {
     font-size: var(--font-size-xs);
-    color: var(--color-text-secondary);
-    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-tertiary);
+    font-weight: var(--font-weight-medium);
     text-transform: uppercase;
-    letter-spacing: var(--letter-spacing-wide);
+    letter-spacing: 0.05em;
 }
 
 .stat-value {
@@ -1429,7 +1431,7 @@ select.form-control {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: var(--font-weight-semibold);
+    font-weight: var(--font-weight-bold);
     font-size: var(--font-size-sm);
     flex-shrink: 0;
     border: 1px solid var(--color-border-default);
@@ -1746,7 +1748,7 @@ button:focus-visible,
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
-    outline: 3px solid var(--color-brand-primary);
+    outline: 2px solid var(--color-brand-primary);
     outline-offset: 2px;
     border-radius: var(--radius-sm);
 }
