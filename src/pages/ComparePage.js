@@ -204,11 +204,24 @@ class ComparePage extends BasePage {
                                         <span class="position-card__name">${name}</span>
                                         <span class="position-card__key">${key}</span>
                                     </div>
-                                    ${!isDisabled ? `
-                                        <span class="status-badge status-badge--${isComplete ? 'success' : hasProgress ? 'info' : 'neutral'}">
-                                            ${isComplete ? 'Complete' : hasProgress ? 'In Progress' : 'Ready'}
-                                        </span>
-                                    ` : '<span class="status-badge status-badge--neutral">Not Ready</span>'}
+                                    <div class="position-card__actions">
+                                        ${!isDisabled ? `
+                                            <span class="status-badge status-badge--${isComplete ? 'success' : hasProgress ? 'info' : 'neutral'}">
+                                                ${isComplete ? 'Complete' : hasProgress ? 'In Progress' : 'Ready'}
+                                            </span>
+                                        ` : '<span class="status-badge status-badge--neutral">Not Ready</span>'}
+                                        ${hasProgress && !isDisabled ? `
+                                            <button
+                                                type="button"
+                                                class="position-card__reset-btn"
+                                                data-position-reset="${key}"
+                                                aria-label="Reset ${name} comparisons"
+                                                title="Reset comparisons for this position"
+                                                onclick="event.stopPropagation();">
+                                                Reset
+                                            </button>
+                                        ` : ''}
+                                    </div>
                                 </div>
 
                                 <div class="position-card__stats">
@@ -449,6 +462,35 @@ class ComparePage extends BasePage {
 
         // Add keyboard event listener
         document.addEventListener('keydown', this.handleKeyboard);
+
+        // Position card reset buttons
+        const resetButtons = this.$$('.position-card__reset-btn');
+        if (resetButtons && resetButtons.length > 0) {
+            resetButtons.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    const positionKey = btn.getAttribute('data-position-reset');
+                    if (!positionKey) return;
+
+                    const positionName = this.activityConfig.positions[positionKey];
+                    const confirmed = confirm(`Are you sure you want to reset all comparisons for ${positionName}? This cannot be undone.`);
+
+                    if (confirmed) {
+                        this.comparisonService.resetPosition(positionKey);
+                        toast.success(`${positionName} comparisons have been reset`);
+
+                        // If this was the selected position, clear it
+                        if (this.selectedPosition === positionKey) {
+                            this.selectedPosition = '';
+                            this.currentPair = null;
+                        }
+
+                        this.update();
+                    }
+                });
+            });
+        }
 
         // Position cards
         const positionCards = this.$$('.position-card');
