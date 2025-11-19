@@ -234,7 +234,7 @@ class ComparePage extends BasePage {
                                             ${getIcon('users-x', { size: 32 })}
                                         </div>
                                         <div style="font-size: var(--font-size-sm); line-height: 1.4;">
-                                            Not enough players assigned to the ${name} position yet.
+                                            No players assigned to the ${name} position yet. Add players on the Settings page.
                                         </div>
                                     </div>
                                 ` : `
