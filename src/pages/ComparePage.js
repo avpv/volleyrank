@@ -153,13 +153,30 @@ class ComparePage extends BasePage {
         const positions = this.activityConfig.positions;
         const progress = this.comparisonService.getAllProgress();
 
+        // Check if any position has comparisons
+        const hasAnyComparisons = Object.values(progress).some(p => p.completed > 0);
+
         return `
             <div class="position-selector" role="region" aria-label="Position selection">
                 <div class="position-selector__header">
-                    <h3>Select Position to Compare</h3>
-                    <p class="position-selector__description">
-                        Choose a position to begin head-to-head player comparisons. Use keyboard shortcuts: <kbd>A</kbd> (left), <kbd>D</kbd> (right), <kbd>W</kbd> (draw)
-                    </p>
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem;">
+                        <div style="flex: 1;">
+                            <h3>Select Position to Compare</h3>
+                            <p class="position-selector__description">
+                                Choose a position to begin head-to-head player comparisons. Use keyboard shortcuts: <kbd>A</kbd> (left), <kbd>D</kbd> (right), <kbd>W</kbd> (draw)
+                            </p>
+                        </div>
+                        <button
+                            type="button"
+                            class="btn btn-secondary"
+                            id="${ELEMENT_IDS.RESET_ALL_BTN}"
+                            title="${hasAnyComparisons ? 'Reset all comparisons for all positions' : 'No comparisons to reset'}"
+                            aria-label="Reset all comparisons"
+                            ${!hasAnyComparisons ? 'disabled' : ''}>
+                            ${getIcon('refresh', { size: 16, className: 'btn-icon' })}
+                            Reset All
+                        </button>
+                    </div>
                 </div>
 
                 <div class="position-grid" role="radiogroup" aria-label="Available positions">
@@ -413,6 +430,12 @@ class ComparePage extends BasePage {
             document.removeEventListener('keydown', this.handleKeyboard);
         }
 
+        // Reset all button
+        const resetAllBtn = this.$(`#${ELEMENT_IDS.RESET_ALL_BTN}`);
+        if (resetAllBtn) {
+            resetAllBtn.addEventListener('click', () => this.handleResetAll());
+        }
+
         // Keyboard shortcuts for comparison
         this.handleKeyboard = (e) => {
             // Only handle keyboard shortcuts if we have an active comparison
@@ -632,6 +655,40 @@ class ComparePage extends BasePage {
             toast.success('Win-Win recorded', uiConfig.TOAST.QUICK_DURATION);
         } catch (error) {
             toast.error(error.message);
+        }
+    }
+
+    handleResetAll() {
+        const positions = Object.keys(this.activityConfig.positions);
+        const progress = this.comparisonService.getAllProgress();
+
+        // Count total comparisons
+        const totalComparisons = Object.values(progress).reduce((sum, p) => sum + p.completed, 0);
+
+        if (totalComparisons === 0) {
+            toast.info('No comparisons to reset');
+            return;
+        }
+
+        const confirmed = confirm(
+            `Are you sure you want to reset ALL comparisons for ALL positions?\n\n` +
+            `This will reset ${totalComparisons} comparison(s) across ${positions.length} position(s).\n\n` +
+            `This action cannot be undone.`
+        );
+
+        if (confirmed) {
+            try {
+                this.comparisonService.resetAll(positions);
+                toast.success('All comparisons have been reset');
+
+                // Clear selected position and current pair
+                this.selectedPosition = '';
+                this.currentPair = null;
+
+                this.update();
+            } catch (error) {
+                toast.error(error.message);
+            }
         }
     }
 }
