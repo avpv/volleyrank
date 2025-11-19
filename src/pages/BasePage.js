@@ -136,19 +136,19 @@ class BasePage extends Component {
     }
 
     /**
-     * Render loading state with enhanced accessibility
+     * Render loading state
      */
     renderLoading(message = 'Loading...') {
         return `
-            <div class="loading" role="status" aria-live="polite" aria-busy="true">
-                <div class="loading-spinner" aria-hidden="true"></div>
-                <p class="text-secondary">${this.escape(message)}</p>
+            <div class="loading d-flex flex-column items-center justify-center animate-fade-in" role="status" aria-live="polite">
+                <div class="loading-spinner mb-4 animate-spin" aria-hidden="true"></div>
+                <p class="text-secondary animate-pulse">${this.escape(message)}</p>
             </div>
         `;
     }
 
     /**
-     * Render empty state with enhanced UX and accessibility
+     * Render empty state with improved structure and accessibility
      * @param {string} message - Main message or description
      * @param {string} icon - Optional icon/SVG content
      * @param {string} title - Optional title (if not provided, message is used as description)
@@ -156,14 +156,14 @@ class BasePage extends Component {
     renderEmpty(message, icon = '', title = '') {
         // If title is provided, treat message as description
         const hasTitle = title !== '';
-        const titleText = hasTitle ? title : 'No items';
+        const titleText = hasTitle ? title : '';
         const descriptionText = hasTitle ? message : message;
 
         return `
-            <div class="empty-state" role="status" aria-live="polite" aria-label="${this.escape(hasTitle ? titleText : 'Empty state')}">
+            <div class="empty-state animate-fade-in" role="status" aria-label="${hasTitle ? this.escape(titleText) : 'Empty state'}">
                 ${icon ? `<div class="empty-state__icon" aria-hidden="true">${icon}</div>` : ''}
                 ${hasTitle ? `<h3 class="empty-state__title">${this.escape(titleText)}</h3>` : ''}
-                <p class="empty-state__description">${this.escape(descriptionText)}</p>
+                <p class="empty-state__description">${hasTitle ? this.escape(descriptionText) : this.escape(message)}</p>
             </div>
         `;
     }
