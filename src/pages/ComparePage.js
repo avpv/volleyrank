@@ -255,11 +255,6 @@ class ComparePage extends BasePage {
                                     </div>
                                 ` : ''}
 
-                                <div class="position-card__status position-card__status--${cardState}">
-                                    <span class="position-status__text">${statusText}</span>
-                                    ${isDisabled ? `<span class="position-status__hint">Need ${2 - players.length} more</span>` : ''}
-                                </div>
-
                                 ${!isDisabled ? `
                                     <div class="position-card__actions">
                                         <button
