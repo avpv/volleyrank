@@ -229,10 +229,14 @@ class ComparePage extends BasePage {
                                 </div>
 
                                 ${isDisabled ? `
-                                    ${this.renderEmpty(
-                `Not enough players assigned to the ${name} position yet. Add players on the Settings page.`,
-                getIcon('users-x', { size: 40, color: 'var(--color-text-secondary)' })
-            )}
+                                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; padding: var(--spacing-4); text-align: center; color: var(--color-text-secondary);">
+                                        <div style="margin-bottom: var(--spacing-2); opacity: 0.7;">
+                                            ${getIcon('users-x', { size: 32 })}
+                                        </div>
+                                        <div style="font-size: var(--font-size-sm); line-height: 1.4;">
+                                            Not enough players assigned to the ${name} position yet.
+                                        </div>
+                                    </div>
                                 ` : `
                                     <div class="position-card__info">
                                         <div class="position-card__stats">
