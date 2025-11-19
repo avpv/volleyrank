@@ -219,29 +219,32 @@ class ComparePage extends BasePage {
                                     <div class="position-card__title">
                                         <span class="position-card__name">${name}</span>
                                     </div>
-                                    <div class="position-card__badges">
-                                        ${!isDisabled ? `
+                                    ${!isDisabled ? `
+                                        <div class="position-card__badges">
                                             <span class="status-badge status-badge--${isComplete ? 'success' : hasProgress ? 'in-progress' : 'ready'}">
                                                 ${isComplete ? 'Complete' : hasProgress ? 'In Progress' : 'Ready'}
                                             </span>
-                                        ` : '<span class="status-badge status-badge--neutral">Not Ready</span>'}
-                                    </div>
-                                </div>
-
-                                <div class="position-card__stats">
-                                    <div class="position-stat">
-                                        <span class="position-stat__value">${players.length}</span>
-                                        <span class="position-stat__label">player${players.length !== 1 ? 's' : ''}</span>
-                                    </div>
-                                    ${!isDisabled ? `
-                                        <div class="position-stat">
-                                            <span class="position-stat__value">${prog.completed}/${prog.total}</span>
-                                            <span class="position-stat__label">comparisons</span>
                                         </div>
                                     ` : ''}
                                 </div>
 
-                                ${!isDisabled ? `
+                                ${isDisabled ? `
+                                    <div class="empty-state animate-fade-in" role="status" aria-label="Empty state">
+                                        <div class="empty-state__icon" aria-hidden="true">${getIcon('user-x', { size: 40, color: 'var(--color-text-secondary)', strokeWidth: 2 })}</div>
+                                        <p class="empty-state__description">Not enough players assigned to the ${name} position yet. Add players on the Settings page.</p>
+                                    </div>
+                                ` : `
+                                    <div class="position-card__stats">
+                                        <div class="position-stat">
+                                            <span class="position-stat__value">${players.length}</span>
+                                            <span class="position-stat__label">player${players.length !== 1 ? 's' : ''}</span>
+                                        </div>
+                                        <div class="position-stat">
+                                            <span class="position-stat__value">${prog.completed}/${prog.total}</span>
+                                            <span class="position-stat__label">comparisons</span>
+                                        </div>
+                                    </div>
+
                                     <div class="position-card__progress">
                                         <div class="position-progress-bar">
                                             <div class="position-progress-fill position-progress-fill--${cardState}"
@@ -253,9 +256,7 @@ class ComparePage extends BasePage {
                                         </div>
                                         <span class="position-card__percentage">${Math.round(prog.percentage)}%</span>
                                     </div>
-                                ` : ''}
 
-                                ${!isDisabled ? `
                                     <div class="position-card__actions">
                                         <button
                                             type="button"
@@ -268,7 +269,7 @@ class ComparePage extends BasePage {
                                             Reset
                                         </button>
                                     </div>
-                                ` : ''}
+                                `}
                             </div>
                         `;
         }).join('')}
