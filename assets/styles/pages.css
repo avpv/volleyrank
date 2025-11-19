@@ -1335,12 +1335,6 @@
     position: relative;
 }
 
-.page-header+.comparison-area {
-    border-top: none;
-    margin-top: var(--spacing-8);
-    padding-top: 0;
-}
-
 
 
 .comparison-area--active {
