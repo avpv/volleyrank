@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy - TeamBalance</title>
+    <style>
+        :root {
+            --color-bg: #0d1117;
+            --color-text: #c9d1d9;
+            --color-text-secondary: #8b949e;
+            --color-border: #30363d;
+            --color-accent: #58a6ff;
+            --spacing-4: 1rem;
+            --spacing-6: 1.5rem;
+            --spacing-8: 2rem;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            line-height: 1.6;
+            padding: var(--spacing-8);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: var(--spacing-6);
+            color: var(--color-text);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: var(--spacing-8);
+            margin-bottom: var(--spacing-4);
+            color: var(--color-text);
+        }
+
+        p {
+            margin-bottom: var(--spacing-4);
+            color: var(--color-text-secondary);
+        }
+
+        ul {
+            margin-bottom: var(--spacing-4);
+            margin-left: var(--spacing-6);
+            color: var(--color-text-secondary);
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        a {
+            color: var(--color-accent);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .last-updated {
+            color: var(--color-text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: var(--spacing-6);
+            padding-bottom: var(--spacing-4);
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: var(--spacing-8);
+            padding: 0.5rem 1rem;
+            background-color: var(--color-border);
+            border-radius: 4px;
+            color: var(--color-text);
+        }
+
+        .back-link:hover {
+            background-color: #484f58;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Privacy Policy</h1>
+        <p class="last-updated">Last updated: November 20, 2024</p>
+
+        <h2>Introduction</h2>
+        <p>
+            TeamBalance is a client-side web application for managing team rosters and player ratings. 
+            This privacy policy explains how we handle your data.
+        </p>
+
+        <h2>Data Storage</h2>
+        <p>
+            All your data (players, ratings, teams, activities) is stored locally in your browser using 
+            localStorage. We do not collect, transmit, or store any of your data on external servers.
+        </p>
+
+        <h2>Google Sheets Integration</h2>
+        <p>
+            TeamBalance offers optional integration with Google Sheets to export and import player data. 
+            When you use this feature:
+        </p>
+        <ul>
+            <li>You explicitly authorize the app to access your Google Sheets</li>
+            <li>The app requests only the minimum necessary permissions (spreadsheets scope)</li>
+            <li>Data is transmitted directly between your browser and Google's servers</li>
+            <li>We do not store your Google account credentials or access tokens</li>
+            <li>You can revoke access at any time through the app or your Google Account settings</li>
+        </ul>
+
+        <h2>Data We Access</h2>
+        <p>When you use Google Sheets integration, the app can:</p>
+        <ul>
+            <li>Read data from spreadsheets you specify</li>
+            <li>Write player data to spreadsheets you specify</li>
+            <li>Create new spreadsheets in your Google Drive (only when you explicitly request export to a new spreadsheet)</li>
+        </ul>
+
+        <h2>Data We Do NOT Collect</h2>
+        <ul>
+            <li>Personal information (name, email, phone number)</li>
+            <li>Usage analytics or tracking data</li>
+            <li>Cookies for tracking purposes</li>
+            <li>Any data from your Google account beyond the spreadsheets you explicitly share</li>
+        </ul>
+
+        <h2>Third-Party Services</h2>
+        <p>
+            The app uses Google Identity Services and Google Sheets API for the optional integration feature. 
+            Please refer to <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Google's Privacy Policy</a> 
+            for information on how Google handles your data.
+        </p>
+
+        <h2>Your Rights</h2>
+        <p>You have full control over your data:</p>
+        <ul>
+            <li>All data is stored locally in your browser</li>
+            <li>You can export your data at any time</li>
+            <li>You can delete all data by clearing your browser's localStorage</li>
+            <li>You can disconnect Google Sheets integration at any time</li>
+        </ul>
+
+        <h2>Children's Privacy</h2>
+        <p>
+            This app does not knowingly collect any information from children under 13 years of age.
+        </p>
+
+        <h2>Changes to This Policy</h2>
+        <p>
+            We may update this privacy policy from time to time. Any changes will be reflected on this page 
+            with an updated "Last updated" date.
+        </p>
+
+        <h2>Contact</h2>
+        <p>
+            If you have questions about this privacy policy, please open an issue on the 
+            <a href="https://github.com/avpv/team-balance" target="_blank" rel="noopener noreferrer">GitHub repository</a>.
+        </p>
+
+        <a href="index.html" class="back-link">← Back to TeamBalance</a>
+    </div>
+</body>
+</html>
