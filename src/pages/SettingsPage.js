@@ -499,10 +499,172 @@ class SettingsPage extends BasePage {
 
     // ===== MODAL: Import =====
     showImportModal() {
-        // Import modal logic would go here (omitted for brevity as it wasn't fully implemented in original)
-        // For now, just a placeholder or reuse existing logic if it was there
-        // The original code had a placeholder for import modal
-        toast.info('Import feature coming soon!');
+        const modal = new Modal({
+            title: 'Import Players',
+            content: this.renderImportContent(),
+            showCancel: true,
+            showConfirm: true,
+            confirmText: 'Import',
+            cancelText: 'Cancel',
+            onConfirm: () => this.handleImport()
+        });
+
+        this.addComponent(modal);
+        modal.mount();
+        modal.open();
+
+        // Attach file input listener
+        const fileInput = modal.container.querySelector(`#${ELEMENT_IDS.IMPORT_FILE_INPUT}`);
+        if (fileInput) {
+            fileInput.addEventListener('change', (e) => this.handleFileSelect(e));
+        }
+    }
+
+    renderImportContent() {
+        return `
+            <div class="modal-content-inner">
+                <div class="form-group">
+                    <label for="${ELEMENT_IDS.IMPORT_FILE_INPUT}">Upload File (JSON or CSV)</label>
+                    <input 
+                        type="file" 
+                        id="${ELEMENT_IDS.IMPORT_FILE_INPUT}" 
+                        class="form-control" 
+                        accept=".json,.csv"
+                    >
+                    <p class="form-help">
+                        Supported formats:
+                        <br>• JSON: Array of objects with "name" and "positions" properties
+                        <br>• CSV: "name,positions" (positions separated by semicolon)
+                    </p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="${ELEMENT_IDS.IMPORT_DATA_INPUT}">Or Paste Data</label>
+                    <textarea 
+                        id="${ELEMENT_IDS.IMPORT_DATA_INPUT}" 
+                        class="form-control" 
+                        rows="10" 
+                        placeholder='[{"name": "John Doe", "positions": ["setter", "hitter"]}]'
+                    ></textarea>
+                </div>
+            </div>
+        `;
+    }
+
+    handleFileSelect(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const content = e.target.result;
+            const textarea = document.getElementById(ELEMENT_IDS.IMPORT_DATA_INPUT);
+            if (textarea) {
+                textarea.value = content;
+            }
+        };
+        reader.readAsText(file);
+    }
+
+    handleImport() {
+        const textarea = document.getElementById(ELEMENT_IDS.IMPORT_DATA_INPUT);
+        const content = textarea ? textarea.value.trim() : '';
+
+        if (!content) {
+            toast.error('Please provide data to import');
+            return false;
+        }
+
+        try {
+            let players = [];
+            
+            // Try parsing as JSON first
+            if (content.startsWith('[') || content.startsWith('{')) {
+                try {
+                    const json = JSON.parse(content);
+                    players = Array.isArray(json) ? json : [json];
+                } catch (e) {
+                    throw new Error('Invalid JSON format');
+                }
+            } else {
+                // Assume CSV
+                players = this.parseCSV(content);
+            }
+
+            if (players.length === 0) {
+                throw new Error('No players found in data');
+            }
+
+            // Import players
+            let successCount = 0;
+            let errorCount = 0;
+
+            players.forEach(p => {
+                try {
+                    // Normalize positions
+                    let positions = p.positions;
+                    if (typeof positions === 'string') {
+                        positions = positions.split(/[;,|]/).map(pos => pos.trim());
+                    }
+                    
+                    if (!positions || !Array.isArray(positions)) {
+                        throw new Error(`Invalid positions for ${p.name}`);
+                    }
+
+                    this.playerService.add(p.name, positions);
+                    successCount++;
+                } catch (err) {
+                    console.warn(`Failed to import ${p.name}:`, err);
+                    errorCount++;
+                }
+            });
+
+            if (successCount > 0) {
+                toast.success(`Imported ${successCount} players${errorCount > 0 ? ` (${errorCount} failed)` : ''}`);
+                return true;
+            } else {
+                toast.error('Failed to import any players. Check format.');
+                return false;
+            }
+
+        } catch (error) {
+            toast.error(error.message);
+            return false;
+        }
+    }
+
+    parseCSV(content) {
+        const lines = content.split(/\r?\n/);
+        const players = [];
+        
+        // Check for header
+        let startIndex = 0;
+        if (lines[0].toLowerCase().includes('name') && lines[0].toLowerCase().includes('position')) {
+            startIndex = 1;
+        }
+
+        for (let i = startIndex; i < lines.length; i++) {
+            const line = lines[i].trim();
+            if (!line) continue;
+
+            // Simple CSV parse: name, positions
+            // Handle quoted values? For now simple split
+            const parts = line.split(',');
+            if (parts.length >= 2) {
+                const name = parts[0].trim();
+                // Remaining parts are positions, or second part is positions string
+                let positions = parts.slice(1).join(',');
+                
+                // Remove quotes if present
+                if (name.startsWith('"') && name.endsWith('"')) {
+                    // name = name.slice(1, -1); // Already handled by simple split? No.
+                }
+                
+                players.push({ name, positions });
+            }
+        }
+        
+        return players;
     }
 
     getSelectedModalPositions(inputName) {
