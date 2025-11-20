@@ -203,8 +203,8 @@
 
 /* Player Card in Comparison - Minimal Design */
 .comparison-cards .player-card {
-    min-height: 320px;
-    padding: var(--spacing-6) var(--spacing-5);
+    min-height: 260px;
+    padding: var(--spacing-4) var(--spacing-4);
     align-items: center;
     text-align: center;
     border-width: 1px;
@@ -219,11 +219,11 @@
 
 /* Player Avatar - Minimal Design */
 .comparison-cards .player-avatar {
-    width: 80px;
-    height: 80px;
-    font-size: 32px;
+    width: 60px;
+    height: 60px;
+    font-size: 24px;
     border-radius: 50%;
-    margin-bottom: var(--spacing-4);
+    margin-bottom: var(--spacing-3);
     background-color: var(--color-brand-primary);
     color: white;
     border: 2px solid var(--color-border-default);
@@ -239,9 +239,9 @@
 
 /* Enhanced Typography */
 .comparison-cards .player-name {
-    font-size: var(--font-size-lg);
+    font-size: var(--font-size-base);
     font-weight: var(--font-weight-semibold);
-    margin-bottom: var(--spacing-2);
+    margin-bottom: var(--spacing-1);
     letter-spacing: -0.01em;
     line-height: 1.2;
 }
@@ -251,16 +251,16 @@
     color: var(--color-text-tertiary);
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    margin-bottom: var(--spacing-4);
+    margin-bottom: var(--spacing-3);
     font-weight: var(--font-weight-semibold);
 }
 
 /* Rating Display - Clean Typography */
 .comparison-cards .player-rating {
-    font-size: var(--font-size-xl);
+    font-size: var(--font-size-lg);
     font-weight: var(--font-weight-bold);
     color: var(--color-text-primary);
-    margin-bottom: var(--spacing-2);
+    margin-bottom: var(--spacing-1);
     font-variant-numeric: tabular-nums;
     line-height: 1.1;
 }
