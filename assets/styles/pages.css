@@ -2513,3 +2513,94 @@
         padding: var(--spacing-5);
     }
 }
+
+/* =============================================================================
+   Privacy Policy Page
+   ============================================================================= */
+
+.privacy-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+.privacy-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--color-border-default);
+}
+
+.privacy-title {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--color-text-primary);
+}
+
+.privacy-updated {
+    color: var(--color-text-secondary);
+    font-size: 0.875rem;
+}
+
+.privacy-section {
+    margin-bottom: 2rem;
+}
+
+.privacy-section h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--color-text-primary);
+}
+
+.privacy-section h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    margin-top: 1.5rem;
+    color: var(--color-text-primary);
+}
+
+.privacy-section p {
+    line-height: 1.6;
+    margin-bottom: 1rem;
+    color: var(--color-text-primary);
+}
+
+.privacy-section ul {
+    margin-bottom: 1rem;
+    padding-left: 2rem;
+}
+
+.privacy-section li {
+    line-height: 1.6;
+    margin-bottom: 0.5rem;
+    color: var(--color-text-primary);
+}
+
+.privacy-highlight {
+    background-color: rgba(47, 129, 247, 0.15);
+    border-left: 3px solid var(--color-brand-primary);
+    padding: 1rem;
+    margin: 1rem 0;
+    border-radius: 6px;
+}
+
+.privacy-footer {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--color-border-default);
+    text-align: center;
+}
+
+.back-link {
+    display: inline-block;
+    margin-top: 1rem;
+    color: var(--color-brand-primary);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.back-link:hover {
+    text-decoration: underline;
+}

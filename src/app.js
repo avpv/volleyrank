@@ -44,6 +44,7 @@ import SettingsPage from './pages/SettingsPage.js';
 import ComparePage from './pages/ComparePage.js';
 import RankingsPage from './pages/RankingsPage.js';
 import TeamsPage from './pages/TeamsPage.js';
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage.js';
 
 /**
  * Application configuration constants
@@ -172,6 +173,16 @@ class Application {
         // Team builder page
         router.register('/teams/', () => {
             this.renderPage('teams', TeamsPage);
+        });
+
+        // Privacy policy page
+        router.register('/privacy-policy.html/', () => {
+            this.renderPage('privacy-policy', PrivacyPolicyPage);
+        });
+
+        // Also handle /privacy-policy/ without the .html extension
+        router.register('/privacy-policy/', () => {
+            this.renderPage('privacy-policy', PrivacyPolicyPage);
         });
     }
 

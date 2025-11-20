@@ -212,9 +212,10 @@ class Router {
             'settings': '/',
             'compare': '/compare/',
             'rankings': '/rankings/',
-            'teams': '/teams/'
+            'teams': '/teams/',
+            'privacy-policy': '/privacy-policy.html/'
         };
-        
+
         return routes[name] || '/';
     }
 
