@@ -894,9 +894,8 @@
 
 /* Match ranking-title style for the header in disabled state */
 .position-card--disabled .position-card__header {
-    margin-bottom: 0;
-    padding-bottom: 0;
-    border-bottom: none;
+    margin-bottom: var(--spacing-4);
+    padding-bottom: var(--spacing-2);
 }
 
 .position-card--disabled .position-card__name {
