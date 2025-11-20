@@ -33,7 +33,13 @@ const integrationsConfig = {
         //    - https://avpv.github.io/team-balance
         //    - https://avpv.github.io/team-balance/
         //
-        // 8. Configure OAuth consent screen (required for first-time setup)
+        // 8. Configure OAuth consent screen (required for first-time setup):
+        //    - App name: TeamBalance
+        //    - User support email: Your email
+        //    - Developer contact email: Your email
+        //    - Application privacy policy link: https://avpv.github.io/team-balance/privacy-policy.html
+        //    - Application terms of service link: (optional)
+        //    - Authorized domains: avpv.github.io
         // 9. Copy the Client ID and paste it here
         //
         // Troubleshooting: If you get "403: access_denied" error, see:
