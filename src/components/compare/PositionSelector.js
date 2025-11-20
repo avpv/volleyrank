@@ -23,23 +23,25 @@ class PositionSelector extends BaseComponent {
         return `
             <div class="position-selector" role="region" aria-label="Position selection">
                 <div class="position-selector__header">
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem;">
-                        <div style="flex: 1;">
+                    <div class="position-selector__header-content">
+                        <div class="position-selector__header-text">
                             <h3>Select Position to Compare</h3>
                             <p class="position-selector__description">
                                 Choose a position to begin head-to-head player comparisons. Use keyboard shortcuts: <kbd>A</kbd> (left), <kbd>D</kbd> (right), <kbd>W</kbd> (draw)
                             </p>
                         </div>
-                        <button
-                            type="button"
-                            class="btn btn-secondary"
-                            id="${ELEMENT_IDS.RESET_ALL_BTN}"
-                            title="${hasAnyComparisons ? 'Reset all comparisons for all positions' : 'No comparisons to reset'}"
-                            aria-label="Reset all comparisons"
-                            ${!hasAnyComparisons ? 'disabled' : ''}>
-                            ${getIcon('refresh', { size: 16, className: 'btn-icon' })}
-                            Reset All
-                        </button>
+                        <div class="position-selector__header-actions">
+                            <button
+                                type="button"
+                                class="btn btn-secondary position-selector__reset-all-btn"
+                                id="${ELEMENT_IDS.RESET_ALL_BTN}"
+                                title="${hasAnyComparisons ? 'Reset all comparisons for all positions' : 'No comparisons to reset'}"
+                                aria-label="Reset all comparisons"
+                                ${!hasAnyComparisons ? 'disabled' : ''}>
+                                ${getIcon('refresh', { size: 16, className: 'btn-icon' })}
+                                Reset All
+                            </button>
+                        </div>
                     </div>
                 </div>
 
