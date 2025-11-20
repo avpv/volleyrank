@@ -97,16 +97,12 @@ class ComparePage extends BasePage {
             this.sidebar.destroy();
         }
 
-        // Use the activityKey passed as prop (can be null if no activity selected)
-        const activityKey = this.activityKey;
-        const activityConfig = activityKey ? this.props.activityConfig : null;
-
         // Always create sidebar - it will show all sessions from all activities
         this.sidebar = new Sidebar(sidebarContainer, {
             sessionService: this.sessionService,
             eventBus: this.eventBus,
-            activityKey: activityKey, // Can be null
-            activityName: activityConfig?.name || null
+            activityKey: this.activityKey, // Can be null
+            activityName: this.activityConfig?.name || null
         });
 
         this.sidebar.mount();
@@ -217,7 +213,7 @@ class ComparePage extends BasePage {
             if (!this.currentPair) return;
 
             // Don't handle shortcuts if user is typing in an input/textarea
-            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
+            if (['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) {
                 return;
             }
 
@@ -229,10 +225,6 @@ class ComparePage extends BasePage {
                 // Delegate to ComparisonArea component
                 if (this.comparisonArea) {
                     this.comparisonArea.triggerAnimation(key);
-
-                    // Logic is still handled here via component callbacks, 
-                    // but we need to trigger the actual action if the component doesn't handle it internally via key press
-                    // Actually, the component just animates. We need to trigger the action.
 
                     // Wait for animation to start
                     setTimeout(() => {
@@ -430,11 +422,6 @@ class ComparePage extends BasePage {
     getSelectedModalPositions(inputName) {
         const checkboxes = document.querySelectorAll(`input[name="${inputName}"]:checked`);
         return Array.from(checkboxes).map(cb => cb.value);
-    }
-
-    handleResetAll() {
-        // This method is kept for backward compatibility but now just calls showResetAllModal
-        this.showResetAllModal();
     }
 }
 
