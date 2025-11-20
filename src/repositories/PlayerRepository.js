@@ -248,6 +248,19 @@ class PlayerRepository {
     }
 
     /**
+     * Remove all players from the current activity's active session
+     * @returns {Array<Object>} Array of removed players
+     */
+    clearAll() {
+        const currentPlayers = this.getAll();
+
+        this._updateActiveSession({ players: [] });
+
+        this.eventBus.emit('players:cleared', { count: currentPlayers.length });
+        return currentPlayers;
+    }
+
+    /**
      * Reset player's ratings for specific positions
      * @param {string} playerId - Player ID
      * @param {Array<string>} positions - Positions to reset
