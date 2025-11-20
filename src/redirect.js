@@ -348,47 +348,57 @@ class RedirectManager {
     
     /**
      * Execute redirect from 404 page
-     * 
+     *
      * Main entry point when loaded from 404.html.
      * Captures the requested path and redirects to home.
-     * 
+     *
      * Flow:
      * 1. Check if on home page → skip redirect
      * 2. Extract application path from URL
      * 3. Validate path is not root
-     * 4. Try to store in sessionStorage
-     * 5. If successful → redirect to clean home URL
-     * 6. If failed → use query parameter fallback
-     * 
+     * 4. Skip static HTML files (not SPA routes)
+     * 5. Try to store in sessionStorage
+     * 6. If successful → redirect to clean home URL
+     * 7. If failed → use query parameter fallback
+     *
      * Examples:
      * - User visits /teams/ → stores "/teams/", redirects to /
      * - User visits / → no action needed
+     * - User visits /privacy.html → no action (static file, show 404)
      * - Storage blocked → redirects to /?redirect=/teams/
-     * 
+     *
      * @public
      * @returns {void}
      */
     execute() {
         try {
             logger.debug('Executing redirect handler');
-            
+
             // Step 1: Skip if already on home page
             if (PathUtils.isHomePage()) {
                 logger.debug('Already on home page, no redirect needed');
                 return;
             }
-            
+
             // Step 2: Extract application path
             const appPath = PathUtils.extractAppPath();
-            
+
             // Step 3: Validate path
             if (!appPath || appPath === '/') {
                 logger.debug('Root path detected, redirecting to home');
                 this.redirectToHome();
                 return;
             }
-            
-            // Step 4: Try sessionStorage method (preferred)
+
+            // Step 4: Skip static HTML files (not SPA routes)
+            // Static files should be served directly by the server
+            // If they don't exist, the user should see a 404 error
+            if (appPath.match(/\.html\/?$/i)) {
+                logger.info('Static HTML file requested, not redirecting:', appPath);
+                return;
+            }
+
+            // Step 5: Try sessionStorage method (preferred)
             if (StorageUtils.isAvailable() && StorageUtils.storePath(appPath)) {
                 // Success: redirect to clean URL
                 logger.info('Using sessionStorage method');
@@ -398,7 +408,7 @@ class RedirectManager {
                 logger.warn('SessionStorage unavailable, using query parameter fallback');
                 this.redirectWithQueryParam(appPath);
             }
-            
+
         } catch (error) {
             logger.error('Redirect execution failed:', error);
             // Safe fallback: go to home
