@@ -1024,6 +1024,7 @@
     margin: var(--spacing-3) 0;
     border: 1px solid var(--color-border-default);
     border-radius: var(--radius-md);
+    background-color: var(--color-bg-primary);
 }
 
 .position-card__stats {
@@ -1031,7 +1032,6 @@
     gap: var(--spacing-4);
     padding: 0;
     margin: 0 0 var(--spacing-3) 0;
-    background-color: var(--color-bg-primary);
 }
 
 .position-stat {
