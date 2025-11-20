@@ -261,6 +261,39 @@ class PlayerRepository {
     }
 
     /**
+     * Remove all players with specific positions from the current activity's active session
+     * @param {Array<string>} positions - Positions to filter by
+     * @returns {Array<Object>} Array of removed players
+     */
+    clearAllByPositions(positions) {
+        const currentPlayers = this.getAll();
+
+        // Filter out players who have at least one of the specified positions
+        const playersToRemove = currentPlayers.filter(player =>
+            player.positions.some(pos => positions.includes(pos))
+        );
+
+        // Keep players who don't have any of the specified positions
+        const remainingPlayers = currentPlayers.filter(player =>
+            !player.positions.some(pos => positions.includes(pos))
+        );
+
+        this._updateActiveSession({ players: remainingPlayers });
+
+        // Clean up: remove from other players' compared lists
+        playersToRemove.forEach(player => {
+            this.removeFromComparedLists(player.name);
+        });
+
+        this.eventBus.emit('players:cleared-by-positions', {
+            count: playersToRemove.length,
+            positions: positions
+        });
+
+        return playersToRemove;
+    }
+
+    /**
      * Reset player's ratings for specific positions
      * @param {string} playerId - Player ID
      * @param {Array<string>} positions - Positions to reset
