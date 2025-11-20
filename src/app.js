@@ -87,7 +87,7 @@ class Application {
      */
     constructor() {
         /** @private {Object} Activity configuration */
-        this.activityConfig = this.loadActivityConfig();
+        this.activityConfig = null; // Will be set after activities are initialized
 
         /** @private {BasePage|null} Current active page instance */
         this.currentPage = null;
@@ -133,30 +133,6 @@ class Application {
     async init() {
         const initializer = new AppInitializer(this);
         await initializer.run();
-    }
-
-    /**
-     * Load activity configuration from localStorage
-     *
-     * @private
-     * @returns {Object|null} Activity configuration with key, or null if no activity selected
-     */
-    loadActivityConfig() {
-        const selectedActivity = storage.get(STORAGE_KEYS.SELECTED_ACTIVITY, null);
-
-        // If no activity selected, return null
-        if (!selectedActivity) {
-            return null;
-        }
-
-        const activityConfig = activities[selectedActivity];
-
-        if (!activityConfig) {
-            console.warn(`Activity '${selectedActivity}' not found`);
-            return null;
-        }
-
-        return { key: selectedActivity, config: activityConfig };
     }
 
     /**
