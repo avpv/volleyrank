@@ -374,16 +374,17 @@ class ComparePage extends BasePage {
                         aria-label="Select ${this.escape(player1.name)} as better player (keyboard: A)"
                         role="button">
                         <div class="keyboard-hint" aria-hidden="true">A</div>
-                        <div class="player-avatar d-flex items-center justify-center">
-                            ${player1.name.charAt(0).toUpperCase()}
+                        <div class="player-header">
+                            <h4 class="player-name">${this.escape(player1.name)}</h4>
                         </div>
-                        <div class="player-name font-semibold">${this.escape(player1.name)}</div>
-                        <div class="player-position text-secondary">${posName}</div>
-                        <div class="player-rating font-medium" aria-label="Current rating">
-                            ${Math.round(player1.ratings[this.selectedPosition])} <span class="text-tertiary text-xs">ELO</span>
-                        </div>
-                        <div class="player-comparisons text-tertiary" aria-label="Number of comparisons">
-                            ${player1.comparisons[this.selectedPosition]} comparison${player1.comparisons[this.selectedPosition] !== 1 ? 's' : ''}
+                        <div class="player-positions">
+                            <div class="position-badge">
+                                <div class="badge-position">${posName}</div>
+                                <div class="badge-stats">
+                                    <span class="badge-rating">${Math.round(player1.ratings[this.selectedPosition])} ELO</span>
+                                    <span class="badge-comparisons">${player1.comparisons[this.selectedPosition]} comp.</span>
+                                </div>
+                            </div>
                         </div>
                     </button>
 
@@ -409,16 +410,17 @@ class ComparePage extends BasePage {
                         aria-label="Select ${this.escape(player2.name)} as better player (keyboard: D)"
                         role="button">
                         <div class="keyboard-hint" aria-hidden="true">D</div>
-                        <div class="player-avatar d-flex items-center justify-center">
-                            ${player2.name.charAt(0).toUpperCase()}
+                        <div class="player-header">
+                            <h4 class="player-name">${this.escape(player2.name)}</h4>
                         </div>
-                        <div class="player-name font-semibold">${this.escape(player2.name)}</div>
-                        <div class="player-position text-secondary">${posName}</div>
-                        <div class="player-rating font-medium" aria-label="Current rating">
-                            ${Math.round(player2.ratings[this.selectedPosition])} <span class="text-tertiary text-xs">ELO</span>
-                        </div>
-                        <div class="player-comparisons text-tertiary" aria-label="Number of comparisons">
-                            ${player2.comparisons[this.selectedPosition]} comparison${player2.comparisons[this.selectedPosition] !== 1 ? 's' : ''}
+                        <div class="player-positions">
+                            <div class="position-badge">
+                                <div class="badge-position">${posName}</div>
+                                <div class="badge-stats">
+                                    <span class="badge-rating">${Math.round(player2.ratings[this.selectedPosition])} ELO</span>
+                                    <span class="badge-comparisons">${player2.comparisons[this.selectedPosition]} comp.</span>
+                                </div>
+                            </div>
                         </div>
                     </button>
                 </div>

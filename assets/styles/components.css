@@ -653,7 +653,10 @@ select.form-control {
 }
 
 .player-card.clickable:hover {
-    border-color: var(--color-brand-primary);
+    border-color: var(--color-border-emphasis);
+    transform: none;
+    box-shadow: none;
+    background-color: var(--color-surface-raised);
 }
 
 .player-card.clickable:focus-visible {
