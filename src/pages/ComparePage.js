@@ -5,6 +5,7 @@
  */
 import BasePage from './BasePage.js';
 import toast from '../components/base/Toast.js';
+import Modal from '../components/base/Modal.js';
 import { getIcon } from '../components/base/Icons.js';
 import Sidebar from '../components/Sidebar.js';
 import storage from '../core/StorageAdapter.js';
@@ -436,7 +437,7 @@ class ComparePage extends BasePage {
         // Reset all button
         const resetAllBtn = this.$(`#${ELEMENT_IDS.RESET_ALL_BTN}`);
         if (resetAllBtn) {
-            resetAllBtn.addEventListener('click', () => this.handleResetAll());
+            resetAllBtn.addEventListener('click', () => this.showResetAllModal());
         }
 
         // Keyboard shortcuts for comparison
@@ -679,11 +680,8 @@ class ComparePage extends BasePage {
         }
     }
 
-    handleResetAll() {
-        const positions = Object.keys(this.activityConfig.positions);
+    showResetAllModal() {
         const progress = this.comparisonService.getAllProgress();
-
-        // Count total comparisons
         const totalComparisons = Object.values(progress).reduce((sum, p) => sum + p.completed, 0);
 
         if (totalComparisons === 0) {
@@ -691,26 +689,89 @@ class ComparePage extends BasePage {
             return;
         }
 
-        const confirmed = confirm(
-            `Are you sure you want to reset ALL comparisons for ALL positions?\n\n` +
-            `This will reset ${totalComparisons} comparison(s) across ${positions.length} position(s).\n\n` +
-            `This action cannot be undone.`
-        );
+        const modal = new Modal({
+            title: 'Reset All Comparisons',
+            content: this.renderResetAllContent(),
+            showCancel: true,
+            showConfirm: true,
+            confirmText: 'Reset All',
+            cancelText: 'Cancel',
+            onConfirm: () => {
+                const selected = this.getSelectedModalPositions('resetAllPositions');
+                if (selected.length === 0) {
+                    toast.error('Please select at least one position');
+                    return false;
+                }
+                try {
+                    this.comparisonService.resetAll(selected);
+                    const posNames = selected.map(p => this.activityConfig.positions[p]).join(', ');
+                    toast.success(`Reset comparisons for ${posNames}`);
 
-        if (confirmed) {
-            try {
-                this.comparisonService.resetAll(positions);
-                toast.success('All comparisons have been reset');
+                    // Clear selected position and current pair if it was reset
+                    if (selected.includes(this.selectedPosition)) {
+                        this.selectedPosition = '';
+                        this.currentPair = null;
+                    }
 
-                // Clear selected position and current pair
-                this.selectedPosition = '';
-                this.currentPair = null;
-
-                this.update();
-            } catch (error) {
-                toast.error(error.message);
+                    this.update();
+                    return true;
+                } catch (error) {
+                    toast.error(error.message);
+                    return false;
+                }
             }
-        }
+        });
+
+        this.addComponent(modal);
+        modal.mount();
+        modal.open();
+    }
+
+    renderResetAllContent() {
+        const progress = this.comparisonService.getAllProgress();
+
+        return `
+            <div class="modal-content-inner">
+                <div class="form-group">
+                    <label>Select positions to reset comparisons:</label>
+                    <div class="positions-grid">
+                        ${Object.entries(this.activityConfig.positions)
+                .filter(([pos]) => progress[pos].completed > 0)
+                .map(([pos, name]) => {
+                    const prog = progress[pos];
+                    return `
+                                    <label class="position-checkbox">
+                                        <input
+                                            type="checkbox"
+                                            name="resetAllPositions"
+                                            value="${pos}"
+                                            class="position-input"
+                                            checked
+                                        >
+                                        <span class="position-label">${name} (${prog.completed}/${prog.total} comparisons)</span>
+                                    </label>
+                                `;
+                }).join('')}
+                    </div>
+                    <div class="warning-box warning-box-danger">
+                        <div class="warning-title">Warning</div>
+                        <div class="warning-text">
+                            This will reset all comparison history for selected positions. Player ratings will be recalculated to 1500. This action cannot be undone!
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    getSelectedModalPositions(inputName) {
+        const checkboxes = document.querySelectorAll(`input[name="${inputName}"]:checked`);
+        return Array.from(checkboxes).map(cb => cb.value);
+    }
+
+    handleResetAll() {
+        // This method is kept for backward compatibility but now just calls showResetAllModal
+        this.showResetAllModal();
     }
 }
 
