@@ -89,7 +89,10 @@ export const ANIMATION = {
     ACTIVITY_SWITCH_DELAY: 1500,
 
     /** Settings reload delay (ms) - delay before reloading after settings change */
-    RELOAD_DELAY: 2000
+    RELOAD_DELAY: 2000,
+
+    /** Key press animation duration (ms) */
+    KEY_PRESS: 400
 };
 
 /**
@@ -263,6 +266,73 @@ export const UI_CLASSES = {
 };
 
 /**
+ * Icon Sizes
+ * Standardized sizes for icons across the application
+ */
+export const ICON_SIZES = {
+    SMALL: 14,
+    MEDIUM: 16,
+    LARGE: 18,
+    XLARGE: 24,
+    XXLARGE: 40,
+    HUGE: 48
+};
+
+/**
+ * Common Colors
+ * References to CSS variables for use in JS
+ */
+export const COLORS = {
+    SUCCESS: 'var(--color-success)',
+    WARNING: 'var(--color-warning)',
+    TEXT_SECONDARY: 'var(--color-text-secondary)'
+};
+
+/**
+ * Keyboard Keys
+ * Standardized key codes for event handling
+ */
+export const KEYBOARD_KEYS = {
+    A: 'a',
+    D: 'd',
+    W: 'w',
+    ARROW_LEFT: 'arrowleft',
+    ARROW_RIGHT: 'arrowright',
+    ARROW_UP: 'arrowup',
+    ARROW_DOWN: 'arrowdown',
+    ENTER: 'enter',
+    ESCAPE: 'escape'
+};
+
+/**
+ * Common Messages
+ * Standardized user-facing text
+ */
+export const MESSAGES = {
+    ERRORS: {
+        DATA_INCOMPLETE: 'Player data is incomplete. Please check your player list.',
+        LOAD_FAILED: 'Unable to load the next comparison. Please try again.',
+        SELECT_POSITION: 'Please select at least one position',
+        SELECT_ACTIVITY: 'Please select an activity type first',
+        SELECT_PLAYER_PER_TEAM: 'Please select at least one player per team',
+        EXPORT_FAILED: 'Export failed'
+    },
+    SUCCESS: {
+        WIN_WIN: 'Win-Win recorded',
+        EXPORT_COMPLETE: 'Teams exported!',
+        RESET_COMPLETE: 'comparisons have been reset'
+    },
+    INFO: {
+        NO_COMPARISONS: 'No comparisons to reset',
+        OPTIMIZING: 'Optimizing teams... This may take a moment'
+    },
+    TITLES: {
+        STATUS: 'Status',
+        DATA_ERROR: 'Data Error'
+    }
+};
+
+/**
  * Data Attributes
  * Centralized data-* attribute names
  */
@@ -296,5 +366,9 @@ export default {
     LAYOUT,
     ELEMENT_IDS,
     UI_CLASSES,
-    DATA_ATTRIBUTES
+    DATA_ATTRIBUTES,
+    ICON_SIZES,
+    COLORS,
+    KEYBOARD_KEYS,
+    MESSAGES
 };

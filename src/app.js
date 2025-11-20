@@ -35,6 +35,7 @@ import { escapeHtml } from './utils/stringUtils.js';
 import { initializeServices } from './config/services.js';
 import storage from './core/StorageAdapter.js';
 import { STORAGE_KEYS } from './utils/constants.js';
+import AppInitializer from './core/AppInitializer.js';
 
 const { ELEMENT_IDS, DATA_ATTRIBUTES, ANIMATION, TOAST } = uiConfig;
 
@@ -123,150 +124,39 @@ class Application {
      * Initialize application
      * 
      * Main bootstrap sequence that sets up the entire application.
-     * This is the entry point called immediately after construction.
-     * 
-     * Bootstrap sequence:
-     * 1. Handle GitHub Pages redirect (SessionStorage or Query Param)
-     * 2. Load persisted application state from localStorage
-     * 3. Setup global event listeners for app-wide events
-     * 4. Register all application routes
-     * 5. Initialize router with restored path if available
-     * 6. Setup global error handlers
-     * 7. Show welcome message for first-time users
+     * Uses AppInitializer to handle the complex startup process.
      * 
      * @async
      * @public
      * @returns {Promise<void>}
-     * @throws {Error} If critical initialization fails
      */
     async init() {
-        try {
-            // Step 0: Initialize activities (load all activity configs)
-            await initializeActivities();
-
-            // Reload activity config after activities are initialized
-            this.activityConfig = this.loadActivityConfig();
-
-            // Step 1: Initialize services with activity config (or null if none selected)
-            const configForServices = this.activityConfig ? this.activityConfig.config : null;
-            this.services = initializeServices(configForServices);
-
-            // Step 2: Handle GitHub Pages 404 redirect
-            this.handleRedirect();
-
-            // Step 3: Load persisted application state
-            const loaded = stateManager.load();
-
-            // Step 3.1: Ensure active session exists for current activity (only if activity selected)
-            if (this.activityConfig) {
-                const sessionService = this.services.resolve('sessionService');
-                const activeSession = sessionService.ensureActiveSession(this.activityConfig.key);
-            }
-
-            // Step 4: Setup global event listeners
-            this.setupEventListeners();
-
-            // Step 3.5: Setup navigation click handlers
-            this.setupNavigationHandlers();
-
-            // Step 4: Register application routes
-            this.registerRoutes();
-
-            // Step 5: Update navigation UI
-            this.updateNavigation();
-
-            // Step 6: Initialize router with initial path if available
-            if (this.initialPath) {
-                router.initialPath = this.initialPath;
-            }
-            router.init();
-
-            // Step 7: Setup global error handlers
-            this.setupErrorHandling();
-
-            // Step 8: Show welcome message for first-time users
-            if (!loaded) {
-                toast.info(
-                    `Welcome to ${APP_CONFIG.NAME}! Add players to get started.`,
-                    APP_CONFIG.WELCOME_TOAST_DURATION
-                );
-            }
-
-        } catch (error) {
-            console.error('Failed to initialize application:', error);
-            this.showFatalError(error);
-        }
+        const initializer = new AppInitializer(this);
+        await initializer.run();
     }
 
     /**
-     * Handle GitHub Pages redirect
-     * 
-     * Processes redirects from 404.html using the redirect module.
-     * Supports two methods for maximum compatibility:
-     * 
-     * Method 1: SessionStorage (Preferred)
-     * - User accesses /teams/
-     * - 404.html stores "/teams/" in sessionStorage
-     * - Redirects to clean URL "/"
-     * - This method reads from sessionStorage
-     * - Routes to /teams/ seamlessly
-     * - Result: Clean URL, no query parameters
-     * 
-     * Method 2: Query Parameter (Fallback)
-     * - Used when sessionStorage is unavailable
-     * - Reads from ?redirect=/teams/
-     * - Cleans URL and routes correctly
-     * 
-     * Benefits:
-     * - Invisible to user (no visible redirect)
-     * - Clean URLs (no query parameters in address bar)
-     * - Professional UX
-     * - SEO-friendly
-     * 
+     * Load activity configuration from localStorage
+     *
      * @private
-     * @returns {void}
+     * @returns {Object|null} Activity configuration with key, or null if no activity selected
      */
-    handleRedirect() {
-        // Method 1: Try to restore from sessionStorage (cleanest approach)
-        const storedPath = redirectModule.restore();
+    loadActivityConfig() {
+        const selectedActivity = storage.get(STORAGE_KEYS.SELECTED_ACTIVITY, null);
 
-        if (storedPath) {
-            // Update browser URL to correct path (no query params)
-            const fullPath = router.basePath + storedPath;
-            window.history.replaceState(
-                { path: storedPath },
-                '',
-                fullPath
-            );
-            
-            // Store for router initialization
-            this.initialPath = storedPath;
-
-            return;
+        // If no activity selected, return null
+        if (!selectedActivity) {
+            return null;
         }
-        
-        // Method 2: Fallback to query parameter (compatibility)
-        const url = new URL(window.location);
 
-        if (url.searchParams.has('redirect')) {
-            const redirectPath = url.searchParams.get('redirect');
+        const activityConfig = activities[selectedActivity];
 
-            // Remove redirect parameter from URL
-            url.searchParams.delete('redirect');
-            
-            // Build full path
-            const fullPath = router.basePath + redirectPath;
-            
-            // Update browser URL without reload
-            window.history.replaceState(
-                { path: redirectPath },
-                '',
-                fullPath
-            );
-            
-            // Store for router initialization
-            this.initialPath = redirectPath;
+        if (!activityConfig) {
+            console.warn(`Activity '${selectedActivity}' not found`);
+            return null;
         }
+
+        return { key: selectedActivity, config: activityConfig };
     }
 
     /**
@@ -352,7 +242,7 @@ class Application {
             console.error('[ERROR] App container #appMain not found!');
             return;
         }
-        
+
         // Step 3: Clear container content
         container.innerHTML = '';
 

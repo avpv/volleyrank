@@ -12,7 +12,7 @@ import { activities } from '../config/activities/index.js';
 import ratingConfig from '../config/rating.js';
 import uiConfig from '../config/ui.js';
 
-const { ELEMENT_IDS } = uiConfig;
+const { ELEMENT_IDS, ICON_SIZES, MESSAGES } = uiConfig;
 
 class TeamsPage extends BasePage {
     constructor(container, props = {}) {
@@ -275,7 +275,7 @@ class TeamsPage extends BasePage {
                                 <span class="tooltip-wrapper">
                                     Count
                                     <span class="tooltip-icon" role="tooltip">
-                                        ${getIcon('info', { size: 14 })}
+                                        ${getIcon('info', { size: ICON_SIZES.SMALL })}
                                         <span class="tooltip-content">Players per team at this position</span>
                                     </span>
                                 </span>
@@ -284,7 +284,7 @@ class TeamsPage extends BasePage {
                                 <span class="tooltip-wrapper">
                                     Weight
                                     <span class="tooltip-icon" role="tooltip">
-                                        ${getIcon('info', { size: 14 })}
+                                        ${getIcon('info', { size: ICON_SIZES.SMALL })}
                                         <span class="tooltip-content">Balance priority (1.0-3.0, higher = more important)</span>
                                     </span>
                                 </span>
@@ -301,7 +301,7 @@ class TeamsPage extends BasePage {
                         ${players.length < 2 ? 'disabled' : ''}
                         aria-label="${this.state.isOptimizing ? 'Optimizing teams...' : 'Generate balanced teams'}"
                         ${this.state.isOptimizing ? 'aria-busy="true"' : ''}>
-                        ${getIcon('users', { size: 18, className: 'btn-icon' })}
+                        ${getIcon('users', { size: ICON_SIZES.LARGE, className: 'btn-icon' })}
                         ${this.state.isOptimizing ? 'Generating Teams...' : 'Generate Balanced Teams'}
                     </button>
                     ${players.length < 2 ? `
@@ -378,7 +378,7 @@ class TeamsPage extends BasePage {
                             class="btn btn-primary btn-sm"
                             id="exportTeamsBtn"
                             aria-label="Export teams to file">
-                            ${getIcon('arrow-up', { size: 16, className: 'btn-icon' })}
+                            ${getIcon('arrow-up', { size: ICON_SIZES.MEDIUM, className: 'btn-icon' })}
                             Export
                         </button>
                     </div>
@@ -386,19 +386,19 @@ class TeamsPage extends BasePage {
 
                 <div class="balance-indicator balance-indicator--${quality.class}" role="status" aria-live="polite">
                     <div class="balance-icon" aria-hidden="true">
-                        ${getIcon(quality.icon, { size: 40, className: 'balance-icon-svg' })}
+                        ${getIcon(quality.icon, { size: ICON_SIZES.XXLARGE, className: 'balance-icon-svg' })}
                     </div>
                     <div class="balance-content">
                         <span class="balance-label d-flex items-center gap-2">
                             Team Balance Quality:
-                            <span class="status-badge status-badge--${weightedBalance < 50 ? 'success' : weightedBalance < 100 ? 'in-progress' : 'warning'}">
+                            <span class="status-badge status-badge--${weightedBalance < ratingConfig.BALANCE_THRESHOLDS.QUALITY.EXCELLENT ? 'success' : weightedBalance < ratingConfig.BALANCE_THRESHOLDS.QUALITY.GOOD ? 'in-progress' : 'warning'}">
                                 ${quality.label}
                             </span>
                         </span>
                         <span class="balance-value">${weightedBalance} ELO average difference</span>
                     </div>
                     <div class="balance-explanation">
-                        ${weightedBalance < 50 ? 'Excellent balance!' : weightedBalance < 100 ? 'Good balance' : 'Consider re-generating for better balance'}
+                        ${weightedBalance < ratingConfig.BALANCE_THRESHOLDS.QUALITY.EXCELLENT ? 'Excellent balance!' : weightedBalance < ratingConfig.BALANCE_THRESHOLDS.QUALITY.GOOD ? 'Good balance' : 'Consider re-generating for better balance'}
                         Lower difference means more even teams.
                     </div>
                 </div>
@@ -604,13 +604,13 @@ class TeamsPage extends BasePage {
 
             // Validate
             if (Object.values(composition).every(v => v === 0)) {
-                toast.error('Please select at least one player per team');
+                toast.error(MESSAGES.ERRORS.SELECT_PLAYER_PER_TEAM);
                 this.setState({ isOptimizing: false });
                 return;
             }
 
             // Show optimizing message
-            toast.info('Optimizing teams... This may take a moment', uiConfig.TOAST.LONG_DURATION);
+            toast.info(MESSAGES.INFO.OPTIMIZING, uiConfig.TOAST.LONG_DURATION);
 
             // Apply custom position weights temporarily for optimization
             const originalWeights = { ...this.activityConfig.positionWeights };
@@ -693,9 +693,9 @@ class TeamsPage extends BasePage {
             document.body.removeChild(link);
             URL.revokeObjectURL(url);
 
-            toast.success('Teams exported!');
+            toast.success(MESSAGES.SUCCESS.EXPORT_COMPLETE);
         } catch (error) {
-            toast.error('Export failed');
+            toast.error(MESSAGES.ERRORS.EXPORT_FAILED);
         }
     }
 }
