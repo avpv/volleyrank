@@ -20,45 +20,49 @@
     align-items: center;
     justify-content: center;
     gap: var(--spacing-2);
-    padding: var(--spacing-3) var(--spacing-6);
+    padding: 5px var(--spacing-4);
     font-family: inherit;
     font-size: var(--font-size-sm);
     font-weight: var(--font-weight-medium);
-    line-height: 1.2;
+    line-height: 20px;
     text-align: center;
     text-decoration: none;
     white-space: nowrap;
-    border: 1px solid;
+    border: 1px solid transparent;
     border-radius: var(--radius-md);
     cursor: pointer;
     user-select: none;
-    transition: background-color var(--duration-fast) var(--ease-smooth),
-        border-color var(--duration-fast) var(--ease-smooth);
+    transition: .2s cubic-bezier(0.3, 0, 0.5, 1);
+    transition-property: color, background-color, border-color;
     position: relative;
-    min-height: 44px;
+    height: 32px;
+    box-shadow: var(--shadow-sm);
 }
 
 /* Button Variants */
+/* Button Variants */
 .btn-primary {
-    background: var(--color-brand-primary);
-    border-color: var(--color-brand-primary);
-    color: white;
+    color: #ffffff;
+    background-color: var(--color-brand-primary);
+    border-color: rgba(27, 31, 36, 0.15);
+    box-shadow: var(--shadow-sm);
 }
 
 .btn-primary:hover:not(:disabled) {
-    background: var(--color-brand-primary-hover);
-    border-color: var(--color-brand-primary-hover);
+    background-color: var(--color-brand-primary-hover);
+    border-color: rgba(27, 31, 36, 0.15);
 }
 
 .btn-primary:active:not(:disabled) {
-    background: var(--color-brand-primary-active);
+    background-color: var(--color-brand-primary-active);
     box-shadow: var(--shadow-button-active);
 }
 
 .btn-secondary {
+    color: var(--color-text-primary);
     background-color: var(--color-surface-raised);
     border-color: var(--color-border-default);
-    color: var(--color-text-primary);
+    box-shadow: var(--shadow-sm);
 }
 
 .btn-secondary:hover:not(:disabled) {
@@ -72,29 +76,27 @@
 }
 
 .btn-warning {
-    background-color: var(--color-warning);
-    border-color: var(--color-warning);
-    color: white;
+    color: var(--color-text-primary);
+    background-color: var(--color-surface-raised);
+    border-color: var(--color-border-default);
+    color: var(--color-warning-text);
 }
 
 .btn-warning:hover:not(:disabled) {
-    background-color: var(--color-warning-hover);
-    border-color: var(--color-warning-hover);
-}
-
-.btn-warning:active:not(:disabled) {
-    box-shadow: var(--shadow-button-active);
+    background-color: var(--color-surface-overlay);
+    color: var(--color-warning-hover);
 }
 
 .btn-danger {
-    background-color: var(--color-error);
-    border-color: var(--color-error);
-    color: white;
+    color: var(--color-error-text);
+    background-color: var(--color-surface-raised);
+    border-color: var(--color-border-default);
 }
 
 .btn-danger:hover:not(:disabled) {
-    background-color: var(--color-error-hover);
-    border-color: var(--color-error-hover);
+    color: #ffffff;
+    background-color: var(--color-error);
+    border-color: var(--color-error);
 }
 
 .btn-danger:active:not(:disabled) {
@@ -102,16 +104,17 @@
 }
 
 /* Button Sizes */
+/* Button Sizes */
 .btn-sm {
-    padding: var(--spacing-2) var(--spacing-4);
+    padding: 3px var(--spacing-3);
     font-size: var(--font-size-xs);
-    min-height: 36px;
+    height: 28px;
 }
 
 .btn-lg {
-    padding: var(--spacing-4) var(--spacing-8);
+    padding: var(--spacing-2) var(--spacing-4);
     font-size: var(--font-size-base);
-    min-height: 48px;
+    height: 40px;
 }
 
 /* Button States */
@@ -240,27 +243,29 @@
 /* Inputs - Better touch targets */
 .form-control {
     width: 100%;
-    padding: var(--spacing-3) var(--spacing-4);
+    padding: 5px 12px;
     font-family: inherit;
-    font-size: var(--font-size-base);
+    font-size: 14px;
+    line-height: 20px;
     background-color: var(--color-bg-primary);
     border: 1px solid var(--color-border-default);
     border-radius: var(--radius-md);
     color: var(--color-text-primary);
-    transition: var(--transition-default);
-    min-height: 44px;
+    transition: 80ms cubic-bezier(0.33, 1, 0.68, 1);
+    transition-property: color, background-color, box-shadow, border-color;
+    height: 32px;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.075);
 }
 
 .form-control:hover:not(:focus):not(:disabled) {
     border-color: var(--color-border-emphasis);
-    background-color: var(--color-bg-hover);
 }
 
 .form-control:focus {
     outline: none;
     border-color: var(--color-brand-primary);
     background-color: var(--color-bg-primary);
-    box-shadow: 0 0 0 3px rgba(47, 129, 247, 0.1);
+    box-shadow: 0 0 0 3px rgba(31, 111, 235, 0.3);
 }
 
 .form-control:focus-visible {
@@ -294,31 +299,37 @@ select.form-control {
 /* Team Builder Inputs */
 .team-count-input {
     width: var(--input-width-small);
-    padding: var(--spacing-2) var(--spacing-3);
+    padding: 5px 12px;
     font-family: inherit;
-    font-size: var(--font-size-base);
+    font-size: 14px;
+    line-height: 20px;
     font-weight: var(--font-weight-semibold);
     background-color: var(--color-bg-primary);
     border: 1px solid var(--color-border-default);
     border-radius: var(--radius-md);
     color: var(--color-text-primary);
     text-align: center;
-    transition: var(--transition-default);
+    transition: 80ms cubic-bezier(0.33, 1, 0.68, 1);
+    height: 32px;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.075);
 }
 
 .composition-input,
 .weight-input {
     width: var(--input-width-tiny);
-    padding: var(--spacing-2) var(--spacing-3);
+    padding: 5px 12px;
     font-family: inherit;
-    font-size: var(--font-size-base);
+    font-size: 14px;
+    line-height: 20px;
     font-weight: var(--font-weight-semibold);
     background-color: var(--color-bg-primary);
     border: 1px solid var(--color-border-default);
     border-radius: var(--radius-md);
     color: var(--color-text-primary);
     text-align: center;
-    transition: var(--transition-default);
+    transition: 80ms cubic-bezier(0.33, 1, 0.68, 1);
+    height: 32px;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.075);
 }
 
 .team-count-input:hover,
@@ -332,7 +343,7 @@ select.form-control {
 .weight-input:focus {
     outline: none;
     border-color: var(--color-brand-primary);
-    box-shadow: 0 0 0 3px rgba(47, 129, 247, 0.1);
+    box-shadow: 0 0 0 3px rgba(31, 111, 235, 0.3);
 }
 
 /* Composition Table */
@@ -416,6 +427,7 @@ select.form-control {
     transition: var(--transition-default);
     user-select: none;
     min-height: 44px;
+    box-shadow: var(--shadow-sm);
 }
 
 .position-checkbox:hover {
@@ -430,12 +442,12 @@ select.form-control {
 
 .position-checkbox input[type="checkbox"] {
     appearance: none;
-    width: 20px;
-    height: 20px;
+    width: 16px;
+    height: 16px;
     margin: 0;
     padding: 0;
     border: 1px solid var(--color-border-default);
-    border-radius: var(--radius-sm);
+    border-radius: 2px;
     background: var(--color-bg-primary);
     cursor: pointer;
     transition: var(--transition-default);
@@ -444,6 +456,7 @@ select.form-control {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .position-checkbox input[type="checkbox"]:checked {
@@ -617,20 +630,22 @@ select.form-control {
 .card {
     background-color: var(--color-surface-raised);
     border: 1px solid var(--color-border-default);
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius-md);
     padding: var(--spacing-5);
     transition: var(--transition-default);
+    box-shadow: var(--shadow-sm);
 }
 
 .card:hover {
     border-color: var(--color-border-emphasis);
+    box-shadow: var(--shadow-md);
 }
 
 /* Player Cards - Compare Page */
 .player-card {
     background-color: var(--color-surface-raised);
     border: 1px solid var(--color-border-default);
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius-md);
     padding: var(--spacing-6);
     position: relative;
     display: flex;
@@ -638,13 +653,13 @@ select.form-control {
     justify-content: space-between;
     min-height: 300px;
     transition: all var(--duration-fast) var(--ease-smooth);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-sm);
 }
 
 .player-card:hover {
     border-color: var(--color-border-emphasis);
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: var(--shadow-md);
     background-color: var(--color-surface-overlay);
 }
 
@@ -699,11 +714,11 @@ select.form-control {
 
 /* Multi-badge */
 .multi-badge {
-    background: rgba(47, 129, 247, 0.15);
+    background: rgba(56, 139, 253, 0.15);
     color: var(--color-brand-primary);
-    border: 1px solid var(--color-brand-primary);
+    border: 1px solid rgba(56, 139, 253, 0.4);
     font-size: var(--font-size-xxs);
-    padding: 2px var(--spacing-2);
+    padding: 2px 8px;
     border-radius: var(--radius-sm);
     font-weight: var(--font-weight-semibold);
     text-transform: uppercase;

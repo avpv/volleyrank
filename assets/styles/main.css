@@ -17,179 +17,189 @@
 
 :root {
     /* ==========================================================================
-       Dark Color System
+       Dark Color System - GitHub Style Neutral
        ========================================================================== */
-    
+
     /* Primary Backgrounds */
     --color-bg-primary: #0d1117;
     --color-bg-secondary: #161b22;
     --color-bg-tertiary: #21262d;
     --color-bg-elevated: #30363d;
-    
+
     /* Surface Colors */
-    --color-surface-base: #161b22;
-    --color-surface-raised: #21262d;
-    --color-surface-overlay: #30363d;
-    --color-surface-interactive: #388bfd1a;
+    --color-surface-base: #0d1117;
+    --color-surface-raised: #161b22;
+    --color-surface-overlay: #21262d;
+    --color-surface-interactive: #21262d;
 
     /* Hover States */
-    --color-bg-hover: rgba(255, 255, 255, 0.03);
-    --color-surface-hover: #2d333b;
-    
+    --color-bg-hover: #21262d;
+    --color-surface-hover: #30363d;
+
     /* Borders - Simplified system */
-    --color-border-muted: #21262d;       /* Subtle dividers, table borders */
-    --color-border-default: #30363d;     /* Standard borders (cards, inputs) */
-    --color-border-emphasis: #57606a;    /* Hover/focus states, active elements */
-    
+    --color-border-muted: #21262d;
+    /* Subtle dividers */
+    --color-border-default: #30363d;
+    /* Standard borders */
+    --color-border-emphasis: #6e7681;
+    /* Hover/focus states */
+    --color-border-strong: #8b949e;
+    /* Active elements */
+
     /* Text Colors - Refined hierarchy */
     --color-text-primary: #e6edf3;
-    --color-text-secondary: #adb5bd;
-    --color-text-tertiary: #9da5ae;
-    --color-text-disabled: #495057;
+    --color-text-secondary: #8b949e;
+    --color-text-tertiary: #7d8590;
+    --color-text-disabled: #484f58;
     --color-text-inverse: #0d1117;
     --color-text-link: #58a6ff;
 
-    /* Brand Colors - Blue */
-    --color-brand-primary: #2f81f7;
-    --color-brand-primary-hover: #58a6ff;
+    /* Brand Colors - GitHub Blue */
+    --color-brand-primary: #1f6feb;
+    --color-brand-primary-hover: #388bfd;
     --color-brand-primary-active: #1f6feb;
-    --color-brand-secondary: #a371f7;
+    --color-brand-secondary: #8957e5;
     --color-brand-accent: #ff7b72;
-    
-    /* Semantic Colors */
-    --color-success: #56d364;
-    --color-success-hover: #3fb950;
-    --color-success-light: rgba(86, 211, 100, 0.12);
 
-    --color-warning: #e3b341;
-    --color-warning-hover: #d29922;
-    --color-warning-light: rgba(227, 179, 65, 0.12);
+    /* Semantic Colors - Muted/Professional */
+    --color-success: #238636;
+    --color-success-hover: #2ea043;
+    --color-success-light: rgba(46, 160, 67, 0.15);
+    --color-success-text: #3fb950;
 
-    --color-error: #ff6b6b;
+    --color-warning: #9e6a03;
+    --color-warning-hover: #bb8009;
+    --color-warning-light: rgba(187, 128, 9, 0.15);
+    --color-warning-text: #d29922;
+
+    --color-error: #da3633;
     --color-error-hover: #f85149;
-    --color-error-light: rgba(255, 107, 107, 0.12);
-    
-    --color-info: #2f81f7;
-    --color-info-hover: #58a6ff;
-    --color-info-light: rgba(47, 129, 247, 0.12);
-    
+    --color-error-light: rgba(248, 81, 73, 0.15);
+    --color-error-text: #f85149;
+
+    --color-info: #1f6feb;
+    --color-info-hover: #388bfd;
+    --color-info-light: rgba(56, 139, 253, 0.15);
+    --color-info-text: #58a6ff;
+
     /* ==========================================================================
        Typography - Scale
        ========================================================================== */
-    
+
     /* Font Families */
-    --font-family-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
-    --font-family-mono: 'SFMono-Regular', 'Consolas', 'Liberation Mono', 'Menlo', monospace;
-    
-    /* Font Sizes - Refined scale */
-    --font-size-xxs: 0.625rem;    /* 10px - micro text, badges */
-    --font-size-xs: 0.75rem;      /* 12px - captions, labels */
-    --font-size-sm: 0.875rem;     /* 14px - body small, UI */
-    --font-size-base: 1rem;       /* 16px - body text */
-    --font-size-md: 1.0625rem;    /* 17px - body emphasis */
-    --font-size-lg: 1.125rem;     /* 18px - subheadings */
-    --font-size-xl: 1.25rem;      /* 20px - card titles */
-    --font-size-2xl: 1.5rem;      /* 24px - section headings */
-    --font-size-2-5xl: 1.75rem;   /* 28px - subsection headers */
-    --font-size-3xl: 2rem;        /* 32px - page titles */
-    
-    /* Font Weights - Simplified (3 weights only) */
-    --font-weight-normal: 400;      /* Body text, labels, descriptions */
-    --font-weight-medium: 500;      /* Emphasized text, buttons, nav links */
-    --font-weight-semibold: 600;    /* Headings, card titles, important elements */
-    
+    --font-family-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+    --font-family-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+
+    /* Font Sizes */
+    --font-size-xxs: 10px;
+    --font-size-xs: 12px;
+    --font-size-sm: 14px;
+    --font-size-base: 16px;
+    --font-size-md: 18px;
+    --font-size-lg: 20px;
+    --font-size-xl: 24px;
+    --font-size-2xl: 32px;
+    --font-size-3xl: 40px;
+
+    /* Font Weights */
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 600;
+
     /* Line Heights */
     --line-height-none: 1;
     --line-height-tight: 1.25;
     --line-height-normal: 1.5;
-    --line-height-relaxed: 1.75;
-    
+    --line-height-relaxed: 1.6;
+
     /* Letter Spacing */
     --letter-spacing-tight: -0.01em;
     --letter-spacing-normal: 0;
     --letter-spacing-wide: 0.01em;
-    
+
     /* ==========================================================================
        Spacing - Scale
        ========================================================================== */
-    
-    --spacing-1: 0.25rem;
-    --spacing-2: 0.5rem;
-    --spacing-3: 0.75rem;
-    --spacing-4: 1rem;
-    --spacing-5: 1.25rem;
-    --spacing-6: 1.5rem;
-    --spacing-8: 2rem;
-    --spacing-10: 2.5rem;
-    --spacing-12: 3rem;
-    --spacing-16: 4rem;
-    --spacing-20: 5rem;
-    --spacing-24: 6rem;
-    
+
+    --spacing-1: 4px;
+    --spacing-2: 8px;
+    --spacing-3: 12px;
+    --spacing-4: 16px;
+    --spacing-5: 20px;
+    --spacing-6: 24px;
+    --spacing-8: 32px;
+    --spacing-10: 40px;
+    --spacing-12: 48px;
+    --spacing-16: 64px;
+    --spacing-20: 80px;
+    --spacing-24: 96px;
+
     /* ==========================================================================
-       Border Radius - Minimal geometric shapes
+       Border Radius - Rectangular Geometry (0-4px)
        ========================================================================== */
 
-    --radius-sm: 2px;   /* Minimal rounding - badges, kbd, rank badges */
-    --radius-md: 3px;   /* Standard - buttons, inputs, small cards */
-    --radius-lg: 4px;   /* Large surfaces - modals, major sections */
-    
+    --radius-sm: 2px;
+    /* Badges, tiny elements */
+    --radius-md: 4px;
+    /* Buttons, inputs, cards */
+    --radius-lg: 4px;
+    /* Modals, large containers (kept consistent) */
+    --radius-pill: 4px;
+    /* Overriding pill shapes to be rectangular */
+
     /* ==========================================================================
-       Shadows - Minimal system (use sparingly)
+       Shadows - Minimal
        ========================================================================== */
 
-    --shadow-focus: 0 0 0 3px rgba(47, 129, 247, 0.12);     /* Focus states */
-    --shadow-modal: 0 8px 24px rgba(0, 0, 0, 0.15);         /* Modal overlays */
-    --shadow-toast: 0 4px 12px rgba(0, 0, 0, 0.2);          /* Toast notifications */
-    --shadow-button-active: inset 0 1px 3px rgba(0, 0, 0, 0.2); /* Button pressed */
-    
+    --shadow-sm: 0 1px 0 rgba(27, 31, 36, 0.04);
+    --shadow-md: 0 3px 6px rgba(140, 149, 159, 0.15);
+    --shadow-lg: 0 8px 24px rgba(140, 149, 159, 0.2);
+    --shadow-focus: 0 0 0 2px rgba(31, 111, 235, 0.3);
+    /* Focus states */
+    --shadow-modal: 0 8px 24px rgba(0, 0, 0, 0.5);
+    /* Modal overlays */
+    --shadow-button-active: inset 0 1px 0 rgba(27, 31, 36, 0.1);
+    /* Button pressed */
+
     /* ==========================================================================
-       Animation & Timing - Simplified
+       Animation & Timing
        ========================================================================== */
 
-    --duration-fast: 0.2s;      /* Hover states, simple color changes */
-    --duration-default: 0.3s;   /* Standard interactions, modals */
+    --duration-fast: 0.15s;
+    --duration-default: 0.2s;
 
-    --ease-smooth: cubic-bezier(0.4, 0.0, 0.2, 1);
-    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-smooth: cubic-bezier(0.3, 0, 0.5, 1);
+    --ease-out: cubic-bezier(0.33, 1, 0.68, 1);
 
     --transition-default: all var(--duration-fast) var(--ease-smooth);
-    --transition-colors: background-color var(--duration-fast) var(--ease-smooth),
-                         color var(--duration-fast) var(--ease-smooth),
-                         border-color var(--duration-fast) var(--ease-smooth);
-    
+
     /* ==========================================================================
        Icon Sizes
        ========================================================================== */
 
-    --icon-size-xs: 14px;    /* Inline text icons */
-    --icon-size-sm: 16px;    /* Button icons */
-    --icon-size-base: 20px;  /* Standard UI icons */
-    --icon-size-lg: 24px;    /* Headers, important actions */
-    --icon-size-xl: 32px;    /* Large feature icons */
+    --icon-size-xs: 12px;
+    --icon-size-sm: 16px;
+    --icon-size-base: 20px;
+    --icon-size-lg: 24px;
+    --icon-size-xl: 32px;
 
     /* ==========================================================================
        Layout
        ========================================================================== */
 
-    --header-height: 4rem;
-    --nav-height: 3rem;
+    --header-height: 64px;
+    --nav-height: 48px;
     --container-max-width: 1280px;
 
     /* ==========================================================================
-       Input Widths - Standardized
+       Input Widths
        ========================================================================== */
 
     --input-width-full: 100%;
     --input-width-medium: 320px;
-    --input-width-small: 120px;
+    --input-width-small: 160px;
     --input-width-tiny: 80px;
-
-    /* ==========================================================================
-       Hover Effects - Minimal (no transforms)
-       ========================================================================== */
-
-    /* All hover effects should use color/border changes only, no transforms */
 }
 
 /* =============================================================================
@@ -229,7 +239,12 @@ body {
    Typography
    ============================================================================= */
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
     font-weight: var(--font-weight-semibold);
     line-height: var(--line-height-tight);
     color: var(--color-text-primary);
@@ -457,6 +472,7 @@ a:hover {
         opacity: 0;
         transform: translateY(10px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -533,7 +549,9 @@ a:hover {
 }
 
 @keyframes spin {
-    to { transform: rotate(360deg); }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 .empty-state {
@@ -547,6 +565,7 @@ a:hover {
         opacity: 0;
         transform: translateY(10px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -658,27 +677,27 @@ textarea:focus-visible {
         --header-height: 3.5rem;
         --nav-height: 3rem;
     }
-    
+
     .header-content,
     .app-nav .nav-container,
     .app-main,
     .app-footer .footer-content {
         padding: 0 var(--spacing-4);
     }
-    
+
     .app-main {
         padding: var(--spacing-6) var(--spacing-4);
     }
-    
+
     .app-title {
         font-size: var(--font-size-lg);
         padding: 0;
     }
-    
+
     .app-subtitle {
         display: none;
     }
-    
+
     .nav-link {
         padding: var(--spacing-2) var(--spacing-3);
         font-size: var(--font-size-sm);
@@ -709,7 +728,7 @@ textarea:focus-visible {
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
     }
-    
+
     .nav-link {
         white-space: nowrap;
     }
@@ -724,12 +743,13 @@ textarea:focus-visible {
    ============================================================================= */
 
 @media print {
+
     .app-header,
     .app-nav,
     .app-footer {
         display: none;
     }
-    
+
     .app-main {
         padding: 0;
         max-width: none;
@@ -741,6 +761,7 @@ textarea:focus-visible {
    ============================================================================= */
 
 @media (prefers-reduced-motion: reduce) {
+
     *,
     *::before,
     *::after {
@@ -748,7 +769,7 @@ textarea:focus-visible {
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
     }
-    
+
     html {
         scroll-behavior: auto;
     }

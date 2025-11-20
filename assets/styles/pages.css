@@ -220,7 +220,7 @@
     width: 60px;
     height: 60px;
     font-size: 24px;
-    border-radius: 50%;
+    border-radius: var(--radius-md);
     margin-bottom: var(--spacing-3);
     background-color: var(--color-brand-primary);
     color: white;
@@ -303,7 +303,7 @@
     gap: var(--spacing-2);
     min-width: 120px;
     height: 120px;
-    border-radius: 50%;
+    border-radius: var(--radius-lg);
     background-color: var(--color-surface-raised);
     border: 2px solid var(--color-border-default);
     color: var(--color-text-secondary);
@@ -641,9 +641,10 @@
     left: 50%;
     margin: -8px 0 0 -8px;
     border: 2px solid transparent;
-    border-top-color: currentColor;
+    border-top-color: var(--color-brand-primary);
+    border-right-color: var(--color-brand-primary);
     border-radius: 50%;
-    animation: spin 0.8s linear infinite;
+    animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
