@@ -6,10 +6,11 @@ import stateManager from '../core/StateManager.js';
 import storage from '../core/StorageAdapter.js';
 import toast from '../components/base/Toast.js';
 import Modal from '../components/base/Modal.js';
+import { getIcon } from '../components/base/Icons.js';
+import { activities } from '../config/activities/index.js';
 import Sidebar from '../components/Sidebar.js';
 import uiConfig from '../config/ui.js';
 import { STORAGE_KEYS } from '../utils/constants.js';
-import { getIcon } from '../components/base/Icons.js';
 
 // Components
 import ActivitySelector from '../components/settings/ActivitySelector.js';
@@ -17,7 +18,7 @@ import AddPlayerForm from '../components/settings/AddPlayerForm.js';
 import PositionStats from '../components/settings/PositionStats.js';
 import PlayerList from '../components/settings/PlayerList.js';
 
-const { ELEMENT_IDS, DATA_ATTRIBUTES } = uiConfig;
+const { ELEMENT_IDS, DATA_ATTRIBUTES, ANIMATION } = uiConfig;
 
 class SettingsPage extends BasePage {
     constructor(container, props = {}) {
@@ -36,6 +37,7 @@ class SettingsPage extends BasePage {
         this.addPlayerForm = null;
         this.positionStats = null;
         this.playerList = null;
+        this.importModal = null;
     }
 
     onCreate() {
@@ -69,6 +71,10 @@ class SettingsPage extends BasePage {
         if (this.sidebar) {
             this.sidebar.destroy();
             this.sidebar = null;
+        }
+        if (this.importModal) {
+            this.importModal.destroy();
+            this.importModal = null;
         }
         this.destroyComponents();
     }
@@ -499,172 +505,263 @@ class SettingsPage extends BasePage {
 
     // ===== MODAL: Import =====
     showImportModal() {
-        const modal = new Modal({
+        if (this.importModal) {
+            this.importModal.destroy();
+        }
+
+        this.importModal = new Modal({
             title: 'Import Players',
-            content: this.renderImportContent(),
+            content: this.renderImportModalContent(),
             showCancel: true,
             showConfirm: true,
             confirmText: 'Import',
             cancelText: 'Cancel',
-            onConfirm: () => this.handleImport()
+            size: 'large',
+            onConfirm: () => this.handleImportConfirm(),
+            onClose: () => {
+                this.importModal = null;
+            }
         });
 
-        this.addComponent(modal);
-        modal.mount();
-        modal.open();
+        this.importModal.mount();
+        this.importModal.open();
 
-        // Attach file input listener
-        const fileInput = modal.container.querySelector(`#${ELEMENT_IDS.IMPORT_FILE_INPUT}`);
-        if (fileInput) {
-            fileInput.addEventListener('change', (e) => this.handleFileSelect(e));
-        }
+        setTimeout(() => {
+            this.attachImportModalListeners();
+        }, ANIMATION.SHORT);
     }
 
-    renderImportContent() {
+    renderImportModalContent() {
+        const currentActivity = storage.get('selectedActivity', null);
+        const activityName = currentActivity ? activities[currentActivity]?.name : 'Unknown';
+        const positions = this.playerService.positions;
+        const positionsList = Object.entries(positions)
+            .map(([key, name]) => `${name} (${key})`)
+            .join(', ');
+
+        // Generate example positions from current activity
+        const positionKeys = Object.keys(positions);
+
+        // Create examples based on number of available positions
+        let csvExample, jsonExample;
+
+        if (positionKeys.length === 0) {
+            // No positions defined - use placeholders
+            csvExample = `name,positions
+"John Smith","POS1"
+"Alice Johnson","POS1"
+"Bob Williams","POS2"`;
+            jsonExample = `[
+  {"name": "John Smith", "positions": ["POS1"]},
+  {"name": "Alice Johnson", "positions": ["POS1"]}
+]`;
+        } else if (positionKeys.length === 1) {
+            // Single position - all players have the same position (no duplicates per player)
+            const pos = positionKeys[0];
+            csvExample = `name,positions
+"John Smith","${pos}"
+"Alice Johnson","${pos}"
+"Bob Williams","${pos}"`;
+            jsonExample = `[
+  {"name": "John Smith", "positions": ["${pos}"]},
+  {"name": "Alice Johnson", "positions": ["${pos}"]}
+]`;
+        } else {
+            // Multiple positions - show variety with unique positions per player
+            const pos1 = positionKeys[0];
+            const pos2 = positionKeys[1];
+            const pos3 = positionKeys[2] || pos1;
+            csvExample = `name,positions
+"John Smith","${pos1},${pos2}"
+"Alice Johnson","${pos2}"
+"Bob Williams","${pos3}"`;
+            jsonExample = `[
+  {"name": "John Smith", "positions": ["${pos1}", "${pos2}"]},
+  {"name": "Alice Johnson", "positions": ["${pos2}"]}
+]`;
+        }
+
         return `
-            <div class="modal-content-inner">
-                <div class="form-group">
-                    <label for="${ELEMENT_IDS.IMPORT_FILE_INPUT}">Upload File (JSON or CSV)</label>
-                    <input 
-                        type="file" 
-                        id="${ELEMENT_IDS.IMPORT_FILE_INPUT}" 
-                        class="form-control" 
-                        accept=".json,.csv"
-                    >
-                    <p class="form-help">
-                        Supported formats:
-                        <br>• JSON: Array of objects with "name" and "positions" properties
-                        <br>• CSV: "name,positions" (positions separated by semicolon)
-                    </p>
+            <div class="import-modal-content">
+                <p class="modal-description">
+                    Import players from CSV or JSON format. You can paste data or upload a file.
+                </p>
+
+                <div class="info-box">
+                    <div class="info-title">Current Activity: ${this.escape(activityName)}</div>
+                    <div class="info-text">
+                        Players should have positions for this activity: <strong>${positionsList}</strong>
+                    </div>
                 </div>
-                
+
+                <div class="format-example">
+                    <strong>CSV Format:</strong>
+                    <pre class="code-block">${csvExample}</pre>
+                </div>
+
+                <div class="format-example">
+                    <strong>JSON Format:</strong>
+                    <pre class="code-block">${jsonExample}</pre>
+                </div>
+
                 <div class="form-group">
-                    <label for="${ELEMENT_IDS.IMPORT_DATA_INPUT}">Or Paste Data</label>
-                    <textarea 
-                        id="${ELEMENT_IDS.IMPORT_DATA_INPUT}" 
-                        class="form-control" 
-                        rows="10" 
-                        placeholder='[{"name": "John Doe", "positions": ["setter", "hitter"]}]'
+                    <label>Upload File (CSV or JSON)</label>
+                    <input
+                        type="file"
+                        id="${ELEMENT_IDS.IMPORT_FILE_INPUT}"
+                        accept=".csv,.json"
+                        class="file-input"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label>Or Paste Data</label>
+                    <textarea
+                        id="${ELEMENT_IDS.IMPORT_DATA_INPUT}"
+                        rows="8"
+                        placeholder="Paste CSV or JSON data here..."
+                        class="import-textarea"
                     ></textarea>
                 </div>
+
+                <div id="${ELEMENT_IDS.IMPORT_PREVIEW}"></div>
             </div>
         `;
     }
 
-    handleFileSelect(event) {
-        const file = event.target.files[0];
-        if (!file) return;
+    attachImportModalListeners() {
+        const fileInput = document.getElementById(ELEMENT_IDS.IMPORT_FILE_INPUT);
+        const dataInput = document.getElementById(ELEMENT_IDS.IMPORT_DATA_INPUT);
 
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const content = e.target.result;
-            const textarea = document.getElementById(ELEMENT_IDS.IMPORT_DATA_INPUT);
-            if (textarea) {
-                textarea.value = content;
-            }
-        };
-        reader.readAsText(file);
+        if (fileInput) {
+            fileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    this.handleFileUpload(file);
+                }
+            });
+        }
+
+        if (dataInput) {
+            dataInput.addEventListener('input', (e) => {
+                this.previewImportData(e.target.value);
+            });
+        }
     }
 
-    handleImport() {
-        const textarea = document.getElementById(ELEMENT_IDS.IMPORT_DATA_INPUT);
-        const content = textarea ? textarea.value.trim() : '';
+    async handleFileUpload(file) {
+        try {
+            const text = await file.text();
+            const dataInput = document.getElementById(ELEMENT_IDS.IMPORT_DATA_INPUT);
+            if (dataInput) {
+                dataInput.value = text;
+                this.previewImportData(text);
+            }
+        } catch (error) {
+            toast.error('Failed to read file: ' + error.message);
+        }
+    }
 
-        if (!content) {
+    previewImportData(data) {
+        const preview = document.getElementById(ELEMENT_IDS.IMPORT_PREVIEW);
+        if (!preview) return;
+
+        try {
+            const players = this.parseImportData(data);
+
+            if (players.length === 0) {
+                preview.innerHTML = '';
+                return;
+            }
+
+            preview.innerHTML = `
+                <div class="preview-success">
+                    <strong>Found ${players.length} player(s)</strong>
+                    <div class="preview-list">
+                        ${players.map(p => `
+                            <div class="preview-item">• ${this.escape(p.name)} - ${p.positions.join(', ')}</div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        } catch (error) {
+            preview.innerHTML = `
+                <div class="preview-error">
+                    <strong>Error:</strong> ${this.escape(error.message)}
+                </div>
+            `;
+        }
+    }
+
+    parseImportData(data) {
+        if (!data || !data.trim()) return [];
+        data = data.trim();
+
+        // Try JSON
+        if (data.startsWith('[') || data.startsWith('{')) {
+            try {
+                let parsed = JSON.parse(data);
+                if (!Array.isArray(parsed)) parsed = [parsed];
+                return parsed.map(item => ({
+                    name: item.name,
+                    positions: Array.isArray(item.positions) ? item.positions : [item.positions]
+                }));
+            } catch (e) {
+                throw new Error('Invalid JSON format');
+            }
+        }
+
+        // Try CSV
+        const lines = data.split('\n').map(l => l.trim()).filter(l => l);
+        if (lines.length < 2) throw new Error('CSV must have header and data rows');
+
+        const dataLines = lines.slice(1);
+        const players = [];
+
+        for (const line of dataLines) {
+            const match = line.match(/^"?([^,"]+)"?\s*,\s*"?([^"]+)"?$/);
+            if (!match) throw new Error(`Invalid CSV line: ${line}`);
+
+            players.push({
+                name: match[1].trim(),
+                positions: match[2].split(',').map(p => p.trim())
+            });
+        }
+
+        return players;
+    }
+
+    handleImportConfirm() {
+        const dataInput = document.getElementById(ELEMENT_IDS.IMPORT_DATA_INPUT);
+        if (!dataInput || !dataInput.value.trim()) {
             toast.error('Please provide data to import');
             return false;
         }
 
         try {
-            let players = [];
-            
-            // Try parsing as JSON first
-            if (content.startsWith('[') || content.startsWith('{')) {
-                try {
-                    const json = JSON.parse(content);
-                    players = Array.isArray(json) ? json : [json];
-                } catch (e) {
-                    throw new Error('Invalid JSON format');
-                }
-            } else {
-                // Assume CSV
-                players = this.parseCSV(content);
-            }
-
+            const players = this.parseImportData(dataInput.value);
             if (players.length === 0) {
-                throw new Error('No players found in data');
-            }
-
-            // Import players
-            let successCount = 0;
-            let errorCount = 0;
-
-            players.forEach(p => {
-                try {
-                    // Normalize positions
-                    let positions = p.positions;
-                    if (typeof positions === 'string') {
-                        positions = positions.split(/[;,|]/).map(pos => pos.trim());
-                    }
-                    
-                    if (!positions || !Array.isArray(positions)) {
-                        throw new Error(`Invalid positions for ${p.name}`);
-                    }
-
-                    this.playerService.add(p.name, positions);
-                    successCount++;
-                } catch (err) {
-                    console.warn(`Failed to import ${p.name}:`, err);
-                    errorCount++;
-                }
-            });
-
-            if (successCount > 0) {
-                toast.success(`Imported ${successCount} players${errorCount > 0 ? ` (${errorCount} failed)` : ''}`);
-                return true;
-            } else {
-                toast.error('Failed to import any players. Check format.');
+                toast.error('No players found');
                 return false;
             }
 
+            let imported = 0, skipped = 0;
+            players.forEach(playerData => {
+                try {
+                    this.playerService.add(playerData.name, playerData.positions);
+                    imported++;
+                } catch (error) {
+                    skipped++;
+                    console.warn(`Skipped ${playerData.name}:`, error.message);
+                }
+            });
+
+            toast.success(`Imported ${imported} player(s)${skipped > 0 ? `, skipped ${skipped}` : ''}`);
+            return true;
         } catch (error) {
-            toast.error(error.message);
+            toast.error('Import failed: ' + error.message);
             return false;
         }
-    }
-
-    parseCSV(content) {
-        const lines = content.split(/\r?\n/);
-        const players = [];
-        
-        // Check for header
-        let startIndex = 0;
-        if (lines[0].toLowerCase().includes('name') && lines[0].toLowerCase().includes('position')) {
-            startIndex = 1;
-        }
-
-        for (let i = startIndex; i < lines.length; i++) {
-            const line = lines[i].trim();
-            if (!line) continue;
-
-            // Simple CSV parse: name, positions
-            // Handle quoted values? For now simple split
-            const parts = line.split(',');
-            if (parts.length >= 2) {
-                const name = parts[0].trim();
-                // Remaining parts are positions, or second part is positions string
-                let positions = parts.slice(1).join(',');
-                
-                // Remove quotes if present
-                if (name.startsWith('"') && name.endsWith('"')) {
-                    // name = name.slice(1, -1); // Already handled by simple split? No.
-                }
-                
-                players.push({ name, positions });
-            }
-        }
-        
-        return players;
     }
 
     getSelectedModalPositions(inputName) {
