@@ -186,6 +186,27 @@ class PlayerService {
     }
 
     /**
+     * Remove all players with specific positions
+     * @param {Array<string>} positions - Positions to filter by
+     * @returns {Array<Object>} Array of removed players
+     * @throws {Error} If validation fails
+     */
+    clearAllByPositions(positions) {
+        if (!Array.isArray(positions) || positions.length === 0) {
+            throw new Error('At least one position is required');
+        }
+
+        const removedPlayers = this.playerRepository.clearAllByPositions(positions);
+
+        this.eventBus.emit('players:cleared-by-positions', {
+            count: removedPlayers.length,
+            positions
+        });
+
+        return removedPlayers;
+    }
+
+    /**
      * Reset player ratings for all or specific positions
      * @param {string} playerId - Player ID
      * @param {Array<string>|null} positions - Positions to reset (null = all)

@@ -472,24 +472,20 @@ class SettingsPage extends BasePage {
     showClearAllModal() {
         const modal = new Modal({
             title: 'Remove All Players',
-            content: `
-                <div class="modal-content-inner">
-                    <div class="warning-box warning-box-danger">
-                        <div class="warning-title">Danger Zone</div>
-                        <div class="warning-text">
-                            Are you sure you want to remove ALL players from this session? This will delete all player data, ratings, and history. This action cannot be undone!
-                        </div>
-                    </div>
-                </div>
-            `,
+            content: this.renderClearAllContent(),
             showCancel: true,
             showConfirm: true,
             confirmText: 'Remove All',
             cancelText: 'Cancel',
             onConfirm: () => {
+                const selected = this.getSelectedModalPositions('clearAllPositions');
+                if (selected.length === 0) {
+                    toast.error('Please select at least one position');
+                    return false;
+                }
                 try {
-                    this.playerService.clearAll();
-                    toast.success('All players removed');
+                    const removedPlayers = this.playerService.clearAllByPositions(selected);
+                    toast.success(`Removed ${removedPlayers.length} player(s)`);
                     return true;
                 } catch (error) {
                     toast.error(error.message);
@@ -501,6 +497,36 @@ class SettingsPage extends BasePage {
         this.addComponent(modal);
         modal.mount();
         modal.open();
+    }
+
+    renderClearAllContent() {
+        return `
+            <div class="modal-content-inner">
+                <div class="form-group">
+                    <label>Select positions to remove ALL players from:</label>
+                    <div class="positions-grid">
+                        ${Object.entries(this.playerService.positions).map(([key, name]) => `
+                            <label class="position-checkbox">
+                                <input
+                                    type="checkbox"
+                                    name="clearAllPositions"
+                                    value="${key}"
+                                    class="position-input"
+                                    checked
+                                >
+                                <span class="position-label">${name} (${key})</span>
+                            </label>
+                        `).join('')}
+                    </div>
+                    <div class="warning-box warning-box-danger mt-3">
+                        <div class="warning-title">Danger Zone</div>
+                        <div class="warning-text">
+                            This will remove ALL players who play the selected positions. This will delete all their data, ratings, and history. This action cannot be undone!
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
     }
 
     // ===== MODAL: Import =====
