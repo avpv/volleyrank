@@ -423,7 +423,7 @@ class SettingsPage extends BasePage {
                     return false;
                 }
                 try {
-                    this.playerService.resetAll(selected);
+                    this.playerService.resetAllPositions(selected);
                     // Toast is handled by event bus
                     return true;
                 } catch (error) {
