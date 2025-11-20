@@ -172,6 +172,20 @@ class PlayerService {
     }
 
     /**
+     * Remove all players
+     * @returns {Array<Object>} Array of removed players
+     */
+    clearAll() {
+        const removedPlayers = this.playerRepository.clearAll();
+
+        this.eventBus.emit('players:cleared', {
+            count: removedPlayers.length
+        });
+
+        return removedPlayers;
+    }
+
+    /**
      * Reset player ratings for all or specific positions
      * @param {string} playerId - Player ID
      * @param {Array<string>|null} positions - Positions to reset (null = all)
