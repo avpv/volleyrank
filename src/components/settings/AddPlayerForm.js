@@ -145,18 +145,32 @@ class AddPlayerForm extends BaseComponent {
         const positions = this.playerService.positions;
         const currentActivity = storage.get('selectedActivity', null);
 
-        return Object.entries(positions).map(([key, name]) => `
+        const selectAllHtml = `
+            <label class="position-checkbox select-all-checkbox">
+                <input
+                    type="checkbox"
+                    id="selectAllPositions"
+                    class="position-input select-all"
+                    ${!currentActivity ? 'disabled' : ''}
+                >
+                <span class="position-label">Select All</span>
+            </label>
+        `;
+
+        const positionsHtml = Object.entries(positions).map(([key, name]) => `
             <label class="position-checkbox">
                 <input
                     type="checkbox"
                     name="position"
                     value="${key}"
-                    class="position-input"
+                    class="position-input position-item"
                     ${!currentActivity ? 'disabled' : ''}
                 >
                 <span class="position-label">${name} (${key})</span>
             </label>
         `).join('');
+
+        return selectAllHtml + positionsHtml;
     }
 
     onMount() {
@@ -195,6 +209,33 @@ class AddPlayerForm extends BaseComponent {
 
         if (clearAllBtn && this.onClearAllClick) {
             clearAllBtn.addEventListener('click', () => this.onClearAllClick());
+        }
+
+        // Select All Checkbox Logic
+        const selectAllCheckbox = this.container.querySelector('#selectAllPositions');
+        const positionCheckboxes = this.container.querySelectorAll('.position-input.position-item');
+
+        if (selectAllCheckbox && positionCheckboxes.length > 0) {
+            // Handle "Select All" click
+            selectAllCheckbox.addEventListener('change', (e) => {
+                const isChecked = e.target.checked;
+                positionCheckboxes.forEach(cb => {
+                    if (!cb.disabled) {
+                        cb.checked = isChecked;
+                    }
+                });
+            });
+
+            // Handle individual position clicks to update "Select All" state
+            positionCheckboxes.forEach(cb => {
+                cb.addEventListener('change', () => {
+                    const allChecked = Array.from(positionCheckboxes).every(item => item.checked);
+                    const someChecked = Array.from(positionCheckboxes).some(item => item.checked);
+                    
+                    selectAllCheckbox.checked = allChecked;
+                    selectAllCheckbox.indeterminate = someChecked && !allChecked;
+                });
+            });
         }
     }
 
