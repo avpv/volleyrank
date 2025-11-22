@@ -1,0 +1,288 @@
+/* =============================================================================
+   Page Structure - Unified Page Layout System
+   ============================================================================= */
+
+/**
+ * This file defines a consistent structure for all pages in the application.
+ *
+ * Page Hierarchy:
+ * 1. page-header (required) - Title and subtitle
+ * 2. page-intro (optional) - Welcome messages, guides, important notices
+ * 3. page-controls (optional) - Filters, selectors, forms
+ * 4. page-content (required) - Main content area
+ * 5. page-actions (optional) - Bottom actions, footer-like elements
+ */
+
+/* -----------------------------------------------------------------------------
+   1. Page Header (Required on all pages)
+   ----------------------------------------------------------------------------- */
+
+.page-header {
+    margin-bottom: var(--spacing-6);
+    padding-bottom: var(--spacing-3);
+}
+
+.page-header__title {
+    margin-bottom: 0;
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+    letter-spacing: -0.02em;
+}
+
+/* Support for direct h2 usage (backward compatibility) */
+.page-header h2 {
+    margin-bottom: 0;
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+    letter-spacing: -0.02em;
+}
+
+/* Responsive title sizing */
+@media (max-width: 768px) {
+    .page-header__title,
+    .page-header h2 {
+        font-size: var(--font-size-xl);
+    }
+}
+
+.page-subtitle {
+    font-size: var(--font-size-base);
+    color: var(--color-text-secondary);
+    margin-top: var(--spacing-3);
+    line-height: var(--line-height-relaxed);
+    max-width: 70ch;
+    font-weight: var(--font-weight-normal);
+}
+
+/* Header with actions (like buttons on the right) */
+.page-header--with-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--spacing-4);
+}
+
+.page-header__content {
+    flex: 1;
+}
+
+.page-header__actions {
+    display: flex;
+    gap: var(--spacing-3);
+    align-items: center;
+}
+
+@media (max-width: 768px) {
+    .page-header--with-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .page-header__actions {
+        justify-content: flex-start;
+    }
+}
+
+/* -----------------------------------------------------------------------------
+   2. Page Intro (Optional)
+   ----------------------------------------------------------------------------- */
+
+.page-intro {
+    margin-bottom: var(--spacing-8);
+}
+
+/* Common intro patterns */
+.page-intro--welcome {
+    background: var(--color-bg-subtle);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-6);
+}
+
+.page-intro--alert {
+    background: var(--color-warning-bg, #fef3c7);
+    border: 1px solid var(--color-warning-border, #fbbf24);
+    border-radius: var(--border-radius-md);
+    padding: var(--spacing-4);
+}
+
+.page-intro--info {
+    background: var(--color-info-bg, #dbeafe);
+    border: 1px solid var(--color-info-border, #60a5fa);
+    border-radius: var(--border-radius-md);
+    padding: var(--spacing-4);
+}
+
+/* -----------------------------------------------------------------------------
+   3. Page Controls (Optional)
+   ----------------------------------------------------------------------------- */
+
+.page-controls {
+    margin-bottom: var(--spacing-8);
+}
+
+/* Multiple control sections */
+.page-controls__section {
+    margin-bottom: var(--spacing-6);
+}
+
+.page-controls__section:last-child {
+    margin-bottom: 0;
+}
+
+/* Control section with title */
+.page-controls__section-title {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+    margin-bottom: var(--spacing-4);
+}
+
+/* Horizontal controls layout */
+.page-controls--horizontal {
+    display: flex;
+    gap: var(--spacing-4);
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* -----------------------------------------------------------------------------
+   4. Page Content (Required)
+   ----------------------------------------------------------------------------- */
+
+.page-content {
+    /* Main content area - minimal styling to allow flexibility */
+}
+
+/* Content sections within page content */
+.page-content__section {
+    margin-bottom: var(--spacing-8);
+}
+
+.page-content__section:last-child {
+    margin-bottom: 0;
+}
+
+.page-content__section-title {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+    margin-bottom: var(--spacing-4);
+}
+
+/* Empty state within content */
+.page-content--empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+}
+
+/* -----------------------------------------------------------------------------
+   5. Page Actions (Optional)
+   ----------------------------------------------------------------------------- */
+
+.page-actions {
+    margin-top: var(--spacing-8);
+    padding-top: var(--spacing-6);
+    border-top: 1px solid var(--color-border-subtle);
+}
+
+/* Horizontal action buttons */
+.page-actions--horizontal {
+    display: flex;
+    gap: var(--spacing-3);
+    justify-content: flex-end;
+    flex-wrap: wrap;
+}
+
+/* Centered actions */
+.page-actions--centered {
+    display: flex;
+    gap: var(--spacing-3);
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+/* Space between actions */
+.page-actions--space-between {
+    display: flex;
+    gap: var(--spacing-3);
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* -----------------------------------------------------------------------------
+   Utility Classes
+   ----------------------------------------------------------------------------- */
+
+/* Dividers between sections */
+.page-divider {
+    height: 1px;
+    background: var(--color-border-subtle);
+    margin: var(--spacing-8) 0;
+}
+
+.page-divider--thick {
+    height: 2px;
+    background: var(--color-border-default);
+}
+
+/* Section spacing */
+.page-section {
+    margin-bottom: var(--spacing-10);
+}
+
+.page-section--compact {
+    margin-bottom: var(--spacing-6);
+}
+
+.page-section--spacious {
+    margin-bottom: var(--spacing-12);
+}
+
+/* -----------------------------------------------------------------------------
+   Responsive Adjustments
+   ----------------------------------------------------------------------------- */
+
+@media (max-width: 768px) {
+    .page-header {
+        margin-bottom: var(--spacing-5);
+    }
+
+    .page-intro,
+    .page-controls,
+    .page-actions {
+        margin-bottom: var(--spacing-6);
+    }
+
+    .page-content__section {
+        margin-bottom: var(--spacing-6);
+    }
+
+    .page-section {
+        margin-bottom: var(--spacing-8);
+    }
+}
+
+/* -----------------------------------------------------------------------------
+   Integration with Existing Layouts
+   ----------------------------------------------------------------------------- */
+
+/* Ensure page-header works well after page-layout */
+.page-layout__content > .page-header:first-child {
+    margin-top: 0;
+}
+
+/* Remove extra spacing when controls directly follow header */
+.page-header + .page-controls {
+    /* Spacing already provided by page-header margin-bottom */
+}
+
+/* Remove extra spacing when content directly follows header (no controls) */
+.page-header + .page-content {
+    /* Spacing already provided by page-header margin-bottom */
+}

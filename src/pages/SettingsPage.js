@@ -189,18 +189,28 @@ class SettingsPage extends BasePage {
         const currentActivity = storage.get(STORAGE_KEYS.SELECTED_ACTIVITY, null);
 
         return this.renderPageWithSidebar(`
-            <div class="page-header">
+            <header class="page-header">
                 <h2>Player Management</h2>
                 <p class="page-subtitle">Select your activity, add players, and manage your roster</p>
+            </header>
+
+            ${players.length === 0 ? `
+                <div class="page-intro">
+                    ${this.renderWelcomeGuide()}
+                </div>
+            ` : ''}
+
+            <div class="page-controls">
+                <div class="activity-selector-container"></div>
+                <div class="add-player-form-container"></div>
             </div>
 
-            ${players.length === 0 ? this.renderWelcomeGuide() : ''}
-
-            <div class="activity-selector-container"></div>
-            <div class="add-player-form-container"></div>
-            
-            ${currentActivity ? '<div class="position-stats-container"></div>' : ''}
-            ${currentActivity ? '<div class="player-list-container"></div>' : ''}
+            ${currentActivity ? `
+                <div class="page-content">
+                    <div class="position-stats-container"></div>
+                    <div class="player-list-container"></div>
+                </div>
+            ` : ''}
         `);
     }
 

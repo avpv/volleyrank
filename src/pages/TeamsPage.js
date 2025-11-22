@@ -229,13 +229,20 @@ class TeamsPage extends BasePage {
 
     render() {
         return this.renderPageWithSidebar(`
-            <div class="page-header">
+            <header class="page-header">
                 <h2>Create Balanced Teams</h2>
-                <p class="text-secondary mt-2">Configure team composition and weights, then generate optimally balanced teams using mathematical algorithms</p>
+                <p class="page-subtitle">Configure team composition and weights, then generate optimally balanced teams using mathematical algorithms</p>
+            </header>
+
+            <div class="page-controls">
+                ${this.renderTeamBuilder()}
             </div>
 
-            ${this.renderTeamBuilder()}
-            ${this.state.teams ? this.renderTeamsDisplay() : ''}
+            ${this.state.teams ? `
+                <div class="page-content">
+                    ${this.renderTeamsDisplay()}
+                </div>
+            ` : ''}
         `);
     }
 
