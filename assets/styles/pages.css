@@ -2553,14 +2553,17 @@
 @media (max-width: 768px) {
     .page-layout__content {
         width: 100%;
-        padding: var(--spacing-4);
+        padding: var(--spacing-2);
     }
 
     /* Mobile spacing improvements */
     .comparison-area,
-    .team-builder,
-    .position-selector {
+    .team-builder {
         padding: var(--spacing-5);
+    }
+
+    .position-selector {
+        padding: var(--spacing-5) 0;
     }
 }
 
