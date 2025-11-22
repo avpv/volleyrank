@@ -191,13 +191,18 @@ class ComparePage extends BasePage {
 
     render() {
         return this.renderPageWithSidebar(`
-            <div class="page-header">
+            <header class="page-header">
                 <h2>Compare Players</h2>
                 <p class="page-subtitle">Build accurate player ratings through head-to-head comparisons</p>
+            </header>
+
+            <div class="page-controls">
+                <div class="position-selector-container"></div>
             </div>
 
-            <div class="position-selector-container"></div>
-            <div class="comparison-area-container"></div>
+            <div class="page-content">
+                <div class="comparison-area-container"></div>
+            </div>
         `);
     }
 

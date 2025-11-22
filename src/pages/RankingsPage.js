@@ -89,15 +89,17 @@ class RankingsPage extends BasePage {
         const positions = this.activityConfig.positions;
 
         return this.renderPageWithSidebar(`
-            <div class="page-header mb-6">
-                <h2 class="text-2xl md:text-3xl font-semibold">Player Rankings</h2>
-                <p class="text-secondary mt-2">View and compare player skill ratings across all positions based on ELO rankings</p>
-            </div>
+            <header class="page-header">
+                <h2>Player Rankings</h2>
+                <p class="page-subtitle">View and compare player skill ratings across all positions based on ELO rankings</p>
+            </header>
 
-            <div class="rankings-grid d-grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6" role="region" aria-label="Player rankings by position">
-                ${Object.entries(positions).map(([key, name]) =>
-                    this.renderPositionRankings(key, name, rankings[key])
-                ).join('')}
+            <div class="page-content">
+                <div class="rankings-grid d-grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6" role="region" aria-label="Player rankings by position">
+                    ${Object.entries(positions).map(([key, name]) =>
+                        this.renderPositionRankings(key, name, rankings[key])
+                    ).join('')}
+                </div>
             </div>
         `);
     }
