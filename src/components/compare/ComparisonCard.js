@@ -1,5 +1,6 @@
 import BaseComponent from '../BaseComponent.js';
 import { getIcon } from '../base/Icons.js';
+import { generateAvatar } from '../../utils/avatarGenerator.js';
 
 class ComparisonCard extends BaseComponent {
     constructor(container, props = {}) {
@@ -18,26 +19,37 @@ class ComparisonCard extends BaseComponent {
 
         if (!player) return '';
 
+        // Generate SVG avatar based on player name
+        const avatarSvg = generateAvatar(player.name, 96);
+
+        const rating = Math.round(player.ratings[positionKey]);
+        const comparisons = player.comparisons[positionKey];
+
         return `
             <button
-                class="player-card clickable"
+                class="player-card clickable comparison-player-card"
                 id="${side}PlayerCard"
                 data-winner-id="${player.id}"
                 data-loser-id="${opponentId}"
                 aria-label="Select ${this.escape(player.name)} as better player (keyboard: ${keyboardHint})"
                 role="button">
                 <div class="keyboard-hint" aria-hidden="true">${keyboardHint}</div>
-                <div class="player-header">
-                    <h4 class="player-name">${this.escape(player.name)}</h4>
+
+                <div class="player-avatar comparison-avatar">
+                    ${avatarSvg}
                 </div>
-                <div class="player-positions">
-                    <div class="position-badge">
-                        <div class="badge-position">${positionName}</div>
-                        <div class="badge-stats">
-                            <span class="badge-rating">${Math.round(player.ratings[positionKey])} ELO</span>
-                            <span class="badge-comparisons">${player.comparisons[positionKey]} comp.</span>
-                        </div>
+
+                <div class="player-info-section">
+                    <h4 class="player-name">${this.escape(player.name)}</h4>
+                    <p class="player-position">${positionName}</p>
+                </div>
+
+                <div class="player-stats-section">
+                    <div class="player-rating">
+                        <span class="rating-value">${rating}</span>
+                        <span class="rating-label">ELO</span>
                     </div>
+                    <p class="player-comparisons">${comparisons} comparison${comparisons !== 1 ? 's' : ''}</p>
                 </div>
             </button>
         `;
