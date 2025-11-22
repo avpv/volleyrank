@@ -186,90 +186,147 @@
 .comparison-cards {
     display: grid;
     grid-template-columns: 1fr auto 1fr;
-    gap: var(--spacing-8);
+    gap: var(--spacing-6);
     align-items: stretch;
-    max-width: 1100px;
+    max-width: 1400px;
     margin: 0 auto;
 }
 
 @media (max-width: 768px) {
     .comparison-cards {
         grid-template-columns: 1fr;
-        gap: var(--spacing-8);
+        gap: var(--spacing-6);
     }
 }
 
-/* Player Card in Comparison - Minimal Design */
+/* Player Card in Comparison - Enhanced Design */
 .comparison-cards .player-card {
-    min-height: 260px;
-    padding: var(--spacing-4) var(--spacing-4);
+    min-height: 340px;
+    padding: var(--spacing-8);
+    display: flex;
+    flex-direction: column;
     align-items: center;
+    justify-content: center;
     text-align: center;
-    border-width: 1px;
-    background-color: var(--color-surface-raised);
+    border: 2px solid var(--color-border-default);
+    background: linear-gradient(135deg, var(--color-surface-raised) 0%, var(--color-surface-base) 100%);
     position: relative;
-    transition: border-color var(--duration-fast) ease;
+    transition: all var(--duration-default) cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    cursor: pointer;
 }
 
 .comparison-cards .player-card:hover {
-    border-color: var(--color-border-emphasis);
+    border-color: var(--color-brand-primary);
+    background: linear-gradient(135deg, var(--color-surface-overlay) 0%, var(--color-surface-raised) 100%);
+    box-shadow: 0 8px 24px rgba(47, 129, 247, 0.15);
+    transform: translateY(-4px) scale(1.02);
 }
 
-/* Player Avatar - Minimal Design */
+.comparison-cards .player-card:active {
+    transform: translateY(-2px) scale(1.01);
+    transition: all 0.1s ease;
+}
+
+.comparison-cards .player-card:focus-visible {
+    outline: none;
+    border-color: var(--color-brand-primary);
+    box-shadow: 0 0 0 4px rgba(47, 129, 247, 0.2);
+}
+
+/* Player Avatar - Bold and Prominent */
 .comparison-cards .player-avatar {
-    width: 60px;
-    height: 60px;
-    font-size: 24px;
-    border-radius: var(--radius-md);
-    margin-bottom: var(--spacing-3);
-    background-color: var(--color-brand-primary);
+    width: 96px;
+    height: 96px;
+    font-size: var(--font-size-3xl);
+    font-weight: var(--font-weight-bold);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--spacing-5);
+    background: linear-gradient(135deg, var(--color-brand-primary) 0%, var(--color-brand-secondary) 100%);
     color: white;
-    border: 2px solid var(--color-border-default);
+    border: 3px solid var(--color-border-default);
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: border-color var(--duration-fast) ease;
+    transition: all var(--duration-default) cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(47, 129, 247, 0.2);
+    letter-spacing: 0.02em;
 }
 
 .comparison-cards .player-card:hover .player-avatar {
-    border-color: var(--color-border-emphasis);
+    border-color: var(--color-brand-primary);
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(47, 129, 247, 0.35);
+}
+
+/* Player Info Section */
+.comparison-cards .player-info-section {
+    margin-bottom: var(--spacing-5);
+    width: 100%;
 }
 
 /* Enhanced Typography */
 .comparison-cards .player-name {
-    font-size: var(--font-size-base);
-    font-weight: var(--font-weight-semibold);
-    margin-bottom: var(--spacing-1);
-    letter-spacing: -0.01em;
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+    margin-bottom: var(--spacing-2);
+    letter-spacing: -0.02em;
     line-height: 1.2;
+    color: var(--color-text-primary);
 }
 
 .comparison-cards .player-position {
-    font-size: var(--font-size-xs);
+    font-size: var(--font-size-sm);
     color: var(--color-text-tertiary);
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    margin-bottom: var(--spacing-3);
+    margin: 0;
     font-weight: var(--font-weight-semibold);
 }
 
-/* Rating Display - Clean Typography */
+/* Player Stats Section */
+.comparison-cards .player-stats-section {
+    margin-top: auto;
+    padding-top: var(--spacing-5);
+    border-top: 2px solid var(--color-border-default);
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-3);
+    align-items: center;
+}
+
+/* Rating Display - Prominent and Clear */
 .comparison-cards .player-rating {
-    font-size: var(--font-size-lg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-1);
+}
+
+.comparison-cards .rating-value {
+    font-size: var(--font-size-4xl);
     font-weight: var(--font-weight-bold);
-    color: var(--color-text-primary);
-    margin-bottom: var(--spacing-1);
+    color: var(--color-brand-primary);
     font-variant-numeric: tabular-nums;
-    line-height: 1.1;
+    line-height: 1;
+    letter-spacing: -0.02em;
+}
+
+.comparison-cards .rating-label {
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
 }
 
 .comparison-cards .player-comparisons {
-    margin-top: auto;
-    padding-top: var(--spacing-4);
-    border-top: 1px solid var(--color-border-default);
-    width: 100%;
     font-size: var(--font-size-sm);
     color: var(--color-text-secondary);
+    font-weight: var(--font-weight-medium);
+    margin: 0;
 }
 
 /* VS Divider - Enhanced */
@@ -277,50 +334,58 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: var(--spacing-6);
+    justify-content: center;
+    gap: var(--spacing-4);
     position: relative;
     z-index: 5;
-    padding: var(--spacing-4) 0;
+    padding: var(--spacing-6) 0;
 }
 
-/* VS Text - Minimal Typography */
+/* VS Text - Bold Typography */
 .vs-text {
-    font-size: var(--font-size-3xl);
+    font-size: var(--font-size-4xl);
     font-weight: 900;
     color: var(--color-text-tertiary);
-    opacity: 0.5;
+    opacity: 0.4;
     font-style: italic;
     user-select: none;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.08em;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* Draw Button - Minimal Design */
+/* Draw Button - Enhanced Design */
 .draw-button {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: var(--spacing-2);
-    min-width: 120px;
-    height: 120px;
+    gap: var(--spacing-3);
+    min-width: 140px;
+    min-height: 140px;
+    padding: var(--spacing-5);
     border-radius: var(--radius-lg);
-    background-color: var(--color-surface-raised);
+    background: linear-gradient(135deg, var(--color-surface-raised) 0%, var(--color-surface-base) 100%);
     border: 2px solid var(--color-border-default);
     color: var(--color-text-secondary);
     cursor: pointer;
-    transition: border-color var(--duration-fast) ease;
+    transition: all var(--duration-default) cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
-    font-size: var(--font-size-sm);
+    font-size: var(--font-size-base);
     font-weight: var(--font-weight-semibold);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .draw-button:hover {
-    border-color: var(--color-border-emphasis);
+    border-color: var(--color-brand-primary);
     color: var(--color-text-primary);
+    background: linear-gradient(135deg, var(--color-surface-overlay) 0%, var(--color-surface-raised) 100%);
+    box-shadow: 0 4px 16px rgba(47, 129, 247, 0.15);
+    transform: translateY(-2px);
 }
 
 .draw-button:active {
-    transform: scale(0.98);
+    transform: translateY(-1px) scale(0.98);
+    transition: all 0.1s ease;
 }
 
 /* Keyboard Hints */
@@ -2299,37 +2364,49 @@
         max-width: 100%;
     }
 
-    /* Compact player cards on mobile for Compare page */
+    /* Optimized player cards on mobile for Compare page */
     .comparison-cards .player-card.clickable {
-        padding: var(--spacing-3);
-        min-height: auto;
+        padding: var(--spacing-5);
+        min-height: 280px;
     }
 
     .comparison-cards .player-avatar {
-        width: 48px;
-        height: 48px;
-        font-size: var(--font-size-lg);
-        margin: 0 auto var(--spacing-2);
+        width: 72px;
+        height: 72px;
+        font-size: var(--font-size-2xl);
+        margin-bottom: var(--spacing-4);
     }
 
     .comparison-cards .player-name {
-        font-size: var(--font-size-base);
-        margin-bottom: var(--spacing-1);
+        font-size: var(--font-size-xl);
+        margin-bottom: var(--spacing-2);
     }
 
     .comparison-cards .player-position {
         font-size: var(--font-size-xs);
-        margin-bottom: var(--spacing-2);
     }
 
-    .comparison-cards .player-rating {
-        font-size: var(--font-size-lg);
-        margin-top: var(--spacing-2);
+    .comparison-cards .player-info-section {
+        margin-bottom: var(--spacing-4);
+    }
+
+    .comparison-cards .player-stats-section {
+        padding-top: var(--spacing-4);
+    }
+
+    .comparison-cards .rating-value {
+        font-size: var(--font-size-3xl);
     }
 
     .comparison-cards .player-comparisons {
         font-size: var(--font-size-xs);
-        margin-top: var(--spacing-1);
+    }
+
+    .draw-button {
+        min-width: 100px;
+        min-height: 100px;
+        padding: var(--spacing-4);
+        font-size: var(--font-size-sm);
     }
 
     .comparison-info {
@@ -2436,35 +2513,48 @@
         min-height: 48px;
     }
 
-    /* Extra compact player cards on very small screens */
+    /* Compact player cards on very small screens */
     .comparison-cards .player-card.clickable {
-        padding: var(--spacing-2);
+        padding: var(--spacing-4);
+        min-height: 240px;
     }
 
     .comparison-cards .player-avatar {
-        width: 40px;
-        height: 40px;
-        font-size: var(--font-size-base);
-        margin: 0 auto var(--spacing-1);
+        width: 56px;
+        height: 56px;
+        font-size: var(--font-size-xl);
+        margin-bottom: var(--spacing-3);
     }
 
     .comparison-cards .player-name {
-        font-size: var(--font-size-sm);
+        font-size: var(--font-size-lg);
     }
 
     .comparison-cards .player-position {
         font-size: var(--font-size-xxs);
-        margin-bottom: var(--spacing-1);
     }
 
-    .comparison-cards .player-rating {
-        font-size: var(--font-size-base);
-        margin-top: var(--spacing-1);
+    .comparison-cards .player-info-section {
+        margin-bottom: var(--spacing-3);
+    }
+
+    .comparison-cards .player-stats-section {
+        padding-top: var(--spacing-3);
+    }
+
+    .comparison-cards .rating-value {
+        font-size: var(--font-size-2xl);
     }
 
     .comparison-cards .player-comparisons {
         font-size: var(--font-size-xxs);
-        margin-top: var(--spacing-1);
+    }
+
+    .draw-button {
+        min-width: 80px;
+        min-height: 80px;
+        padding: var(--spacing-3);
+        font-size: var(--font-size-xs);
     }
 
     /* Even smaller keyboard hints on very small screens */
