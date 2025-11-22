@@ -816,6 +816,13 @@
     padding-top: 0;
 }
 
+/* Remove excessive spacing when position-selector is inside page-controls (unified page structure) */
+.page-controls .position-selector {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: none;
+}
+
 /* Position Selector Header */
 .position-selector__header {
     margin-bottom: var(--spacing-6);
@@ -1374,6 +1381,13 @@
     border-top: none;
     margin-top: var(--spacing-8);
     padding-top: 0;
+}
+
+/* Remove excessive spacing when comparison-area is inside page-content (unified page structure) */
+.page-content .comparison-area {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: none;
 }
 
 .comparison-area--active {
