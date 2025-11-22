@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Character Avatar Generator Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 1rem;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .subtitle {
+            color: rgba(255,255,255,0.9);
+            text-align: center;
+            margin-bottom: 3rem;
+            font-size: 1.1rem;
+        }
+
+        .demo-section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: #2d3748;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 0.5rem;
+        }
+
+        .avatar-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .avatar-card {
+            background: #f7fafc;
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 2px solid #e2e8f0;
+        }
+
+        .avatar-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .avatar-display {
+            margin-bottom: 0.75rem;
+        }
+
+        .avatar-name {
+            font-weight: 600;
+            color: #2d3748;
+            font-size: 0.9rem;
+        }
+
+        .controls {
+            background: #f7fafc;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .control-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #2d3748;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #cbd5e0;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        button:hover {
+            background: #5a67d8;
+        }
+
+        .custom-avatar-display {
+            background: white;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+
+        .feature-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .feature-item {
+            background: #f7fafc;
+            padding: 1rem;
+            border-radius: 6px;
+            border-left: 4px solid #667eea;
+        }
+
+        .feature-title {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 0.25rem;
+        }
+
+        .feature-desc {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        code {
+            background: #2d3748;
+            color: #68d391;
+            padding: 0.2rem 0.5rem;
+            border-radius: 3px;
+            font-size: 0.9rem;
+        }
+
+        .code-block {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 Character Avatar Generator</h1>
+        <p class="subtitle">Deterministic, customizable SVG avatars with personality</p>
+
+        <!-- Sample Avatars -->
+        <div class="demo-section">
+            <h2 class="section-title">Sample Avatars (Generated from Names)</h2>
+            <div class="avatar-grid" id="sampleAvatars"></div>
+        </div>
+
+        <!-- Custom Avatar Builder -->
+        <div class="demo-section">
+            <h2 class="section-title">Custom Avatar Builder</h2>
+            <div class="controls">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                    <div class="control-group">
+                        <label>Name/Seed</label>
+                        <input type="text" id="seedInput" value="Custom Avatar" placeholder="Enter name">
+                    </div>
+                    <div class="control-group">
+                        <label>Skin Tone</label>
+                        <select id="skinTone">
+                            <option value="">Random</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>Hair Style</label>
+                        <select id="hairStyle">
+                            <option value="">Random</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>Hair Color</label>
+                        <select id="hairColor">
+                            <option value="">Random</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>Eye Shape</label>
+                        <select id="eyeShape">
+                            <option value="">Random</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>Eye Color</label>
+                        <select id="eyeColor">
+                            <option value="">Random</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>Eyebrows</label>
+                        <select id="eyebrowShape">
+                            <option value="">Random</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>Expression</label>
+                        <select id="mouthExpression">
+                            <option value="">Random</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>Accessory</label>
+                        <select id="accessory">
+                            <option value="">Random</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="margin-top: 1rem;">
+                    <button onclick="generateCustomAvatar()">Generate Avatar</button>
+                    <button onclick="randomizeAll()">Randomize All</button>
+                    <button onclick="resetCustom()">Reset</button>
+                </div>
+            </div>
+            <div class="custom-avatar-display">
+                <div id="customAvatarDisplay"></div>
+            </div>
+        </div>
+
+        <!-- Features -->
+        <div class="demo-section">
+            <h2 class="section-title">Features</h2>
+            <div class="feature-list">
+                <div class="feature-item">
+                    <div class="feature-title">✨ Deterministic</div>
+                    <div class="feature-desc">Same name always generates the same avatar</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-title">🎨 8 Skin Tones</div>
+                    <div class="feature-desc">Diverse and inclusive color palette</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-title">💇 8 Hair Styles</div>
+                    <div class="feature-desc">Bald, short, long, curly, ponytail, spiky, wavy, buzzcut</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-title">🌈 9 Hair Colors</div>
+                    <div class="feature-desc">Natural and vibrant color options</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-title">👁️ 4 Eye Shapes</div>
+                    <div class="feature-desc">Round, almond, wide, squint</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-title">🎯 6 Eye Colors</div>
+                    <div class="feature-desc">Brown, blue, green, gray, purple variations</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-title">😊 6 Expressions</div>
+                    <div class="feature-desc">Neutral, smile, big smile, sad, surprised, smirk</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-title">👓 7 Accessories</div>
+                    <div class="feature-desc">Glasses, sunglasses, beard, mustache, hat, headphones</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-title">🎨 SVG Format</div>
+                    <div class="feature-desc">Scalable, lightweight, inline-ready</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-title">⚡ Pure JS</div>
+                    <div class="feature-desc">No dependencies, works everywhere</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-title">🎲 Custom Options</div>
+                    <div class="feature-desc">Override any feature manually</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-title">🌟 Background</div>
+                    <div class="feature-desc">Solid colors or gradients</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Usage Example -->
+        <div class="demo-section">
+            <h2 class="section-title">Usage Example</h2>
+            <div class="code-block">
+<pre>import { generateCharacterAvatar, AvatarOptions } from './characterAvatarGenerator.js';
+
+// Generate from name (deterministic)
+const avatar1 = generateCharacterAvatar('John Doe');
+
+// Generate with custom size
+const avatar2 = generateCharacterAvatar('Jane Smith', {}, 128);
+
+// Generate with custom options
+const avatar3 = generateCharacterAvatar('Alex Johnson', {
+    skinTone: AvatarOptions.skinTones[2],
+    hairStyle: 'curly',
+    hairColor: AvatarOptions.hairColors[4],
+    mouthExpression: 'smile',
+    accessory: 'glasses'
+});
+
+// Insert into DOM
+document.getElementById('avatar').innerHTML = avatar1;</pre>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { generateCharacterAvatar, AvatarOptions } from '../src/utils/characterAvatarGenerator.js';
+
+        // Sample names to generate
+        const sampleNames = [
+            'Alice Johnson', 'Bob Smith', 'Carol Williams', 'David Brown',
+            'Emma Davis', 'Frank Miller', 'Grace Wilson', 'Henry Moore',
+            'Isabel Taylor', 'Jack Anderson', 'Kate Thomas', 'Liam Jackson'
+        ];
+
+        // Generate sample avatars
+        function generateSamples() {
+            const container = document.getElementById('sampleAvatars');
+            container.innerHTML = sampleNames.map(name => `
+                <div class="avatar-card">
+                    <div class="avatar-display">
+                        ${generateCharacterAvatar(name, {}, 120)}
+                    </div>
+                    <div class="avatar-name">${name}</div>
+                </div>
+            `).join('');
+        }
+
+        // Populate dropdowns
+        function populateDropdowns() {
+            const skinToneSelect = document.getElementById('skinTone');
+            AvatarOptions.skinTones.forEach((color, i) => {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = `Tone ${i + 1}`;
+                option.style.background = color;
+                skinToneSelect.appendChild(option);
+            });
+
+            const hairColorSelect = document.getElementById('hairColor');
+            AvatarOptions.hairColors.forEach((color, i) => {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = `Color ${i + 1}`;
+                option.style.background = color;
+                hairColorSelect.appendChild(option);
+            });
+
+            const eyeColorSelect = document.getElementById('eyeColor');
+            AvatarOptions.eyeColors.forEach((color, i) => {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = `Color ${i + 1}`;
+                option.style.background = color;
+                eyeColorSelect.appendChild(option);
+            });
+
+            const hairStyleSelect = document.getElementById('hairStyle');
+            AvatarOptions.hairStyles.forEach(style => {
+                const option = document.createElement('option');
+                option.value = style;
+                option.textContent = style.charAt(0).toUpperCase() + style.slice(1);
+                hairStyleSelect.appendChild(option);
+            });
+
+            const eyeShapeSelect = document.getElementById('eyeShape');
+            AvatarOptions.eyeShapes.forEach(shape => {
+                const option = document.createElement('option');
+                option.value = shape;
+                option.textContent = shape.charAt(0).toUpperCase() + shape.slice(1);
+                eyeShapeSelect.appendChild(option);
+            });
+
+            const eyebrowShapeSelect = document.getElementById('eyebrowShape');
+            AvatarOptions.eyebrowShapes.forEach(shape => {
+                const option = document.createElement('option');
+                option.value = shape;
+                option.textContent = shape.charAt(0).toUpperCase() + shape.slice(1);
+                eyebrowShapeSelect.appendChild(option);
+            });
+
+            const mouthExpressionSelect = document.getElementById('mouthExpression');
+            AvatarOptions.mouthExpressions.forEach(expr => {
+                const option = document.createElement('option');
+                option.value = expr;
+                option.textContent = expr.charAt(0).toUpperCase() + expr.slice(1);
+                mouthExpressionSelect.appendChild(option);
+            });
+
+            const accessorySelect = document.getElementById('accessory');
+            AvatarOptions.accessories.forEach(acc => {
+                const option = document.createElement('option');
+                option.value = acc;
+                option.textContent = acc.charAt(0).toUpperCase() + acc.slice(1);
+                accessorySelect.appendChild(option);
+            });
+        }
+
+        // Generate custom avatar
+        window.generateCustomAvatar = function() {
+            const seed = document.getElementById('seedInput').value;
+            const options = {};
+
+            const skinToneIdx = document.getElementById('skinTone').value;
+            if (skinToneIdx !== '') options.skinTone = AvatarOptions.skinTones[skinToneIdx];
+
+            const hairColorIdx = document.getElementById('hairColor').value;
+            if (hairColorIdx !== '') options.hairColor = AvatarOptions.hairColors[hairColorIdx];
+
+            const eyeColorIdx = document.getElementById('eyeColor').value;
+            if (eyeColorIdx !== '') options.eyeColor = AvatarOptions.eyeColors[eyeColorIdx];
+
+            const hairStyle = document.getElementById('hairStyle').value;
+            if (hairStyle) options.hairStyle = hairStyle;
+
+            const eyeShape = document.getElementById('eyeShape').value;
+            if (eyeShape) options.eyeShape = eyeShape;
+
+            const eyebrowShape = document.getElementById('eyebrowShape').value;
+            if (eyebrowShape) options.eyebrowShape = eyebrowShape;
+
+            const mouthExpression = document.getElementById('mouthExpression').value;
+            if (mouthExpression) options.mouthExpression = mouthExpression;
+
+            const accessory = document.getElementById('accessory').value;
+            if (accessory) options.accessory = accessory;
+
+            const avatar = generateCharacterAvatar(seed, options, 200);
+            document.getElementById('customAvatarDisplay').innerHTML = avatar;
+        };
+
+        // Randomize all fields
+        window.randomizeAll = function() {
+            const randomName = sampleNames[Math.floor(Math.random() * sampleNames.length)];
+            document.getElementById('seedInput').value = randomName;
+
+            // Reset all selects to random
+            document.querySelectorAll('select').forEach(select => select.value = '');
+
+            generateCustomAvatar();
+        };
+
+        // Reset custom avatar
+        window.resetCustom = function() {
+            document.getElementById('seedInput').value = 'Custom Avatar';
+            document.querySelectorAll('select').forEach(select => select.value = '');
+            generateCustomAvatar();
+        };
+
+        // Initialize
+        generateSamples();
+        populateDropdowns();
+        generateCustomAvatar();
+    </script>
+</body>
+</html>
