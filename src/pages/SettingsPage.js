@@ -191,6 +191,7 @@ class SettingsPage extends BasePage {
         return this.renderPageWithSidebar(`
             <div class="page-header">
                 <h2>Player Management</h2>
+                <p class="page-subtitle">Select your activity, add players, and manage your roster</p>
             </div>
 
             ${players.length === 0 ? this.renderWelcomeGuide() : ''}
