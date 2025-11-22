@@ -17,9 +17,6 @@ class PositionSelector extends BaseComponent {
     }
 
     render() {
-        // Check if any position has comparisons
-        const hasAnyComparisons = Object.values(this.progress).some(p => p.completed > 0);
-
         return `
             <div class="position-selector" role="region" aria-label="Position selection">
                 <div class="position-selector__header">
@@ -38,18 +35,6 @@ class PositionSelector extends BaseComponent {
                                     <span class="shortcuts__text">Quick keys: <kbd>A</kbd> left • <kbd>D</kbd> right • <kbd>W</kbd> draw</span>
                                 </div>
                             </div>
-                        </div>
-                        <div class="position-selector__header-actions">
-                            <button
-                                type="button"
-                                class="btn btn-secondary position-selector__reset-all-btn"
-                                id="${ELEMENT_IDS.RESET_ALL_BTN}"
-                                title="${hasAnyComparisons ? 'Reset all comparisons for all positions' : 'No comparisons to reset'}"
-                                aria-label="Reset all comparisons"
-                                ${!hasAnyComparisons ? 'disabled' : ''}>
-                                ${getIcon('refresh', { size: 16, className: 'btn-icon' })}
-                                Reset All
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -163,12 +148,6 @@ class PositionSelector extends BaseComponent {
     }
 
     onMount() {
-        // Reset All button
-        const resetAllBtn = this.container.querySelector(`#${ELEMENT_IDS.RESET_ALL_BTN}`);
-        if (resetAllBtn && this.onResetAll) {
-            resetAllBtn.addEventListener('click', () => this.onResetAll());
-        }
-
         // Position cards
         const positionCards = this.container.querySelectorAll('.position-card');
         positionCards.forEach(card => {
