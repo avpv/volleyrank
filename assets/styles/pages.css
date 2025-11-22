@@ -188,7 +188,7 @@
     grid-template-columns: 1fr auto 1fr;
     gap: var(--spacing-6);
     align-items: stretch;
-    max-width: 1400px;
+    max-width: 1800px;
     margin: 0 auto;
 }
 
