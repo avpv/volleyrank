@@ -185,10 +185,10 @@
 /* Comparison Cards Grid */
 .comparison-cards {
     display: grid;
-    grid-template-columns: 1fr auto 1fr;
-    gap: var(--spacing-6);
+    grid-template-columns: 1fr 200px 1fr;
+    gap: var(--spacing-8);
     align-items: stretch;
-    max-width: 1800px;
+    max-width: 100%;
     margin: 0 auto;
 }
 
@@ -1585,8 +1585,8 @@
 
 .comparison-cards {
     display: grid;
-    grid-template-columns: 1fr auto 1fr;
-    gap: var(--spacing-6);
+    grid-template-columns: 1fr 200px 1fr;
+    gap: var(--spacing-8);
     align-items: stretch;
     width: 100%;
 }
