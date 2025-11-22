@@ -235,29 +235,32 @@
     box-shadow: 0 0 0 4px rgba(47, 129, 247, 0.2);
 }
 
-/* Player Avatar - Bold and Prominent */
+/* Player Avatar - Bold and Prominent with SVG Support */
 .comparison-cards .player-avatar {
     width: 96px;
     height: 96px;
-    font-size: var(--font-size-3xl);
-    font-weight: var(--font-weight-bold);
     border-radius: var(--radius-lg);
     margin-bottom: var(--spacing-5);
-    background: linear-gradient(135deg, var(--color-brand-primary) 0%, var(--color-brand-secondary) 100%);
-    color: white;
     border: 3px solid var(--color-border-default);
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all var(--duration-default) cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 12px rgba(47, 129, 247, 0.2);
-    letter-spacing: 0.02em;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+    background-color: var(--color-surface-base);
+}
+
+.comparison-cards .player-avatar svg {
+    width: 100%;
+    height: 100%;
+    display: block;
 }
 
 .comparison-cards .player-card:hover .player-avatar {
     border-color: var(--color-brand-primary);
-    transform: scale(1.1);
-    box-shadow: 0 6px 20px rgba(47, 129, 247, 0.35);
+    transform: scale(1.08);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
 }
 
 /* Player Info Section */
@@ -2373,7 +2376,6 @@
     .comparison-cards .player-avatar {
         width: 72px;
         height: 72px;
-        font-size: var(--font-size-2xl);
         margin-bottom: var(--spacing-4);
     }
 
@@ -2522,7 +2524,6 @@
     .comparison-cards .player-avatar {
         width: 56px;
         height: 56px;
-        font-size: var(--font-size-xl);
         margin-bottom: var(--spacing-3);
     }
 

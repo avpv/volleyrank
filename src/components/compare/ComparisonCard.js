@@ -1,5 +1,6 @@
 import BaseComponent from '../BaseComponent.js';
 import { getIcon } from '../base/Icons.js';
+import { generateAvatar } from '../../utils/avatarGenerator.js';
 
 class ComparisonCard extends BaseComponent {
     constructor(container, props = {}) {
@@ -18,13 +19,8 @@ class ComparisonCard extends BaseComponent {
 
         if (!player) return '';
 
-        // Get player initials for avatar
-        const initials = player.name
-            .split(' ')
-            .map(word => word[0])
-            .join('')
-            .toUpperCase()
-            .substring(0, 2);
+        // Generate SVG avatar based on player name
+        const avatarSvg = generateAvatar(player.name, 96);
 
         const rating = Math.round(player.ratings[positionKey]);
         const comparisons = player.comparisons[positionKey];
@@ -39,7 +35,9 @@ class ComparisonCard extends BaseComponent {
                 role="button">
                 <div class="keyboard-hint" aria-hidden="true">${keyboardHint}</div>
 
-                <div class="player-avatar comparison-avatar">${initials}</div>
+                <div class="player-avatar comparison-avatar">
+                    ${avatarSvg}
+                </div>
 
                 <div class="player-info-section">
                     <h4 class="player-name">${this.escape(player.name)}</h4>
