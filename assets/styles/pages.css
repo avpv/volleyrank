@@ -810,6 +810,12 @@
     padding-top: 0;
 }
 
+.page-header+.position-selector-container .position-selector {
+    border-top: none;
+    margin-top: var(--spacing-8);
+    padding-top: 0;
+}
+
 /* Position Selector Header */
 .position-selector__header {
     margin-bottom: var(--spacing-6);
@@ -1306,6 +1312,12 @@
 }
 
 .page-header+.comparison-area {
+    border-top: none;
+    margin-top: var(--spacing-8);
+    padding-top: 0;
+}
+
+.page-header+.comparison-area-container .comparison-area {
     border-top: none;
     margin-top: var(--spacing-8);
     padding-top: 0;
